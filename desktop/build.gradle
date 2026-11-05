@@ -1,41 +1,61 @@
-apply plugin: "kotlin"
+apply plugin: 'application'
 
-sourceCompatibility = 1.8
-sourceSets.main.java.srcDirs = [ "src/" ]
-sourceSets.main.resources.srcDirs = ["../android/assets"]
+sourceSets.main.java.srcDirs = ['src/']
+sourceSets.main.resources.srcDirs = ['../android/assets']
 
-project.ext.mainClassName = "com.mantkowicz.light.game.desktop.DesktopLauncher"
-project.ext.assetsDir = new File("../android/assets")
+def assetsDir = rootProject.file('android/assets')
+def isMac = System.getProperty('os.name').toLowerCase().contains('mac')
+def desktopJvmArgs = ['--enable-native-access=ALL-UNNAMED'] + (isMac ? ['-XstartOnFirstThread'] : [])
 
-task run(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    workingDir = project.assetsDir
-    ignoreExitValue = true
+application {
+    mainClass = 'com.mantkowicz.light.game.desktop.DesktopLauncher'
+    applicationName = appName
+    // macOS -XstartOnFirstThread is handled at runtime by StartupHelper, keeping start scripts portable
+    applicationDefaultJvmArgs = ['--enable-native-access=ALL-UNNAMED']
 }
 
-task debug(dependsOn: classes, type: JavaExec) {
-    main = project.mainClassName
-    classpath = sourceSets.main.runtimeClasspath
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+}
+
+// libGDX ships LWJGL 3.3.3, which warns about an unsupported JNI version on JDK 24+.
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == 'org.lwjgl') useVersion lwjglVersion
+    }
+}
+
+tasks.named('run', JavaExec) {
+    workingDir = assetsDir
     standardInput = System.in
-    workingDir = project.assetsDir
     ignoreExitValue = true
+    jvmArgs desktopJvmArgs
+}
+
+tasks.register('debug', JavaExec) {
+    group = 'application'
+    mainClass = application.mainClass
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = assetsDir
+    standardInput = System.in
+    ignoreExitValue = true
+    jvmArgs desktopJvmArgs
     debug = true
 }
 
-task dist(type: Jar) {
+tasks.register('dist', Jar) {
+    group = 'distribution'
+    description = 'Builds a runnable fat jar.'
+    archiveBaseName = appName
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
-        attributes 'Main-Class': project.mainClassName
+        attributes 'Main-Class': application.mainClass, 'Enable-Native-Access': 'ALL-UNNAMED'
     }
     dependsOn configurations.runtimeClasspath
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     with jar
 }
-
-
-dist.dependsOn classes
-
-eclipse.project.name = appName + "-desktop"

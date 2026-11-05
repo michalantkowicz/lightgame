@@ -1,1 +1,20 @@
-include 'desktop', 'android', 'core'
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+        google()
+    }
+}
+
+rootProject.name = 'light-game'
+
+include 'core', 'desktop', 'html'
+
+// The Android module needs an Android SDK. Include it only when one is configured
+// (ANDROID_HOME / ANDROID_SDK_ROOT or sdk.dir in local.properties).
+def localProps = new Properties()
+def localPropsFile = file('local.properties')
+if (localPropsFile.exists()) localPropsFile.withInputStream { localProps.load(it) }
+if (localProps.getProperty('sdk.dir') || System.getenv('ANDROID_HOME') || System.getenv('ANDROID_SDK_ROOT')) {
+    include 'android'
+}

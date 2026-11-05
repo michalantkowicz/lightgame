@@ -1,0 +1,10 @@
+# GWT output: *.cache.* files have content hashes in their names and never change,
+# so browsers may cache them forever; *.nocache.js and index.html must always be fresh.
+<IfModule mod_headers.c>
+    <FilesMatch "\.cache\.">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "(\.nocache\.js|\.html)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>

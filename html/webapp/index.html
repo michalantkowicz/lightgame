@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>Light Game</title>
+    <link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="embed-html"></div>
+<script src="html/html.nocache.js"></script>
+<script>
+    // keep keyboard focus on the game and stop the page from scrolling / showing a context menu
+    var embed = document.getElementById('embed-html');
+    embed.addEventListener('mousedown', function (e) { e.preventDefault(); window.focus(); }, false);
+    embed.addEventListener('contextmenu', function (e) { e.preventDefault(); }, false);
+</script>
+</body>
+</html>

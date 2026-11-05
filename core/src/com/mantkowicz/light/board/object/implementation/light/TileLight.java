@@ -44,7 +44,7 @@ public class TileLight extends TileObject {
     void moveLight(Tile tile, int rotation) {
         Vector2 lightPosition = new Vector2(light.getX(), light.getY());
         Vector2 newLightPosition = lightPosition.cpy().add(0, tile.getHeight() / 2f - BORDER_OFFSET);
-        Vector2 offset = newLightPosition.cpy().sub(lightPosition).rotate(rotation);
+        Vector2 offset = newLightPosition.cpy().sub(lightPosition).rotateDeg(rotation);
         light.setPosition(light.getX() + offset.x, light.getY() + offset.y);
     }
 

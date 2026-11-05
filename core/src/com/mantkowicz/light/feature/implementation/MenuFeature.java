@@ -98,7 +98,7 @@ public class MenuFeature implements Feature {
         float firstElementRotation = (BUTTON_OFFSET_DEGREES * (elementsCount - 1)) / 2f;
 
         return new Vector2(0, MENU_RADIUS)
-                .rotate(firstElementRotation - (elementIndex * BUTTON_OFFSET_DEGREES))
+                .rotateDeg(firstElementRotation - (elementIndex * BUTTON_OFFSET_DEGREES))
                 .sub(button.getWidth() / 2f, button.getHeight() / 2f);
     }
 }

@@ -16,10 +16,9 @@ public class GameStage extends AbstractStage {
     }
 
     public void fadeOut() {
-        shaderProgram.begin();
+        shaderProgram.bind();
         shaderProgram.setUniformf("saturation", 0.25f);
         shaderProgram.setUniformf("brightness", 0.25f);
-        shaderProgram.end();
 
         getBatch().setShader(shaderProgram);
     }

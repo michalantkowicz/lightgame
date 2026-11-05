@@ -1,0 +1,120 @@
+// HTML5 / WebGL build via the libGDX GWT backend.
+//   ./gradlew html:dist      -> optimized build in html/build/dist
+//   ./gradlew html:serve     -> builds and serves it at http://localhost:8080
+//   ./gradlew html:superDev  -> GWT Super Dev Mode (recompiles on page reload) at http://localhost:8080
+
+sourceSets.main.java.srcDirs = ['src/']
+sourceSets.main.java.exclude '**/emu/**' // GWT super-source, compiled only by GWT
+sourceSets.main.resources.srcDirs = ['src/']
+
+configurations {
+    gwtCompiler
+}
+
+dependencies {
+    implementation project(':core')
+    implementation "org.gwtproject:gwt-user:$gwtVersion"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
+    implementation "com.badlogicgames.gdx:gdx-box2d-gwt:$gdxVersion"
+
+    // GWT compiles from Java sources, so every module it translates needs its sources jar
+    implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
+    implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
+    implementation "com.badlogicgames.gdx:gdx-box2d:$gdxVersion:sources"
+    implementation "com.badlogicgames.gdx:gdx-box2d-gwt:$gdxVersion:sources"
+    implementation "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion:sources"
+
+    gwtCompiler "org.gwtproject:gwt-dev:$gwtVersion"
+    gwtCompiler "org.gwtproject:gwt-codeserver:$gwtVersion"
+}
+
+// keep the GWT toolchain in sync with the requested version (gdx-backend-gwt pulls an older gwt-user)
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == 'org.gwtproject' && requested.name.startsWith('gwt-')) useVersion gwtVersion
+    }
+}
+
+def gwtModule = 'com.mantkowicz.light.game.GdxDefinition'
+def gwtSuperdevModule = 'com.mantkowicz.light.game.GdxDefinitionSuperdev'
+def distDir = layout.buildDirectory.dir('dist')
+def gwtSourceDirs = files('src', project(':core').file('src'))
+def gwtClasspath = gwtSourceDirs + sourceSets.main.compileClasspath + configurations.gwtCompiler
+def assetsDir = rootProject.file('android/assets')
+
+tasks.register('copyWebapp', Copy) {
+    from 'webapp'
+    into distDir
+}
+
+tasks.register('compileGwt', JavaExec) {
+    group = 'build'
+    description = 'Compiles the game to JavaScript with GWT.'
+    dependsOn 'copyWebapp', 'classes'
+    mainClass = 'com.google.gwt.dev.Compiler'
+    classpath = gwtClasspath
+    workingDir = projectDir // gdx.assetpath is resolved relative to this
+    maxHeapSize = '2g'
+    inputs.files(gwtSourceDirs).withPropertyName('gwtSources')
+    inputs.dir(assetsDir).withPropertyName('assets')
+    inputs.files(sourceSets.main.compileClasspath).withPropertyName('gwtLibs')
+    outputs.dir(distDir.map { it.dir('html') })
+    outputs.dir(distDir.map { it.dir('assets') })
+    outputs.cacheIf { true }
+    doFirst {
+        args '-war', distDir.get().asFile.absolutePath,
+             '-workDir', layout.buildDirectory.dir('gwt/work').get().asFile.absolutePath,
+             '-deploy', layout.buildDirectory.dir('gwt/deploy').get().asFile.absolutePath,
+             '-extra', layout.buildDirectory.dir('gwt/extra').get().asFile.absolutePath,
+             '-sourceLevel', '17',
+             '-style', 'OBFUSCATED',
+             '-optimize', '9',
+             '-localWorkers', "${Runtime.runtime.availableProcessors()}",
+             '-failOnError',
+             gwtModule
+    }
+}
+
+tasks.register('dist') {
+    group = 'distribution'
+    description = 'Builds the deployable HTML5 version into html/build/dist.'
+    dependsOn 'compileGwt'
+    doLast { logger.lifecycle("HTML5 build ready in ${distDir.get().asFile}") }
+}
+
+def jwebserver = "${System.getProperty('java.home')}/bin/jwebserver"
+
+tasks.register('serve', Exec) {
+    group = 'application'
+    description = 'Serves html/build/dist at http://localhost:8080 (Ctrl+C to stop).'
+    dependsOn 'dist'
+    doFirst { logger.lifecycle('Open http://localhost:8080 in your browser') }
+    commandLine jwebserver, '-p', '8080', '-b', '127.0.0.1', '-d', distDir.get().asFile.absolutePath
+}
+
+tasks.register('superDev', JavaExec) {
+    group = 'application'
+    description = 'Runs GWT Super Dev Mode; serve html/build/dist with `html:serveDev` and reload to recompile.'
+    dependsOn 'copyWebapp', 'classes'
+    mainClass = 'com.google.gwt.dev.codeserver.CodeServer'
+    classpath = gwtClasspath
+    workingDir = projectDir
+    maxHeapSize = '2g'
+    doFirst {
+        def workDir = layout.buildDirectory.dir('gwt/superdev').get().asFile
+        workDir.mkdirs()
+        args '-launcherDir', distDir.get().asFile.absolutePath,
+             '-workDir', workDir.absolutePath,
+             '-src', file('src').absolutePath,
+             '-src', project(':core').file('src').absolutePath,
+             '-sourceLevel', '17',
+             gwtSuperdevModule
+    }
+}
+
+tasks.register('serveDev', Exec) {
+    group = 'application'
+    description = 'Serves html/build/dist without compiling (use together with superDev).'
+    dependsOn 'copyWebapp'
+    commandLine jwebserver, '-p', '8080', '-b', '127.0.0.1', '-d', distDir.get().asFile.absolutePath
+}

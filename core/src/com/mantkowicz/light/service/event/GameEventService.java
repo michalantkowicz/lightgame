@@ -20,7 +20,7 @@ public class GameEventService {
         if (containsEvent(eventType)) {
             List<GameEvent> eventList = queue.get(eventType);
             for (int i = 0; i < eventList.size(); i++) {
-                if (type.isInstance(eventList.get(i))) {
+                if (isOfType(eventList.get(i), type)) {
                     return (T) eventList.get(i);
                 }
             }
@@ -34,7 +34,7 @@ public class GameEventService {
         if (containsEvent(eventType)) {
             List<GameEvent> eventList = queue.get(eventType);
             for (int i = 0; i < eventList.size(); i++) {
-                if (type.isInstance(eventList.get(i))) {
+                if (isOfType(eventList.get(i), type)) {
                     return (T) eventList.remove(i);
                 }
             }
@@ -45,6 +45,14 @@ public class GameEventService {
     public boolean containsEvent(GameEventType eventType) {
         createIfDoesNotExist(eventType);
         return queue.containsKey(eventType) && !queue.get(eventType).isEmpty();
+    }
+
+    /**
+     * Exact class match instead of {@code Class.isInstance}, which GWT (HTML5 build) does not support.
+     * Event classes are concrete leaves, so this is equivalent.
+     */
+    private static boolean isOfType(GameEvent gameEvent, Class<?> type) {
+        return gameEvent.getClass() == type;
     }
 
     private void createIfDoesNotExist(GameEventType eventType) {

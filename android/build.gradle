@@ -1,92 +1,88 @@
+apply plugin: 'com.android.application'
+
+configurations { natives }
+
+def targetJava = (rootProject.property('javaVersion') as String).toInteger()
+
 android {
-    buildToolsVersion "29.0.3"
-    compileSdkVersion 29
+    namespace = 'com.mantkowicz.light.game'
+    compileSdk = 36
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             java.srcDirs = ['src']
             aidl.srcDirs = ['src']
-            renderscript.srcDirs = ['src']
             res.srcDirs = ['res']
             assets.srcDirs = ['assets']
             jniLibs.srcDirs = ['libs']
         }
-
     }
-    packagingOptions {
-        exclude 'META-INF/robovm/ios/robovm.xml'
+    packaging {
+        resources.excludes += ['META-INF/robovm/ios/robovm.xml']
     }
     defaultConfig {
-        applicationId "com.mantkowicz.light.game"
-        minSdkVersion 14
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        applicationId = 'com.mantkowicz.light.game'
+        minSdk = 21
+        targetSdk = 36
+        versionCode = 1
+        versionName = '1.0'
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.toVersion(targetJava)
+        targetCompatibility = JavaVersion.toVersion(targetJava)
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
 
+dependencies {
+    implementation project(':core')
+    implementation "com.badlogicgames.gdx:gdx-backend-android:$gdxVersion"
+    ['armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'].each { abi ->
+        natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-$abi"
+        natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-$abi"
+    }
+}
 
-// called every time gradle gets executed, takes the native dependencies of
-// the natives configuration, and extracts them to the proper libs/ folders
-// so they get packed with the APK.
-task copyAndroidNatives {
+// Extracts the native libraries from the natives configuration into libs/<abi>
+// so they get packed into the APK.
+tasks.register('copyAndroidNatives') {
+    def nativeJars = configurations.natives
+    def libsDir = file('libs')
+    inputs.files(nativeJars)
+    outputs.dir(libsDir)
     doFirst {
-        file("libs/armeabi/").mkdirs()
-        file("libs/armeabi-v7a/").mkdirs()
-        file("libs/arm64-v8a/").mkdirs()
-        file("libs/x86_64/").mkdirs()
-        file("libs/x86/").mkdirs()
-
-        configurations.natives.files.each { jar ->
-            def outputDir = null
-            if (jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
-            if (jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
-            if(jar.name.endsWith("natives-armeabi.jar")) outputDir = file("libs/armeabi")
-            if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
-            if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
-            if(outputDir != null) {
-                copy {
+        nativeJars.files.each { jar ->
+            def abi = ['arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'].find { jar.name.endsWith("natives-${it}.jar") }
+            if (abi != null) {
+                project.copy {
                     from zipTree(jar)
-                    into outputDir
-                    include "*.so"
+                    into new File(libsDir, abi)
+                    include '*.so'
                 }
             }
         }
     }
 }
 
-tasks.whenTaskAdded { packageTask ->
-    if (packageTask.name.contains("package")) {
-        packageTask.dependsOn 'copyAndroidNatives'
-    }
+tasks.matching { it.name.contains('merge') && it.name.contains('JniLibFolders') }.configureEach {
+    dependsOn 'copyAndroidNatives'
 }
 
-task run(type: Exec) {
-    def path
-    def localProperties = project.file("../local.properties")
+tasks.register('run', Exec) {
+    group = 'application'
+    def sdkDir = System.getenv('ANDROID_HOME') ?: System.getenv('ANDROID_SDK_ROOT')
+    def localProperties = rootProject.file('local.properties')
     if (localProperties.exists()) {
-        Properties properties = new Properties()
-        localProperties.withInputStream { instr ->
-            properties.load(instr)
-        }
-        def sdkDir = properties.getProperty('sdk.dir')
-        if (sdkDir) {
-            path = sdkDir
-        } else {
-            path = "$System.env.ANDROID_HOME"
-        }
-    } else {
-        path = "$System.env.ANDROID_HOME"
+        def props = new Properties()
+        localProperties.withInputStream { props.load(it) }
+        sdkDir = props.getProperty('sdk.dir') ?: sdkDir
     }
-
-    def adb = path + "/platform-tools/adb"
-    commandLine "$adb", 'shell', 'am', 'start', '-n', 'com.mygdx.game/com.mygdx.game.AndroidLauncher'
+    commandLine "$sdkDir/platform-tools/adb", 'shell', 'am', 'start', '-n',
+            'com.mantkowicz.light.game/com.mantkowicz.light.game.AndroidLauncher'
 }
-
-eclipse.project.name = appName + "-android"
