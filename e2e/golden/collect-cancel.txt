@@ -10,3 +10,4 @@ menu buttons: 0
 text on game stage: "60" at=(1484.0,3530.6) alpha=1.0 color=ffffffff
 text on ui stage: "COLLECT" at=(1056.0,2546.6) alpha=1.0 color=ffffffff
 inventories: player=[-, -, -] chest=[Lighter, -]
+reopened window: chest=[Lighter, -] player=[-, -, -]

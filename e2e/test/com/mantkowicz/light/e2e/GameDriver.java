@@ -214,6 +214,19 @@ public final class GameDriver {
         return "player=" + describe(player.getInventory()) + " chest=" + describe(chest.getInventory());
     }
 
+    /** What the open collect window shows, slot by slot ("-" is an empty slot). */
+    public String collectWindowSlots() {
+        return "chest=" + describeSlots(CollectItemType.COLLECTIBLE_ITEM) + " player=" + describeSlots(CollectItemType.COLLECTING_ITEM);
+    }
+
+    private String describeSlots(CollectItemType type) {
+        List<String> slots = new ArrayList<>();
+        for (CollectItem slot : collectSlots(type)) {
+            slots.add(slot.getItem() == null ? "-" : slot.getItem().getClass().getSimpleName());
+        }
+        return slots.toString();
+    }
+
     private static String describe(Inventory inventory) {
         List<String> slots = new ArrayList<>();
         for (Item item : inventory.getItems()) {

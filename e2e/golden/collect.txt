@@ -35,6 +35,7 @@ menu buttons: 0
 text on game stage: "60" at=(1484.0,3530.6) alpha=1.0 color=ffffffff
 text on ui stage: "COLLECT" at=(1056.0,2546.6) alpha=1.0 color=ffffffff
 inventories: player=[Lighter, -, -] chest=[-, -]
+reopened window: chest=[-, -] player=[Lighter, -, -]
 ## walked away
 crash: none
 player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
@@ -42,6 +43,6 @@ dog: cell=(9,22)
 chest: cell=(10,24)
 camera: at=(1184.0,3010.6) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
-torch: at=(1184.0,3323.0) distance=241.3 color=555555ff
+torch: at=(1184.0,3323.0) distance=237.0 color=555555ff
 menu buttons: 0
 text on game stage: "60" at=(1484.0,3530.6) alpha=1.0 color=ffffffff

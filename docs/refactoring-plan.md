@@ -726,5 +726,7 @@ blocked by it.
 - `GameDriver` gained `clickButton(text)`, `clickChestSlot(i)`, `clickPlayerSlot(i)`, `inventories()`, and snapshots list labels on the
   UI stage (empty in every other scenario, so no other golden changed). `collect` was re-recorded; `collect-cancel` is new.
 - B4 (debug lines over the window) is left for its own PR.
-- **Found:** CANCEL removes the window but keeps the swapped slots on screen. The COLLECT button reopens the **same** window, which then
-  shows the lighter in the player's slot although the inventories didn't change, and OK would save it. Not fixed here (B7, to decide).
+- **B7, found and fixed in the same PR:** CANCEL removed the window but kept the swapped slots, and the COLLECT button reopened the
+  **same** window, which showed the lighter in the player's slot although the inventories didn't change (OK would then save it).
+  `OpenCollectWindowButtonListener` now takes a `Supplier<CollectWindow>` and opens a fresh window on every click. Both collect tests
+  reopen the window and record its slots (`reopened window: ...`); before the fix the cancel test showed the bug.

@@ -16,9 +16,8 @@ public class PlayerCollectResolver implements CollectResolver {
 
     @Override
     public void resolveCollect(Collectible collectible) {
-        CollectWindow collectWindow = new CollectWindow(context, player, collectible);
-
-        OpenCollectWindowButtonListener openCollectWindowButtonListener = new OpenCollectWindowButtonListener(collectWindow, context.getUiStage());
+        OpenCollectWindowButtonListener openCollectWindowButtonListener = new OpenCollectWindowButtonListener(
+                () -> new CollectWindow(context, player, collectible), context.getUiStage());
 
         ActionButton actionButton = new ActionButton(context, "COLLECT", openCollectWindowButtonListener);
 
