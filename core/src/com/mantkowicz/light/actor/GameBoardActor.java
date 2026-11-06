@@ -16,17 +16,28 @@ import static com.mantkowicz.light.board.tile.TilePoint.CENTER;
 public abstract class GameBoardActor extends GameActor implements Interactive {
     private final List<Interaction> interactions = new ArrayList<>();
     private final BoardService boardService;
+    private final String description;
     private Tile tile;
 
-    protected GameBoardActor(GameActorType gameActorType, GameContext context) {
+    protected GameBoardActor(GameActorType gameActorType, GameContext context, String description) {
         super(gameActorType);
+        this.description = description;
         this.boardService = context.getBoardService();
 
-        interactions.add(new DescriptionInteraction(context.getResourcesService(), context.getGameEventService(), this, getDescription()));
-        addListener(new GameBoardActorListener(this, context.getGameEventService()));
+        interactions.add(new DescriptionInteraction(context.getResourcesService(), context.getGameEventService(), this, description));
+        addListener(new OpenMenuOnHoldListener(this, context.getGameEventService()));
     }
 
-    protected abstract String getDescription();
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Shows the actor's image, looked up by name in the resources (atlas region or preloaded texture).
+     */
+    protected void createAvatar(GameContext context, String avatarName) {
+        createAvatar(context.getResourcesService().getTexture(avatarName));
+    }
 
     public Tile getTile() {
         return tile;

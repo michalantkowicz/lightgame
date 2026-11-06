@@ -1,16 +1,15 @@
-package com.mantkowicz.light.actor.implementation.player;
+package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.camera.LookAtMeEvent;
 
-public class PlayerClickListener extends ClickListener {
+public class LookAtMeOnClickListener extends ClickListener {
     private GameBoardActor boardGameActor;
     private GameEventService gameEventService;
 
-    public PlayerClickListener(GameBoardActor boardGameActor, GameEventService gameEventService) {
+    public LookAtMeOnClickListener(GameBoardActor boardGameActor, GameEventService gameEventService) {
         this.boardGameActor = boardGameActor;
         this.gameEventService = gameEventService;
     }

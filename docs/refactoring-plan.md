@@ -262,10 +262,10 @@ Principles:
 | # | Question | Options | Recommendation |
 |---|----------|---------|----------------|
 | D1 | Replace the 13 configuration interfaces with one `GameContext` class? Nothing is lost: every getter stays, in one class. | (a) one `GameContext`; (b) constructor injection of individual services everywhere; (c) keep interfaces but trim them | **(a)**: least code and clear to read. (b) makes some constructors take 6–7 parameters. |
-| D2 | The switched‑off "scared of darkness" feature (§3.3)? | (a) delete (git history keeps it); (b) keep, switched off by a named flag in `Debug` instead of a commented‑out line; (c) re‑enable (behaviour change, goes to Phase 7) | **(b)** |
+| D2 | The switched‑off "scared of darkness" feature (§3.3)? | (a) delete (git history keeps it); (b) keep, switched off by a named flag in `Debug` instead of a commented‑out line; (c) re‑enable (behaviour change, goes to Phase 7) | **Answered: (b)**, keep it |
 | D4 | Replace Dijkstra with BFS in path finding? | (a) BFS: same path **length**, but when several shortest paths exist it may pick a different one; (b) keep Dijkstra and only tidy it | **(a)**. Today's tie‑breaking depends on `HashMap` iteration order, so it isn't a designed behaviour. |
 | D5 | Fix bugs B1–B4 in Phase 7? | per bug: fix / leave / delete the feature | B1: **fix** by adding a real UI stage (see 7.1). B2: **fix** by drawing sprites. B3: **fix** body creation. B4: **fix** by turning the debug lines into a `Debug` switch that is off. |
-| D6 | Debug tools (C11): one place for all of them? | (a) a `Debug` class with `public static boolean` switches (camera box, bright ambient light, table debug lines, FPS label, darkness exclamation), values set so the game behaves exactly as today; (b) the same, but read from launcher arguments or system properties; (c) leave them where they are | **(a)**. Simple, works in HTML5, and turning a tool on is one edit in one file. |
+| D6 | Debug tools (C11): one place for all of them? | (a) a `Debug` class with `public static boolean` switches (camera box, bright ambient light, table debug lines, FPS label, darkness exclamation), values set so the game behaves exactly as today; (b) the same, but read from launcher arguments or system properties; (c) leave them where they are | **Answered: (a), with per‑object control**: switch each tool separately, and outline only chosen actor classes (e.g. only `Dog`), not all‑or‑nothing. |
 
 (D3 became K8.)
 
@@ -275,9 +275,9 @@ Each item stays unless you approve its removal. Answer per item; "keep" needs no
 
 | # | Item | If removed | Step | Recommendation |
 |---|------|-----------|------|----------------|
-| K1 | Stray `new RayHandler(world)` in `Main` (never used, leaks a framebuffer) | One line and an import go | 3.6 | **remove**: it's a leak, not a tool |
-| K2 | Commented‑out code: `Tile` (actor‑era constructor, `setBackground`, `prepare`), `GameScreen` ambient line, `CameraTrackingFeature` debug line, `Player` `addPlugin` | Debug lines become `Debug` switches (D6) either way; the rest is deleted | 3.4/3.6 | **remove** the `Tile` ones (git keeps them) |
-| K3 | `System.out.println` placeholders in `Chest.beforeCollect/afterCollect` and `Lighter.use/unuse` | The methods stay; only the printing goes (or becomes `Gdx.app.log`) | 3.6 | **switch to `Gdx.app.log`** so they show up as debug output on every platform |
+| K1 | Stray `new RayHandler(world)` in `Main` (never used, leaks a framebuffer) | One line and an import go | 3.6 | **Answered: remove.** Not needed for new lights: they use `GameScreen`'s `RayHandler` through `context.getRayHandler()` |
+| K2 | Commented‑out code: `Tile` (actor‑era constructor, `setBackground`, `prepare`), `GameScreen` ambient line, `CameraTrackingFeature` debug line, `Player` `addPlugin` | Debug lines become `Debug` switches (D6) either way; the rest is deleted | 3.4/3.6 | **Answered: remove** (debug lines become `Debug` switches) |
+| K3 | `System.out.println` placeholders in `Chest.beforeCollect/afterCollect` and `Lighter.use/unuse` | The methods stay; only the printing goes (or becomes `Gdx.app.log`) | 3.6 | **Answered: `Gdx.app.log`** |
 | K4 | "Add to stage by event": `AddToStageEvent`, `StageFeature`, `StageType`, `AbstractStage.getStageType()`, `GameActorDefinition`, `DescriptionDefinition` | `DescriptionInteraction` adds the tooltip to the notification stage directly (7 types for one `addActor` call today) | 4.1 | your call: keep if other code should add actors to stages without knowing them |
 | K5 | `CollectResolver` interface (one implementation) and `OpenCollectWindowButtonListener` | `CollectPlugin` builds the window and button itself | 4.2 | keep if non‑player collectors are planned |
 | K6 | Notification tools: `NotificationBuilder`, `NotificationAnimation` + `FadeOutAnimation`, `EnlargeAndFadeOutAnimation`, `MoveUpperAndFadeOutAnimation`, `NotificationType`, `NotificationStyle` | One `Notification.warning(..)` factory; animations become plain libGDX actions | 4.3 | keep (they're tools); only fix the font leak |
@@ -292,7 +292,7 @@ Each item stays unless you approve its removal. Answer per item; "keep" needs no
 | K15 | `BoardPath` (wraps a `List`; `isEmpty()` and `exists()` both exist; `setPath`/`getLastNode` unused) | `getPath` returns `List<Tile>` | 5.6 | keep, but make `exists()` mean `!isEmpty()` explicitly |
 | K16 | `ShaderType` (one value) | `GameStage` loads its shader by path | 5.2 | keep if more shaders are planned |
 | K17 | `MenuCloseEvent` payload (pointer position) | Payload‑less event | 2.1 | keep, with a named getter `getPointer()` |
-| K18 | Unused assets (§3.3) | Files deleted; `"lighter.png"` leaves the preload list | 3.6 | your call per file |
+| K18 | Unused assets (§3.3) | Files deleted; `"lighter.png"` leaves the preload list | 7.5 | **Answered: remove at the very end** of the refactoring (step 7.5) |
 | K19 | `Plugin` vs `Feature`: identical interfaces (A10) | One interface | O1 | keep both: the names say per‑actor vs per‑screen |
 
 ---
@@ -448,7 +448,8 @@ Make each kind of class look the same (§3.5, principles in §4). **Nothing is r
 - Make the instance "constants" `private static final` (`MenuFeature`).
 
 **3.4 Debug tools in one place** (Risk L) **[D6]**
-- Create `debug/Debug.java` with `public static boolean` switches, set so the game behaves exactly as today:
+- Create `debug/Debug.java`: an enum of tools that can be switched on one by one, plus a set of actor classes to outline (scene2d
+  `actor.setDebug(true)` outlines one actor, so e.g. only dogs can be outlined). Defaults keep the game exactly as today:
   - `CAMERA_TRACKING_BOX = false` → `CameraTrackingFeature` calls `cameraActor.setDebug(..)` when true;
   - `BRIGHT_AMBIENT_LIGHT = false` → `GameScreen.prepareLights` uses the commented‑out ambient value when true;
   - `FPS_LABEL = true` → the FPS feature is registered when true;
@@ -465,11 +466,11 @@ Make each kind of class look the same (§3.5, principles in §4). **Nothing is r
 - `Notification.getCenter()` reuses the same calculation as `GameActor.getCenter()` (a static helper, or `Notification` extends `GameActor` if
   that changes nothing else).
 
-**3.6 Small fixes and approved clean‑ups** (Risk L) **[K1, K2, K3, K18]**
+**3.6 Small fixes and approved clean‑ups** (Risk L) **[K1, K2, K3]**
 - `TileLight` passes `TileObjectType.LIGHT` instead of `CHEST` (the field is never read, so nothing changes).
 - `final` on fields that are never reassigned; consistent field names (`boardGameActor` vs `gameBoardActor`).
-- Only the items approved in K1, K2, K3 and K18. For K18, re‑run the reference check: for each removed file, `grep -rF <name>` over
-  `core/src`, `android/assets` and `html` must return nothing.
+- K1: delete the stray `RayHandler` in `Main`. K2: delete commented‑out code (debug lines were already turned into switches in 3.4).
+  K3: `System.out.println` becomes `Gdx.app.log(<class name>, ..)`. K18 waits for 7.5.
 
 **▶ CP2**
 
@@ -605,6 +606,10 @@ extend it to the full flow:
 **7.4 B3: Walls.** In `WallTile`, create the body at the origin (`BodyDef` position `(0,0)`) with a `ChainShape` loop over the absolute polygon
 vertices, and delete the throwing method. Check this by temporarily putting a wall tile into a test map: torch light must be
 blocked by it.
+
+**7.5 Unused assets (K18, approved for the end).** Remove `android/assets/ui/`, `map2_outer.tmx`, `tiles.tsx`, `player_detective.png` and
+`lighter.png`, and `"lighter.png"` from the preload list in `ResourcesService`. For each removed file, `grep -rF <name>` over `core/src`,
+`android/assets` and `html` must return nothing.
 
 **▶ CP6**
 

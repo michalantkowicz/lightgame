@@ -11,12 +11,12 @@ import com.mantkowicz.light.service.event.implementation.MenuOpenEvent;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 
-public class GameBoardActorListener extends InputListener {
+public class OpenMenuOnHoldListener extends InputListener {
     private final GameBoardActor gameBoardActor;
     private final GameEventService gameEventService;
     private DelayAction menuOpenAction;
 
-    public GameBoardActorListener(GameBoardActor gameBoardActor, GameEventService gameEventService) {
+    public OpenMenuOnHoldListener(GameBoardActor gameBoardActor, GameEventService gameEventService) {
         this.gameBoardActor = gameBoardActor;
         this.gameEventService = gameEventService;
     }

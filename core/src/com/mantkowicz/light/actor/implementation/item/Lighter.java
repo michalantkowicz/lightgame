@@ -12,11 +12,14 @@ import static com.mantkowicz.light.actor.GameActorType.LIGHTER;
 import static com.mantkowicz.light.service.resources.ThumbnailType.DEFAULT;
 
 public class Lighter extends GameBoardActor implements Item, Collectible {
+    private static final String DESCRIPTION = "lighter";
+    private static final String THUMBNAIL_NAME = "lighter";
+
     private final TextureRegion thumbnail;
 
     public Lighter(GameContext context) {
-        super(LIGHTER, context);
-        thumbnail = context.getResourcesService().getTexture("lighter");
+        super(LIGHTER, context, DESCRIPTION);
+        thumbnail = context.getResourcesService().getTexture(THUMBNAIL_NAME);
     }
 
     @Override
@@ -47,11 +50,6 @@ public class Lighter extends GameBoardActor implements Item, Collectible {
     @Override
     public Inventory getInventory() {
         return null;
-    }
-
-    @Override
-    protected String getDescription() {
-        return "lighter";
     }
 
     @Override
