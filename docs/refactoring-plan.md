@@ -451,7 +451,7 @@ Make each kind of class look the same (§3.5, principles in §4). **Nothing is r
 - Create `debug/Debug.java`: an enum of tools that can be switched on one by one, plus a set of actor classes to outline (scene2d
   `actor.setDebug(true)` outlines one actor, so e.g. only dogs can be outlined). Defaults keep the game exactly as today:
   - `CAMERA_TRACKING_BOX = false` → `CameraTrackingFeature` calls `cameraActor.setDebug(..)` when true;
-  - `BRIGHT_AMBIENT_LIGHT = false` → `GameScreen.prepareLights` uses the commented‑out ambient value when true;
+  - ~~`BRIGHT_AMBIENT_LIGHT`~~ dropped: the commented‑out ambient line has the same value as the active one (see §8);
   - `FPS_LABEL = true` → the FPS feature is registered when true;
   - `TABLE_DEBUG_LINES = true` → `CollectWindow` calls `backgroundTable.debug()` when true (today's behaviour, B4; Phase 7 sets it to false);
   - `DARKNESS_EXCLAMATION = false` (D2).
@@ -676,3 +676,15 @@ blocked by it.
   (`// ClickListener listener = new BoardClickListener(this, configuration);`). It is left untouched until K2 is decided.
 - **Exception to "don't keep the context":** `PlayerCollectResolver` stores the `GameContext`, because it builds the window and button later,
   when a collect happens. Its shape is decided in 4.2 (K5).
+
+### 2026‑11‑06, Phase 3
+
+- 3.1: the actor shape is `super(type, context, DESCRIPTION)` plus `createAvatar(context, AVATAR_NAME)`, not the planned
+  `super(context, avatarName, description)`: `GameActorType` stays until K9, and `Lighter` has no avatar. `createAvatar(Texture)` is kept.
+  Actor listeners were renamed after what they do: `OpenMenuOnHoldListener` (was `GameBoardActorListener`) and `LookAtMeOnClickListener`
+  (was `PlayerClickListener`, which works for any board actor).
+- 3.4: **no "bright ambient light" tool.** The commented‑out line in `GameScreen.prepareLights` sets ambient alpha `1f`; the active line sets
+  `2 * 0.5f`, which is also `1f`. It is removed with the other commented‑out code (K2). `Debug` holds four tools (camera box, FPS label,
+  collect window lines, darkness exclamation) plus per‑class and per‑actor outlines. A throwaway test with every tool on and `Dog`
+  outlined ran a walk and the menu without a crash.
+

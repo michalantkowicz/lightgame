@@ -12,6 +12,7 @@ import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Collecting;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.Item;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.plugin.implementation.CenterActorByCameraPlugin;
@@ -25,6 +26,7 @@ import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTIBLE_ITEM;
 import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTING_ITEM;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.ABLE_TO_PUT;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.UNCHOSEN;
+import static com.mantkowicz.light.debug.Debug.Tool.COLLECT_WINDOW_LINES;
 
 public class CollectWindow extends GameActor {
     private final int WIDTH = 600;
@@ -55,7 +57,9 @@ public class CollectWindow extends GameActor {
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("black.png")));
         backgroundTable.setBackground(backgroundDrawable);
         backgroundTable.setPosition(-backgroundTable.getWidth() / 2f, -backgroundTable.getHeight() / 2f);
-        backgroundTable.debug();
+        if (Debug.isOn(COLLECT_WINDOW_LINES)) {
+            backgroundTable.debug();
+        }
         addActor(backgroundTable);
 
         mainTable = new Table();

@@ -3,10 +3,13 @@ package com.mantkowicz.light.feature.implementation;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.implementation.CameraActor;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.camera.LookAtMeEvent;
+
+import static com.mantkowicz.light.debug.Debug.Tool.CAMERA_TRACKING_BOX;
 
 
 public class CameraTrackingFeature implements Feature {
@@ -24,7 +27,9 @@ public class CameraTrackingFeature implements Feature {
 
         this.cameraActor = new CameraActor(context.getCamera());
         cameraActor.setPosition(actor.getCenter());
-//        cameraActor.setDebug(DISTANCE_LEFT_RIGHT, DISTANCE_TOP_BOTTOM);
+        if (Debug.isOn(CAMERA_TRACKING_BOX)) {
+            cameraActor.setDebug(DISTANCE_LEFT_RIGHT, DISTANCE_TOP_BOTTOM);
+        }
         context.getGameStage().addActor(cameraActor);
     }
 

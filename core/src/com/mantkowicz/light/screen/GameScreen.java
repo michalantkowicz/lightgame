@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.service.BoardService;
 import com.mantkowicz.light.board.tile.Tile;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.implementation.CameraTrackingFeature;
 import com.mantkowicz.light.feature.implementation.FPSFeature;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
+import static com.mantkowicz.light.debug.Debug.Tool.FPS_LABEL;
 
 public class GameScreen implements Screen {
     private final ResourcesService resourcesService;
@@ -88,7 +90,9 @@ public class GameScreen implements Screen {
         }
         addFeature(new MenuFeature(context));
         addFeature(new StageFeature(context));
-        addFeature(new FPSFeature(context, new Vector2(300, 520)));
+        if (Debug.isOn(FPS_LABEL)) {
+            addFeature(new FPSFeature(context, new Vector2(300, 520)));
+        }
     }
 
     private RayHandler prepareLights() {

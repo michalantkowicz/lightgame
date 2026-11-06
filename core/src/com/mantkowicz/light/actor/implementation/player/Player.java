@@ -9,6 +9,7 @@ import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.LookAtMeOnClickListener;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.PlayerCollectResolver;
 import com.mantkowicz.light.plugin.implementation.BoardMovementPlugin;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import static com.mantkowicz.light.actor.GameActorType.PLAYER;
 import static com.mantkowicz.light.actor.implementation.player.Status.IDLE;
 import static com.mantkowicz.light.actor.implementation.player.Status.MOVEMENT;
+import static com.mantkowicz.light.debug.Debug.Tool.DARKNESS_EXCLAMATION;
 
 public class Player extends GameBoardActor implements Collecting {
     private static final String AVATAR_NAME = "player.png";
@@ -44,7 +46,9 @@ public class Player extends GameBoardActor implements Collecting {
         addPlugin(boardMovementPlugin);
 
         PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);
-//        addPlugin(playerNotificationPlugin);
+        if (Debug.isOn(DARKNESS_EXCLAMATION)) {
+            addPlugin(playerNotificationPlugin);
+        }
 
         PlayerCollectResolver collectResolver = new PlayerCollectResolver(this, context);
         CollectPlugin collectPlugin = new CollectPlugin(collectResolver, context);

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.actor.implementation.player.Status;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public abstract class GameActor extends Group {
         this.gameActorType = gameActorType;
         this.id = ID_COUNTER++;
         pluginsQueue = new ArrayList<>();
+        Debug.outlineIfChosen(this);
     }
 
     public GameActorType getGameActorType() {
