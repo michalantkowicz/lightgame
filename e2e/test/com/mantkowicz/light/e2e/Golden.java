@@ -13,11 +13,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  * Compares a test's recorded text with e2e/golden/&lt;name&gt;.txt. Goldens describe today's behaviour; a mismatch
  * means behaviour changed. Re-record only on purpose: ./gradlew e2e:test -Dgolden.update=true
  */
-final class Golden {
+public final class Golden {
     private Golden() {
     }
 
-    static void assertMatches(String name, String actual) {
+    public static void assertMatches(String name, String actual) {
         Path golden = Path.of(System.getProperty("golden.dir"), name + ".txt");
         if (Boolean.parseBoolean(System.getProperty("golden.update"))) {
             write(golden, actual);

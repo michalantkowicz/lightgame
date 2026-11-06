@@ -1,0 +1,68 @@
+## menu opening
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=239.9 color=555555ff
+menu buttons: 1
+  button at=(1073.0,2927.6) scale=0.7 alpha=0.4
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff
+text on menu stage: "button" at=(1049.2,2951.4) alpha=0.4 color=ffffffff
+## menu open
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=241.3 color=555555ff
+menu buttons: 1
+  button at=(1073.0,2966.0) scale=1.0 alpha=1.0
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff
+text on menu stage: "button" at=(1038.0,3001.0) alpha=1.0 color=ffffffff
+## hovering button
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=239.6 color=555555ff
+menu buttons: 1
+  button at=(1073.0,2966.0) scale=1.5 alpha=1.0
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff
+text on menu stage: "button" at=(1020.5,3018.5) alpha=1.0 color=ffffffff
+## description after 1 s
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=239.9 color=555555ff
+menu buttons: 0
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff
+text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(1096.0,2839.0) alpha=1.0 color=ffffffff
+## description after 3 s
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=240.4 color=555555ff
+menu buttons: 0
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff
+text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(1096.0,2839.0) alpha=0.5 color=ffffffff
+## description after 4.1 s
+crash: none
+player: cell=(10,22) at=(1170.0,2831.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(1184.0,2880.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=242.6 color=555555ff
+menu buttons: 0
+text on game stage: "60" at=(1484.0,3400.0) alpha=1.0 color=ffffffff

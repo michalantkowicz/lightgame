@@ -1,0 +1,46 @@
+frame 0: player cell=(10,22) at=(1258.1,2881.8)
+frame 5: player cell=(10,22) at=(1281.0,2895.0)
+frame 10: player cell=(11,23) at=(1252.3,2878.4)
+frame 15: player cell=(11,23) at=(1192.9,2844.2)
+frame 20: player cell=(11,23) at=(1170.0,2831.0)
+frame 25: player cell=(10,22) at=(1141.3,2814.4)
+frame 30: player cell=(10,22) at=(1081.9,2780.2)
+frame 35: player cell=(10,22) at=(1059.0,2767.0)
+frame 40: player cell=(9,22) at=(1030.3,2783.6)
+frame 45: player cell=(9,22) at=(970.9,2817.8)
+frame 50: player cell=(9,22) at=(948.0,2831.0)
+frame 55: player cell=(8,22) at=(919.3,2847.6)
+frame 60: player cell=(8,22) at=(859.9,2881.8)
+frame 65: player cell=(8,22) at=(837.0,2895.0)
+frame 70: player cell=(7,23) at=(837.0,2895.0)
+frame 75: player cell=(7,23) at=(837.0,2895.0)
+frame 80: player cell=(7,23) at=(837.0,2895.0)
+frame 85: player cell=(7,23) at=(837.0,2895.0)
+frame 90: player cell=(7,23) at=(837.0,2895.0)
+frame 95: player cell=(7,23) at=(837.0,2895.0)
+frame 100: player cell=(7,23) at=(837.0,2895.0)
+frame 105: player cell=(7,23) at=(837.0,2895.0)
+frame 110: player cell=(7,23) at=(837.0,2895.0)
+frame 115: player cell=(7,23) at=(837.0,2895.0)
+frame 120: player cell=(7,23) at=(837.0,2895.0)
+frame 125: player cell=(7,23) at=(837.0,2895.0)
+frame 130: player cell=(7,23) at=(837.0,2895.0)
+frame 135: player cell=(7,23) at=(837.0,2895.0)
+frame 140: player cell=(7,23) at=(837.0,2895.0)
+frame 145: player cell=(7,23) at=(837.0,2895.0)
+frame 150: player cell=(7,23) at=(837.0,2895.0)
+frame 155: player cell=(7,23) at=(837.0,2895.0)
+frame 160: player cell=(7,23) at=(837.0,2895.0)
+frame 165: player cell=(7,23) at=(837.0,2895.0)
+frame 170: player cell=(7,23) at=(837.0,2895.0)
+frame 175: player cell=(7,23) at=(837.0,2895.0)
+## rerouted
+crash: none
+player: cell=(7,23) at=(837.0,2895.0) status=IDLE
+dog: cell=(9,22)
+chest: cell=(10,24)
+camera: at=(977.3,2916.0) zoom=1.0 view=800.0x1280.0
+game stage shaded: false
+torch: at=(1184.0,3323.0) distance=235.9 color=555555ff
+menu buttons: 0
+text on game stage: "60" at=(1277.3,3436.0) alpha=1.0 color=ffffffff

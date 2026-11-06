@@ -98,7 +98,7 @@ public final class GameDriver {
 
     /** Presses on an actor and keeps holding; follow with {@link #seconds} and a release. */
     public void press(Kind kind) {
-        pointer = gameScreenPosition(actor(kind).getCenter());
+        movePointer(gameScreenPosition(actor(kind).getCenter()));
         inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
     }
 
@@ -140,7 +140,7 @@ public final class GameDriver {
     }
 
     private void tap(Vector2 screenPosition) {
-        pointer = screenPosition;
+        movePointer(screenPosition);
         inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
         frames(1);
         inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, 0);
@@ -148,9 +148,15 @@ public final class GameDriver {
     }
 
     private void dragTo(Vector2 screenPosition) {
-        pointer = screenPosition;
+        movePointer(screenPosition);
         inputProcessor().touchDragged((int) pointer.x, (int) pointer.y, 0);
         frames(1);
+    }
+
+    /** The game also polls the pointer position (the menu checks what is under it on release). */
+    private void movePointer(Vector2 screenPosition) {
+        pointer = screenPosition;
+        game.movePointer((int) pointer.x, (int) pointer.y);
     }
 
     // ---------------------------------------------------------------------------------------------- observations
@@ -264,7 +270,8 @@ public final class GameDriver {
         snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
         snapshot.line("chest: cell=%s", chestCell());
         OrthographicCamera camera = (OrthographicCamera) gameStage().getCamera();
-        snapshot.line("camera: at=%s zoom=%s", cameraPosition(), Snapshot.number(camera.zoom));
+        snapshot.line("camera: at=%s zoom=%s view=%sx%s", cameraPosition(), Snapshot.number(camera.zoom),
+                Snapshot.number(camera.viewportWidth), Snapshot.number(camera.viewportHeight));
         snapshot.line("game stage shaded: %s", isGameStageShaded());
         for (Light light : lights()) {
             snapshot.line("torch: at=%s distance=%s color=%s", Snapshot.point(light.getX(), light.getY()),
