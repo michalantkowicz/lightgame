@@ -1,10 +1,12 @@
 package com.mantkowicz.light.e2e;
 
 import box2dLight.Light;
+import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -27,14 +30,17 @@ import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.map.TileChest;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
+import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
 
@@ -136,6 +142,31 @@ public final class GameDriver {
 
     public void clickPlayerSlot(int index) {
         tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTING_ITEM).get(index)));
+    }
+
+    /** Puts a wall tile on a cell, as if the map had one there (the map has no walls; WallTile only builds its physics body). */
+    public void addWall(Cell cell) {
+        ResourcesService resources = screenField("resourcesService");
+        World world = screenField("world");
+        WallTile wall = new WallTile(resources);
+        float x = cell.col() * COLUMN_WIDTH;
+        float y = (cell.row() - (cell.col() % 2) / 2f) * CELL_HEIGHT;
+        wall.setPosition(x, y);
+        wall.prepare(new GameContext(resources, null, null, world, null, null, null, null, null, null, null));
+        frames(1);
+    }
+
+    /** Would a light standing on one cell reach the centre of another? (A temporary light, removed afterwards.) */
+    public boolean lightReaches(Cell from, Cell to) {
+        Vector2 source = cellCenter(from);
+        Vector2 target = cellCenter(to);
+        PointLight light = new PointLight(screenField("rayHandler"), 128, Color.WHITE, source.dst(target) * 2, source.x, source.y);
+        try {
+            light.update();
+            return light.contains(target.x, target.y);
+        } finally {
+            light.remove();
+        }
     }
 
     /** Releases the pointer where it currently is. */

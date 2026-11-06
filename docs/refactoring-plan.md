@@ -743,3 +743,11 @@ blocked by it.
   furniture. The old magic `74`/`64` were indeed half of the 148×128 tile size.
 - New `BoardDrawingTest` (golden `board-drawing`) records every draw call of the board through a recording `SpriteBatch`: 44 backgrounds,
   then the 19 sprites.
+
+### 2026‑11‑06, Phase 7, B3 (walls)
+
+- Fixed as its own PR: `WallTile` creates its static body at the world origin with a `ChainShape` loop over the tile's absolute polygon
+  (the physics world and the lights use stage units). The throwing `Tile.stageToLocalCoordinates` is deleted; `getLeftBottom()` stays.
+- New `WallTest`: `GameDriver.addWall(cell)` builds a `WallTile` in the running game (the map has no walls) and `lightReaches(from, to)`
+  checks with a temporary `PointLight`. A wall on (10,21) shadows (10,20) from (10,22) and doesn't block (12,22). Against the old code
+  the test fails with `UnsupportedOperationException`.
