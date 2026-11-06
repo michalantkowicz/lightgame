@@ -60,14 +60,11 @@ public class Player extends GameBoardActor implements Collecting {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        ShaderProgram shader = batch.getShader();
-        if (shader != null) {
-            batch.setShader(null);
-            super.draw(batch, parentAlpha);
-            batch.setShader(shader);
-        } else {
-            super.draw(batch, parentAlpha);
-        }
+        // The player is drawn with the batch's default shader, not the game stage's custom one.
+        ShaderProgram stageShader = batch.getShader();
+        batch.setShader(null);
+        super.draw(batch, parentAlpha);
+        batch.setShader(stageShader);
     }
 
     @Override
