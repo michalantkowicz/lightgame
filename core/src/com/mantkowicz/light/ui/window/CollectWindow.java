@@ -2,11 +2,13 @@ package com.mantkowicz.light.ui.window;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Collecting;
@@ -26,6 +28,7 @@ import static com.mantkowicz.light.actor.GameActorType.COLLECT_WINDOW;
 import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTIBLE_ITEM;
 import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTING_ITEM;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.ABLE_TO_PUT;
+import static com.mantkowicz.light.ui.window.CollectWindowItemState.CHOSEN;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.UNCHOSEN;
 import static com.mantkowicz.light.debug.Debug.Tool.COLLECT_WINDOW_LINES;
 
@@ -34,6 +37,7 @@ public class CollectWindow extends GameActor {
     private static final int HEIGHT = 600;
     private static final int PADDING = 20;
     private static final int PADDING_ITEM = 20;
+    private static final CollectItem NO_ITEM = null;
     private final Collectible collectible;
     private final Collecting collecting;
     private final Skin skin;
@@ -54,7 +58,7 @@ public class CollectWindow extends GameActor {
         Table backgroundTable = new Table();
         backgroundTable.setSize(context.getMenuStage().getWidth() * 2, context.getMenuStage().getHeight() * 2);
         backgroundTable.setTouchable(Touchable.enabled);
-        backgroundTable.addListener(new StopClickThroughClickListener());
+        backgroundTable.addListener(stopClickThrough());
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("black.png")));
         backgroundTable.setBackground(backgroundDrawable);
         backgroundTable.setPosition(-backgroundTable.getWidth() / 2f, -backgroundTable.getHeight() / 2f);
@@ -67,7 +71,7 @@ public class CollectWindow extends GameActor {
         mainTable.setTouchable(Touchable.enabled);
         mainTable.setSize(WIDTH, HEIGHT);
 
-        mainTable.addListener(new StopClickThroughClickListener());
+        mainTable.addListener(stopClickThrough());
 
         TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("table_background.png")));
         mainTable.setBackground(textureRegionDrawable);
@@ -115,8 +119,19 @@ public class CollectWindow extends GameActor {
         TextButton cancelButton = new TextButton("CANCEL", skin, "no");
         TextButton okButton = new TextButton("OK", skin, "ok");
 
-        cancelButton.addListener(new CollectWindowCancelListener(this));
-        okButton.addListener(new CollectWindowOkListener(this));
+        cancelButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                remove();
+            }
+        });
+        okButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                saveState();
+                remove();
+            }
+        });
 
         Cell<TextButton> cancelButtonCell = buttonsTable.add(cancelButton);
         setItemPadding(cancelButtonCell);
@@ -131,13 +146,55 @@ public class CollectWindow extends GameActor {
         Table itemsTable = new Table();
         for (Item inventoryItem : inventory.getItems()) {
             CollectItem item = new CollectItem(resourcesService, collectItemType, inventoryItem);
-            item.addListener(new CollectWindowItemListener(this, item));
+            item.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    onItemClicked(item);
+                }
+            });
             collectItems.add(item);
 
             Cell<CollectItem> cell = itemsTable.add(item);
             setItemPadding(cell);
         }
         return itemsTable;
+    }
+
+    /**
+     * First click chooses an item, a click on a free slot swaps the chosen item there, a click on the chosen item unchooses it.
+     */
+    private void onItemClicked(CollectItem clickedItem) {
+        CollectWindowItemState itemState = clickedItem.getState();
+        if (UNCHOSEN.equals(itemState) && !isAnyItemChosen() && !clickedItem.isEmpty()) {
+            clickedItem.setState(CHOSEN);
+            setChosenItem(clickedItem);
+            onItemChosen();
+        } else if (ABLE_TO_PUT.equals(itemState) && isAnyItemChosen()) {
+            Item movedItem = chosenItem.removeItem();
+            Item replacedItem = clickedItem.removeItem();
+
+            clickedItem.setItem(movedItem);
+            chosenItem.setItem(replacedItem);
+
+            setChosenItem(NO_ITEM);
+            onItemUnchosen();
+        } else if (CHOSEN.equals(itemState)) {
+            clickedItem.setState(UNCHOSEN);
+            setChosenItem(NO_ITEM);
+            onItemUnchosen();
+        }
+    }
+
+    /**
+     * Swallows touches so they don't reach the board under the window.
+     */
+    private static ClickListener stopClickThrough() {
+        return new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        };
     }
 
     private void setItemPadding(Cell cell) {
