@@ -1,0 +1,64 @@
+# Builds the game and runs all tests on every push to master and on every pull request into master.
+#
+# `./gradlew build` compiles every module and runs every module's tests, so the
+# headless gameplay tests (e2e module, see docs/regression-testing.md) are
+# picked up automatically once they exist. `html:dist` compiles the HTML5
+# version with GWT, which catches Java code that cannot run in the browser.
+# No secrets needed.
+
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:        # every PR targeting master is tested before merge
+    branches: [master]
+  workflow_dispatch:   # also runnable by hand from the Actions tab
+
+# If you push again while a run is still going, cancel the older one.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      # GitHub's Ubuntu runners ship an Android SDK; settings.gradle includes the
+      # android module whenever one is configured. Hide it: CI tests core/desktop/html only.
+      ANDROID_HOME: ""
+      ANDROID_SDK_ROOT: ""
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Caches Gradle and downloaded dependencies between runs.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build and run tests
+        run: |
+          chmod +x gradlew
+          ./gradlew build --no-daemon
+
+      - name: Compile HTML5 version (GWT)
+        run: ./gradlew html:dist --no-daemon
+
+      # On failure only: save test reports and golden-file diffs so you can
+      # download them from the run page and see what broke.
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            **/build/reports/tests/
+            **/build/golden-actual/
+          retention-days: 7
+          if-no-files-found: ignore

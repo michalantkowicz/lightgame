@@ -1,0 +1,54 @@
+// Regression tests: the real game played headlessly (see docs/regression-testing.md) plus a few unit tests.
+// Test code only - this module produces nothing that ships with the game.
+//
+//   ./gradlew e2e:test                          run all tests
+//   ./gradlew e2e:test -Dgolden.update=true     re-record golden files (only when behaviour is meant to change)
+
+sourceSets.main.java.srcDirs = []
+sourceSets.test.java.srcDirs = ['test/']
+sourceSets.test.resources.srcDirs = []
+
+dependencies {
+    testImplementation project(':core')
+    testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+
+    testImplementation platform("org.junit:junit-bom:$junitVersion")
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+def goldenDir = file('golden')
+
+tasks.named('test', Test) {
+    useJUnitPlatform()
+    workingDir = rootProject.file('android/assets') // the game loads its assets relative to this
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    systemProperty 'golden.dir', goldenDir.absolutePath
+    systemProperty 'golden.actual.dir', layout.buildDirectory.dir('golden-actual').get().asFile.absolutePath
+    systemProperty 'golden.update', System.getProperty('golden.update', 'false')
+    inputs.dir(goldenDir).withPropertyName('goldens')
+    inputs.dir(rootProject.file('android/assets')).withPropertyName('assets')
+    testLogging {
+        events = ['failed']
+        exceptionFormat = 'full'
+    }
+}
+
+// Coverage of the game code (core) by these tests: ./gradlew e2e:test e2e:jacocoTestReport
+// -> e2e/build/reports/jacoco/test/html/index.html. Not a gate - a tool to find behaviour no test exercises.
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = '0.8.16'
+}
+tasks.named('jacocoTestReport', JacocoReport) {
+    dependsOn tasks.named('test')
+    def core = project(':core')
+    sourceDirectories.from = files(core.sourceSets.main.java.srcDirs)
+    classDirectories.from = files(core.sourceSets.main.output.classesDirs)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
