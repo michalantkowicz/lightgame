@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.actor.implementation.player.Status;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.Plugin;
@@ -56,7 +57,7 @@ public abstract class GameActor extends Group {
     }
 
     public Vector2 getCenter() {
-        return new Vector2(getX() + getWidth() / 2f, getY() + getHeight() / 2f);
+        return new Vector2(getX(Align.center), getY(Align.center));
     }
 
     public Status getStatus() {

@@ -10,21 +10,12 @@ import com.mantkowicz.light.notification.NotificationStyle;
 
 public class LabelFactory {
     public static Label createLabel(NotificationStyle notificationStyle, String text) {
-        LabelStyle labelStyle = new LabelStyle();
-        labelStyle.font = new BitmapFont(Gdx.files.internal("font.fnt"));
-        switch (notificationStyle) {
-            case DEFAULT:
-                labelStyle.fontColor = Color.WHITE;
-                break;
-            case WARNING:
-                labelStyle.fontColor = Color.FIREBRICK;
-                break;
-            default:
-                throw new IllegalArgumentException("There is no style defined for notification style: " + notificationStyle.name());
-        }
-        return new Label(text, labelStyle);
+        return createLabel(notificationStyle, null, text);
     }
 
+    /**
+     * @param background drawn behind the text, or {@code null} for none
+     */
     public static Label createLabel(NotificationStyle notificationStyle, Drawable background, String text) {
         LabelStyle labelStyle = new LabelStyle();
         labelStyle.background = background;
