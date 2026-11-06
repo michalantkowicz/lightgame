@@ -13,16 +13,16 @@ import com.mantkowicz.light.lights.factory.LightFactory;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.BORDER_LIGHT_POSITION;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.LIGHT_COLOR_HEX;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.LIGHT_TYPE;
-import static com.mantkowicz.light.board.object.TileObjectType.CHEST;
+import static com.mantkowicz.light.board.object.TileObjectType.LIGHT;
 
 public class TileLight extends TileObject {
     private static final float BORDER_OFFSET = 5f;
     private GameLight light;
 
-    private TileLightAttributes lightAttributes;
+    private final TileLightAttributes lightAttributes;
 
     public TileLight(MapProperties objectProperties) {
-        super(CHEST);
+        super(LIGHT);
         lightAttributes = new TileLightAttributes(objectProperties);
     }
 
@@ -54,9 +54,9 @@ public class TileLight extends TileObject {
     }
 
     private class TileLightAttributes {
-        private LightType type;
-        private Color color;
-        private BorderLightPosition borderPosition;
+        private final LightType type;
+        private final Color color;
+        private final BorderLightPosition borderPosition;
 
         public TileLightAttributes(MapProperties properties) {
             String typeLiteral = properties.get(LIGHT_TYPE.getValue(), "TORCH", String.class);

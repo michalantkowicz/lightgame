@@ -1,5 +1,6 @@
 package com.mantkowicz.light.actor.implementation.collectible;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.GameBoardActor;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import static com.mantkowicz.light.actor.GameActorType.CHEST;
 
 public class Chest extends GameBoardActor implements Collectible {
+    private static final String LOG_TAG = "Chest";
     private static final String AVATAR_NAME = "chest.png";
     private static final String DESCRIPTION = "chest";
     private static final int INVENTORY_SIZE = 2;
@@ -35,13 +37,13 @@ public class Chest extends GameBoardActor implements Collectible {
 
     @Override
     public void beforeCollect() {
-        System.out.println("I'll be collect!");
+        Gdx.app.log(LOG_TAG, "I'll be collect!");
         remove();
     }
 
     @Override
     public void afterCollect() {
-        System.out.println("I'm being collected!");
+        Gdx.app.log(LOG_TAG, "I'm being collected!");
         remove();
     }
 

@@ -28,8 +28,7 @@ public class TileSprite extends TileObject {
     public void prepare(Tile tile, GameContext context) {
         Image image = new Image(context.getResourcesService().getTexture(textureName));
         image.setPosition(74 - image.getWidth() / 2f + offset.x, 64 - image.getHeight() / 2f + offset.y);
-
-//        tile.addActor(image);
+        // TODO bug B2: the image is never drawn. It used to be added to the tile, but Tile is no longer an Actor.
     }
 
     @Override

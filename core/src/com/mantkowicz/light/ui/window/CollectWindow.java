@@ -40,7 +40,7 @@ public class CollectWindow extends GameActor {
     private final ResourcesService resourcesService;
     private final List<CollectItem> collectItems;
     private CollectItem chosenItem;
-    private Table mainTable;
+    private final Table mainTable;
 
     public CollectWindow(GameContext context, Collecting collecting, Collectible collectible) {
         super(COLLECT_WINDOW);

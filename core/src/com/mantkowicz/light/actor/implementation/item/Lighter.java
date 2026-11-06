@@ -1,5 +1,6 @@
 package com.mantkowicz.light.actor.implementation.item;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.GameBoardActor;
@@ -12,6 +13,7 @@ import static com.mantkowicz.light.actor.GameActorType.LIGHTER;
 import static com.mantkowicz.light.service.resources.ThumbnailType.DEFAULT;
 
 public class Lighter extends GameBoardActor implements Item, Collectible {
+    private static final String LOG_TAG = "Lighter";
     private static final String DESCRIPTION = "lighter";
     private static final String THUMBNAIL_NAME = "lighter";
 
@@ -24,12 +26,12 @@ public class Lighter extends GameBoardActor implements Item, Collectible {
 
     @Override
     public void use() {
-        System.out.println("TURN LIGHTER ON");
+        Gdx.app.log(LOG_TAG, "TURN LIGHTER ON");
     }
 
     @Override
     public void unuse() {
-        System.out.println("TURN LIGHTER OFF");
+        Gdx.app.log(LOG_TAG, "TURN LIGHTER OFF");
     }
 
     @Override

@@ -44,7 +44,7 @@ public class GameScreen implements Screen {
     private NotificationStage notificationStage;
     private Board board;
     private RayHandler rayHandler;
-    private List<Feature> features = new ArrayList<>();
+    private final List<Feature> features = new ArrayList<>();
 
     public GameScreen(ResourcesService resourcesService, GameEventService gameEventService, World world) {
         this.resourcesService = resourcesService;
@@ -98,7 +98,6 @@ public class GameScreen implements Screen {
     private RayHandler prepareLights() {
         RayHandler rayHandler = new RayHandler(world);
         rayHandler.setAmbientLight(0.02f, 0.02f, 0.02f, 2 * 0.5f);
-//        rayHandler.setAmbientLight(0.02f, 0.02f, 0.02f, 1f);
         return rayHandler;
     }
 

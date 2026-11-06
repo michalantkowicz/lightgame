@@ -4,7 +4,7 @@ import com.mantkowicz.light.board.tile.Tile;
 import com.mantkowicz.light.game.GameContext;
 
 public abstract class TileObject {
-    private TileObjectType objectType;
+    private final TileObjectType objectType;
 
     public TileObject(TileObjectType objectType) {
         this.objectType = objectType;

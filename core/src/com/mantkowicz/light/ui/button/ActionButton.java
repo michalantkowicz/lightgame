@@ -15,7 +15,7 @@ import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 public class ActionButton extends GameActor {
     private final Camera camera;
-    private TextButton button;
+    private final TextButton button;
 
     public ActionButton(GameContext context, String text, EventListener listener) {
         super(ACTION_BUTTON);
