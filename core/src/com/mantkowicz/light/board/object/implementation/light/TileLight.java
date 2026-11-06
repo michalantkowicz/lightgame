@@ -17,25 +17,40 @@ import static com.mantkowicz.light.board.object.TileObjectType.LIGHT;
 
 public class TileLight extends TileObject {
     private static final float BORDER_OFFSET = 5f;
-    private GameLight light;
+    private static final String DEFAULT_TYPE = "TORCH";
+    private static final String DEFAULT_COLOR_HEX = "555555";
 
-    private final TileLightAttributes lightAttributes;
+    private final LightType type;
+    private final Color color;
+    /** {@code null} when the light stands in the middle of the tile */
+    private final BorderLightPosition borderPosition;
+    private GameLight light;
 
     public TileLight(MapProperties objectProperties) {
         super(LIGHT);
-        lightAttributes = new TileLightAttributes(objectProperties);
+        String typeLiteral = objectProperties.get(LIGHT_TYPE.getValue(), DEFAULT_TYPE, String.class);
+        String colorLiteral = objectProperties.get(LIGHT_COLOR_HEX.getValue(), DEFAULT_COLOR_HEX, String.class);
+        String borderPositionLiteral = objectProperties.get(BORDER_LIGHT_POSITION.getValue(), null, String.class);
+
+        type = LightType.valueOf(typeLiteral);
+        color = Color.valueOf(colorLiteral);
+        borderPosition = (borderPositionLiteral != null) ? BorderLightPosition.valueOf(borderPositionLiteral) : null;
     }
 
     @Override
     public void prepare(Tile tile, GameContext context) {
-        light = LightFactory.createLight(context.getRayHandler(), lightAttributes.getType());
-        light.setColor(lightAttributes.getColor());
+        light = LightFactory.createLight(context.getRayHandler(), type);
+        light.setColor(color);
         light.setTile(tile);
         context.getGameStage().addActor(light);
 
-        if (lightAttributes.isLightBorder()) {
-            moveLight(tile, lightAttributes.getBorderPosition().getRotation());
+        if (isLightBorder()) {
+            moveLight(tile, borderPosition.getRotation());
         }
+    }
+
+    private boolean isLightBorder() {
+        return borderPosition != null;
     }
 
     /**
@@ -51,37 +66,5 @@ public class TileLight extends TileObject {
     @Override
     public boolean isAccessible() {
         return true;
-    }
-
-    private class TileLightAttributes {
-        private final LightType type;
-        private final Color color;
-        private final BorderLightPosition borderPosition;
-
-        public TileLightAttributes(MapProperties properties) {
-            String typeLiteral = properties.get(LIGHT_TYPE.getValue(), "TORCH", String.class);
-            String colorLiteral = properties.get(LIGHT_COLOR_HEX.getValue(), "555555", String.class);
-            String borderPositionLiteral = properties.get(BORDER_LIGHT_POSITION.getValue(), null, String.class);
-
-            type = LightType.valueOf(typeLiteral);
-            color = Color.valueOf(colorLiteral);
-            borderPosition = (borderPositionLiteral != null) ? BorderLightPosition.valueOf(borderPositionLiteral) : null;
-        }
-
-        boolean isLightBorder() {
-            return borderPosition != null;
-        }
-
-        public LightType getType() {
-            return type;
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-        public BorderLightPosition getBorderPosition() {
-            return borderPosition;
-        }
     }
 }
