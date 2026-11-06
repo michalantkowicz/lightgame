@@ -27,6 +27,15 @@ public class GameStage extends AbstractStage {
         getBatch().setShader(null);
     }
 
+    /**
+     * Disposes the fade shader too.
+     */
+    @Override
+    public void dispose() {
+        shaderProgram.dispose();
+        super.dispose();
+    }
+
     @Override
     public StageType getStageType() {
         return GAME_STAGE;

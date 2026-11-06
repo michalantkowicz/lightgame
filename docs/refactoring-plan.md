@@ -703,3 +703,18 @@ blocked by it.
   `CollectWindowOkListener`, `CollectWindowCancelListener` and `CollectWindowItemListener` became anonymous classes calling
   `CollectWindow` methods (`onItemClicked` holds the swap logic); `StopClickThroughClickListener` became `stopClickThrough()`.
   `OpenCollectWindowButtonListener` stays a named class (K5). The public `setChosenItem`/`getChosenItem`/`isAnyItemChosen` stay.
+
+### 2026‑11‑06, Phase 5
+
+- K9–K16 kept. D4 answered: **A\*, using gdx-ai** (`IndexedAStarPathFinder`, 1.8.2, the latest release). `BoardGraph` adapts the board
+  (cost 1 per step between accessible neighbours; heuristic = straight-line distance divided by the longest neighbour step, so it never
+  overestimates). Connections are built once, because accessibility is fixed at load time since 5.3. HTML5 needs the gdx-ai sources jar
+  and `<inherits name="com.badlogic.gdx.ai"/>`. Walk and reroute goldens (which record exact routes) are unchanged, and a throwaway test
+  matched A* path lengths against BFS for all 1,936 cell pairs (the map has 44 tiles).
+- 5.2: new `ResourcesService.getDrawable(name)`, used by `CollectWindow` and `CollectItem`.
+- 5.3: the tile texture property is `TileAttribute.TEXTURE_NAME`; the loader applies it before positioning the tile. Only floor tiles
+  carry it in the tileset, so walls are unaffected. `Array.toArray(Class)` is deprecated in libGDX 1.14; `toArray(Vector2[]::new)` is used.
+- 5.4: tiles now come out of the loader in cell order instead of `HashMap` order. Goldens are unchanged.
+- 5.6: `PhraseService` uses its own `RandomXS128`. Using `MathUtils.random` shifted the shared seeded sequence and changed the torch
+  flicker in the no-path golden. `MenuStage` has a `TODO bug B1` at its `addActor` check. `Stage.dispose()` calls `clear()`, which used
+  to trigger the menu interaction; with the `clear()` override gone, disposing the menu stage is safe.

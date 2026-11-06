@@ -69,8 +69,9 @@ public class BoardClickListener extends ClickListener {
     }
 
     private Tile resolveTile(float x, float y) {
+        Vector2 stagePoint = board.localToStageCoordinates(point.set(x, y));
         for (Tile tile : board.getTiles()) {
-            if (tile.doesContainPoint(board.localToStageCoordinates(point.set(x, y)))) {
+            if (tile.doesContainPoint(stagePoint)) {
                 return tile;
             }
         }

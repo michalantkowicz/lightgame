@@ -13,26 +13,26 @@ public class MenuStage extends AbstractStage {
         super(viewport);
     }
 
-    @Override
-    public void clear() {
-        MenuButton button = getButton();
+    /**
+     * Runs the interaction of the menu button under the pointer, if there is one.
+     */
+    public void interactWithButtonUnderPointer() {
+        MenuButton button = getButtonUnderPointer();
         if (button != null) {
             button.interact();
         }
-        super.clear();
     }
 
-    private MenuButton getButton() {
-        Vector2 pointerPosition = new Vector2(Gdx.input.getX(), Gdx.input.getY());
-        screenToStageCoordinates(pointerPosition);
+    private MenuButton getButtonUnderPointer() {
+        Vector2 pointerPosition = screenToStageCoordinates(new Vector2(Gdx.input.getX(), Gdx.input.getY()));
         Actor actor = hit(pointerPosition.x, pointerPosition.y, true);
-        if (actor != null) {
-            return (MenuButton) (actor.getParent()); //FIXME: this is bad style
-        } else {
-            return null;
+        if (actor != null && actor.getParent() instanceof MenuButton) {
+            return (MenuButton) actor.getParent();
         }
+        return null;
     }
 
+    // TODO bug B1: the collect flow adds its ActionButton here, so this throws (fixed in Phase 7)
     @Override
     public void addActor(Actor actor) {
         if (!(actor instanceof MenuButton)) {

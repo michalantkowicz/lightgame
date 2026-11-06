@@ -44,7 +44,6 @@ public class Board extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
-        toBack();
         for (Tile tile : tiles) {
             tile.draw(batch, parentAlpha);
         }

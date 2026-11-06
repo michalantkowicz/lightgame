@@ -4,7 +4,7 @@ import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
@@ -35,7 +35,7 @@ import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 import static com.mantkowicz.light.debug.Debug.Tool.FPS_LABEL;
 
-public class GameScreen implements Screen {
+public class GameScreen extends ScreenAdapter {
     private final ResourcesService resourcesService;
     private final GameEventService gameEventService;
     private final World world;
@@ -75,7 +75,7 @@ public class GameScreen implements Screen {
             tile.prepare(context);
         }
 
-        gameStage.addActor(board);
+        gameStage.getRoot().addActorAt(0, board); // drawn below everything else
 
         createFeatures(context);
     }
@@ -155,23 +155,10 @@ public class GameScreen implements Screen {
     }
 
     @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
     public void dispose() {
         gameStage.dispose();
+        notificationStage.dispose();
+        menuStage.dispose();
         rayHandler.dispose();
     }
 }
