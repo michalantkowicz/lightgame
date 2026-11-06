@@ -615,9 +615,13 @@ blocked by it.
 
 ### Optional
 
-- **O1.** Merge `Plugin` and `Feature` into one interface (A10, K19). Only if the human finds the two names confusing.
+**Decision (2026‑11‑06): both skipped.**
+
+- **O1.** Merge `Plugin` and `Feature` into one interface (A10, K19). Only if the human finds the two names confusing. **Skipped:** the two
+  names say per‑actor vs per‑screen.
 - **O2.** Give the UI its own `ScreenViewport` camera. `ActionButton` and `CollectWindow` would then not need `CenterActorByCameraPlugin`. This is a visible
-  behaviour change, because the UI would stop scaling with the world, so it needs a separate decision.
+  behaviour change, because the UI would stop scaling with the world, so it needs a separate decision. **Skipped:** the UI keeps scaling
+  with the world.
 
 ---
 
@@ -751,3 +755,13 @@ blocked by it.
 - New `WallTest`: `GameDriver.addWall(cell)` builds a `WallTile` in the running game (the map has no walls) and `lightReaches(from, to)`
   checks with a temporary `PointLight`. A wall on (10,21) shadows (10,20) from (10,22) and doesn't block (12,22). Against the old code
   the test fails with `UnsupportedOperationException`.
+
+### 2026‑11‑06, after Phase 7
+
+- **7.5 skipped (K18 changed to keep):** the human decided to keep every asset, because it isn't clear yet what will be needed.
+- **LWJGL 3.3.6 → 3.4.3 (own PR):** on JDK 24+ the desktop run printed "A terminally deprecated method in sun.misc.Unsafe has been
+  called" from LWJGL's memory code. LWJGL 3.4.3 still defaults to an `Unsafe` backend, but it ships an FFM backend for JDK 25+.
+  `DesktopLauncher` selects it with `Configuration.MEMORY_BACKEND.set("ffm")` when running on Java 25 or later; older JVMs keep the
+  default. The game was started for 45 s on JDK 25 with no warning and no error. LWJGL notes FFM is somewhat slower, which doesn't
+  matter for this game.
+- **O1 and O2 skipped** by the human's decision. With that, every step of the plan is done or explicitly skipped.

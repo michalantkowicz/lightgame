@@ -21,7 +21,8 @@ dependencies {
     implementation "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 }
 
-// libGDX ships LWJGL 3.3.3, which warns about an unsupported JNI version on JDK 24+.
+// libGDX ships LWJGL 3.3.3, which warns about an unsupported JNI version on JDK 24+; 3.4.x also has the FFM memory backend
+// that DesktopLauncher selects on JDK 25+ (no sun.misc.Unsafe warning).
 configurations.configureEach {
     resolutionStrategy.eachDependency {
         if (requested.group == 'org.lwjgl') useVersion lwjglVersion
