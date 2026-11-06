@@ -1,6 +1,5 @@
 package com.mantkowicz.light.ui.window;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Collecting;
 import com.mantkowicz.light.actor.GameActor;
@@ -59,8 +57,7 @@ public class CollectWindow extends GameActor {
         backgroundTable.setSize(context.getMenuStage().getWidth() * 2, context.getMenuStage().getHeight() * 2);
         backgroundTable.setTouchable(Touchable.enabled);
         backgroundTable.addListener(stopClickThrough());
-        TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("black.png")));
-        backgroundTable.setBackground(backgroundDrawable);
+        backgroundTable.setBackground(resourcesService.getDrawable("black.png"));
         backgroundTable.setPosition(-backgroundTable.getWidth() / 2f, -backgroundTable.getHeight() / 2f);
         if (Debug.isOn(COLLECT_WINDOW_LINES)) {
             backgroundTable.debug();
@@ -73,8 +70,7 @@ public class CollectWindow extends GameActor {
 
         mainTable.addListener(stopClickThrough());
 
-        TextureRegionDrawable textureRegionDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("table_background.png")));
-        mainTable.setBackground(textureRegionDrawable);
+        mainTable.setBackground(resourcesService.getDrawable("table_background.png"));
 
         mainTable.add(getContent(HEIGHT - 2 * PADDING)).pad(PADDING).expand().center();
 

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 
 import java.util.Arrays;
@@ -55,13 +56,19 @@ public class ResourcesService {
                 return foundRegion;
             }
         }
-        try {
-            Texture texture = assetManager.get(textureName, Texture.class);
-            texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
-            return new TextureRegion(texture);
-        } catch (Throwable t) {
+        if (!assetManager.isLoaded(textureName, Texture.class)) {
             throw new IllegalArgumentException("Couldn't find texture: " + textureName);
         }
+        Texture texture = assetManager.get(textureName, Texture.class);
+        texture.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        return new TextureRegion(texture);
+    }
+
+    /**
+     * {@link #getTexture(String)} wrapped for scene2d widgets.
+     */
+    public TextureRegionDrawable getDrawable(String textureName) {
+        return new TextureRegionDrawable(getTexture(textureName));
     }
 
     public NinePatchDrawable getNinePatch(String textureName) {
@@ -71,12 +78,10 @@ public class ResourcesService {
                 return new NinePatchDrawable(atlas.createPatch(textureName));
             }
         }
-        try {
-            Texture texture = assetManager.get(textureName, Texture.class);
-            return new NinePatchDrawable(new NinePatch(texture));
-        } catch (Throwable t) {
+        if (!assetManager.isLoaded(textureName, Texture.class)) {
             throw new IllegalArgumentException("Couldn't find texture: " + textureName);
         }
+        return new NinePatchDrawable(new NinePatch(assetManager.get(textureName, Texture.class)));
     }
 
     public TextureRegion getThumbnail(ThumbnailType thumbnailType) {

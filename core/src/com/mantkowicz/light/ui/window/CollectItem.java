@@ -1,12 +1,9 @@
 package com.mantkowicz.light.ui.window;
 
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.service.resources.ResourcesService;
 
@@ -26,7 +23,7 @@ public class CollectItem extends Button {
     private Image itemImage;
 
     public CollectItem(ResourcesService resourcesService, CollectItemType collectItemType, Item item) {
-        super(getButtonStyle(resourcesService.getAssetManager()));
+        super(getButtonStyle(resourcesService));
         this.resourcesService = resourcesService;
         this.item = item;
         this.collectItemType = collectItemType;
@@ -34,10 +31,10 @@ public class CollectItem extends Button {
 
         tryAddItemImage(item);
 
-        unchosenUpDrawable = getDrawable(resourcesService.getAssetManager().get("item_background.png", Texture.class));
-        unchosenDownDrawable = getDrawable(resourcesService.getAssetManager().get("item_background_pressed.png", Texture.class));
-        chosenUpDrawable = getDrawable(resourcesService.getAssetManager().get("item_background_chosen.png", Texture.class));
-        ableToPutDrawable = getDrawable(resourcesService.getAssetManager().get("item_background_able_to_put.png", Texture.class));
+        unchosenUpDrawable = resourcesService.getDrawable("item_background.png");
+        unchosenDownDrawable = resourcesService.getDrawable("item_background_pressed.png");
+        chosenUpDrawable = resourcesService.getDrawable("item_background_chosen.png");
+        ableToPutDrawable = resourcesService.getDrawable("item_background_able_to_put.png");
     }
 
     public CollectWindowItemState getState() {
@@ -60,17 +57,13 @@ public class CollectItem extends Button {
         return this;
     }
 
-    private static ButtonStyle getButtonStyle(AssetManager assetManager) {
+    private static ButtonStyle getButtonStyle(ResourcesService resourcesService) {
         ButtonStyle buttonStyle = new ButtonStyle();
 
-        buttonStyle.up = getDrawable(assetManager.get("item_background.png", Texture.class));
-        buttonStyle.down = getDrawable(assetManager.get("item_background_pressed.png", Texture.class));
+        buttonStyle.up = resourcesService.getDrawable("item_background.png");
+        buttonStyle.down = resourcesService.getDrawable("item_background_pressed.png");
 
         return buttonStyle;
-    }
-
-    private static Drawable getDrawable(Texture texture) {
-        return new TextureRegionDrawable(new TextureRegion(texture));
     }
 
     public boolean isEmpty() {
