@@ -73,7 +73,7 @@ public class Player extends GameBoardActor implements Collecting {
             lastIdleChange = null;
         }
         if (MOVEMENT.equals(status) && IDLE.equals(getStatus())) {
-            gameEventService.addEvent(new PlayerMoveEvent(this, 1));
+            gameEventService.post(new PlayerMoveEvent(this));
         }
         super.setStatus(status);
     }

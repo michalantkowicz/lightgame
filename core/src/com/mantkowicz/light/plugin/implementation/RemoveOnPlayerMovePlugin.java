@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.service.event.GameEventService;
+import com.mantkowicz.light.service.event.implementation.PlayerMoveEvent;
 
-import static com.mantkowicz.light.service.event.GameEventType.PLAYER_MOVE;
 
 public class RemoveOnPlayerMovePlugin implements Plugin {
     private final static float DURATION = 0.75f;
@@ -23,7 +23,7 @@ public class RemoveOnPlayerMovePlugin implements Plugin {
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(PLAYER_MOVE)) {
+        if (gameEventService.has(PlayerMoveEvent.class)) {
             if (actor != null) {
                 actor.setTouchable(Touchable.disabled);
                 actor.addAction(Actions.sequence(

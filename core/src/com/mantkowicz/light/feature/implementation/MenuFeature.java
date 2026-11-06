@@ -24,8 +24,6 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
-import static com.mantkowicz.light.service.event.GameEventType.MENU_CLOSE;
-import static com.mantkowicz.light.service.event.GameEventType.MENU_OPEN;
 
 public class MenuFeature implements Feature {
     private static final float MENU_RADIUS = 150f;
@@ -44,15 +42,15 @@ public class MenuFeature implements Feature {
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(MENU_OPEN)) {
-            MenuOpenEvent event = gameEventService.removeEventFromQueue(MENU_OPEN, MenuOpenEvent.class);
-            GameBoardActor actor = event.getEventObject();
+        if (gameEventService.has(MenuOpenEvent.class)) {
+            MenuOpenEvent event = gameEventService.poll(MenuOpenEvent.class);
+            GameBoardActor actor = event.getActor();
 
             for (MenuButton button : createMenuButtons(actor)) {
                 stage.addActor(button);
             }
-        } else if (gameEventService.containsEvent(MENU_CLOSE)) {
-            gameEventService.removeEventFromQueue(MENU_CLOSE, MenuCloseEvent.class);
+        } else if (gameEventService.has(MenuCloseEvent.class)) {
+            gameEventService.poll(MenuCloseEvent.class);
             stage.clear();
         }
     }

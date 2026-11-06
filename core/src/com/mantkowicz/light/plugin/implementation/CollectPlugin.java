@@ -7,7 +7,6 @@ import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.CollectEvent;
 
-import static com.mantkowicz.light.service.event.GameEventType.COLLECT;
 
 public class CollectPlugin implements Plugin {
     private final CollectResolver collectResolver;
@@ -20,9 +19,9 @@ public class CollectPlugin implements Plugin {
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(COLLECT)) {
-            CollectEvent gameEvent = gameEventService.removeEventFromQueue(COLLECT, CollectEvent.class);
-            Collectible collectible = gameEvent.getEventObject();
+        CollectEvent gameEvent = gameEventService.poll(CollectEvent.class);
+        if (gameEvent != null) {
+            Collectible collectible = gameEvent.getCollectible();
             collectResolver.resolveCollect(collectible);
         }
     }

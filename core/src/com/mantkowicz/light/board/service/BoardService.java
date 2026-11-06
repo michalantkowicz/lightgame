@@ -35,13 +35,13 @@ public class BoardService {
     private void checkCollisions(Tile tile, GameActor gameActor) {
         for (GameActor tileActor : gameActorsByTile.getGameActors(tile)) {
             if (!tileActor.equals(gameActor) && tileActor instanceof Collectible) {
-                gameEventService.addEvent(new CollectEvent((Collectible) tileActor));
+                gameEventService.post(new CollectEvent((Collectible) tileActor));
             }
         }
         for (Tile neighbour : tile.getNeighbours()) {
             for (GameActor tileActor : gameActorsByTile.getGameActors(neighbour)) {
                 if (!tileActor.equals(gameActor) && tileActor instanceof Collectible && ((Collectible) tileActor).isDistant()) {
-                    gameEventService.addEvent(new CollectEvent((Collectible) tileActor));
+                    gameEventService.post(new CollectEvent((Collectible) tileActor));
                 }
             }
         }

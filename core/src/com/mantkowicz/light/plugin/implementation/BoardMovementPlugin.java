@@ -17,7 +17,6 @@ import com.mantkowicz.light.service.event.implementation.TileTouchedEvent;
 import static com.mantkowicz.light.actor.implementation.player.Status.IDLE;
 import static com.mantkowicz.light.actor.implementation.player.Status.MOVEMENT;
 import static com.mantkowicz.light.board.tile.TilePoint.CENTER;
-import static com.mantkowicz.light.service.event.GameEventType.TILE_TOUCHED;
 
 public class BoardMovementPlugin implements Plugin {
     private final Player player;
@@ -34,16 +33,18 @@ public class BoardMovementPlugin implements Plugin {
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(TILE_TOUCHED) && IDLE.equals(player.getStatus())) {
-            TileTouchedEvent gameEvent = gameEventService.removeEventFromQueue(TILE_TOUCHED, TileTouchedEvent.class);
-            player.addAction(getMoveByPathAction(gameEvent));
+        if (IDLE.equals(player.getStatus())) {
+            TileTouchedEvent gameEvent = gameEventService.poll(TileTouchedEvent.class);
+            if (gameEvent != null) {
+                player.addAction(getMoveByPathAction(gameEvent));
+            }
         }
     }
 
     private SequenceAction getMoveByPathAction(TileTouchedEvent gameEvent) {
         removePlayerActions(player);
         SequenceAction sequence = Actions.sequence();
-        BoardPath path = boardService.getPath(player.getTile(), gameEvent.getEventObject());
+        BoardPath path = boardService.getPath(player.getTile(), gameEvent.getTile());
         for (Tile pathNode : path.getPathNodes()) {
             Vector2 position = pathNode.calculatePositionForActorAt(player, CENTER);
             SequenceAction moveToTileAction = Actions.sequence(

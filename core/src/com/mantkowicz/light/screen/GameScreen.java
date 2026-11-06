@@ -32,7 +32,6 @@ import java.util.List;
 
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
-import static com.mantkowicz.light.service.event.GameEventType.PLAYER_CREATED;
 
 public class GameScreen implements Screen {
     private final ResourcesService resourcesService;
@@ -77,9 +76,9 @@ public class GameScreen implements Screen {
         gameStage.addActor(board);
 
 
-        if (gameEventService.containsEvent(PLAYER_CREATED)) {
-            PlayerCreatedEvent gameEvent = gameEventService.removeEventFromQueue(PLAYER_CREATED, PlayerCreatedEvent.class);
-            CameraTrackingFeature cameraTrackingFeature = new CameraTrackingFeature(gameEvent.getEventObject(), context);
+        PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
+        if (playerCreatedEvent != null) {
+            CameraTrackingFeature cameraTrackingFeature = new CameraTrackingFeature(playerCreatedEvent.getPlayer(), context);
             addFeature(cameraTrackingFeature);
         }
 

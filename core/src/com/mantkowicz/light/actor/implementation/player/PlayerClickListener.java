@@ -17,6 +17,6 @@ public class PlayerClickListener extends ClickListener {
 
     @Override
     public void clicked(InputEvent event, float x, float y) {
-        gameEventService.addEvent(new LookAtMeEvent(boardGameActor));
+        gameEventService.post(new LookAtMeEvent(boardGameActor));
     }
 }

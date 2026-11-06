@@ -13,7 +13,6 @@ import com.mantkowicz.light.stage.StageType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.mantkowicz.light.service.event.GameEventType.ADD_TO_STAGE;
 
 public class StageFeature implements Feature {
     private final Map<StageType, Stage> stageMap = new HashMap<>();
@@ -29,9 +28,9 @@ public class StageFeature implements Feature {
 
     @Override
     public void run(float delta) {
-        if (eventService.containsEvent(ADD_TO_STAGE)) {
-            AddToStageEvent event = eventService.removeEventFromQueue(ADD_TO_STAGE, AddToStageEvent.class);
-            GameActorDefinition builder = event.getEventObject();
+        AddToStageEvent event = eventService.poll(AddToStageEvent.class);
+        if (event != null) {
+            GameActorDefinition builder = event.getDefinition();
 
             StageType targetStageType = builder.getTargetStageType();
             if (stageMap.containsKey(targetStageType)) {

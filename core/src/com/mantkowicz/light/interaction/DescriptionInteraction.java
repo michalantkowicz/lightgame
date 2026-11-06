@@ -25,7 +25,7 @@ public class DescriptionInteraction implements Interaction {
     @Override
     public void interact() {
         //TODO to remove the actor from the stage after some time
-        eventService.addEvent(new AddToStageEvent(descriptionDefinition));
+        eventService.post(new AddToStageEvent(descriptionDefinition));
     }
 
     @Override

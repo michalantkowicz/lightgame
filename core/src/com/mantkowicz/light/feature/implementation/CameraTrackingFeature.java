@@ -8,7 +8,6 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.camera.LookAtMeEvent;
 
-import static com.mantkowicz.light.service.event.GameEventType.LOOK_AT_ME;
 
 public class CameraTrackingFeature implements Feature {
     private static final float DISTANCE_LEFT_RIGHT = 420;
@@ -31,7 +30,7 @@ public class CameraTrackingFeature implements Feature {
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(LOOK_AT_ME)) {
+        if (gameEventService.has(LookAtMeEvent.class)) {
             handleLookAtMeEvent();
         } else if (cameraActor.isNotCentering() && isActorSet()) {
             Vector2 actorCenter = actor.getCenter();
@@ -44,8 +43,8 @@ public class CameraTrackingFeature implements Feature {
     }
 
     private void handleLookAtMeEvent() {
-        LookAtMeEvent event = gameEventService.removeEventFromQueue(LOOK_AT_ME, LookAtMeEvent.class);
-        GameBoardActor boardGameActor = event.getEventObject();
+        LookAtMeEvent event = gameEventService.poll(LookAtMeEvent.class);
+        GameBoardActor boardGameActor = event.getActor();
         cameraActor.centerAt(boardGameActor.getCenter());
 
         this.actor = boardGameActor;

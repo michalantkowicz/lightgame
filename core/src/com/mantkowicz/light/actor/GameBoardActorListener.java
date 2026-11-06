@@ -32,13 +32,13 @@ public class GameBoardActorListener extends InputListener {
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
         super.touchUp(event, x, y, pointer, button);
         gameBoardActor.removeAction(menuOpenAction);
-        gameEventService.addEvent(new MenuCloseEvent(new Vector2(x, y)));
+        gameEventService.post(new MenuCloseEvent(new Vector2(x, y)));
     }
 
     private class MenuOpenAction extends Action {
         @Override
         public boolean act(float delta) {
-            gameEventService.addEvent(new MenuOpenEvent(gameBoardActor));
+            gameEventService.post(new MenuOpenEvent(gameBoardActor));
             return true;
         }
     }

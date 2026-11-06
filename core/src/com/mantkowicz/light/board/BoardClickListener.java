@@ -48,7 +48,7 @@ public class BoardClickListener extends ClickListener {
                 handleNoPathTile(touchedTile);
             } else if (touchedTile.isMarked()) {
                 touchedTile.unmark();
-                gameEventService.addEvent(new TileTouchedEvent(touchedTile));
+                gameEventService.post(new TileTouchedEvent(touchedTile));
             }
         }
     }

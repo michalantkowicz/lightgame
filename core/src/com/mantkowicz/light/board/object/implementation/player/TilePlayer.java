@@ -20,7 +20,7 @@ public class TilePlayer extends TileObject {
 
         context.getGameStage().addActor(player);
 
-        context.getGameEventService().addEvent(new PlayerCreatedEvent(player));
+        context.getGameEventService().post(new PlayerCreatedEvent(player));
     }
 
     @Override
