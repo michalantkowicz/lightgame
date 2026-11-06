@@ -1,7 +1,7 @@
 # Regression tests
 
 These tests play the real game headlessly, with scripted clicks, holds, drags and key presses. They compare what a
-player could see with text files in `golden/`. A few unit tests cover the board layout, path finding and the inventory.
+player could see with text files in `golden/`. A few unit tests cover the board layout, what the board draws, path finding and the inventory.
 The game itself is not changed for testing.
 
 ## Running
@@ -40,7 +40,7 @@ test/com/mantkowicz/light/e2e/
 ├── Golden.java         compares with golden/<name>.txt, or rewrites it in update mode
 ├── headless/           HeadlessGame, NoOpGL, FixedGraphics, ScriptedInput
 ├── scenario/           gameplay tests, written against GameDriver only
-└── unit/               BoardLayoutTest, PathFindingTest, InventoryTest
+└── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, InventoryTest
 ```
 
 Scenario ids are used in `docs/refactoring-plan.md`:

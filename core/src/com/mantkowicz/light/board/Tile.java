@@ -189,6 +189,15 @@ public abstract class Tile {
         batch.draw(backgroundTexture, x, y);
     }
 
+    /**
+     * Draws the tile's objects (furniture). The board calls it after every background is drawn, so neighbours never cover them.
+     */
+    public void drawObjects(Batch batch) {
+        for (TileObject object : objects) {
+            object.draw(this, batch);
+        }
+    }
+
     // TODO bug B3: never implemented, so WallTile.prepare throws. The map has no wall tiles today.
     protected Vector2 stageToLocalCoordinates(Vector2 tilePosition) {
         throw new UnsupportedOperationException("to be implemented");

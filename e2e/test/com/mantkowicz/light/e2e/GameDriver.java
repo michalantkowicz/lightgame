@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
@@ -243,6 +244,30 @@ public final class GameDriver {
             slots.add(item == null ? "-" : item.getClass().getSimpleName());
         }
         return slots.toString();
+    }
+
+    /** Everything the board draws in one frame, in drawing order: picture name and position. */
+    public String describeBoardDrawing() {
+        Snapshot snapshot = new Snapshot();
+        SpriteBatch recorder = new SpriteBatch() {
+            @Override
+            public void draw(TextureRegion region, float x, float y) {
+                snapshot.line("%s at=%s", regionName(region), Snapshot.point(x, y));
+            }
+        };
+        try {
+            board().draw(recorder, 1);
+        } finally {
+            recorder.dispose();
+        }
+        return snapshot.toString();
+    }
+
+    private static String regionName(TextureRegion region) {
+        if (region instanceof AtlasRegion atlasRegion) {
+            return atlasRegion.name;
+        }
+        return String.valueOf(region.getTexture());
     }
 
     public boolean crashed() {
