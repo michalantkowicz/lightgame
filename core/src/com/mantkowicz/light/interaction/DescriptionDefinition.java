@@ -1,5 +1,6 @@
 package com.mantkowicz.light.interaction;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.GameActorDefinition;
@@ -11,6 +12,7 @@ public class DescriptionDefinition implements GameActorDefinition<Description> {
     private GameActor parent;
     private String description;
     private Drawable background;
+    private BitmapFont font;
 
     @Override
     public Description getActor() {
@@ -24,6 +26,10 @@ public class DescriptionDefinition implements GameActorDefinition<Description> {
 
     public Drawable getBackground() {
         return background;
+    }
+
+    public BitmapFont getFont() {
+        return font;
     }
 
     public GameActor getParent() {
@@ -44,5 +50,9 @@ public class DescriptionDefinition implements GameActorDefinition<Description> {
 
     public void setBackground(Drawable background) {
         this.background = background;
+    }
+
+    public void setFont(BitmapFont font) {
+        this.font = font;
     }
 }

@@ -17,7 +17,7 @@ public class MenuButton extends Group {
         image.setPosition(-image.getWidth() / 2f, -image.getHeight() / 2f);
         addActor(image);
 
-        Label label = LabelFactory.createLabel(NotificationStyle.DEFAULT, "button");
+        Label label = LabelFactory.createLabel(resourcesService.getFont(), NotificationStyle.DEFAULT, "button");
         label.setPosition(-label.getWidth() / 2f, image.getHeight() / 2f + 5f);
         addActor(label);
 

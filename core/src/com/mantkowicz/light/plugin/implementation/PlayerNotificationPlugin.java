@@ -1,6 +1,7 @@
 package com.mantkowicz.light.plugin.implementation;
 
 import box2dLight.RayHandler;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.implementation.player.Player;
 import com.mantkowicz.light.game.GameContext;
@@ -21,12 +22,14 @@ public class PlayerNotificationPlugin implements Plugin {
     private final RayHandler rayHandler;
     private final NotificationStage notificationStage;
     private final PhraseService phraseService;
+    private final BitmapFont font;
 
     public PlayerNotificationPlugin(Player player, GameContext context) {
         this.player = player;
         this.rayHandler = context.getRayHandler();
         this.notificationStage = context.getNotificationStage();
         this.phraseService = context.getPhraseService();
+        this.font = context.getResourcesService().getFont();
     }
 
     @Override
@@ -61,7 +64,7 @@ public class PlayerNotificationPlugin implements Plugin {
     private Notification getExclamationAtShadow() {
         String exclamationText = phraseService.getRandomPhrase(DARKNESS_EXCLAMATION);
         Vector2 notificationCenter = player.getTile().getNotificationCenterPosition();
-        return new NotificationBuilder(exclamationText)
+        return new NotificationBuilder(font, exclamationText)
                 .notificationAnimation(new EnlargeAndFadeOutAnimation())
                 .notificationType(PLAYER_NOTIFICATION)
                 .centerAt(notificationCenter)

@@ -1,5 +1,6 @@
 package com.mantkowicz.light.board;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -22,6 +23,7 @@ public class BoardClickListener extends ClickListener {
     private final GameEventService gameEventService;
     private final NotificationStage notificationStage;
     private final PhraseService phraseService;
+    private final BitmapFont font;
     private final Vector2 point = new Vector2();
 
     public BoardClickListener(GameContext context, Board board) {
@@ -29,6 +31,7 @@ public class BoardClickListener extends ClickListener {
         gameEventService = context.getGameEventService();
         notificationStage = context.getNotificationStage();
         phraseService = context.getPhraseService();
+        font = context.getResourcesService().getFont();
     }
 
     @Override
@@ -56,7 +59,7 @@ public class BoardClickListener extends ClickListener {
     private void handleNoPathTile(Tile touchedTile) {
         String noPathText = phraseService.getRandomPhrase(NO_PATH);
         Vector2 notificationCenter = touchedTile.getCenter();
-        Notification noPathNotification = new NotificationBuilder(noPathText)
+        Notification noPathNotification = new NotificationBuilder(font, noPathText)
                 .notificationAnimation(new MoveUpperAndFadeOutAnimation())
                 .notificationType(NO_PATH_NOTIFICATION)
                 .notificationStyle(WARNING)

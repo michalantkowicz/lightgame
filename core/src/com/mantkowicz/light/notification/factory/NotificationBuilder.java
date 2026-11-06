@@ -1,5 +1,6 @@
 package com.mantkowicz.light.notification.factory;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.mantkowicz.light.notification.Notification;
@@ -13,9 +14,11 @@ public class NotificationBuilder {
     private NotificationStyle notificationStyle;
     private NotificationAnimation notificationAnimation;
     private Vector2 notificationCenter = new Vector2();
+    private final BitmapFont font;
     private final String text;
 
-    public NotificationBuilder(String text) {
+    public NotificationBuilder(BitmapFont font, String text) {
+        this.font = font;
         this.text = text;
 
         notificationStyle = NotificationStyle.DEFAULT;
@@ -44,7 +47,7 @@ public class NotificationBuilder {
     }
 
     public Notification build() {
-        Label label = LabelFactory.createLabel(notificationStyle, text);
+        Label label = LabelFactory.createLabel(font, notificationStyle, text);
 
         Notification notification = new Notification(notificationType, label);
         notification.addAction(notificationAnimation.getAction(notification));

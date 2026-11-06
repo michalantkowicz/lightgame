@@ -17,6 +17,7 @@ public class DescriptionInteraction implements Interaction {
 
         descriptionDefinition = new DescriptionDefinition();
         descriptionDefinition.setBackground(context.getResourcesService().getNinePatch("tooltip"));
+        descriptionDefinition.setFont(context.getResourcesService().getFont());
         descriptionDefinition.setDescription(description);
         descriptionDefinition.setParent(actor);
     }

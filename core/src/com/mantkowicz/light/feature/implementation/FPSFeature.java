@@ -19,7 +19,7 @@ public class FPSFeature implements Feature {
     public FPSFeature(GameContext context, Vector2 offset) {
         this.offset = offset;
         camera = context.getGameStage().getCamera();
-        fpsLabel = createLabel(NotificationStyle.DEFAULT, "");
+        fpsLabel = createLabel(context.getResourcesService().getFont(), NotificationStyle.DEFAULT, "");
         context.getGameStage().addActor(fpsLabel);
     }
 
