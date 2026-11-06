@@ -615,9 +615,13 @@ blocked by it.
 
 ### Optional
 
-- **O1.** Merge `Plugin` and `Feature` into one interface (A10, K19). Only if the human finds the two names confusing.
+**Decision (2026‑11‑06): both skipped.**
+
+- **O1.** Merge `Plugin` and `Feature` into one interface (A10, K19). Only if the human finds the two names confusing. **Skipped:** the two
+  names say per‑actor vs per‑screen.
 - **O2.** Give the UI its own `ScreenViewport` camera. `ActionButton` and `CollectWindow` would then not need `CenterActorByCameraPlugin`. This is a visible
-  behaviour change, because the UI would stop scaling with the world, so it needs a separate decision.
+  behaviour change, because the UI would stop scaling with the world, so it needs a separate decision. **Skipped:** the UI keeps scaling
+  with the world.
 
 ---
 
@@ -760,3 +764,4 @@ blocked by it.
   `DesktopLauncher` selects it with `Configuration.MEMORY_BACKEND.set("ffm")` when running on Java 25 or later; older JVMs keep the
   default. The game was started for 45 s on JDK 25 with no warning and no error. LWJGL notes FFM is somewhat slower, which doesn't
   matter for this game.
+- **O1 and O2 skipped** by the human's decision. With that, every step of the plan is done or explicitly skipped.
