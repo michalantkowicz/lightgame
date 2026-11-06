@@ -2,12 +2,11 @@ package com.mantkowicz.light.board;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mantkowicz.light.board.tile.Tile;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.map.TiledMapLoader;
-import com.mantkowicz.light.map.implementation.tmx.TmxTileMapLoaderProperties;
-import com.mantkowicz.light.map.implementation.tmx.TmxTiledMapLoader;
-import com.mantkowicz.light.service.resources.ResourcesService;
+import com.mantkowicz.light.map.TmxTileMapLoaderProperties;
+import com.mantkowicz.light.map.TmxTiledMapLoader;
+import com.mantkowicz.light.resources.ResourcesService;
 
 import java.util.List;
 

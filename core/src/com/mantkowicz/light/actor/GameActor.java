@@ -6,14 +6,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
-import com.mantkowicz.light.actor.implementation.player.Status;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mantkowicz.light.actor.implementation.player.Status.IDLE;
+import static com.mantkowicz.light.actor.Status.IDLE;
 
 public abstract class GameActor extends Group {
     private static long ID_COUNTER = 0;

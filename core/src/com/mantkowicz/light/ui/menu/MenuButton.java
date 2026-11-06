@@ -8,10 +8,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.mantkowicz.light.interaction.Interaction;
+import com.mantkowicz.light.notification.LabelFactory;
 import com.mantkowicz.light.notification.NotificationStyle;
-import com.mantkowicz.light.notification.factory.LabelFactory;
-import com.mantkowicz.light.service.resources.ResourcesService;
+import com.mantkowicz.light.resources.ResourcesService;
 
 public class MenuButton extends Group {
     private static final float HOVER_SCALE = 1.5f;

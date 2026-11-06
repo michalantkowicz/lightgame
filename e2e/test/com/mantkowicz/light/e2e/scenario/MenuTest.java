@@ -1,8 +1,8 @@
 package com.mantkowicz.light.e2e.scenario;
 
 import com.mantkowicz.light.e2e.Cell;
-import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.GameDriver.Kind;
+import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
 import org.junit.jupiter.api.Test;
 

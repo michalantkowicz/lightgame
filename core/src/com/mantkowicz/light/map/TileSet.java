@@ -1,6 +1,6 @@
 package com.mantkowicz.light.map;
 
-import com.mantkowicz.light.board.tile.Tile;
+import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.util.Tuple;
 
 import java.util.List;
