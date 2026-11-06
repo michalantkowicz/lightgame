@@ -26,6 +26,7 @@ import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.GameStage;
 import com.mantkowicz.light.ui.MenuStage;
 import com.mantkowicz.light.ui.NotificationStage;
+import com.mantkowicz.light.ui.UiStage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class GameScreen extends ScreenAdapter {
     private GameStage gameStage;
     private MenuStage menuStage;
     private NotificationStage notificationStage;
+    private UiStage uiStage;
     private Board board;
     private RayHandler rayHandler;
     private final List<Feature> features = new ArrayList<>();
@@ -57,8 +59,10 @@ public class GameScreen extends ScreenAdapter {
         gameStage = new GameStage(viewport, resourcesService);
         menuStage = new MenuStage(viewport);
         notificationStage = new NotificationStage(viewport);
+        uiStage = new UiStage(viewport);
 
         InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(menuStage);
         multiplexer.addProcessor(gameStage);
         Gdx.input.setInputProcessor(multiplexer);
@@ -113,6 +117,7 @@ public class GameScreen extends ScreenAdapter {
                 gameStage,
                 notificationStage,
                 menuStage,
+                uiStage,
                 boardService);
     }
 
@@ -137,6 +142,9 @@ public class GameScreen extends ScreenAdapter {
         menuStage.act(delta);
         menuStage.draw();
 
+        uiStage.act(delta);
+        uiStage.draw();
+
         for (Feature feature : features) {
             feature.run(delta);
         }
@@ -158,6 +166,7 @@ public class GameScreen extends ScreenAdapter {
         gameStage.dispose();
         notificationStage.dispose();
         menuStage.dispose();
+        uiStage.dispose();
         rayHandler.dispose();
     }
 }

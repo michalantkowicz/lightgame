@@ -53,7 +53,7 @@ Scenario ids are used in `docs/refactoring-plan.md`:
 | S8–S11 | Radial menu: dog description, cancel, short tap, player description | `MenuTest` | `menu-*` |
 | S12, S13 | Q/W fade shader; torch flicker | `ShaderAndLightTest` | `fade-shader`, `torch-flicker` |
 | S14 | Resize | `ResizeTest` | `resize` |
-| S15 | Walking onto the chest. **Records the crash of bug B1 on purpose**; re-record when B1 is fixed | `CollectTest` | `collect` |
+| S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button | `CollectTest` | `collect`, `collect-cancel` |
 
 ## How the headless game works
 

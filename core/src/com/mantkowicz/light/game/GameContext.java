@@ -11,6 +11,7 @@ import com.mantkowicz.light.ui.AbstractStage;
 import com.mantkowicz.light.ui.GameStage;
 import com.mantkowicz.light.ui.MenuStage;
 import com.mantkowicz.light.ui.NotificationStage;
+import com.mantkowicz.light.ui.UiStage;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class GameContext {
     private final GameStage gameStage;
     private final NotificationStage notificationStage;
     private final MenuStage menuStage;
+    private final UiStage uiStage;
     private final BoardService boardService;
 
     public GameContext(ResourcesService resourcesService,
@@ -41,6 +43,7 @@ public class GameContext {
                        GameStage gameStage,
                        NotificationStage notificationStage,
                        MenuStage menuStage,
+                       UiStage uiStage,
                        BoardService boardService) {
         this.resourcesService = resourcesService;
         this.gameEventService = gameEventService;
@@ -51,6 +54,7 @@ public class GameContext {
         this.gameStage = gameStage;
         this.notificationStage = notificationStage;
         this.menuStage = menuStage;
+        this.uiStage = uiStage;
         this.boardService = boardService;
     }
 
@@ -90,11 +94,15 @@ public class GameContext {
         return menuStage;
     }
 
+    public UiStage getUiStage() {
+        return uiStage;
+    }
+
     public BoardService getBoardService() {
         return boardService;
     }
 
     public List<AbstractStage> getStages() {
-        return asList(gameStage, notificationStage, menuStage);
+        return asList(gameStage, notificationStage, menuStage, uiStage);
     }
 }

@@ -54,7 +54,7 @@ public class CollectWindow extends GameActor {
         this.collectItems = new ArrayList<>();
 
         Table backgroundTable = new Table();
-        backgroundTable.setSize(context.getMenuStage().getWidth() * 2, context.getMenuStage().getHeight() * 2);
+        backgroundTable.setSize(context.getUiStage().getWidth() * 2, context.getUiStage().getHeight() * 2);
         backgroundTable.setTouchable(Touchable.enabled);
         backgroundTable.addListener(stopClickThrough());
         backgroundTable.setBackground(resourcesService.getDrawable("black.png"));

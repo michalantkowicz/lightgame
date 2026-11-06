@@ -15,10 +15,13 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Chest;
 import com.mantkowicz.light.actor.Dog;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Inventory;
+import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
@@ -31,6 +34,8 @@ import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
+import com.mantkowicz.light.ui.collect.CollectItem;
+import com.mantkowicz.light.ui.collect.CollectItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -112,6 +117,26 @@ public final class GameDriver {
         dragTo(gameScreenPosition(cellCenter(cell)));
     }
 
+    /** Short click on a UI button (COLLECT, OK, CANCEL, ...) by its text. */
+    public void clickButton(String text) {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
+                tap(uiScreenPosition(button));
+                return;
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** Short click on a slot of the collect window: the chest's row or the player's row. */
+    public void clickChestSlot(int index) {
+        tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTIBLE_ITEM).get(index)));
+    }
+
+    public void clickPlayerSlot(int index) {
+        tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTING_ITEM).get(index)));
+    }
+
     /** Releases the pointer where it currently is. */
     public void release() {
         inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, 0);
@@ -180,6 +205,21 @@ public final class GameDriver {
     /** All snapshots and notes so far, in order: this is what golden files contain. */
     public String timeline() {
         return timeline.toString();
+    }
+
+    /** What the player and the chest carry, slot by slot ("-" is an empty slot). */
+    public String inventories() {
+        Player player = (Player) actor(Kind.PLAYER);
+        Chest chest = (Chest) actor(Kind.CHEST);
+        return "player=" + describe(player.getInventory()) + " chest=" + describe(chest.getInventory());
+    }
+
+    private static String describe(Inventory inventory) {
+        List<String> slots = new ArrayList<>();
+        for (Item item : inventory.getItems()) {
+            slots.add(item == null ? "-" : item.getClass().getSimpleName());
+        }
+        return slots.toString();
     }
 
     public boolean crashed() {
@@ -286,6 +326,7 @@ public final class GameDriver {
         describeLabels(snapshot, "game stage", gameStage());
         describeLabels(snapshot, "notification stage", notificationStage());
         describeLabels(snapshot, "menu stage", menuStage());
+        describeLabels(snapshot, "ui stage", uiStage());
     }
 
     /** Every label a player can see (effective alpha above zero), in drawing order. */
@@ -426,6 +467,43 @@ public final class GameDriver {
 
     private Stage menuStage() {
         return screenField("menuStage");
+    }
+
+    private Stage uiStage() {
+        return screenField("uiStage");
+    }
+
+    /** Every actor on the UI stage, depth first. */
+    private List<Actor> uiActors() {
+        List<Actor> actors = new ArrayList<>();
+        collectActors(uiStage().getRoot(), actors);
+        return actors;
+    }
+
+    private static void collectActors(Actor actor, List<Actor> actors) {
+        actors.add(actor);
+        if (actor instanceof Group group) {
+            for (Actor child : group.getChildren()) {
+                collectActors(child, actors);
+            }
+        }
+    }
+
+    private List<CollectItem> collectSlots(CollectItemType type) {
+        List<CollectItem> slots = new ArrayList<>();
+        for (Actor actor : uiActors()) {
+            if (actor instanceof CollectItem item && item.getCollectItemType() == type) {
+                slots.add(item);
+            }
+        }
+        if (slots.isEmpty()) {
+            throw new IllegalStateException("The collect window is not open");
+        }
+        return slots;
+    }
+
+    private Vector2 uiScreenPosition(Actor actor) {
+        return screenPosition(uiStage(), actor.localToStageCoordinates(new Vector2(actor.getWidth() / 2f, actor.getHeight() / 2f)), true);
     }
 
     private Stage notificationStage() {

@@ -718,3 +718,13 @@ blocked by it.
 - 5.6: `PhraseService` uses its own `RandomXS128`. Using `MathUtils.random` shifted the shared seeded sequence and changed the torch
   flicker in the no-path golden. `MenuStage` has a `TODO bug B1` at its `addActor` check. `Stage.dispose()` calls `clear()`, which used
   to trigger the menu interaction; with the `clear()` override gone, disposing the menu stage is safe.
+
+### 2026‑11‑06, Phase 7, B1 (collect flow)
+
+- Fixed as planned in 7.1, as its own PR: a fourth stage, `UiStage` (an `AbstractStage` with `StageType.UI_STAGE`, so it fits `getStages()`
+  and `StageFeature`), shares the viewport, is drawn last and gets input first. `PlayerCollectResolver` and `CollectWindow` use it.
+- `GameDriver` gained `clickButton(text)`, `clickChestSlot(i)`, `clickPlayerSlot(i)`, `inventories()`, and snapshots list labels on the
+  UI stage (empty in every other scenario, so no other golden changed). `collect` was re-recorded; `collect-cancel` is new.
+- B4 (debug lines over the window) is left for its own PR.
+- **Found:** CANCEL removes the window but keeps the swapped slots on screen. The COLLECT button reopens the **same** window, which then
+  shows the lighter in the player's slot although the inventories didn't change, and OK would save it. Not fixed here (B7, to decide).
