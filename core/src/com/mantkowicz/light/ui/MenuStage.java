@@ -32,7 +32,6 @@ public class MenuStage extends AbstractStage {
         return null;
     }
 
-    // TODO bug B1: the collect flow adds its ActionButton here, so this throws (fixed in Phase 7)
     @Override
     public void addActor(Actor actor) {
         if (!(actor instanceof MenuButton)) {
