@@ -735,3 +735,11 @@ blocked by it.
 
 - Fixed as its own PR: `Debug.Tool.COLLECT_WINDOW_LINES` is off by default (`Debug.switchOn(COLLECT_WINDOW_LINES)` brings it back).
   `GameDriver.uiDebugLinesShown()` is recorded in the collect golden; recorded against the old default it said `true`.
+
+### 2026‑11‑06, Phase 7, B2 (furniture)
+
+- Fixed as its own PR: `TileObject.draw(tile, batch)` is a no-op hook; `TileSprite` loads its region in `prepare` and draws it centred
+  on the tile plus its offset. `Board.draw` draws all backgrounds first, then `Tile.drawObjects`, so a neighbour's background never covers
+  furniture. The old magic `74`/`64` were indeed half of the 148×128 tile size.
+- New `BoardDrawingTest` (golden `board-drawing`) records every draw call of the board through a recording `SpriteBatch`: 44 backgrounds,
+  then the 19 sprites.

@@ -46,6 +46,9 @@ public class Board extends Actor {
         for (Tile tile : tiles) {
             tile.draw(batch, parentAlpha);
         }
+        for (Tile tile : tiles) {
+            tile.drawObjects(batch);
+        }
     }
 
     public static List<Tile> loadTiles(ResourcesService resourcesService, String mapName) {
