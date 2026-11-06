@@ -688,3 +688,18 @@ blocked by it.
   collect window lines, darkness exclamation) plus per‑class and per‑actor outlines. A throwaway test with every tool on and `Dog`
   outlined ran a walk and the menu without a crash.
 
+
+### 2026‑11‑06, Phase 4
+
+- Every K item (K4–K8) was kept, so only the "both versions" parts ran; 4.5 had nothing to do.
+- 4.1: `DescriptionInteraction` takes `(actor, context, description)` like the plugins. The fade sequence uses `Actions.removeActor()`
+  qualified, because `Group.removeActor(Actor)` hides the static import inside an actor.
+- 4.2: **deviation:** `CollectWindow` keeps `(context, Collecting, Collectible)` instead of two `Inventory` parameters, so the
+  `beforeCollect`/`afterCollect` hooks (never called today) stay reachable from the window. Only the constants became `static`.
+- 4.3: the font is `ResourcesService.getFont()`; `LabelFactory.createLabel` and `NotificationBuilder` take the `BitmapFont` as their first
+  argument. `DescriptionDefinition` carries the font next to the background. Filters and metrics are the same as before (the
+  `BitmapFontLoader` defaults match `new BitmapFont(file)`).
+- 4.6: `MenuButtonListener` became an anonymous class in `MenuButton` (with `HOVER_SCALE`/`HOVER_DURATION` constants);
+  `CollectWindowOkListener`, `CollectWindowCancelListener` and `CollectWindowItemListener` became anonymous classes calling
+  `CollectWindow` methods (`onItemClicked` holds the swap logic); `StopClickThroughClickListener` became `stopClickThrough()`.
+  `OpenCollectWindowButtonListener` stays a named class (K5). The public `setChosenItem`/`getChosenItem`/`isAnyItemChosen` stay.

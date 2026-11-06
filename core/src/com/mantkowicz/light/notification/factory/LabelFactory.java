@@ -1,6 +1,5 @@
 package com.mantkowicz.light.notification.factory;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -9,17 +8,18 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mantkowicz.light.notification.NotificationStyle;
 
 public class LabelFactory {
-    public static Label createLabel(NotificationStyle notificationStyle, String text) {
-        return createLabel(notificationStyle, null, text);
+    public static Label createLabel(BitmapFont font, NotificationStyle notificationStyle, String text) {
+        return createLabel(font, notificationStyle, null, text);
     }
 
     /**
+     * @param font       usually {@code resourcesService.getFont()}
      * @param background drawn behind the text, or {@code null} for none
      */
-    public static Label createLabel(NotificationStyle notificationStyle, Drawable background, String text) {
+    public static Label createLabel(BitmapFont font, NotificationStyle notificationStyle, Drawable background, String text) {
         LabelStyle labelStyle = new LabelStyle();
         labelStyle.background = background;
-        labelStyle.font = new BitmapFont(Gdx.files.internal("font.fnt"));
+        labelStyle.font = font;
         switch (notificationStyle) {
             case DEFAULT:
                 labelStyle.fontColor = Color.WHITE;

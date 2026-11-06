@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -18,6 +19,8 @@ import java.util.List;
 import static com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
 public class ResourcesService {
+    private static final String FONT = "font.fnt";
+
     private final Skin skin;
     private final AssetManager assetManager;
     private final Array<TextureAtlas> atlases = new Array<>();
@@ -37,6 +40,7 @@ public class ResourcesService {
             assetManager.load(textureName, Texture.class, textureParameter);
         }
 
+        assetManager.load(FONT, BitmapFont.class);
         assetManager.load("skin/skin.atlas", TextureAtlas.class);
         assetManager.finishLoading();
 
@@ -77,6 +81,13 @@ public class ResourcesService {
 
     public TextureRegion getThumbnail(ThumbnailType thumbnailType) {
         return getTexture(thumbnailType.getRegionName());
+    }
+
+    /**
+     * The one game font, loaded once and disposed with the asset manager.
+     */
+    public BitmapFont getFont() {
+        return assetManager.get(FONT, BitmapFont.class);
     }
 
     public Skin getSkin() {
