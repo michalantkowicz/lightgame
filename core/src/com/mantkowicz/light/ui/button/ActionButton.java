@@ -28,10 +28,10 @@ public class ActionButton extends GameActor {
 
         setSize(button.getWidth(), button.getHeight());
 
-        Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, context.getCamera(), new Vector2(0, SCREEN_WIDTH / 2f));
+        Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, context, new Vector2(0, SCREEN_WIDTH / 2f));
         addPlugin(centerActorByCameraPlugin);
 
-        RemoveOnPlayerMovePlugin removeOnPlayerMovePlugin = new RemoveOnPlayerMovePlugin(context.getGameEventService(), this);
+        RemoveOnPlayerMovePlugin removeOnPlayerMovePlugin = new RemoveOnPlayerMovePlugin(this, context);
         addPlugin(removeOnPlayerMovePlugin);
     }
 }

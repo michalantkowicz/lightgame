@@ -40,7 +40,7 @@ public class Player extends GameBoardActor implements Collecting {
         lastIdleChange = TimeUtils.millis();
         createAvatar(context, AVATAR_NAME);
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, SPEED, context);
+        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SPEED);
         addPlugin(boardMovementPlugin);
 
         PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);
