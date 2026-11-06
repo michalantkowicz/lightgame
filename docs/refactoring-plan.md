@@ -751,3 +751,12 @@ blocked by it.
 - New `WallTest`: `GameDriver.addWall(cell)` builds a `WallTile` in the running game (the map has no walls) and `lightReaches(from, to)`
   checks with a temporary `PointLight`. A wall on (10,21) shadows (10,20) from (10,22) and doesn't block (12,22). Against the old code
   the test fails with `UnsupportedOperationException`.
+
+### 2026‑11‑06, after Phase 7
+
+- **7.5 skipped (K18 changed to keep):** the human decided to keep every asset, because it isn't clear yet what will be needed.
+- **LWJGL 3.3.6 → 3.4.3 (own PR):** on JDK 24+ the desktop run printed "A terminally deprecated method in sun.misc.Unsafe has been
+  called" from LWJGL's memory code. LWJGL 3.4.3 still defaults to an `Unsafe` backend, but it ships an FFM backend for JDK 25+.
+  `DesktopLauncher` selects it with `Configuration.MEMORY_BACKEND.set("ffm")` when running on Java 25 or later; older JVMs keep the
+  default. The game was started for 45 s on JDK 25 with no warning and no error. LWJGL notes FFM is somewhat slower, which doesn't
+  matter for this game.
