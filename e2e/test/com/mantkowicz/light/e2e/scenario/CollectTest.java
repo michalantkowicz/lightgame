@@ -26,6 +26,7 @@ class CollectTest {
         game.seconds(1);
         game.snapshot("window open");
         game.note("inventories: " + game.inventories());
+        game.note("debug lines: " + game.uiDebugLinesShown());
 
         game.clickChestSlot(0);
         game.clickPlayerSlot(0);

@@ -730,3 +730,8 @@ blocked by it.
   **same** window, which showed the lighter in the player's slot although the inventories didn't change (OK would then save it).
   `OpenCollectWindowButtonListener` now takes a `Supplier<CollectWindow>` and opens a fresh window on every click. Both collect tests
   reopen the window and record its slots (`reopened window: ...`); before the fix the cancel test showed the bug.
+
+### 2026‑11‑06, Phase 7, B4 (debug lines)
+
+- Fixed as its own PR: `Debug.Tool.COLLECT_WINDOW_LINES` is off by default (`Debug.switchOn(COLLECT_WINDOW_LINES)` brings it back).
+  `GameDriver.uiDebugLinesShown()` is recorded in the collect golden; recorded against the old default it said `true`.
