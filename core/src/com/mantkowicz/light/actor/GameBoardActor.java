@@ -65,26 +65,6 @@ public abstract class GameBoardActor extends GameActor implements Interactive {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        GameBoardActor that = (GameBoardActor) o;
-
-        if (boardService != null ? !boardService.equals(that.boardService) : that.boardService != null) return false;
-        return getTile() != null ? getTile().equals(that.getTile()) : that.getTile() == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (boardService != null ? boardService.hashCode() : 0);
-        result = 31 * result + (getTile() != null ? getTile().hashCode() : 0);
-        return result;
-    }
-
-    @Override
     public List<Interaction> getInteractions() {
         return interactions;
     }

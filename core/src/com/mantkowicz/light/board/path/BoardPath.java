@@ -23,8 +23,11 @@ public class BoardPath {
         return path == null || path.isEmpty();
     }
 
+    /**
+     * Same as {@code !isEmpty()}.
+     */
     public boolean exists() {
-        return !(path == null || path.isEmpty());
+        return !isEmpty();
     }
 
     public Tile getLastNode() {

@@ -4,6 +4,7 @@
     <inherits name="com.badlogic.gdx.backends.gdx_backends_gwt" />
     <inherits name="com.badlogic.gdx.physics.box2d.box2d-gwt" />
     <inherits name="Box2DLights" />
+    <inherits name="com.badlogic.gdx.ai" />
     <inherits name="LightGame" />
 
     <!-- GWT-specific replacements of library classes (see emu/) -->

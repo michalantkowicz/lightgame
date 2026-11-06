@@ -3,7 +3,7 @@ package com.mantkowicz.light.feature.implementation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.mantkowicz.light.stage.MenuStage;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.game.GameContext;
@@ -30,7 +30,7 @@ public class MenuFeature implements Feature {
     private static final float BUTTON_OFFSET_DEGREES = 60f;
     private static final float MENU_ANIMATION_DURATION = .5f;
 
-    private final Stage stage;
+    private final MenuStage stage;
     private final GameEventService gameEventService;
     private final ResourcesService resourcesService;
 
@@ -51,6 +51,7 @@ public class MenuFeature implements Feature {
             }
         } else if (gameEventService.has(MenuCloseEvent.class)) {
             gameEventService.poll(MenuCloseEvent.class);
+            stage.interactWithButtonUnderPointer();
             stage.clear();
         }
     }

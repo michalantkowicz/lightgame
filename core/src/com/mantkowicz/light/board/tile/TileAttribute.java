@@ -1,7 +1,8 @@
 package com.mantkowicz.light.board.tile;
 
 public enum TileAttribute {
-    TILE_CLASS("tileClass");
+    TILE_CLASS("tileClass"),
+    TEXTURE_NAME("textureName");
 
     private final String value;
 

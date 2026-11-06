@@ -68,26 +68,6 @@ public abstract class GameActor extends Group {
         this.status = status;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        GameActor actor = (GameActor) o;
-
-        if (id != actor.id) return false;
-        if (pluginsQueue != null ? !pluginsQueue.equals(actor.pluginsQueue) : actor.pluginsQueue != null) return false;
-        return getGameActorType() == actor.getGameActorType();
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (pluginsQueue != null ? pluginsQueue.hashCode() : 0);
-        result = 31 * result + (getGameActorType() != null ? getGameActorType().hashCode() : 0);
-        return result;
-    }
-
     public void setPosition(Vector2 position) {
         super.setPosition(position.x, position.y);
     }
