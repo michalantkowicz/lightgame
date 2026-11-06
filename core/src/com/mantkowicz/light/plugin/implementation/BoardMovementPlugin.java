@@ -56,11 +56,7 @@ public class BoardMovementPlugin implements Plugin {
             SequenceAction moveToTileAction = Actions.sequence(
                     Actions.run(() -> player.setStatus(MOVEMENT)),
                     Actions.moveTo(position.x, position.y, speed, Interpolation.sineOut),
-                    Actions.run(() -> {
-                        if (path.exists()) {
-                            player.setTile(pathNode);
-                        }
-                    }),
+                    Actions.run(() -> player.setTile(pathNode)),
                     Actions.run(() -> player.setStatus(IDLE))
             );
             sequence.addAction(moveToTileAction);
