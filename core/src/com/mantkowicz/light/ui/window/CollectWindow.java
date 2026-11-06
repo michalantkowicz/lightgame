@@ -30,10 +30,10 @@ import static com.mantkowicz.light.ui.window.CollectWindowItemState.UNCHOSEN;
 import static com.mantkowicz.light.debug.Debug.Tool.COLLECT_WINDOW_LINES;
 
 public class CollectWindow extends GameActor {
-    private final int WIDTH = 600;
-    private final int HEIGHT = 600;
-    private final int PADDING = 20;
-    private final int PADDING_ITEM = 20;
+    private static final int WIDTH = 600;
+    private static final int HEIGHT = 600;
+    private static final int PADDING = 20;
+    private static final int PADDING_ITEM = 20;
     private final Collectible collectible;
     private final Collecting collecting;
     private final Skin skin;
@@ -139,7 +139,6 @@ public class CollectWindow extends GameActor {
         }
         return itemsTable;
     }
-
 
     private void setItemPadding(Cell cell) {
         cell.padRight(PADDING_ITEM / 2f).padLeft(PADDING_ITEM / 2f).padTop(PADDING_ITEM).padBottom(PADDING_ITEM);
