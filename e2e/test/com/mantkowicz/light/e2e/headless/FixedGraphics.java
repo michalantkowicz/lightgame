@@ -6,11 +6,17 @@ import com.badlogic.gdx.backends.headless.mock.graphics.MockGraphics;
 final class FixedGraphics extends MockGraphics {
     static final float FRAME_TIME = 1 / 60f;
 
-    private final int width;
-    private final int height;
+    private int width;
+    private int height;
     private long frameId;
 
     FixedGraphics(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    /** Like resizing a real window. */
+    void resize(int width, int height) {
         this.width = width;
         this.height = height;
     }

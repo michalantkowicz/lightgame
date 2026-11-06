@@ -58,6 +58,14 @@ public final class HeadlessGame {
         input.endFrame();
     }
 
+    public int screenWidth() {
+        return graphics.getWidth();
+    }
+
+    public int screenHeight() {
+        return graphics.getHeight();
+    }
+
     public ApplicationListener game() {
         return game;
     }
@@ -75,6 +83,7 @@ public final class HeadlessGame {
     }
 
     public void resize(int width, int height) {
+        graphics.resize(width, height);
         game.resize(width, height);
     }
 
