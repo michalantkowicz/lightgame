@@ -11,8 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Collecting;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.configuration.api.CollectWindowConfiguration;
+import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.plugin.implementation.CenterActorByCameraPlugin;
 import com.mantkowicz.light.service.resources.ResourcesService;
@@ -25,6 +27,7 @@ import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTIBLE_ITEM;
 import static com.mantkowicz.light.ui.window.CollectItemType.COLLECTING_ITEM;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.ABLE_TO_PUT;
 import static com.mantkowicz.light.ui.window.CollectWindowItemState.UNCHOSEN;
+import static com.mantkowicz.light.debug.Debug.Tool.COLLECT_WINDOW_LINES;
 
 public class CollectWindow extends GameActor {
     private final int WIDTH = 600;
@@ -37,25 +40,27 @@ public class CollectWindow extends GameActor {
     private final ResourcesService resourcesService;
     private final List<CollectItem> collectItems;
     private CollectItem chosenItem;
-    private Table mainTable;
+    private final Table mainTable;
 
-    public CollectWindow(CollectWindowConfiguration configuration, Collecting collecting, Collectible collectible) {
+    public CollectWindow(GameContext context, Collecting collecting, Collectible collectible) {
         super(COLLECT_WINDOW);
 
         this.collectible = collectible;
         this.collecting = collecting;
-        this.skin = configuration.getResourcesService().getSkin();
-        this.resourcesService = configuration.getResourcesService();
+        this.skin = context.getResourcesService().getSkin();
+        this.resourcesService = context.getResourcesService();
         this.collectItems = new ArrayList<>();
 
         Table backgroundTable = new Table();
-        backgroundTable.setSize(configuration.getUiStage().getWidth() * 2, configuration.getUiStage().getHeight() * 2);
+        backgroundTable.setSize(context.getMenuStage().getWidth() * 2, context.getMenuStage().getHeight() * 2);
         backgroundTable.setTouchable(Touchable.enabled);
         backgroundTable.addListener(new StopClickThroughClickListener());
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("black.png")));
         backgroundTable.setBackground(backgroundDrawable);
         backgroundTable.setPosition(-backgroundTable.getWidth() / 2f, -backgroundTable.getHeight() / 2f);
-        backgroundTable.debug();
+        if (Debug.isOn(COLLECT_WINDOW_LINES)) {
+            backgroundTable.debug();
+        }
         addActor(backgroundTable);
 
         mainTable = new Table();
@@ -73,7 +78,7 @@ public class CollectWindow extends GameActor {
 
         setSize(mainTable.getWidth(), mainTable.getHeight());
 
-        Plugin plugin = new CenterActorByCameraPlugin(this, configuration.getCamera(), new Vector2());
+        Plugin plugin = new CenterActorByCameraPlugin(this, context, new Vector2());
         addPlugin(plugin);
     }
 
@@ -94,8 +99,8 @@ public class CollectWindow extends GameActor {
     private Table getContent(int contentHeight) {
         Table table = new Table();
 
-        Table collectibleTable = getCollectibleTable();
-        Table inventoryTable = getInventoryTable();
+        Table collectibleTable = createItemsTable(collectible.getInventory(), COLLECTIBLE_ITEM);
+        Table inventoryTable = createItemsTable(collecting.getInventory(), COLLECTING_ITEM);
         Table buttonsTable = getButtonsTable();
 
         table.add(collectibleTable).height(contentHeight * 0.3f).row();
@@ -122,31 +127,19 @@ public class CollectWindow extends GameActor {
         return buttonsTable;
     }
 
-    private Table getInventoryTable() {
-        Table inventoryTable = new Table();
-        for (Item collectingItem : collecting.getInventory().getItems()) {
-            CollectItem item = new CollectItem(resourcesService, COLLECTING_ITEM, collectingItem);
+    private Table createItemsTable(Inventory inventory, CollectItemType collectItemType) {
+        Table itemsTable = new Table();
+        for (Item inventoryItem : inventory.getItems()) {
+            CollectItem item = new CollectItem(resourcesService, collectItemType, inventoryItem);
             item.addListener(new CollectWindowItemListener(this, item));
             collectItems.add(item);
 
-            Cell<CollectItem> cell = inventoryTable.add(item);
+            Cell<CollectItem> cell = itemsTable.add(item);
             setItemPadding(cell);
         }
-        return inventoryTable;
+        return itemsTable;
     }
 
-    private Table getCollectibleTable() {
-        Table collectibleTable = new Table();
-        for (Item collectibleItem : collectible.getInventory().getItems()) {
-            CollectItem item = new CollectItem(resourcesService, COLLECTIBLE_ITEM, collectibleItem);
-            item.addListener(new CollectWindowItemListener(this, item));
-            collectItems.add(item);
-
-            Cell<CollectItem> cell = collectibleTable.add(item);
-            setItemPadding(cell);
-        }
-        return collectibleTable;
-    }
 
     private void setItemPadding(Cell cell) {
         cell.padRight(PADDING_ITEM / 2f).padLeft(PADDING_ITEM / 2f).padTop(PADDING_ITEM).padBottom(PADDING_ITEM);

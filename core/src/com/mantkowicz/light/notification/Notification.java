@@ -40,6 +40,6 @@ public class Notification extends Group {
     }
 
     public Vector2 getCenter() {
-        return new Vector2(getX() + getWidth() / 2f, getY() + getHeight() / 2f);
+        return new Vector2(getX(Align.center), getY(Align.center));
     }
 }

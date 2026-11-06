@@ -5,7 +5,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.lights.GameLight;
 import com.mantkowicz.light.lights.LightType;
 import com.mantkowicz.light.lights.factory.LightFactory;
@@ -13,25 +13,25 @@ import com.mantkowicz.light.lights.factory.LightFactory;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.BORDER_LIGHT_POSITION;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.LIGHT_COLOR_HEX;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.LIGHT_TYPE;
-import static com.mantkowicz.light.board.object.TileObjectType.CHEST;
+import static com.mantkowicz.light.board.object.TileObjectType.LIGHT;
 
 public class TileLight extends TileObject {
     private static final float BORDER_OFFSET = 5f;
     private GameLight light;
 
-    private TileLightAttributes lightAttributes;
+    private final TileLightAttributes lightAttributes;
 
     public TileLight(MapProperties objectProperties) {
-        super(CHEST);
+        super(LIGHT);
         lightAttributes = new TileLightAttributes(objectProperties);
     }
 
     @Override
-    public void prepare(Tile tile, GamePrepareConfiguration configuration) {
-        light = LightFactory.createLight(configuration.getRayHandler(), lightAttributes.getType());
+    public void prepare(Tile tile, GameContext context) {
+        light = LightFactory.createLight(context.getRayHandler(), lightAttributes.getType());
         light.setColor(lightAttributes.getColor());
         light.setTile(tile);
-        configuration.getStage().addActor(light);
+        context.getGameStage().addActor(light);
 
         if (lightAttributes.isLightBorder()) {
             moveLight(tile, lightAttributes.getBorderPosition().getRotation());
@@ -54,9 +54,9 @@ public class TileLight extends TileObject {
     }
 
     private class TileLightAttributes {
-        private LightType type;
-        private Color color;
-        private BorderLightPosition borderPosition;
+        private final LightType type;
+        private final Color color;
+        private final BorderLightPosition borderPosition;
 
         public TileLightAttributes(MapProperties properties) {
             String typeLiteral = properties.get(LIGHT_TYPE.getValue(), "TORCH", String.class);

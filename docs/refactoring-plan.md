@@ -1,13 +1,17 @@
 # Light Game: Refactoring Plan
 
-Goal: make the codebase **as simple and human‑readable as possible while keeping the current behaviour**.
+Goal: make the codebase **as simple, consistent and human‑readable as possible while keeping the current behaviour
+and every tool it has**.
 The plan is written for step‑by‑step execution by agents (or a human), with checkpoints to stop, review and
 roll back.
 
 - Scope: the `core` module (all game code) plus the small launcher touch points in `desktop`/`html`.
 - Baseline: commit that contains the libGDX 1.14.2 / Gradle 9.8.2 / HTML5 migration. **The migration must be
   committed before Phase 0 starts.**
-- Size today: **129 Java files, ~4,730 lines** in `core`. Rough estimate after the plan: **~55 files, ~2,500 lines**.
+- Size today: **129 Java files, ~4,730 lines** in `core`. How much smaller it gets depends on the keep‑or‑remove answers (§5.2).
+- **Direction (2026‑11‑06):** the game is a snapshot of past experiments, so unused code is often a tool that is temporarily
+  not called. The plan therefore focuses on consistency (actors, plugins, features look the same; shared code in one place;
+  debug tools in one place) and removes nothing without a per‑item decision.
 
 ---
 
@@ -17,24 +21,26 @@ roll back.
    Bug‑fix steps (Phase 7) use `fix(<id>): …`.
 2. **Behaviour must not change** in Phases 0–6. If a step seems to need a behaviour change, stop and ask.
    Known bugs are listed in §3.4 and fixed **only** in Phase 7, after approval.
-3. **No drive‑by changes.** Do only what the step says. If you find something new, add it to §8 ("Found during
+3. **Nothing is removed just because it is unused.** Deleting a method, class, debug tool or asset needs the human's approval
+   for that item (§5.2). Unapproved items stay and keep working when their class is moved or reshaped. §3.3 lists them.
+4. **No drive‑by changes.** Do only what the step says. If you find something new, add it to §8 ("Found during
    execution") and continue.
-4. **Every step must pass the step gate (§6.1)** before committing. Every phase ends with a **checkpoint (§6.2)**: tag
+5. **Every step must pass the step gate (§6.1)** before committing. Every phase ends with a **checkpoint (§6.2)**: tag
    it, then STOP and wait for human review before starting the next phase.
-5. **Rollback:** `git reset --hard refactor-cp<N>` returns to the last approved checkpoint. To replay a single step,
+6. **Rollback:** `git reset --hard refactor-cp<N>` returns to the last approved checkpoint. To replay a single step,
    reset to the previous step's commit and re‑execute it.
-6. **GWT (HTML5) constraints.** `core` is also compiled to JavaScript by GWT, so do not use:
+7. **GWT (HTML5) constraints.** `core` is also compiled to JavaScript by GWT, so do not use:
    - reflection: `Class.isInstance`, `Class.forName`, `getDeclaredFields`, …
    - `String.format`, threads or `synchronized`, `java.io` file APIs.
 
    `getClass()`, class literals as map keys, lambdas, anonymous classes, enums and `switch` on strings or enums are fine.
    `./gradlew html:dist` is part of every gate because it catches these.
-7. **Style to keep:**
+8. **Style to keep:**
    - 4‑space indentation and explicit imports. Static imports are OK, as the code already uses them.
    - `private final` fields where possible, no Lombok, no new libraries in `core`.
    - Constants are `private static final`.
-8. Don't touch `android/`, `html/src/**/emu/**`, or the build files, except where a step says so.
-9. Decisions in §5 must be answered by the human **before** the steps that depend on them. Each step lists its
+9. Don't touch `android/`, `html/src/**/emu/**`, or the build files, except where a step says so.
+10. Decisions in §5 must be answered by the human **before** the steps that depend on them. Each step lists its
    decision dependency.
 
 ---
@@ -105,44 +111,57 @@ User‑visible behaviour, which the manual smoke test in §6.3 checks:
 
 ### 3.2 Boilerplate
 
+Items that would **remove** a class, method or extension point are not done automatically: they are listed with a K number and decided
+one by one in §5.2.
+
 - **Generated `equals`/`hashCode`** in `GameActor`, `GameBoardActor` and `Tile`. Ids are unique per instance, so they behave like identity
-  anyway. They also hash **mutable** state (`tile`, `polygon`, `pluginsQueue`), which is a latent bug for `HashMap` keys.
-  Delete them and use identity. This also makes `id`/`ID_COUNTER`/`ID_SEQUENCE` and the whole `GameActorType` enum unused.
-- **Enum‑with‑value wrappers:**
-  - String keys: `TileAttribute` (1 value), `TileObjectAttribute`.
-  - Single‑value enums: `ShaderType` (1 value), `ThumbnailType` (1 value), `LightType` (1 value).
-  - Enums where only one value is used: `BlinkingIntensity`, `BlinkingSpeed`.
+  anyway. They also hash **mutable** state (`tile`, `polygon`, `pluginsQueue`), which is a latent bug for `HashMap` keys. Switching to
+  identity is equivalent; whether `id`/`GameActorType` then go is **K9**.
+- **Enum‑with‑value wrappers:** `TileAttribute`, `TileObjectAttribute` (they document the map's property names, so they stay);
+  single‑value enums `ShaderType` (K16), `ThumbnailType` (K8), `LightType` and enums where one value is used, `BlinkingIntensity`,
+  `BlinkingSpeed` (K7). These are extension points.
 - **Trivial listener classes in separate files:** `PlayerClickListener`, `MenuButtonListener`, `OpenCollectWindowButtonListener`,
-  `CollectWindowCancelListener`, `CollectWindowOkListener`, `StopClickThroughClickListener`.
-- **Duplicated code:**
+  `CollectWindowCancelListener`, `CollectWindowOkListener`, `StopClickThroughClickListener`. Today some listeners are named classes and
+  some are anonymous, with no rule (see C9).
+- **Duplicated code** (moved to one common place in 3.5):
   - `LabelFactory` has two near‑identical methods.
   - `CollectWindow.getCollectibleTable()`/`getInventoryTable()` are identical.
   - `TileChest`/`TileDog`/`TilePlayer` are the same 10 lines.
   - The hex width formula appears twice and the cell‑position formula twice (`TmxTiledMapLoader`).
   - `Notification.getCenter()` duplicates `GameActor.getCenter()`.
-- **Unneeded wrappers:** `BoardPath` (wraps a `List`, has both `isEmpty()` and `exists()`, plus unused `setPath`/`getLastNode`),
-  `GameActorsByTile` (a `Map` with 3 methods).
-- **`TilePoint` enum and a `switch`** to build 6 polygon corners. Only `CENTER` is used from outside `Tile`.
-- **Pathfinding is O(n²) Dijkstra on a graph where every edge has weight 1** (`BoardService.getPath`). A 15‑line BFS
-  does the same job (decision D4).
+  - Anonymous `Action` classes that only call one method (`BoardMovementPlugin`, `RemoveOnPlayerMovePlugin`), where libGDX has
+    `Actions.run(..)` and `Actions.removeActor()`.
+- **Pathfinding is O(n²) Dijkstra on a graph where every edge has weight 1** (`BoardService.getPath`). A BFS does the same job (D4).
 - **`GameScreen` has empty `pause/resume/hide` methods.** Extending `ScreenAdapter` removes them.
 - **"Constants" declared as instance fields:** `final` but not `static` (`MenuFeature`, `CollectWindow`, `Description`).
 
-### 3.3 Dead code (verified by search; none of it is reachable)
+### 3.3 Unused today, kept on purpose
 
-| Item | Where |
-|------|-------|
-| Stray `new RayHandler(world)` that is never used and leaks an FBO | `Main.java:27` |
-| Disabled "scared of darkness" feature: `PlayerNotificationPlugin` is built but `addPlugin` is commented out. It drags along `EnlargeAndFadeOutAnimation`, `NotificationType.PLAYER_NOTIFICATION`, `NotificationStage.doesContainNotification/removeAllNotificationsOfType/getNotificationCount`, `Tile.getNotificationCenterPosition`, `Player.getIdleLength`/`lastIdleChange` and `PhraseGroup.DARKNESS_EXCLAMATION` (decision D2) | `Player.java:46` and listed files |
-| `Collectible.beforeCollect/afterCollect/getName/getTile/DEFAULT`; `Chest`'s `System.out` implementations; `Chest.setName("Nice Chest")` | `actor/` |
-| `Item.use/unuse` and `Lighter`'s implementations; `Lighter.thumbnail` field (loaded, never read). `Lighter` extends `GameBoardActor` and implements `Collectible` but is never placed on a board or stage, because it only ever lives inside an inventory | `actor/implementation/item/Lighter.java` |
-| `CameraActor.setDebug`, `centerAtWithZoom`; commented `setDebug` call in `CameraTrackingFeature` | |
-| `GameLight.getTile/setLightPosition/setLightColor/getLightType`; `TorchLight.COLOR`, which is always overwritten by the map colour (default `555555`) | `lights/` |
-| `TileObject.objectType` field (never read; `TileLight` even passes `CHEST`) | `TileLight.java:25` |
-| `Tile.getId`, `Tile.id`, commented‑out actor code in `Tile`, `TileSet.properties`/`TilesetProperties`, `TmxTiledMapLoader.getTilesetProperties` | |
-| `PhraseService.getPhrase`; `Inventory.getCapacity`; `NotificationType` (after D2 nothing reads it); `FadeOutAnimation` (only a builder default that is always overridden) | |
-| `MenuCloseEvent` payload (a pointer position nobody reads) | |
-| Unused assets: `android/assets/ui/` (uiskin), `map2_outer.tmx`, `tiles.tsx`, `player_detective.png`, `lighter.png` (preloaded but never fetched by that name; the atlas region `lighter` is used). **Keep** `grass*`, `road*`, `tileFloor`, `woodenFloor*`, `floor-tile`, `wall-tile` PNGs: `lightgame_tileset.tsx` references them and `TmxMapLoader` loads them. | `android/assets` |
+The game is a snapshot of earlier experiments: some usages were removed temporarily while playing with mechanics. **Nothing in this
+table is deleted by the plan.** It is listed so that nobody "cleans it up" by accident, and so refactoring steps keep it working
+(for example, a moved class keeps these methods). Clean‑up candidates that need a decision have a K number (§5.2).
+
+| Item | What it is for |
+|------|----------------|
+| `CameraActor.setDebug` (camera tracking box) and the commented call in `CameraTrackingFeature` | Debug tool. Goes to the debug place (D6) |
+| `CameraActor.centerAtWithZoom` | Camera helper |
+| "Scared of darkness": `PlayerNotificationPlugin` (built, `addPlugin` commented out), `EnlargeAndFadeOutAnimation`, `NotificationType.PLAYER_NOTIFICATION`, `NotificationStage.doesContainNotification/removeAllNotificationsOfType/getNotificationCount`, `Tile.getNotificationCenterPosition`, `Player.getIdleLength`/`lastIdleChange`, `PhraseGroup.DARKNESS_EXCLAMATION` | Switched‑off feature (D2) |
+| `Collectible.beforeCollect/afterCollect/getName/getTile/DEFAULT`; `Chest.setName("Nice Chest")` | Collect hooks, used by the collect flow once B1 is fixed |
+| `Item.use/unuse` (`Lighter`: "TURN LIGHTER ON/OFF") | Item hooks |
+| `Lighter` as a `GameBoardActor` with a thumbnail field | An item that could also lie on the board (K10) |
+| `GameLight.getTile/setLightPosition/setLightColor/getLightType`; `TorchLight.COLOR` (overwritten by the map colour today) | Light helpers and default colour |
+| `TileObject.objectType` (never read; `TileLight` passes `CHEST`, which looks like a copy‑paste slip) | Object type information. 3.6 fixes the slip: `TileLight` passes `LIGHT` |
+| `Tile.getId`, `TileSet.properties`/`TilesetProperties` (tile size, written, never read) | Map information (K14) |
+| `PhraseService.getPhrase`, `Inventory.getCapacity`, the `Inventory` constructor path for a `null` list | Small API |
+| `GameEventService.getEvent(..)` | Peek at an event without consuming it |
+| `BoardPath.setPath/getLastNode`, `GameBoardActor.remove()` | Path and board helpers |
+| `LabelFactory.createLabel(WARNING, background, text)`, `FadeOutAnimation`, `NotificationType` | Notification tools (K6) |
+| `MenuCloseEvent` payload (pointer position) | Where the menu was released (K17) |
+| The "distant collectibles" hook (`Collectible.isDistant()`, neighbour loop in `BoardService.checkCollisions`) | Collecting from a neighbour tile |
+| Unused assets: `android/assets/ui/` (uiskin), `map2_outer.tmx`, `tiles.tsx`, `player_detective.png`, `lighter.png` (preloaded, never fetched by that name) | K18 |
+
+Real clean‑up candidates, not tools (decide in §5.2): the stray `new RayHandler(world)` in `Main` that is never used and leaks a
+framebuffer (K1); commented‑out code (K2); `System.out.println` placeholders (K3).
 
 ### 3.4 Bugs found (**do not fix before Phase 7**; each needs approval)
 
@@ -153,41 +172,79 @@ User‑visible behaviour, which the manual smoke test in §6.3 checks:
 | B3 | **Any `WALL` tile crashes on load.** `WallTile.prepare` calls `Tile.stageToLocalCoordinates`, which throws `UnsupportedOperationException`. The tileset defines WALL (gid 2); the current map doesn't use it. | `Tile.java:218`, `WallTile.java:22` |
 | B4 | **Debug outlines are drawn over the collect window** (`backgroundTable.debug()` turns on stage debug drawing). Only visible after B1 is fixed. | `CollectWindow.java:58` |
 | B5 | **Resource leaks.** Every label loads a **new `BitmapFont`** from disk that is never disposed: each "no path" text, each menu button, each tooltip. Description tooltips fade to alpha 0 but are **never removed** from the stage. `GameScreen.dispose()` is never called and doesn't dispose `menuStage`, `notificationStage` or the shader. | `LabelFactory.java:14,31`, `Description.java:33`, `GameScreen.dispose()` |
-| B6 | `PhraseService.getRandomPhrase` shuffles the enum's backing array in place. It's harmless but surprising. It gets fixed naturally in step 5.7. | `PhraseService.java:20` |
+| B6 | `PhraseService.getRandomPhrase` shuffles the enum's backing array in place. It's harmless but surprising. It gets fixed in step 5.6. | `PhraseService.java:20` |
 
-B5 and B6 are invisible to the player and are fixed **inside** the refactoring steps that rewrite that code (4.3, 4.1, 5.7),
+B5 and B6 are invisible to the player and are fixed **inside** the refactoring steps that rewrite that code (4.1, 4.3, 5.6),
 because the new code simply doesn't have the leak. All other bugs wait for Phase 7.
+
+### 3.5 Consistency findings
+
+The same kind of class is written in different ways. These are the main targets of Phase 3.
+
+**Actors**
+
+| # | Finding | Where |
+|---|---------|-------|
+| C1 | **Avatars load three ways.** `Dog`, `Chest` and `Player` each have an `AVATAR_RESOURCE_NAME` constant and call `getAssetManager().get(name, Texture.class)`; `Lighter` calls `getTexture("lighter")`; `GameActor.createAvatar` takes a `Texture`. | `actor/implementation/**` |
+| C2 | **The description is an abstract method called from the base constructor** (A9). `Dog` returns a sentence, `Player` returns `"player"`, `Lighter` has one nobody can see. | `GameBoardActor.java:25` |
+| C3 | **The inventory is declared twice:** `Collecting.getInventory()` (the player) and `Collectible.getInventory()` (the chest, and `Lighter`, which returns `null`). Sizes are magic numbers in each constructor (`3`, `2`), each with `new ArrayList<Item>()`. | `Player`, `Chest`, `Lighter` |
+| C4 | **Status lives in `GameActor`, set in three places.** The base constructor calls the overridable `setStatus(IDLE)` before `Player`'s fields exist, and `Player` calls `setStatus(IDLE)` again at the end of its constructor. | `GameActor.java:30`, `Player.java:52` |
+| C5 | **Listeners are attached differently.** The press‑and‑hold menu listener is added by `GameBoardActor`; the player's click listener is a separate class in the player package; `Chest` disables touch while `Dog` relies on the default. | `GameBoardActorListener`, `PlayerClickListener` |
+| C6 | **Plugins are wired differently per actor.** `Player` builds three plugins inline (one built and not added); `ActionButton` builds two. | `Player`, `ActionButton` |
+
+**Plugins and features**
+
+| # | Finding | Where |
+|---|---------|-------|
+| C7 | **Constructor parameter order differs:** `BoardMovementPlugin(player, speed, configuration)`, `CollectPlugin(resolver, configuration)`, `RemoveOnPlayerMovePlugin(eventService, actor)`, `CenterActorByCameraPlugin(actor, camera, offset)`; features: `CameraTrackingFeature(actor, configuration)`, `MenuFeature(configuration)`, `FPSFeature(stage, offset)`. Some fields are `final`, others not. | `plugin/implementation`, `feature/implementation` |
+| C8 | **Non‑plugins live in `plugin/`:** `CollectResolver`, `PlayerCollectResolver` and `OpenCollectWindowButtonListener` sit next to `Plugin`, while the plugins sit in `plugin/implementation`. | `plugin/` |
+| C9 | **No rule for listeners and small actions:** some are named classes in their own file, some are anonymous, some are anonymous `Action` subclasses that libGDX already provides (`Actions.run`, `Actions.removeActor`). | see §3.2 |
+| C10 | **Features add their own actors in different ways:** `CameraTrackingFeature` creates the `CameraActor` and adds it to the stage from the configuration; `FPSFeature` takes the stage directly. `GameScreen` registers features in two places (the camera one inside an event check). | `GameScreen.show()` |
+
+**Debug tools**
+
+| # | Finding | Where |
+|---|---------|-------|
+| C11 | **Debug switches are scattered and toggled by commenting code:** the camera tracking box (`CameraActor.setDebug`, call commented out), a brighter ambient light (commented line in `GameScreen.prepareLights`), table debug lines (`backgroundTable.debug()`, on by accident: B4), the FPS label (always on), the darkness exclamation (commented `addPlugin`). | various |
 
 ---
 
 ## 4. Target architecture
 
 Packages are organised by feature, with no `api/`, `factory/` or `implementation/` layers. Sub‑packages exist only where they hold ~5+ classes.
+The layout below assumes every K decision is **keep**; a class marked `(K#)` disappears only if that item is approved for removal.
 
 ```
 com.mantkowicz.light
-├── game/        Main, GameScreen, GameContext
-├── resources/   Resources (textures, nine-patches, skin, font, label creation), Phrases
-├── event/       GameEvent, GameEvents (queue), TileTouchedEvent, CollectEvent, PlayerMoveEvent,
-│                LookAtMeEvent, PlayerCreatedEvent, MenuOpenEvent, MenuCloseEvent
-├── board/       Board, BoardClickListener, Tile, FloorTile, WallTile, BoardService (actors on tiles,
-│                collisions, path finding)
-├── map/         TmxBoardLoader (+ hex grid math), TileObject, TileSprite, TileChest, TileDog,
-│                TilePlayer, TileLight, LightType
-├── actor/       GameActor, GameBoardActor, Player, Dog, Chest, CameraActor, Inventory, Item, Lighter,
-│                Collectible
-├── light/       TorchLight, BlinkingAction
-├── plugin/      Plugin, BoardMovementPlugin, CollectPlugin, CenterActorByCameraPlugin, RemoveOnPlayerMovePlugin
-├── feature/     Feature, CameraTrackingFeature, MenuFeature, FPSFeature
-└── ui/          GameStage, MenuStage, NotificationStage, Notification, ActionButton
-    ├── menu/    MenuButton, Interaction, DescriptionInteraction, Description
-    └── collect/ CollectWindow, CollectItem
+├── game/          Main, GameScreen, GameContext
+├── debug/         Debug (all debug switches in one place, D6)
+├── resources/     ResourcesService, ShaderType (K16), Thumbnail + ThumbnailType (K8), PhraseService, PhraseGroup
+├── event/         GameEvent, GameEventService (queue), TileTouchedEvent, CollectEvent, PlayerMoveEvent,
+│                  LookAtMeEvent, PlayerCreatedEvent, MenuOpenEvent, MenuCloseEvent, AddToStageEvent (K4)
+├── board/         Board, BoardClickListener, BoardService, GameActorsByTile, BoardPath (K15),
+│   │              Tile, AccessibleTile + NoPathTile (K13), FloorTile, WallTile, TileFactory (K13), TilePoint (K12), TileType
+├── map/           TiledMapLoader (K14), TmxTiledMapLoader (+ hex grid math), TileSet (K14), TileObject, TileObjectType,
+│                  TileObjectAttribute, TileObjectFactory, TileSprite, TileActorObject (TileChest/TileDog/TilePlayer), TileLight
+├── actor/         GameActor, GameBoardActor, ActorListeners, Status, Player, Dog, Chest, CameraActor,
+│                  Inventory, Item, Lighter, Collectible, Collecting
+├── light/         GameLight, TorchLight, LightType, LightFactory, BlinkingAction, BlinkingIntensity, BlinkingSpeed (K7)
+├── plugin/        Plugin, BoardMovementPlugin, CollectPlugin, CenterActorByCameraPlugin, RemoveOnPlayerMovePlugin,
+│                  PlayerNotificationPlugin (D2)
+├── feature/       Feature, CameraTrackingFeature, MenuFeature, FPSFeature, StageFeature (K4)
+├── notification/  Notification, NotificationBuilder, NotificationAnimation + 3 animations, NotificationType, NotificationStyle (K6)
+└── ui/            GameStage, MenuStage, NotificationStage, ActionButton, StageType (K4)
+    ├── menu/      MenuButton, Interaction, Interactive (K11), DescriptionInteraction, Description, DescriptionDefinition (K4)
+    └── collect/   CollectWindow, CollectItem, CollectItemType, CollectWindowItemState, CollectResolver (K5), PlayerCollectResolver (K5)
 ```
 
 Principles:
 - **One wiring object, `GameContext`.** It has final fields, getters only, and is built once in `GameScreen`. Classes take what
   they need from it **in their constructor** and store only those fields; they don't keep the context itself.
   `TileObject`s, which run at spawn time, are the exception and receive it as a method argument.
+- **One shape per kind of class** (Phase 3):
+  - an actor: `super(context, avatarName, description)`, then its own fields, then `addPlugin(..)` calls, then listeners;
+  - a plugin: `new XPlugin(ownerActor, context, params…)`, all fields `private final`, one `run(delta)` that polls its event first;
+  - a feature: `new XFeature(context, params…)`, same rules; features that show something add their actor in the constructor.
 - **Events are keyed by their class:** `events.post(new TileTouchedEvent(tile))`,
   `TileTouchedEvent e = events.poll(TileTouchedEvent.class)` (returns `null` if absent), and `events.has(PlayerMoveEvent.class)`.
   Payloads have named getters, e.g. `getTile()`.
@@ -200,13 +257,43 @@ Principles:
 
 ## 5. Decisions needed from the human (answer before the dependent steps)
 
+### 5.1 Design decisions
+
 | # | Question | Options | Recommendation |
 |---|----------|---------|----------------|
-| D1 | Replace the 13 configuration interfaces with one `GameContext` class? | (a) one `GameContext`; (b) constructor injection of individual services everywhere; (c) keep interfaces but trim them | **(a)**: least code and clear to read. (b) makes some constructors take 6–7 parameters. |
-| D2 | Delete the disabled "scared of darkness" feature (`PlayerNotificationPlugin` and the code listed in §3.3)? | (a) delete (git history keeps it); (b) keep and leave disabled; (c) re‑enable (behaviour change, goes to Phase 7) | **(a)** |
-| D3 | Remove the thumbnail mechanism (`Thumbnail`, `ThumbnailType`)? Today every thumbnail is the same atlas region, `collectButton`. | (a) remove; use `"collectButton"` directly in `MenuButton` and `CollectItem`; (b) keep as a hook for per‑item icons | **(a)**. It's easy to re‑add a `getIcon()` method when a second icon actually exists. |
+| D1 | Replace the 13 configuration interfaces with one `GameContext` class? Nothing is lost: every getter stays, in one class. | (a) one `GameContext`; (b) constructor injection of individual services everywhere; (c) keep interfaces but trim them | **(a)**: least code and clear to read. (b) makes some constructors take 6–7 parameters. |
+| D2 | The switched‑off "scared of darkness" feature (§3.3)? | (a) delete (git history keeps it); (b) keep, switched off by a named flag in `Debug` instead of a commented‑out line; (c) re‑enable (behaviour change, goes to Phase 7) | **Answered: (b)**, keep it |
 | D4 | Replace Dijkstra with BFS in path finding? | (a) BFS: same path **length**, but when several shortest paths exist it may pick a different one; (b) keep Dijkstra and only tidy it | **(a)**. Today's tie‑breaking depends on `HashMap` iteration order, so it isn't a designed behaviour. |
-| D5 | Fix bugs B1–B4 in Phase 7? | per bug: fix / leave / delete the feature | B1: **fix** by adding a real UI stage (see 7.1). B2: **fix** by drawing sprites. B3: **fix** body creation. B4: **fix** by removing `.debug()`. |
+| D5 | Fix bugs B1–B4 in Phase 7? | per bug: fix / leave / delete the feature | B1: **fix** by adding a real UI stage (see 7.1). B2: **fix** by drawing sprites. B3: **fix** body creation. B4: **fix** by turning the debug lines into a `Debug` switch that is off. |
+| D6 | Debug tools (C11): one place for all of them? | (a) a `Debug` class with `public static boolean` switches (camera box, bright ambient light, table debug lines, FPS label, darkness exclamation), values set so the game behaves exactly as today; (b) the same, but read from launcher arguments or system properties; (c) leave them where they are | **Answered: (a), with per‑object control**: switch each tool separately, and outline only chosen actor classes (e.g. only `Dog`), not all‑or‑nothing. |
+
+(D3 became K8.)
+
+### 5.2 Keep or remove (default: keep)
+
+Each item stays unless you approve its removal. Answer per item; "keep" needs no answer. Approved removals are done in the step listed.
+
+| # | Item | If removed | Step | Recommendation |
+|---|------|-----------|------|----------------|
+| K1 | Stray `new RayHandler(world)` in `Main` (never used, leaks a framebuffer) | One line and an import go | 3.6 | **Answered: remove.** Not needed for new lights: they use `GameScreen`'s `RayHandler` through `context.getRayHandler()` |
+| K2 | Commented‑out code: `Tile` (actor‑era constructor, `setBackground`, `prepare`), `GameScreen` ambient line, `CameraTrackingFeature` debug line, `Player` `addPlugin` | Debug lines become `Debug` switches (D6) either way; the rest is deleted | 3.4/3.6 | **Answered: remove** (debug lines become `Debug` switches) |
+| K3 | `System.out.println` placeholders in `Chest.beforeCollect/afterCollect` and `Lighter.use/unuse` | The methods stay; only the printing goes (or becomes `Gdx.app.log`) | 3.6 | **Answered: `Gdx.app.log`** |
+| K4 | "Add to stage by event": `AddToStageEvent`, `StageFeature`, `StageType`, `AbstractStage.getStageType()`, `GameActorDefinition`, `DescriptionDefinition` | `DescriptionInteraction` adds the tooltip to the notification stage directly (7 types for one `addActor` call today) | 4.1 | your call: keep if other code should add actors to stages without knowing them |
+| K5 | `CollectResolver` interface (one implementation) and `OpenCollectWindowButtonListener` | `CollectPlugin` builds the window and button itself | 4.2 | keep if non‑player collectors are planned |
+| K6 | Notification tools: `NotificationBuilder`, `NotificationAnimation` + `FadeOutAnimation`, `EnlargeAndFadeOutAnimation`, `MoveUpperAndFadeOutAnimation`, `NotificationType`, `NotificationStyle` | One `Notification.warning(..)` factory; animations become plain libGDX actions | 4.3 | keep (they're tools); only fix the font leak |
+| K7 | Light extension points: `LightFactory`, abstract `GameLight`, `BlinkingIntensity`/`BlinkingSpeed` enums | `TorchLight` is the only light class with constants | 4.4 | keep if more light types are planned |
+| K8 | Thumbnail mechanism (`Thumbnail`, `ThumbnailType`, `getThumbnail`); today every item uses `collectButton` | `MenuButton`/`CollectItem` use `"collectButton"` directly | 4.5 | keep if per‑item icons are planned |
+| K9 | Actor ids and `GameActorType` (only used by the generated `equals`) | Identity equality; enum and constructor parameter go | 5.1 | keep the enum (type info for debugging); identity equality either way |
+| K10 | `Lighter` as a `GameBoardActor` (it's never placed on a board) | `Lighter` becomes a plain `Item` | 5.1 | keep if items should lie on the board later |
+| K11 | `Interactive` interface (one implementer) | `GameBoardActor.getInteractions()` stays as a plain method | 5.1 | keep |
+| K12 | `TilePoint` (6 corners + centre; only `CENTER` is used outside `Tile`) | Polygon built from a list; `positionFor(actor)` replaces `calculatePositionForActorAt(actor, CENTER)` | 5.3 | keep: placing actors at corners is a useful helper |
+| K13 | Middle tile layer `AccessibleTile`/`NoPathTile` and `TileFactory` (`FloorTile` overrides `isAccessible` anyway) | `FloorTile`/`WallTile` extend `Tile`; the loader picks the class with a `switch` | 5.3 | your call |
+| K14 | Map loader abstraction: `TiledMapLoader<T>` interface, `TmxTileMapLoaderProperties`, `TileSet` + `TilesetProperties` (written, never read) | One `TmxBoardLoader.load(mapFile)` returning `List<Tile>` | 5.5 | keep if other map formats are planned; `TilesetProperties` could be completed instead (read the tile size from it) |
+| K15 | `BoardPath` (wraps a `List`; `isEmpty()` and `exists()` both exist; `setPath`/`getLastNode` unused) | `getPath` returns `List<Tile>` | 5.6 | keep, but make `exists()` mean `!isEmpty()` explicitly |
+| K16 | `ShaderType` (one value) | `GameStage` loads its shader by path | 5.2 | keep if more shaders are planned |
+| K17 | `MenuCloseEvent` payload (pointer position) | Payload‑less event | 2.1 | keep, with a named getter `getPointer()` |
+| K18 | Unused assets (§3.3) | Files deleted; `"lighter.png"` leaves the preload list | 7.5 | **Answered: remove at the very end** of the refactoring (step 7.5) |
+| K19 | `Plugin` vs `Feature`: identical interfaces (A10) | One interface | O1 | keep both: the names say per‑actor vs per‑screen |
 
 ---
 
@@ -271,49 +358,19 @@ Regression tests that **play the real game** headlessly and observe only what a 
 run them, the rules for golden files and the scenario ids S1–S16 are in **[`e2e/README.md`](../e2e/README.md)**. Read it
 before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in §8. Visual (screenshot) tests are deferred.
 
-### Phase 1: Delete dead code (pure deletions)
+### Phase 1: One wiring object
 
-**1.1 Remove unused members** (Risk L). Delete everything in §3.3 **except** the D2 feature and the assets:
-- `Main.java:27`, the stray `RayHandler` (removing it also removes an unused import).
-- `Collectible`: `beforeCollect`, `afterCollect`, `getName`, `getTile`, `DEFAULT`. Remove `Chest`'s implementations and `setName`, and `Lighter`'s
-  `beforeCollect`/`afterCollect`.
-- `Item.use/unuse` and the `Lighter` implementations; the `Lighter.thumbnail` field.
-- `CameraActor.setDebug`/`centerAtWithZoom`; the commented line in `CameraTrackingFeature`.
-- `GameLight.getTile/tile/setLightPosition/setLightColor/getLightType` and its `lightType` field (and the constructor parameter);
-  `TorchLight.COLOR` and its `setColor(COLOR)` call.
-- `TileObject.objectType` and the constructor parameter in all subclasses; remove the `TileObjectType` imports that become unused
-  (the enum itself stays, because the loader uses it).
-- The commented‑out code in `Tile` (constructor, `setBackground`, `prepare`). **Leave `Tile.id`, `equals` and `hashCode` alone**:
-  removing the id from `equals` would change semantics. They all go in 5.3, where tiles switch to identity.
-- `TileSet.properties`/`TilesetProperties`/`setProperties` and `TmxTiledMapLoader.getTilesetProperties`.
-- `PhraseService.getPhrase` and `Inventory.getCapacity`. (`FadeOutAnimation` stays until 4.3: it is still the builder's default.)
-- Acceptance: the step gate passes and the golden files are unchanged.
+Comes first because every later step changes constructors: doing it first means each constructor is rewritten once.
 
-**1.2 Delete the disabled "scared of darkness" feature** (Risk L) **[D2]**
-- Delete `PlayerNotificationPlugin`, `EnlargeAndFadeOutAnimation`, the `PLAYER_NOTIFICATION` value,
-  `NotificationStage.doesContainNotification/removeAllNotificationsOfType/getNotificationCount`,
-  `Tile.getNotificationCenterPosition` (and the `NOTIFICATION_OFFSET` constant), `Player.getIdleLength`, and `Player.lastIdleChange` with its
-  handling in `setStatus` (keep the `PlayerMoveEvent` logic), plus `PhraseGroup.DARKNESS_EXCLAMATION`.
-- Delete the plugin construction lines in `Player`, and `Notification.getLabel` if it becomes unused.
-
-**1.3 Delete unused assets** (Risk L)
-- Remove `android/assets/ui/`, `map2_outer.tmx`, `tiles.tsx`, `player_detective.png` and `lighter.png`. Also remove `"lighter.png"` from the
-  preload list in `ResourcesService`.
-- Re‑run the reference check from the analysis: for each removed file, `grep -rF <name>` over `core/src`, `android/assets` and `html`
-  must return nothing.
-
-**▶ CP1**
-
-### Phase 2: One wiring object
-
-**2.1 Introduce `GameContext`** (Risk M) **[D1]**
+**1.1 Introduce `GameContext`** (Risk M) **[D1]**
 - Create `game/GameContext.java` with `private final` fields and getters:
-  - `Resources`/`ResourcesService`, `GameEventService`, `PhraseService`;
+  - `ResourcesService`, `GameEventService`, `PhraseService`;
   - `World`, `RayHandler`, `OrthographicCamera`;
   - `GameStage gameStage`, `NotificationStage notificationStage`, `MenuStage menuStage`;
   - `BoardService boardService`.
   - **Use exactly these names.** `getStage()` becomes `getGameStage()` and `getUiStage()` becomes `getMenuStage()`. That makes bug B1 visible in the code
     instead of hiding it.
+  - Keep `getStages()` (the list of the three stages) while `StageFeature` uses it (K4).
 - **Fix the construction order** so no setter is needed:
   1. Load the tiles: the loader needs only resources.
   2. Create `BoardService`. Change its constructor to take `List<Tile>` instead of `Board`, because it only uses `board.getTiles()`.
@@ -321,26 +378,25 @@ before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in 
   4. Create `Board(context, tiles)`.
   5. Call `prepare(context)` on each tile.
 - Replace every use of `GamePrepareConfiguration` and of each `configuration/api/*` interface with `GameContext`. Constructors pull out
-  the services they need into fields, as most already do.
-- Delete the `configuration/` package (14 files, ~310 lines) and the `StagesConfiguration.getStages()` list. `StageFeature` still needs the
-  stages until 4.1, so give it the three stages explicitly.
+  the services they need into fields, as most already do. No getter is lost: they all move into `GameContext`.
+- Delete the `configuration/` package (14 files, ~310 lines).
 - Acceptance: the step gate passes, and `grep -r "configuration" core/src` returns nothing.
 
-### Phase 3: Event system
+### Phase 2: Event system
 
-**3.1 Class‑keyed event queue** (Risk M)
+**2.1 Class‑keyed event queue** (Risk M) **[K17]**
 - In `GameEventService`:
   - Replace `Map<GameEventType, List<GameEvent>>` with `Map<Class<?>, List<GameEvent>>`, keyed by `event.getClass()`.
-  - API: `post(GameEvent)`, `<T extends GameEvent> T poll(Class<T>)` (returns `null` if absent), `boolean has(Class<?>)`.
+  - API: `post(GameEvent)`, `<T extends GameEvent> T poll(Class<T>)` (returns `null` if absent), `boolean has(Class<?>)`, and
+    `<T extends GameEvent> T peek(Class<T>)`, which replaces today's unused `getEvent(..)` (returns without consuming).
   - Keep `updateEventsLivesAndClean()` unchanged.
 - `GameEvent`:
   - Drop the type and the generic payload. Each event declares its own `final` field and a named getter:
     `TileTouchedEvent.getTile()`, `CollectEvent.getCollectible()`, `MenuOpenEvent.getActor()`, `LookAtMeEvent.getActor()`,
-    `PlayerCreatedEvent.getPlayer()`, `AddToStageEvent.getDefinition()`.
-  - `MenuCloseEvent` becomes payload‑less, and the `new Vector2(x, y)` in `GameBoardActorListener` goes away.
+    `PlayerCreatedEvent.getPlayer()`, `AddToStageEvent.getDefinition()`, `PlayerMoveEvent.getPlayer()`, `MenuCloseEvent.getPointer()` (K17).
   - `PlayerMoveEvent` keeps `maxAge = 1`; hard‑code it in its constructor and drop the parameter.
   - Keep the `IMMORTAL` concept as a private detail of `GameEvent`. A protected constructor `GameEvent(int maxAge)` plus a no‑arg constructor meaning immortal is enough.
-- Delete `GameEventType`. Move `LookAtMeEvent` out of the one‑class `camera` sub‑package into `implementation` for now; Phase 6 moves everything.
+- Delete `GameEventType` (its information is the event class itself).
 - Rewrite the call sites:
   - The pattern `if (has(X)) { X e = removeEventFromQueue(TYPE, X.class); … }` becomes
     `X e = events.poll(X.class); if (e != null) { … }`.
@@ -351,156 +407,166 @@ before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in 
   - **Careful with `RemoveOnPlayerMovePlugin`.** It only checks `has(PlayerMoveEvent.class)` and never consumes, because aging removes the event. Keep that.
 - Event behaviour is covered by the gameplay scenarios: the menu open/close priority (S8–S10) and waiting until idle (S3).
   **Exception:** the one‑frame `PlayerMoveEvent` has no observable effect until B1 is fixed, because its only consumer is the COLLECT
-  button. Keep the aging logic in `updateEventsLivesAndClean()` unchanged and point it out in the commit message for review.
+  button. Keep the aging logic unchanged and point it out in the commit message for review.
 
-**▶ CP2**: covers Phases 2–3.
+**▶ CP1**: covers Phases 1–2.
 
-### Phase 4: Remove indirection layers
+### Phase 3: Consistency
 
-**4.1 Show descriptions directly** (Risk M)
-- `DescriptionInteraction.interact()` calls `notificationStage.addActor(new Description(resources, actor, text))`. Today the
-  event is consumed later in the same frame by `StageFeature`, so adding immediately is equivalent.
-- In `Description`:
-  - take `(Resources, GameActor parent, String text)`;
-  - make `DESCRIPTION_MAX_WIDTH` `private static final`;
-  - **append `removeActor()` to its action sequence**, which fixes the B5 leak with no visible change.
-- Delete `AddToStageEvent`, `StageFeature`, `GameActorDefinition`, `DescriptionDefinition`, `AbstractStage` (the stages extend `Stage`
-  directly) and `StageType`, plus all `getStageType()` methods.
+Make each kind of class look the same (§3.5, principles in §4). **Nothing is removed in this phase** except what K1–K3/K18 approve.
 
-**4.2 Collect flow** (Risk M)
-- `CollectPlugin` polls `CollectEvent` and directly builds the `CollectWindow`, plus an `ActionButton` whose click listener
-  adds the window to the stage. Keep **exactly the stage that is used today** (`menuStage`, even though it is wrong; B1 is fixed in Phase 7).
-- Delete `CollectResolver`, `PlayerCollectResolver` and `OpenCollectWindowButtonListener`.
-- `CollectWindow` takes `(GameContext context, Inventory playerInventory, Inventory collectibleInventory)`.
-  Delete the `Collecting` interface; `Player.getInventory()` stays as a plain method.
-- Merge `getCollectibleTable`/`getInventoryTable` into one `createItemsTable(Inventory, CollectItemType)`.
-- Make the constants (`WIDTH`, `HEIGHT`, `PADDING`, `PADDING_ITEM`) `private static final`.
-- **Keep `backgroundTable.debug()`** for now (B4).
+**3.1 Actors** (Risk M) — C1–C6
+- Base constructor `GameBoardActor(GameContext context, String avatarName, String description)`:
+  - it creates the avatar through the resources (one way for all actors, C1) and the description interaction;
+  - `getDescription()` stays as a plain getter returning the stored text, so it is no longer abstract and no longer called from the
+    constructor (C2, A9).
+- Every actor follows the same order: `super(..)`, own fields, `addPlugin(..)` calls, listeners, touchability. Touchability is stated
+  explicitly in each actor (`Dog` gets `setTouchable(enabled)`, which is the default, so nothing changes) (C5).
+- Status (C4): `GameActor` initialises the field directly (`private Status status = IDLE`) instead of calling the overridable setter.
+  `Player` drops its second `setStatus(IDLE)`. **Check:** `Player.setStatus(IDLE)` today records `lastIdleChange`; initialise
+  `lastIdleChange` in `Player`'s constructor so `getIdleLength()` behaves the same.
+- Inventories (C3): `Collecting` and `Collectible` both extend a small `InventoryOwner { Inventory getInventory(); }`. Inventory sizes become
+  named constants (`INVENTORY_SIZE = 3` in `Player`, `2` in `Chest`).
+- Listeners (C5): `GameBoardActorListener` and `PlayerClickListener` move next to each other (one file `ActorListeners` with two static
+  nested classes, or both in `actor/`, whichever reads better) and are attached in the same place in the constructor.
+- Keep every method listed in §3.3.
 
-**4.3 Notifications and labels** (Risk M)
-- The **font is loaded once**: in `ResourcesService`, through `AssetManager` (`BitmapFont.class`, `"font.fnt"`), disposed with the
-  manager. This fixes the B5 font leak.
-- `ResourcesService.createLabel(Color color, String text)` and `createLabel(Color, Drawable background, String text)` replace
-  `LabelFactory`. They give the same `LabelStyle`: white default, `Color.FIREBRICK` for warnings.
-- `Notification` gets a static factory for its only real use:
-  `Notification.warning(Resources, String text, Vector2 center)`. It builds the label, adds
-  `parallel(moveBy(0, 20, 2f), fadeOut(2f))` and centres itself. It keeps its self‑removal in `act()`.
-- Delete `NotificationBuilder`, `LabelFactory`, `NotificationAnimation`, `MoveUpperAndFadeOutAnimation`, `FadeOutAnimation`,
-  `NotificationType` and `NotificationStyle`. Delete `Notification.getCenter()` if unused.
-- Update the callers: `BoardClickListener`, `MenuButton` (white label `"button"`), `FPSFeature` and `Description`.
+**3.2 Plugins** (Risk L) — C6–C9
+- One constructor shape: `(owner actor, GameContext context, params…)`; all fields `private final`.
+  `CenterActorByCameraPlugin(actor, context, offset)` takes the camera from the context.
+- One body shape: poll or check the event first, then act. `RemoveOnPlayerMovePlugin` keeps its null check only if the owner can be null
+  (it can't today: drop it only if that is certain, otherwise keep).
+- Replace the anonymous one‑method `Action` classes with `Actions.run(..)` and `Actions.removeActor()` (same order, same frame).
+- `BoardMovementPlugin`: replace `removePlayerActions` with `player.clearActions()`.
+- The darkness plugin **[D2]**: with (b), `Player` adds it only when `Debug.DARKNESS_EXCLAMATION` is true (false by default, so behaviour is unchanged).
 
-**4.4 Lights** (Risk L)
-- Make `TorchLight` the only light class: it is an `Actor` or `Group` that owns its `PointLight`. Its `setPosition` and `setColor` forward
-  to the light, as `GameLight` does today. Fold `GameLight` into it.
-- `BlinkingAction` keeps its behaviour with the constants `INTENSITY = 5` and `DELAY = 0.2f`. Delete `BlinkingIntensity`/`BlinkingSpeed`.
-- Delete `LightFactory`. `TileLight` validates `lightType` with `LightType.valueOf(..)`; keep the 1‑value enum, which validates the map data,
-  then does `new TorchLight(rayHandler)`.
-- Replace the inner `TileLightAttributes` class with plain `private final` fields on `TileLight` (type, color, border position).
+**3.3 Features** (Risk L) — C7, C10
+- One constructor shape: `(GameContext context, params…)`. `FPSFeature(context, offset)`; `CameraTrackingFeature(context, actor)`.
+- Features that show something add their actor in their constructor (both already do; make them use the context the same way).
+- `GameScreen` registers all features in one method, `createFeatures(context)`, in today's order (camera, menu, stage, FPS).
+  The camera feature is still created only when `PlayerCreatedEvent` arrives.
+- Make the instance "constants" `private static final` (`MenuFeature`).
 
-**4.5 Remove the thumbnail mechanism** (Risk L) **[D3]**
-- `MenuButton` and `CollectItem` use `resources.getRegion("collectButton")`. Delete `Thumbnail`, `ThumbnailType`,
-  `ResourcesService.getThumbnail` and all `getThumbnailType()` implementations. `Item` becomes a marker interface; that is fine.
+**3.4 Debug tools in one place** (Risk L) **[D6]**
+- Create `debug/Debug.java`: an enum of tools that can be switched on one by one, plus a set of actor classes to outline (scene2d
+  `actor.setDebug(true)` outlines one actor, so e.g. only dogs can be outlined). Defaults keep the game exactly as today:
+  - `CAMERA_TRACKING_BOX = false` → `CameraTrackingFeature` calls `cameraActor.setDebug(..)` when true;
+  - ~~`BRIGHT_AMBIENT_LIGHT`~~ dropped: the commented‑out ambient line has the same value as the active one (see §8);
+  - `FPS_LABEL = true` → the FPS feature is registered when true;
+  - `TABLE_DEBUG_LINES = true` → `CollectWindow` calls `backgroundTable.debug()` when true (today's behaviour, B4; Phase 7 sets it to false);
+  - `DARKNESS_EXCLAMATION = false` (D2).
+- The commented‑out debug lines are replaced by these switches.
 
-**4.6 Inline trivial listeners** (Risk L)
-- Turn these into anonymous classes at their single use site:
-  - `PlayerClickListener`, `MenuButtonListener`, `CollectWindowCancelListener` and `CollectWindowOkListener`;
-  - `StopClickThroughClickListener`: a small private static factory method in `CollectWindow`, because it is used twice.
-- Move the logic of `CollectWindowItemListener` into a `CollectWindow.onItemClicked(CollectItem)` method. The listener becomes a one‑line anonymous class.
+**3.5 Shared code in one place** (Risk L)
+- `LabelFactory`: one method with an optional background; the other delegates.
+- `CollectWindow`: `getCollectibleTable`/`getInventoryTable` become one `createItemsTable(Inventory, CollectItemType)`.
+- `TileChest`/`TileDog`/`TilePlayer`: one generic spawner, e.g. `TileActorObject(Function<GameContext, GameBoardActor>)`, or a shared base
+  class with one abstract `createActor(context)`. Keep the three names if the base class reads better.
+- `TmxTiledMapLoader`: write the hex width and cell‑position formulas once each, as private methods.
+- `Notification.getCenter()` reuses the same calculation as `GameActor.getCenter()` (a static helper, or `Notification` extends `GameActor` if
+  that changes nothing else).
+
+**3.6 Small fixes and approved clean‑ups** (Risk L) **[K1, K2, K3]**
+- `TileLight` passes `TileObjectType.LIGHT` instead of `CHEST` (the field is never read, so nothing changes).
+- `final` on fields that are never reassigned; consistent field names (`boardGameActor` vs `gameBoardActor`).
+- K1: delete the stray `RayHandler` in `Main`. K2: delete commented‑out code (debug lines were already turned into switches in 3.4).
+  K3: `System.out.println` becomes `Gdx.app.log(<class name>, ..)`. K18 waits for 7.5.
+
+**▶ CP2**
+
+### Phase 4: Indirection layers (only what §5.2 approves)
+
+Each step has a **keep** version (the default) and a **remove** version.
+
+**4.1 Descriptions** (Risk M) **[K4]**
+- Both versions: `Description` gets `removeActor()` appended to its action sequence, which fixes the B5 leak with no visible change, and
+  `DESCRIPTION_MAX_WIDTH` becomes `private static final`.
+- Remove version: `DescriptionInteraction.interact()` calls `notificationStage.addActor(new Description(..))` directly. Today the event is
+  consumed later in the same frame by `StageFeature`, so adding immediately is equivalent. Delete the K4 classes.
+
+**4.2 Collect flow** (Risk M) **[K5]**
+- Both versions: `CollectWindow` takes `(GameContext, Inventory playerInventory, Inventory collectibleInventory)`, and its constants become
+  `private static final`. Keep **exactly the stage used today** (`menuStage`; B1 is fixed in Phase 7) and keep the table debug switch.
+- Remove version: `CollectPlugin` builds the window and the button itself; delete the K5 classes.
+
+**4.3 Notifications and labels** (Risk M) **[K6]**
+- Both versions: the **font is loaded once** in `ResourcesService` through `AssetManager` (`BitmapFont.class`, `"font.fnt"`) and disposed
+  with it (fixes the B5 font leak). Labels keep the same `LabelStyle`: white default, `Color.FIREBRICK` for warnings.
+- Remove version: `Notification.warning(resources, text, center)` builds the label with `parallel(moveBy(0, 20, 2f), fadeOut(2f))`;
+  `LabelFactory` becomes `ResourcesService.createLabel(..)`; delete the K6 classes. Update `BoardClickListener`, `MenuButton`, `FPSFeature`
+  and `Description`.
+
+**4.4 Lights** (Risk L) **[K7]**
+- Both versions: replace the inner `TileLightAttributes` class with plain `private final` fields on `TileLight`.
+- Remove version: `TorchLight` absorbs `GameLight`; `BlinkingAction` uses `INTENSITY = 5`, `DELAY = 0.2f`; `TileLight` validates with
+  `LightType.valueOf(..)` and creates `new TorchLight(rayHandler)`.
+
+**4.5 Thumbnails** (Risk L) **[K8]** — only the remove version: `MenuButton` and `CollectItem` use `"collectButton"` directly.
+
+**4.6 One rule for listeners** (Risk L) — C9
+- A listener used once and shorter than ~5 lines becomes an anonymous class at its use site (`MenuButtonListener`,
+  `CollectWindowCancelListener`, `CollectWindowOkListener`); `StopClickThroughClickListener` becomes a private factory method in
+  `CollectWindow` (used twice). Larger listeners stay named classes. The logic of `CollectWindowItemListener` moves into
+  `CollectWindow.onItemClicked(CollectItem)`.
+- The actor listeners were already grouped in 3.1.
 
 **▶ CP3**
 
 ### Phase 5: Simplify the domain model
 
-**5.1 Actors** (Risk M)
-- Delete `equals`/`hashCode` from `GameActor` and `GameBoardActor`. Also delete `id`/`ID_COUNTER`, the `GameActorType` enum and its constructor
-  parameter everywhere.
-- **Move status into `Player`.** `Status` is used only by the player. `GameActor` no longer has a status, and the constructor no longer calls an
-  overridable method (A9).
-- Change the constructor to `GameBoardActor(GameContext context, String avatarRegion, String description)`. It creates the avatar and the
-  description interaction, so the abstract `getDescription()` goes away (A9). `Dog` shrinks to a constructor call.
-  - Avatars come from `resources.getRegion("dog.png")`. `Image` renders a `Texture` and a `TextureRegion` identically.
-- Make `Lighter` a plain `class Lighter implements Item {}`. It is not a scene2d actor, so its menu interaction and listener disappear with no visible effect:
-  it is never on a stage. `TileChest` creates it without a context.
-- `Collectible` keeps only `isDistant()` and `getInventory()`. Delete `Interactive`: `GameBoardActor.getInteractions()` stays as a plain method.
-- `Inventory`: change the constructor to `Inventory(int capacity)` (null‑padded) and rename `setItemsAndCompleteWithNulls` to `setItems`, keeping the same
-  semantics. `InventoryTest` stays green.
-- Keep `GameActor.setPosition(Vector2)`/`moveBy(Vector2)`; they make the camera code read better.
+**5.1 Actors** (Risk M) **[K9, K10, K11]**
+- `GameActor`/`GameBoardActor`: replace the generated `equals`/`hashCode` with identity (delete both methods; equivalent, because ids are unique).
+  K9 decides whether `id` and `GameActorType` stay.
+- `Inventory`: keep the public API (both constructor paths, `getCapacity`); tidy the internals only. `InventoryTest` stays green.
+- Keep `GameActor.setPosition(Vector2)`/`moveBy(Vector2)`. **Careful:** `GameActor.setPosition(Vector2)` must keep calling
+  `super.setPosition(..)`. Otherwise `CameraActor.setPosition(float, float)` starts running (it doesn't today; see §8).
+- `Player.draw`: the `else` branch is dead (`SpriteBatch.getShader()` is never `null`). Rewrite it as "draw without the custom shader".
+- K10 and K11 remove versions as described in §5.2.
 
-**5.2 Resources** (Risk M)
-- Rename `ResourcesService` to `Resources`. API:
-  - `getRegion(name)`: atlas first, then preloaded textures. Use `assetManager.isLoaded(name)`, not `catch (Throwable)`.
-  - `getNinePatch(name)`, `getSkin()`, `getFont()`, `createLabel(..)`, `dispose()`.
-- **Make `getAssetManager()` private.** `CollectItem` creates its drawables through `new TextureRegionDrawable(resources.getRegion(..))`.
-- Delete `ShaderType`. `GameStage` loads `shader/fadeOut/vertex.shd` and `fragment.shd` itself (`Gdx.files.internal`).
+**5.2 Resources** (Risk M) **[K16]**
+- `getTexture(name)`: atlas first, then preloaded textures. Use `assetManager.isLoaded(name)` instead of `catch (Throwable)`.
+- Actors already load through the resources (3.1). `CollectItem` creates its drawables through `new TextureRegionDrawable(getTexture(..))`.
+  `getAssetManager()` stays public (a tool), but game code doesn't use it.
 - **Keep the preload list and the Linear filter settings unchanged.**
 
-**5.3 Tiles** (Risk M)
-- Delete `AccessibleTile`, `NoPathTile` and `TileFactory`. `FloorTile` and `WallTile` extend `Tile` directly, and the loader picks the class with a
-  `switch` on `TileType`.
-- **The loader sets the background region directly.** It uses the tile's `textureName` property if present, otherwise the class default, so
-  `Tile.attributes` and `FloorTile.prepare`'s texture logic go away. `setBackground` becomes private.
-- **Accessibility:**
-  - `FloorTile` is blocked if any of its objects blocks. Compute it in `addTileObject`, which only happens at load time, so it is equivalent.
-  - Rename `TileObject.isAccessible()` to `isBlocking()` with the inverted meaning. Only `TileSprite` returns `true`, so the default
-    becomes `false` in `TileObject` and the other subclasses drop their override.
-- Delete `equals`/`hashCode` (identity) and `TilePoint`. Build the polygon in one method that lists the 6 corners. Replace
-  `calculatePositionForActorAt(actor, CENTER)` with `positionFor(Actor actor)`, which returns the bottom‑left position that centres the actor
-  on the tile.
+**5.3 Tiles** (Risk M) **[K12, K13]**
+- Accessibility: `FloorTile` is blocked if any of its objects blocks. Compute it in `addTileObject`, which only happens at load time, so it is equivalent.
+- **The loader sets the background region directly.** It uses the tile's `textureName` property if present, otherwise the class default.
+- Identity `equals`/`hashCode` (delete both). `Tile.id`/`getId` stay.
 - `getPolygonVertices()` returns `polygon.toArray(Vector2.class)`.
-- **Keep B3 as it is.** Move the throwing `stageToLocalCoordinates` into `WallTile` as a private method with `// TODO bug B3`.
-- `Tile.prepare(GameContext)` keeps only `object.prepare(this, context)` for each object.
+- **Keep B3 as it is.** Mark the throwing `stageToLocalCoordinates` with `// TODO bug B3`.
+- K12 and K13 remove versions as described in §5.2.
 
-**5.4 Tile objects** (Risk L)
-- Delete `TileObjectAttribute`. Use `private static final String` keys in the classes that read them: the loader reads
-  `objectClass`, `TileSprite` reads `textureName`/`textureOffset`, and `TileLight` reads `lightType`/`lightColorHex`/`borderLightPosition`.
-  Same for `TileAttribute` (`tileClass`).
-- `TileObjectFactory.createTileObject` becomes a private method of the loader. Keep `assertMandatoryProperties` behaviour (same messages).
-- Keep `TileChest`, `TileDog`, `TilePlayer` and `TileSprite` as tiny separate classes; they read well. **Don't change `TileSprite.prepare`** (B2 decides).
-
-**5.5 Map loader** (Risk M)
-- Replace `TiledMapLoader`, `TmxTiledMapLoader`, `TmxTileMapLoaderProperties`, `TileSet` and `Tuple` with
-  `TmxBoardLoader { TmxBoardLoader(Resources); List<Tile> load(String mapFile) }`.
-- **Use `GridPoint2`** (libGDX, value equality) for cell coordinates and keep the maps **local** to `load()`, not instance fields.
-- Extract the hex math into private methods that are each written once:
-  - `cellWidth(tileHeight)`;
-  - `cellPosition(col, row)` and `cellCenter(col, row)`;
-  - `neighbourCells(col, row)`, which returns the 6 staggered‑odd neighbours.
+**5.4 Map loader** (Risk M) **[K14]**
+- Inside `TmxTiledMapLoader`: **use `GridPoint2`** (libGDX, value equality) for cell coordinates instead of `Tuple` keys, and keep the maps
+  **local** to `load()`, not instance fields. Add `neighbourCells(col, row)` returning the 6 staggered‑odd neighbours.
 - **Keep the nearest‑cell search for objects exactly as it is**, including that it scans empty cells and that a later object on the same cell
-  overwrites an earlier one (`objectsMap.put`, line 130). Replace the linear `addTileObjects` scan with `objects.get(cell)`, which is equivalent
+  overwrites an earlier one (`objectsMap.put`). Replace the linear `addTileObjects` scan with `objects.get(cell)`, which is equivalent
   because there is at most one object per cell.
-- Keep `tiledMap.dispose()`.
+- Keep `tiledMap.dispose()`. `TileObjectFactory` keeps its `assertMandatoryProperties` behaviour (same messages).
 - `BoardLayoutTest` keeps the golden file **unchanged**.
+- K14 remove version: one `TmxBoardLoader.load(mapFile)` returning `List<Tile>`.
 
-**5.6 Board service and movement** (Risk M) **[D4]**
-- Fold `GameActorsByTile` into `BoardService` (`Map<Tile, List<GameActor>>`). Collision checks stay the same: the same tile, plus `isDistant`
-  neighbours, and an event per collectible.
-- Delete `BoardPath`. `getPath` returns `List<Tile>` (start excluded, target included, empty if unreachable).
-- **[D4a]** Implement it as BFS from the start over accessible tiles, never expanding from an inaccessible tile. Otherwise **[D4b]** keep Dijkstra but
-  simplify it. `PathFindingTest` must pass either way.
-- `BoardMovementPlugin`:
-  - replace `removePlayerActions` with `player.clearActions()`;
-  - replace the anonymous status actions with `Actions.run(() -> player.setStatus(..))`;
-  - delete the `path.exists()` check inside the per‑node action, because it is always true inside the loop.
+**5.5 Board service and movement** (Risk M) **[D4, K15]**
+- **[D4a]** Path finding as BFS from the start over accessible tiles, never expanding from an inaccessible tile. Otherwise **[D4b]** keep
+  Dijkstra but simplify it. `PathFindingTest` must pass either way.
+- `BoardMovementPlugin`: delete the `path.exists()` check inside the per‑node action (always true inside the loop).
 - Leave `GameBoardActor.setTile` as it is, with its order: unregister the old tile, register the new one (which triggers
-  collisions), then set the position.
+  collisions), then set the position. Keep the distant‑collectibles hook.
 
-**5.7 Small cleanups** (Risk L)
-- `PhraseService` and `PhraseGroup` become one enum, `Phrase`, with `String random()` returning
-  `values[MathUtils.random(values.length - 1)]`. It no longer shuffles, which fixes B6.
+**5.6 Small cleanups** (Risk L)
+- `PhraseService.getRandomPhrase` picks with `MathUtils.random(..)` instead of shuffling the backing list in place (fixes B6). `getPhrase` stays.
 - `GameScreen`:
   - extend `ScreenAdapter`, which removes the empty methods;
   - `dispose()` disposes all three stages, the shader (through `GameStage.dispose()`) and the `RayHandler`;
   - `Main.dispose()` calls `getScreen().dispose()` before disposing the world and resources (fixes B5).
-- `Board`:
-  - delete `toBack()` from `draw()` and add the board at index 0 once (`gameStage.getRoot().addActorAt(0, board)`);
-  - convert the click point once, not per tile.
+- `Board`: add the board at index 0 once (`gameStage.getRoot().addActorAt(0, board)`) instead of `toBack()` in every `draw()`, and convert
+  the click point once, not per tile.
 - `MenuStage` (A8):
-  - make the selection explicit with `interactWithButtonUnderPointer()`;
-  - `MenuFeature` calls it, then `clear()`;
+  - make the selection explicit with `interactWithButtonUnderPointer()`; `MenuFeature` calls it, then `clear()`;
   - delete the `clear()` override;
   - replace the cast with an `instanceof MenuButton` check on the hit actor's parent;
   - keep the `addActor` type check, because B1 depends on it until Phase 7.
-- Make the remaining instance "constants" `static` (`MenuFeature`).
 
 **▶ CP4**
 
@@ -511,7 +577,7 @@ before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in 
 - Check that `html/src/com/mantkowicz/light/game/client/HtmlLauncher.java` and `desktop/.../DesktopLauncher.java` still import
   `com.mantkowicz.light.game.Main`, which doesn't move.
 - `core/src/LightGame.gwt.xml` (`<source path="com/mantkowicz/light" />`) doesn't need to change.
-- Acceptance: the step gate passes, and no package is left with only 1 class, except where §4 says so.
+- Acceptance: the step gate passes.
 
 **▶ CP5**: final report with before/after file and line counts.
 
@@ -523,29 +589,33 @@ before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in 
 - in the input multiplexer it comes **before** `menuStage`;
 - it lives in `GameContext`.
 
-`MenuStage` stays exclusive to menu buttons, so `menuStage.clear()` no longer affects the collect UI. Test the full flow:
+`MenuStage` stays exclusive to menu buttons, so `menuStage.clear()` no longer affects the collect UI. Re‑record the S15 golden with approval and
+extend it to the full flow:
 1. Walk onto the chest: a COLLECT button appears.
 2. Click it: the window opens.
 3. Select the lighter, move it to the player's inventory, and press OK; the inventories update.
 4. CANCEL closes the window without changes.
 5. Walking away fades out the button.
 
-**7.2 B4: Debug lines.** Delete `backgroundTable.debug()`, together with 7.1.
+**7.2 B4: Debug lines.** Set `Debug.TABLE_DEBUG_LINES = false`, together with 7.1.
 
 **7.3 B2: Furniture not drawn.** `TileSprite` keeps its region and offset, and `Tile.draw` draws its sprites after the background.
-- The position is relative to the tile:
-  `x + 74 - w/2 + offset.x`, `y + 64 - h/2 + offset.y`.
-- Replace the magic `74`/`64` with `width/2`, `height/2`. Check that the result is identical for the 148×128 tiles (74 and 64), and note it if not.
+- The position is relative to the tile: `x + width/2 - w/2 + offset.x`, `y + height/2 - h/2 + offset.y` (today's magic `74`/`64` are
+  `width/2`/`height/2` of the 148×128 tiles; check, and note it if not).
 
 **7.4 B3: Walls.** In `WallTile`, create the body at the origin (`BodyDef` position `(0,0)`) with a `ChainShape` loop over the absolute polygon
 vertices, and delete the throwing method. Check this by temporarily putting a wall tile into a test map: torch light must be
 blocked by it.
 
+**7.5 Unused assets (K18, approved for the end).** Remove `android/assets/ui/`, `map2_outer.tmx`, `tiles.tsx`, `player_detective.png` and
+`lighter.png`, and `"lighter.png"` from the preload list in `ResourcesService`. For each removed file, `grep -rF <name>` over `core/src`,
+`android/assets` and `html` must return nothing.
+
 **▶ CP6**
 
 ### Optional
 
-- **O1.** Merge `Plugin` and `Feature` into one interface (A10). Only do this if the human finds the two names confusing.
+- **O1.** Merge `Plugin` and `Feature` into one interface (A10, K19). Only if the human finds the two names confusing.
 - **O2.** Give the UI its own `ScreenViewport` camera. `ActionButton` and `CollectWindow` would then not need `CenterActorByCameraPlugin`. This is a visible
   behaviour change, because the UI would stop scaling with the world, so it needs a separate decision.
 
@@ -575,10 +645,10 @@ blocked by it.
 - an error path for invalid data (factory `default` throws, missing‑texture fallbacks);
 - lifecycle code: `pause/resume/hide` are empty, and `dispose` is never called (B5).
 
-**New findings, not yet in §3** (handle in the step that touches the code):
-- `GameEventService.getEvent(..)` is never called. Remove it in 3.1.
+**New findings** (step numbers updated to the revised plan; all of them are now covered in §3.3 or the steps):
+- `GameEventService.getEvent(..)` is never called. Kept as `peek(..)` in 2.1.
 - **"Distant collectibles" are never used.** No collectible returns `isDistant() == true`, so the neighbour loop in
-  `BoardService.checkCollisions` never fires. Keep the behaviour in 5.6, because it's a cheap hook, but don't add tests for it.
+  `BoardService.checkCollisions` never fires. Keep the behaviour in 5.5, because it's a cheap hook, but don't add tests for it.
 - **The `else` branch of `Player.draw` is dead.** `SpriteBatch.getShader()` never returns `null` (it returns the default shader).
   The override simply means "draw the player without the custom shader". Simplify it in 5.1, keeping that behaviour.
 - **`CameraActor.setPosition(float, float)` is never called.** `GameActor.setPosition(Vector2)` calls `super.setPosition(..)`,
@@ -586,5 +656,35 @@ blocked by it.
   the override starts running. Keep the current behaviour: the camera position is applied in `act()`.
 - `GameBoardActor.remove()` is only reached through dead code (`Chest.beforeCollect/afterCollect`). Keep it, because it's correct and
   B1's fix may use it.
-- The `Inventory` constructor path for a `null` list is unused. 5.1 replaces the constructor anyway.
-- `LabelFactory.createLabel(WARNING, background, text)` (a warning with a background) is unused. It disappears in 4.3.
+- The `Inventory` constructor path for a `null` list is unused. Kept (§3.3).
+- `LabelFactory.createLabel(WARNING, background, text)` (a warning with a background) is unused. Kept unless K6 is approved for removal.
+
+### 2026‑11‑06, plan revised after step 1.1
+
+- The old step 1.1 ("remove unused members") was executed and then **reverted at the human's request**: many unused methods are
+  tools or hooks from earlier experiments (camera debug box, zoom helper, light setters, item hooks). Nothing was pushed.
+- The plan was rewritten: rule 3 (no removal without per‑item approval), §3.3 now lists what is kept on purpose, §3.5 adds
+  consistency findings C1–C11, §5.2 adds the keep‑or‑remove list K1–K19, and the phases were reordered (wiring and events first,
+  then consistency) so constructors are rewritten once.
+
+### 2026‑11‑06, Phase 1 (step 1.1)
+
+- D1 taken as (a), the recommendation, when the human said to start refactoring.
+- `Board.load(..)` became `Board.loadTiles(resources, mapName)`, so tiles exist before `BoardService` and `GameContext`; `BoardService` takes `List<Tile>`.
+  `GameDriver` changed mechanically (one line).
+- **Acceptance grep deviation:** `grep -r configuration core/src` still finds one line, the commented‑out code in `Tile.prepare`
+  (`// ClickListener listener = new BoardClickListener(this, configuration);`). It is left untouched until K2 is decided.
+- **Exception to "don't keep the context":** `PlayerCollectResolver` stores the `GameContext`, because it builds the window and button later,
+  when a collect happens. Its shape is decided in 4.2 (K5).
+
+### 2026‑11‑06, Phase 3
+
+- 3.1: the actor shape is `super(type, context, DESCRIPTION)` plus `createAvatar(context, AVATAR_NAME)`, not the planned
+  `super(context, avatarName, description)`: `GameActorType` stays until K9, and `Lighter` has no avatar. `createAvatar(Texture)` is kept.
+  Actor listeners were renamed after what they do: `OpenMenuOnHoldListener` (was `GameBoardActorListener`) and `LookAtMeOnClickListener`
+  (was `PlayerClickListener`, which works for any board actor).
+- 3.4: **no "bright ambient light" tool.** The commented‑out line in `GameScreen.prepareLights` sets ambient alpha `1f`; the active line sets
+  `2 * 0.5f`, which is also `1f`. It is removed with the other commented‑out code (K2). `Debug` holds four tools (camera box, FPS label,
+  collect window lines, darkness exclamation) plus per‑class and per‑actor outlines. A throwaway test with every tool on and `Dog`
+  outlined ran a walk and the menu without a crash.
+

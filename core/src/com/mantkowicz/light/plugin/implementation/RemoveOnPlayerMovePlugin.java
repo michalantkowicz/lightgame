@@ -1,46 +1,37 @@
 package com.mantkowicz.light.plugin.implementation;
 
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.service.event.GameEventService;
+import com.mantkowicz.light.service.event.implementation.PlayerMoveEvent;
 
-import static com.mantkowicz.light.service.event.GameEventType.PLAYER_MOVE;
-
+/**
+ * Fades the actor out and removes it as soon as the player starts moving.
+ * Only checks the event, never consumes it: the event dies by itself after one loop.
+ */
 public class RemoveOnPlayerMovePlugin implements Plugin {
-    private final static float DURATION = 0.75f;
+    private static final float DURATION = 0.75f;
 
-    private GameEventService gameEventService;
-    private GameActor actor;
+    private final GameActor actor;
+    private final GameEventService gameEventService;
 
-    public RemoveOnPlayerMovePlugin(GameEventService gameEventService, GameActor actor) {
-        this.gameEventService = gameEventService;
+    public RemoveOnPlayerMovePlugin(GameActor actor, GameContext context) {
         this.actor = actor;
+        this.gameEventService = context.getGameEventService();
     }
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(PLAYER_MOVE)) {
-            if (actor != null) {
-                actor.setTouchable(Touchable.disabled);
-                actor.addAction(Actions.sequence(
-                        Actions.fadeOut(DURATION, Interpolation.sineOut),
-                        getActorRemoveAction(actor)
-                ));
-            }
+        if (gameEventService.has(PlayerMoveEvent.class)) {
+            actor.setTouchable(Touchable.disabled);
+            actor.addAction(Actions.sequence(
+                    Actions.fadeOut(DURATION, Interpolation.sineOut),
+                    Actions.removeActor()
+            ));
         }
-    }
-
-    private static Action getActorRemoveAction(final GameActor gameActor) {
-        return new Action() {
-            @Override
-            public boolean act(float delta) {
-                gameActor.remove();
-                return true;
-            }
-        };
     }
 }

@@ -2,27 +2,27 @@ package com.mantkowicz.light.plugin;
 
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.implementation.player.Player;
-import com.mantkowicz.light.configuration.api.PlayerCollectResolverConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.ui.button.ActionButton;
 import com.mantkowicz.light.ui.window.CollectWindow;
 
 public class PlayerCollectResolver implements CollectResolver {
-    private final PlayerCollectResolverConfiguration configuration;
+    private final GameContext context;
     private final Player player;
 
-    public PlayerCollectResolver(Player player, PlayerCollectResolverConfiguration configuration) {
+    public PlayerCollectResolver(Player player, GameContext context) {
         this.player = player;
-        this.configuration = configuration;
+        this.context = context;
     }
 
     @Override
     public void resolveCollect(Collectible collectible) {
-        CollectWindow collectWindow = new CollectWindow(configuration, player, collectible);
+        CollectWindow collectWindow = new CollectWindow(context, player, collectible);
 
-        OpenCollectWindowButtonListener openCollectWindowButtonListener = new OpenCollectWindowButtonListener(collectWindow, configuration.getUiStage());
+        OpenCollectWindowButtonListener openCollectWindowButtonListener = new OpenCollectWindowButtonListener(collectWindow, context.getMenuStage());
 
-        ActionButton actionButton = new ActionButton(configuration, "COLLECT", openCollectWindowButtonListener);
+        ActionButton actionButton = new ActionButton(context, "COLLECT", openCollectWindowButtonListener);
 
-        configuration.getUiStage().addActor(actionButton);
+        context.getMenuStage().addActor(actionButton);
     }
 }

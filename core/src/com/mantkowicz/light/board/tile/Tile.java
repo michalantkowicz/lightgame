@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.board.object.TileObject;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ResourcesService;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import static com.mantkowicz.light.board.tile.TilePoint.RIGHT_BOTTOM_CORNER;
 import static com.mantkowicz.light.board.tile.TilePoint.RIGHT_CORNER;
 import static com.mantkowicz.light.board.tile.TilePoint.RIGHT_TOP_CORNER;
 
-public abstract class Tile {//} extends Actor {
+public abstract class Tile {
     private static final int NOTIFICATION_OFFSET = 5;
     private static final float TAN_30_DIV_6 = 0.289f;
 
@@ -56,18 +56,11 @@ public abstract class Tile {//} extends Actor {
     protected void setBackground(ResourcesService resourcesService, String backgroundTextureName) {
         backgroundTexture = resourcesService.getTexture(backgroundTextureName);
         setSize(backgroundTexture.getRegionWidth(), backgroundTexture.getRegionHeight()); //TODO: move setSize to tile creation place
-//        this.background = new Image(backgroundTexture);
-
-//        addActor(this.background);
-//        this.setSize(this.background.getWidth(), this.background.getHeight());
     }
 
-    public void prepare(GamePrepareConfiguration configuration) {
-//        ClickListener listener = new BoardClickListener(this, configuration);
-//        addListener(listener);
-
+    public void prepare(GameContext context) {
         for (TileObject object : objects) {
-            object.prepare(this, configuration);
+            object.prepare(this, context);
         }
     }
 

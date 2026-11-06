@@ -3,35 +3,39 @@ package com.mantkowicz.light.feature.implementation;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.implementation.CameraActor;
-import com.mantkowicz.light.configuration.api.CameraTrackingFeatureConfiguration;
+import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.camera.LookAtMeEvent;
 
-import static com.mantkowicz.light.service.event.GameEventType.LOOK_AT_ME;
+import static com.mantkowicz.light.debug.Debug.Tool.CAMERA_TRACKING_BOX;
+
 
 public class CameraTrackingFeature implements Feature {
     private static final float DISTANCE_LEFT_RIGHT = 420;
     private static final float DISTANCE_TOP_BOTTOM = 420;
 
+    private final CameraActor cameraActor;
+    private final GameEventService gameEventService;
     private GameBoardActor actor;
-    private CameraActor cameraActor;
     private Vector2 interval = new Vector2();
-    private GameEventService gameEventService;
 
-    public CameraTrackingFeature(GameBoardActor actor, CameraTrackingFeatureConfiguration configuration) {
+    public CameraTrackingFeature(GameContext context, GameBoardActor actor) {
         this.actor = actor;
-        this.gameEventService = configuration.getGameEventService();
+        this.gameEventService = context.getGameEventService();
 
-        this.cameraActor = new CameraActor(configuration.getCamera());
+        this.cameraActor = new CameraActor(context.getCamera());
         cameraActor.setPosition(actor.getCenter());
-//        cameraActor.setDebug(DISTANCE_LEFT_RIGHT, DISTANCE_TOP_BOTTOM);
-        configuration.getStage().addActor(cameraActor);
+        if (Debug.isOn(CAMERA_TRACKING_BOX)) {
+            cameraActor.setDebug(DISTANCE_LEFT_RIGHT, DISTANCE_TOP_BOTTOM);
+        }
+        context.getGameStage().addActor(cameraActor);
     }
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(LOOK_AT_ME)) {
+        if (gameEventService.has(LookAtMeEvent.class)) {
             handleLookAtMeEvent();
         } else if (cameraActor.isNotCentering() && isActorSet()) {
             Vector2 actorCenter = actor.getCenter();
@@ -44,11 +48,11 @@ public class CameraTrackingFeature implements Feature {
     }
 
     private void handleLookAtMeEvent() {
-        LookAtMeEvent event = gameEventService.removeEventFromQueue(LOOK_AT_ME, LookAtMeEvent.class);
-        GameBoardActor boardGameActor = event.getEventObject();
-        cameraActor.centerAt(boardGameActor.getCenter());
+        LookAtMeEvent event = gameEventService.poll(LookAtMeEvent.class);
+        GameBoardActor lookedAtActor = event.getActor();
+        cameraActor.centerAt(lookedAtActor.getCenter());
 
-        this.actor = boardGameActor;
+        this.actor = lookedAtActor;
     }
 
     private void gentlyStopCameraIfNecessary() {

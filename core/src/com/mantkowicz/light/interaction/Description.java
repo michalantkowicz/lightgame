@@ -1,6 +1,5 @@
 package com.mantkowicz.light.interaction;
 
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.notification.factory.LabelFactory;
@@ -13,7 +12,7 @@ import static com.mantkowicz.light.notification.NotificationStyle.DEFAULT;
 
 public class Description extends GameActor {
     private final int DESCRIPTION_MAX_WIDTH = 200;
-    private Label label;
+    private final Label label;
 
     protected Description(DescriptionDefinition definition) {
         super(DESCRIPTION);

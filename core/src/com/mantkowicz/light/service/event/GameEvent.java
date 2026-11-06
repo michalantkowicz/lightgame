@@ -1,22 +1,20 @@
 package com.mantkowicz.light.service.event;
 
-public abstract class GameEvent<T> {
+/**
+ * An event in the {@link GameEventService} queue. Each event class declares its own payload with a named getter.
+ */
+public abstract class GameEvent {
     private static final int IMMORTAL = Integer.MIN_VALUE;
 
-    private final GameEventType gameEventType;
-    private final T eventObject;
-
+    private final int maxAge;
     private int age;
-    private int maxAge;
 
     /**
-     * @param maxAge how much loops event lives, must be greater or equal 0
+     * @param maxAge how many loops the event lives, must be greater or equal 0
      * @throws IllegalArgumentException if maxAge < 0
      */
-    protected GameEvent(GameEventType gameEventType, T eventObject, int maxAge) {
-        this.gameEventType = gameEventType;
-        this.eventObject = eventObject;
-        if (maxAge != IMMORTAL && maxAge < 0) {
+    protected GameEvent(int maxAge) {
+        if (maxAge < 0) {
             throw new IllegalArgumentException("The maxAge must be at least 0");
         }
         this.maxAge = maxAge;
@@ -26,16 +24,9 @@ public abstract class GameEvent<T> {
     /**
      * creates immortal game event (will be deleted on demand)
      */
-    protected GameEvent(GameEventType gameEventType, T eventObject) {
-        this(gameEventType, eventObject, IMMORTAL);
-    }
-
-    public GameEventType getGameEventType() {
-        return gameEventType;
-    }
-
-    public T getEventObject() {
-        return eventObject;
+    protected GameEvent() {
+        this.maxAge = IMMORTAL;
+        this.age = 0;
     }
 
     public void increaseAge() {
@@ -43,9 +34,6 @@ public abstract class GameEvent<T> {
     }
 
     public boolean isTooOld() {
-        if (maxAge != IMMORTAL && age >= maxAge) {
-            return true;
-        }
-        return false;
+        return maxAge != IMMORTAL && age >= maxAge;
     }
 }

@@ -3,11 +3,11 @@ package com.mantkowicz.light.board;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.api.BoardConfiguration;
-import com.mantkowicz.light.map.TileSet;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.map.TiledMapLoader;
 import com.mantkowicz.light.map.implementation.tmx.TmxTileMapLoaderProperties;
 import com.mantkowicz.light.map.implementation.tmx.TmxTiledMapLoader;
+import com.mantkowicz.light.service.resources.ResourcesService;
 
 import java.util.List;
 
@@ -17,10 +17,10 @@ import static java.lang.Math.min;
 public class Board extends Actor {
     private final List<Tile> tiles;
 
-    public Board(BoardConfiguration configuration, TileSet tileSet) {
-        this.tiles = tileSet.getTiles();
+    public Board(GameContext context, List<Tile> tiles) {
+        this.tiles = tiles;
         setupPositionAndSize(tiles);
-        addListener(new BoardClickListener(configuration, this));
+        addListener(new BoardClickListener(context, this));
     }
 
     private void setupPositionAndSize(List<Tile> tiles) {
@@ -50,10 +50,10 @@ public class Board extends Actor {
         }
     }
 
-    public static Board load(BoardConfiguration configuration, String mapName) {
+    public static List<Tile> loadTiles(ResourcesService resourcesService, String mapName) {
         TmxTileMapLoaderProperties properties = new TmxTileMapLoaderProperties().setTileMapFileName(mapName);
-        TiledMapLoader<TmxTileMapLoaderProperties> tmxTiledMapLoader = new TmxTiledMapLoader(configuration.getResourcesService());
-        return new Board(configuration, tmxTiledMapLoader.loadTiles(properties));
+        TiledMapLoader<TmxTileMapLoaderProperties> tmxTiledMapLoader = new TmxTiledMapLoader(resourcesService);
+        return tmxTiledMapLoader.loadTiles(properties).getTiles();
     }
 
     public List<Tile> getTiles() {

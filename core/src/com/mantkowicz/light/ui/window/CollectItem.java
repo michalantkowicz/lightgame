@@ -21,7 +21,7 @@ public class CollectItem extends Button {
     private final CollectItemType collectItemType;
     private CollectWindowItemState state;
 
-    private ResourcesService resourcesService;
+    private final ResourcesService resourcesService;
     private Item item;
     private Image itemImage;
 

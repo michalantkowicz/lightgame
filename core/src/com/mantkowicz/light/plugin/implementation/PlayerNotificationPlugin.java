@@ -3,7 +3,7 @@ package com.mantkowicz.light.plugin.implementation;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.implementation.player.Player;
-import com.mantkowicz.light.configuration.api.NotificationPluginConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.notification.Notification;
 import com.mantkowicz.light.notification.animation.EnlargeAndFadeOutAnimation;
 import com.mantkowicz.light.notification.factory.NotificationBuilder;
@@ -22,11 +22,11 @@ public class PlayerNotificationPlugin implements Plugin {
     private final NotificationStage notificationStage;
     private final PhraseService phraseService;
 
-    public PlayerNotificationPlugin(Player player, NotificationPluginConfiguration configuration) {
+    public PlayerNotificationPlugin(Player player, GameContext context) {
         this.player = player;
-        this.rayHandler = configuration.getRayHandler();
-        this.notificationStage = configuration.getNotificationStage();
-        this.phraseService = configuration.getPhraseService();
+        this.rayHandler = context.getRayHandler();
+        this.notificationStage = context.getNotificationStage();
+        this.phraseService = context.getPhraseService();
     }
 
     @Override

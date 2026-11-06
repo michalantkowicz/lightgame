@@ -106,7 +106,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 TiledMapTileLayer tileLayer = getTileLayer(tiledMap);
 
                 float tileHeight = tileLayer.getTileHeight();
-                float tileWidth = Math.round((Math.sqrt(3) * tileHeight) / 2f);
+                float tileWidth = cellWidth(tileHeight);
 
                 Integer objectX = 0;
                 Integer objectY = 0;
@@ -133,9 +133,21 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     }
 
     private Vector2 getTileCenter(Tuple<Integer, Integer> coordinates, float tileWidth, float tileHeight) {
-        float x = coordinates.getX() * tileWidth;
-        float y = (coordinates.getY() - (coordinates.getX() % 2) / 2f) * tileHeight;
-        return new Vector2(x, y).add(tileWidth / 2f, tileHeight / 2f);
+        return cellPosition(coordinates.getX(), coordinates.getY(), tileWidth, tileHeight).add(tileWidth / 2f, tileHeight / 2f);
+    }
+
+    /**
+     * Width of a hex cell (flat top) of the given height.
+     */
+    private static float cellWidth(float tileHeight) {
+        return Math.round((Math.sqrt(3) * tileHeight) / 2f);
+    }
+
+    /**
+     * Bottom-left position of a cell. Odd columns are shifted down by half a cell (staggered odd columns).
+     */
+    private static Vector2 cellPosition(int x, int y, float tileWidth, float tileHeight) {
+        return new Vector2(x * tileWidth, (y - (x % 2) / 2f) * tileHeight);
     }
 
 
@@ -156,14 +168,14 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         Integer y = cellPosition.getY();
 
         float tileHeight = tileLayer.getTileHeight();
-        float tileWidth = Math.round((Math.sqrt(3) * tileHeight) / 2f);
+        float tileWidth = cellWidth(tileHeight);
 
         TiledMapTileLayer.Cell cell = tileLayer.getCell(x, y);
 
         if (cell != null) {
             int tileDefinitionId = cell.getTile().getId();
             Tile tile = createTile(tileSet, tileDefinitionId);
-            Vector2 position = new Vector2(x * tileWidth, (y - (x % 2) / 2f) * tileHeight);
+            Vector2 position = cellPosition(x, y, tileWidth, tileHeight);
             tile.setPosition(position.x, position.y);
 
             addTileObjects(tile, x, y);

@@ -1,6 +1,5 @@
 package com.mantkowicz.light.game;
 
-import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,7 +23,6 @@ public class Main extends Game {
 
         Box2D.init();
         world = new World(new Vector2(0, 0), true);
-        RayHandler rayHandler = new RayHandler(world);
 
         setScreen(new GameScreen(resourcesService, gameEventService, world));
     }

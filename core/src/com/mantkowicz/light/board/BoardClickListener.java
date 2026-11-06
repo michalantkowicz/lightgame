@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.api.BoardConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.notification.Notification;
 import com.mantkowicz.light.notification.animation.MoveUpperAndFadeOutAnimation;
 import com.mantkowicz.light.notification.factory.NotificationBuilder;
@@ -24,11 +24,11 @@ public class BoardClickListener extends ClickListener {
     private final PhraseService phraseService;
     private final Vector2 point = new Vector2();
 
-    public BoardClickListener(BoardConfiguration configuration, Board board) {
+    public BoardClickListener(GameContext context, Board board) {
         this.board = board;
-        gameEventService = configuration.getGameEventService();
-        notificationStage = configuration.getNotificationStage();
-        phraseService = configuration.getPhraseService();
+        gameEventService = context.getGameEventService();
+        notificationStage = context.getNotificationStage();
+        phraseService = context.getPhraseService();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BoardClickListener extends ClickListener {
                 handleNoPathTile(touchedTile);
             } else if (touchedTile.isMarked()) {
                 touchedTile.unmark();
-                gameEventService.addEvent(new TileTouchedEvent(touchedTile));
+                gameEventService.post(new TileTouchedEvent(touchedTile));
             }
         }
     }

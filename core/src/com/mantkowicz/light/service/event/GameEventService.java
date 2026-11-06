@@ -6,74 +6,63 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A polled queue of game events, keyed by the event class.
+ * Events live until they are polled, unless they have a max age.
+ */
 public class GameEventService {
-    private final Map<GameEventType, List<GameEvent>> queue = new HashMap<>();
+    private final Map<Class<?>, List<GameEvent>> queue = new HashMap<>();
 
-    public void addEvent(GameEvent gameEvent) {
-        createIfDoesNotExist(gameEvent.getGameEventType());
-        queue.get(gameEvent.getGameEventType()).add(gameEvent);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends GameEvent> T getEvent(GameEventType eventType, Class<T> type) {
-        createIfDoesNotExist(eventType);
-        if (containsEvent(eventType)) {
-            List<GameEvent> eventList = queue.get(eventType);
-            for (int i = 0; i < eventList.size(); i++) {
-                if (isOfType(eventList.get(i), type)) {
-                    return (T) eventList.get(i);
-                }
-            }
-        }
-        throw new IllegalArgumentException("No such game event type");
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends GameEvent> T removeEventFromQueue(GameEventType eventType, Class<T> type) {
-        createIfDoesNotExist(eventType);
-        if (containsEvent(eventType)) {
-            List<GameEvent> eventList = queue.get(eventType);
-            for (int i = 0; i < eventList.size(); i++) {
-                if (isOfType(eventList.get(i), type)) {
-                    return (T) eventList.remove(i);
-                }
-            }
-        }
-        throw new IllegalArgumentException("No such game event type");
-    }
-
-    public boolean containsEvent(GameEventType eventType) {
-        createIfDoesNotExist(eventType);
-        return queue.containsKey(eventType) && !queue.get(eventType).isEmpty();
+    public void post(GameEvent gameEvent) {
+        eventsOf(gameEvent.getClass()).add(gameEvent);
     }
 
     /**
-     * Exact class match instead of {@code Class.isInstance}, which GWT (HTML5 build) does not support.
-     * Event classes are concrete leaves, so this is equivalent.
+     * @return the oldest event of this class without removing it, or {@code null} if there is none
      */
-    private static boolean isOfType(GameEvent gameEvent, Class<?> type) {
-        return gameEvent.getClass() == type;
+    @SuppressWarnings("unchecked")
+    public <T extends GameEvent> T peek(Class<T> type) {
+        List<GameEvent> events = eventsOf(type);
+        return events.isEmpty() ? null : (T) events.get(0);
     }
 
-    private void createIfDoesNotExist(GameEventType eventType) {
-        if (!queue.containsKey(eventType)) {
-            queue.put(eventType, new ArrayList<GameEvent>());
+    /**
+     * @return the oldest event of this class, removed from the queue, or {@code null} if there is none
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends GameEvent> T poll(Class<T> type) {
+        List<GameEvent> events = eventsOf(type);
+        return events.isEmpty() ? null : (T) events.remove(0);
+    }
+
+    public boolean has(Class<? extends GameEvent> type) {
+        return !eventsOf(type).isEmpty();
+    }
+
+    /**
+     * Keyed by the exact class, because GWT (HTML5 build) does not support {@code Class.isInstance}.
+     * Event classes are concrete leaves, so this is equivalent.
+     */
+    private List<GameEvent> eventsOf(Class<?> type) {
+        List<GameEvent> events = queue.get(type);
+        if (events == null) {
+            events = new ArrayList<>();
+            queue.put(type, events);
         }
+        return events;
     }
 
     /**
      * this method should be called at the end of main loop of the application to provide housekeeping
      */
     public void updateEventsLivesAndClean() {
-        for (GameEventType eventType : queue.keySet()) {
-            if (queue.get(eventType) != null) {
-                Iterator<GameEvent> iterator = queue.get(eventType).iterator();
-                while (iterator.hasNext()) {
-                    GameEvent gameEvent = iterator.next();
-                    gameEvent.increaseAge();
-                    if (gameEvent.isTooOld()) {
-                        iterator.remove();
-                    }
+        for (List<GameEvent> events : queue.values()) {
+            Iterator<GameEvent> iterator = events.iterator();
+            while (iterator.hasNext()) {
+                GameEvent gameEvent = iterator.next();
+                gameEvent.increaseAge();
+                if (gameEvent.isTooOld()) {
+                    iterator.remove();
                 }
             }
         }

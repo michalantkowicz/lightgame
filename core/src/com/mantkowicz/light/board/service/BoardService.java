@@ -2,7 +2,6 @@ package com.mantkowicz.light.board.service;
 
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.GameActor;
-import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.path.BoardPath;
 import com.mantkowicz.light.board.tile.Tile;
 import com.mantkowicz.light.service.event.GameEventService;
@@ -17,15 +16,15 @@ import java.util.Map;
 import static java.lang.Integer.MAX_VALUE;
 
 public class BoardService {
-    private final Board board;
+    private final List<Tile> tiles;
     private final GameActorsByTile gameActorsByTile;
     private final GameEventService gameEventService;
 
-    public BoardService(GameEventService gameEventService, Board board) {
+    public BoardService(GameEventService gameEventService, List<Tile> tiles) {
         this.gameEventService = gameEventService;
-        this.board = board;
+        this.tiles = tiles;
 
-        this.gameActorsByTile = new GameActorsByTile(board.getTiles());
+        this.gameActorsByTile = new GameActorsByTile(tiles);
     }
 
     public void registerGameActor(Tile tile, GameActor gameActor) {
@@ -36,13 +35,13 @@ public class BoardService {
     private void checkCollisions(Tile tile, GameActor gameActor) {
         for (GameActor tileActor : gameActorsByTile.getGameActors(tile)) {
             if (!tileActor.equals(gameActor) && tileActor instanceof Collectible) {
-                gameEventService.addEvent(new CollectEvent((Collectible) tileActor));
+                gameEventService.post(new CollectEvent((Collectible) tileActor));
             }
         }
         for (Tile neighbour : tile.getNeighbours()) {
             for (GameActor tileActor : gameActorsByTile.getGameActors(neighbour)) {
                 if (!tileActor.equals(gameActor) && tileActor instanceof Collectible && ((Collectible) tileActor).isDistant()) {
-                    gameEventService.addEvent(new CollectEvent((Collectible) tileActor));
+                    gameEventService.post(new CollectEvent((Collectible) tileActor));
                 }
             }
         }
@@ -93,7 +92,7 @@ public class BoardService {
 
     private Map<Tile, Integer> getLengthMap(Tile startTile) {
         Map<Tile, Integer> lengthMap = new HashMap<>();
-        for (Tile tile : board.getTiles()) {
+        for (Tile tile : tiles) {
             lengthMap.put(tile, MAX_VALUE);
         }
         lengthMap.put(startTile, 0);

@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.actor.GameBoardActor;
-import com.mantkowicz.light.configuration.api.MenuFeatureConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.interaction.Interaction;
 import com.mantkowicz.light.service.event.GameEventService;
@@ -24,35 +24,33 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
-import static com.mantkowicz.light.service.event.GameEventType.MENU_CLOSE;
-import static com.mantkowicz.light.service.event.GameEventType.MENU_OPEN;
 
 public class MenuFeature implements Feature {
     private static final float MENU_RADIUS = 150f;
-    private final float BUTTON_OFFSET_DEGREES = 60f;
+    private static final float BUTTON_OFFSET_DEGREES = 60f;
+    private static final float MENU_ANIMATION_DURATION = .5f;
 
     private final Stage stage;
     private final GameEventService gameEventService;
     private final ResourcesService resourcesService;
-    private final float MENU_ANIMATION_DURATION = .5f;
 
-    public MenuFeature(MenuFeatureConfiguration configuration) {
-        this.stage = configuration.getUiStage();
-        this.gameEventService = configuration.getGameEventService();
-        this.resourcesService = configuration.getResourcesService();
+    public MenuFeature(GameContext context) {
+        this.stage = context.getMenuStage();
+        this.gameEventService = context.getGameEventService();
+        this.resourcesService = context.getResourcesService();
     }
 
     @Override
     public void run(float delta) {
-        if (gameEventService.containsEvent(MENU_OPEN)) {
-            MenuOpenEvent event = gameEventService.removeEventFromQueue(MENU_OPEN, MenuOpenEvent.class);
-            GameBoardActor actor = event.getEventObject();
+        if (gameEventService.has(MenuOpenEvent.class)) {
+            MenuOpenEvent event = gameEventService.poll(MenuOpenEvent.class);
+            GameBoardActor actor = event.getActor();
 
             for (MenuButton button : createMenuButtons(actor)) {
                 stage.addActor(button);
             }
-        } else if (gameEventService.containsEvent(MENU_CLOSE)) {
-            gameEventService.removeEventFromQueue(MENU_CLOSE, MenuCloseEvent.class);
+        } else if (gameEventService.has(MenuCloseEvent.class)) {
+            gameEventService.poll(MenuCloseEvent.class);
             stage.clear();
         }
     }

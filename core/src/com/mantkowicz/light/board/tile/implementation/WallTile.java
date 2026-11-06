@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
 import com.mantkowicz.light.board.tile.NoPathTile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ResourcesService;
 
 public class WallTile extends NoPathTile {
@@ -14,13 +14,13 @@ public class WallTile extends NoPathTile {
     }
 
     @Override
-    public void prepare(GamePrepareConfiguration configuration) {
-        super.prepare(configuration);
+    public void prepare(GameContext context) {
+        super.prepare(context);
 
         BodyDef wallBodyDef = new BodyDef();
         Vector2 tilePosition = this.getLeftBottom();
         wallBodyDef.position.set(this.stageToLocalCoordinates(tilePosition));
-        Body wallBody = configuration.getWorld().createBody(wallBodyDef);
+        Body wallBody = context.getWorld().createBody(wallBodyDef);
 
         ChainShape hexShape = new ChainShape();
         hexShape.createLoop(this.getPolygonVertices());

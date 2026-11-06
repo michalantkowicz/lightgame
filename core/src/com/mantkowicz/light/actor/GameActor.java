@@ -1,12 +1,13 @@
 package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.actor.implementation.player.Status;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.Plugin;
 
 import java.util.ArrayList;
@@ -20,14 +21,13 @@ public abstract class GameActor extends Group {
     private final long id;
     private final List<Plugin> pluginsQueue;
     private final GameActorType gameActorType;
-    private Status status;
+    private Status status = IDLE;
 
     protected GameActor(GameActorType gameActorType) {
         this.gameActorType = gameActorType;
         this.id = ID_COUNTER++;
         pluginsQueue = new ArrayList<>();
-
-        setStatus(IDLE);
+        Debug.outlineIfChosen(this);
     }
 
     public GameActorType getGameActorType() {
@@ -47,13 +47,17 @@ public abstract class GameActor extends Group {
     }
 
     protected void createAvatar(Texture texture) {
-        Image avatar = new Image(texture);
+        createAvatar(new TextureRegion(texture));
+    }
+
+    protected void createAvatar(TextureRegion region) {
+        Image avatar = new Image(region);
         this.addActor(avatar);
         setSize(avatar.getWidth(), avatar.getHeight());
     }
 
     public Vector2 getCenter() {
-        return new Vector2(getX() + getWidth() / 2f, getY() + getHeight() / 2f);
+        return new Vector2(getX(Align.center), getY(Align.center));
     }
 
     public Status getStatus() {

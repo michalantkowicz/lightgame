@@ -12,7 +12,7 @@ import com.mantkowicz.light.actor.GameActor;
 import static com.mantkowicz.light.actor.GameActorType.CAMERA_ACTOR;
 
 public class CameraActor extends GameActor {
-    private OrthographicCamera camera;
+    private final OrthographicCamera camera;
 
     public CameraActor(OrthographicCamera camera) {
         super(CAMERA_ACTOR);
