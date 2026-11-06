@@ -198,11 +198,6 @@ public abstract class Tile {
         }
     }
 
-    // TODO bug B3: never implemented, so WallTile.prepare throws. The map has no wall tiles today.
-    protected Vector2 stageToLocalCoordinates(Vector2 tilePosition) {
-        throw new UnsupportedOperationException("to be implemented");
-    }
-
     public float getX() {
         return x;
     }
