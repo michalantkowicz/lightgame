@@ -5,7 +5,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.lights.GameLight;
 import com.mantkowicz.light.lights.LightType;
 import com.mantkowicz.light.lights.factory.LightFactory;
@@ -27,11 +27,11 @@ public class TileLight extends TileObject {
     }
 
     @Override
-    public void prepare(Tile tile, GamePrepareConfiguration configuration) {
-        light = LightFactory.createLight(configuration.getRayHandler(), lightAttributes.getType());
+    public void prepare(Tile tile, GameContext context) {
+        light = LightFactory.createLight(context.getRayHandler(), lightAttributes.getType());
         light.setColor(lightAttributes.getColor());
         light.setTile(tile);
-        configuration.getStage().addActor(light);
+        context.getGameStage().addActor(light);
 
         if (lightAttributes.isLightBorder()) {
             moveLight(tile, lightAttributes.getBorderPosition().getRotation());

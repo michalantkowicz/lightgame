@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.actor.GameBoardActor;
-import com.mantkowicz.light.configuration.api.MenuFeatureConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.interaction.Interaction;
 import com.mantkowicz.light.service.event.GameEventService;
@@ -36,10 +36,10 @@ public class MenuFeature implements Feature {
     private final ResourcesService resourcesService;
     private final float MENU_ANIMATION_DURATION = .5f;
 
-    public MenuFeature(MenuFeatureConfiguration configuration) {
-        this.stage = configuration.getUiStage();
-        this.gameEventService = configuration.getGameEventService();
-        this.resourcesService = configuration.getResourcesService();
+    public MenuFeature(GameContext context) {
+        this.stage = context.getMenuStage();
+        this.gameEventService = context.getGameEventService();
+        this.resourcesService = context.getResourcesService();
     }
 
     @Override

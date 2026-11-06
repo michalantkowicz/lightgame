@@ -5,7 +5,7 @@ import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.configuration.api.PlayerConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ThumbnailType;
 
 import static com.mantkowicz.light.actor.GameActorType.LIGHTER;
@@ -14,9 +14,9 @@ import static com.mantkowicz.light.service.resources.ThumbnailType.DEFAULT;
 public class Lighter extends GameBoardActor implements Item, Collectible {
     private final TextureRegion thumbnail;
 
-    public Lighter(PlayerConfiguration configuration) {
-        super(LIGHTER, configuration);
-        thumbnail = configuration.getResourcesService().getTexture("lighter");
+    public Lighter(GameContext context) {
+        super(LIGHTER, context);
+        thumbnail = context.getResourcesService().getTexture("lighter");
     }
 
     @Override

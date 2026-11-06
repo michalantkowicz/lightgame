@@ -661,3 +661,13 @@ blocked by it.
 - The plan was rewritten: rule 3 (no removal without per‑item approval), §3.3 now lists what is kept on purpose, §3.5 adds
   consistency findings C1–C11, §5.2 adds the keep‑or‑remove list K1–K19, and the phases were reordered (wiring and events first,
   then consistency) so constructors are rewritten once.
+
+### 2026‑11‑06, Phase 1 (step 1.1)
+
+- D1 taken as (a), the recommendation, when the human said to start refactoring.
+- `Board.load(..)` became `Board.loadTiles(resources, mapName)`, so tiles exist before `BoardService` and `GameContext`; `BoardService` takes `List<Tile>`.
+  `GameDriver` changed mechanically (one line).
+- **Acceptance grep deviation:** `grep -r configuration core/src` still finds one line, the commented‑out code in `Tile.prepare`
+  (`// ClickListener listener = new BoardClickListener(this, configuration);`). It is left untouched until K2 is decided.
+- **Exception to "don't keep the context":** `PlayerCollectResolver` stores the `GameContext`, because it builds the window and button later,
+  when a collect happens. Its shape is decided in 4.2 (K5).

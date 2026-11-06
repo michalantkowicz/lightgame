@@ -12,7 +12,7 @@ import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Collecting;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.configuration.api.CollectWindowConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.plugin.implementation.CenterActorByCameraPlugin;
 import com.mantkowicz.light.service.resources.ResourcesService;
@@ -39,17 +39,17 @@ public class CollectWindow extends GameActor {
     private CollectItem chosenItem;
     private Table mainTable;
 
-    public CollectWindow(CollectWindowConfiguration configuration, Collecting collecting, Collectible collectible) {
+    public CollectWindow(GameContext context, Collecting collecting, Collectible collectible) {
         super(COLLECT_WINDOW);
 
         this.collectible = collectible;
         this.collecting = collecting;
-        this.skin = configuration.getResourcesService().getSkin();
-        this.resourcesService = configuration.getResourcesService();
+        this.skin = context.getResourcesService().getSkin();
+        this.resourcesService = context.getResourcesService();
         this.collectItems = new ArrayList<>();
 
         Table backgroundTable = new Table();
-        backgroundTable.setSize(configuration.getUiStage().getWidth() * 2, configuration.getUiStage().getHeight() * 2);
+        backgroundTable.setSize(context.getMenuStage().getWidth() * 2, context.getMenuStage().getHeight() * 2);
         backgroundTable.setTouchable(Touchable.enabled);
         backgroundTable.addListener(new StopClickThroughClickListener());
         TextureRegionDrawable backgroundDrawable = new TextureRegionDrawable(new TextureRegion(resourcesService.getTexture("black.png")));
@@ -73,7 +73,7 @@ public class CollectWindow extends GameActor {
 
         setSize(mainTable.getWidth(), mainTable.getHeight());
 
-        Plugin plugin = new CenterActorByCameraPlugin(this, configuration.getCamera(), new Vector2());
+        Plugin plugin = new CenterActorByCameraPlugin(this, context.getCamera(), new Vector2());
         addPlugin(plugin);
     }
 

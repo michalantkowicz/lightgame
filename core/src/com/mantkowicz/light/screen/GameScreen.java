@@ -13,12 +13,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.service.BoardService;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.implementation.CameraTrackingFeature;
 import com.mantkowicz.light.feature.implementation.FPSFeature;
 import com.mantkowicz.light.feature.implementation.MenuFeature;
 import com.mantkowicz.light.feature.implementation.StageFeature;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.PlayerCreatedEvent;
 import com.mantkowicz.light.service.phrase.PhraseService;
@@ -33,7 +33,6 @@ import java.util.List;
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 import static com.mantkowicz.light.service.event.GameEventType.PLAYER_CREATED;
-import static java.util.Arrays.asList;
 
 public class GameScreen implements Screen {
     private final ResourcesService resourcesService;
@@ -66,17 +65,13 @@ public class GameScreen implements Screen {
 
         rayHandler = prepareLights();
 
+        List<Tile> tiles = Board.loadTiles(resourcesService, "map.tmx");
+        BoardService boardService = new BoardService(gameEventService, tiles);
+        GameContext context = createContext(boardService);
+        board = new Board(context, tiles);
 
-        // Preparing configuration after loading tiles
-        GamePrepareConfiguration configuration = prepareConfiguration();
-
-        board = Board.load(configuration, "map.tmx");
-
-        configuration.setBoardService(new BoardService(gameEventService, board));
-
-
-        for (Tile tile : board.getTiles()) {
-            tile.prepare(configuration);
+        for (Tile tile : tiles) {
+            tile.prepare(context);
         }
 
         gameStage.addActor(board);
@@ -84,12 +79,12 @@ public class GameScreen implements Screen {
 
         if (gameEventService.containsEvent(PLAYER_CREATED)) {
             PlayerCreatedEvent gameEvent = gameEventService.removeEventFromQueue(PLAYER_CREATED, PlayerCreatedEvent.class);
-            CameraTrackingFeature cameraTrackingFeature = new CameraTrackingFeature(gameEvent.getEventObject(), configuration);
+            CameraTrackingFeature cameraTrackingFeature = new CameraTrackingFeature(gameEvent.getEventObject(), context);
             addFeature(cameraTrackingFeature);
         }
 
-        addFeature(new MenuFeature(configuration));
-        addFeature(new StageFeature(configuration));
+        addFeature(new MenuFeature(context));
+        addFeature(new StageFeature(context));
         addFeature(new FPSFeature(gameStage, new Vector2(300, 520)));
     }
 
@@ -100,21 +95,20 @@ public class GameScreen implements Screen {
         return rayHandler;
     }
 
-    private GamePrepareConfiguration prepareConfiguration() {
+    private GameContext createContext(BoardService boardService) {
         PhraseService phraseService = new PhraseService();
         OrthographicCamera camera = (OrthographicCamera) gameStage.getCamera();
 
-        return new GamePrepareConfiguration(gameEventService,
-                null,
+        return new GameContext(resourcesService,
+                gameEventService,
+                phraseService,
                 world,
                 rayHandler,
+                camera,
                 gameStage,
                 notificationStage,
-                phraseService,
                 menuStage,
-                resourcesService,
-                camera,
-                asList(gameStage, notificationStage, menuStage));
+                boardService);
     }
 
     @Override

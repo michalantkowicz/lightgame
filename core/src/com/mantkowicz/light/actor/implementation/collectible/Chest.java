@@ -6,7 +6,7 @@ import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.configuration.api.PlayerConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ThumbnailType;
 
 import java.util.ArrayList;
@@ -18,13 +18,13 @@ public class Chest extends GameBoardActor implements Collectible {
 
     private final Inventory inventory;
 
-    public Chest(PlayerConfiguration configuration) {
-        super(CHEST, configuration);
+    public Chest(GameContext context) {
+        super(CHEST, context);
 
         inventory = new Inventory(2, new ArrayList<Item>());
         setName("Nice Chest");
 
-        Texture avatarTexture = configuration.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
+        Texture avatarTexture = context.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
         createAvatar(avatarTexture);
 
         setTouchable(Touchable.disabled);

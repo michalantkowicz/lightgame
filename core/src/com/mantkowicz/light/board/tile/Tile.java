@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.board.object.TileObject;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ResourcesService;
 
 import java.util.ArrayList;
@@ -62,12 +62,12 @@ public abstract class Tile {//} extends Actor {
 //        this.setSize(this.background.getWidth(), this.background.getHeight());
     }
 
-    public void prepare(GamePrepareConfiguration configuration) {
+    public void prepare(GameContext context) {
 //        ClickListener listener = new BoardClickListener(this, configuration);
 //        addListener(listener);
 
         for (TileObject object : objects) {
-            object.prepare(this, configuration);
+            object.prepare(this, context);
         }
     }
 

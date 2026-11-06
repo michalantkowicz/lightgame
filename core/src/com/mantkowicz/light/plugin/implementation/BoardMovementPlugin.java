@@ -9,7 +9,7 @@ import com.mantkowicz.light.actor.implementation.player.Player;
 import com.mantkowicz.light.board.path.BoardPath;
 import com.mantkowicz.light.board.service.BoardService;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.api.BoardMovementPluginConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.TileTouchedEvent;
@@ -25,10 +25,10 @@ public class BoardMovementPlugin implements Plugin {
     private final BoardService boardService;
     private final float speed;
 
-    public BoardMovementPlugin(Player player, float speed, BoardMovementPluginConfiguration configuration) {
+    public BoardMovementPlugin(Player player, float speed, GameContext context) {
         this.player = player;
-        this.gameEventService = configuration.getGameEventService();
-        this.boardService = configuration.getBoardService();
+        this.gameEventService = context.getGameEventService();
+        this.boardService = context.getBoardService();
         this.speed = speed;
     }
 

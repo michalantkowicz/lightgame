@@ -1,7 +1,7 @@
 package com.mantkowicz.light.plugin.implementation;
 
 import com.mantkowicz.light.actor.Collectible;
-import com.mantkowicz.light.configuration.api.CollectPluginConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.CollectResolver;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.service.event.GameEventService;
@@ -13,9 +13,9 @@ public class CollectPlugin implements Plugin {
     private final CollectResolver collectResolver;
     private final GameEventService gameEventService;
 
-    public CollectPlugin(CollectResolver collectResolver, CollectPluginConfiguration configuration) {
+    public CollectPlugin(CollectResolver collectResolver, GameContext context) {
         this.collectResolver = collectResolver;
-        this.gameEventService = configuration.getGameEventService();
+        this.gameEventService = context.getGameEventService();
     }
 
     @Override

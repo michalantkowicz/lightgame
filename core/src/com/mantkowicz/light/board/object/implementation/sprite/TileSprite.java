@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 
 import static com.mantkowicz.light.board.object.TileObjectAttribute.TEXTURE_NAME;
 import static com.mantkowicz.light.board.object.TileObjectAttribute.TEXTURE_OFFSET;
@@ -25,8 +25,8 @@ public class TileSprite extends TileObject {
     }
 
     @Override
-    public void prepare(Tile tile, GamePrepareConfiguration configuration) {
-        Image image = new Image(configuration.getResourcesService().getTexture(textureName));
+    public void prepare(Tile tile, GameContext context) {
+        Image image = new Image(context.getResourcesService().getTexture(textureName));
         image.setPosition(74 - image.getWidth() / 2f + offset.x, 64 - image.getHeight() / 2f + offset.y);
 
 //        tile.addActor(image);

@@ -3,7 +3,7 @@ package com.mantkowicz.light.feature.implementation;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.implementation.CameraActor;
-import com.mantkowicz.light.configuration.api.CameraTrackingFeatureConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.service.event.GameEventService;
 import com.mantkowicz.light.service.event.implementation.camera.LookAtMeEvent;
@@ -19,14 +19,14 @@ public class CameraTrackingFeature implements Feature {
     private Vector2 interval = new Vector2();
     private GameEventService gameEventService;
 
-    public CameraTrackingFeature(GameBoardActor actor, CameraTrackingFeatureConfiguration configuration) {
+    public CameraTrackingFeature(GameBoardActor actor, GameContext context) {
         this.actor = actor;
-        this.gameEventService = configuration.getGameEventService();
+        this.gameEventService = context.getGameEventService();
 
-        this.cameraActor = new CameraActor(configuration.getCamera());
+        this.cameraActor = new CameraActor(context.getCamera());
         cameraActor.setPosition(actor.getCenter());
 //        cameraActor.setDebug(DISTANCE_LEFT_RIGHT, DISTANCE_TOP_BOTTOM);
-        configuration.getStage().addActor(cameraActor);
+        context.getGameStage().addActor(cameraActor);
     }
 
     @Override

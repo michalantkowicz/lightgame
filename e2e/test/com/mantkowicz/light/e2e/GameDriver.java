@@ -417,7 +417,7 @@ public final class GameDriver {
 
     private BoardService boardService() {
         GameEventService events = screenField("gameEventService");
-        return new BoardService(events, board());
+        return new BoardService(events, board().getTiles());
     }
 
     private Stage gameStage() {

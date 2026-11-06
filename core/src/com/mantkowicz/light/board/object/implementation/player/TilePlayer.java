@@ -3,7 +3,7 @@ package com.mantkowicz.light.board.object.implementation.player;
 import com.mantkowicz.light.actor.implementation.player.Player;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.event.implementation.PlayerCreatedEvent;
 
 import static com.mantkowicz.light.board.object.TileObjectType.PLAYER;
@@ -14,13 +14,13 @@ public class TilePlayer extends TileObject {
     }
 
     @Override
-    public void prepare(Tile tile, GamePrepareConfiguration configuration) {
-        Player player = new Player(configuration);
+    public void prepare(Tile tile, GameContext context) {
+        Player player = new Player(context);
         player.setTile(tile);
 
-        configuration.getStage().addActor(player);
+        context.getGameStage().addActor(player);
 
-        configuration.getGameEventService().addEvent(new PlayerCreatedEvent(player));
+        context.getGameEventService().addEvent(new PlayerCreatedEvent(player));
     }
 
     @Override

@@ -2,17 +2,17 @@ package com.mantkowicz.light.actor.implementation.animal;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.mantkowicz.light.actor.GameBoardActor;
-import com.mantkowicz.light.configuration.api.PlayerConfiguration;
+import com.mantkowicz.light.game.GameContext;
 
 import static com.mantkowicz.light.actor.GameActorType.DOG;
 
 public class Dog extends GameBoardActor {
     private static final String AVATAR_RESOURCE_NAME = "dog.png";
 
-    public Dog(PlayerConfiguration configuration) {
-        super(DOG, configuration);
+    public Dog(GameContext context) {
+        super(DOG, context);
 
-        Texture avatarTexture = configuration.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
+        Texture avatarTexture = context.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
         createAvatar(avatarTexture);
     }
 

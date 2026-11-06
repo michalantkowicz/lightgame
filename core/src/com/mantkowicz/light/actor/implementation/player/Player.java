@@ -8,7 +8,7 @@ import com.mantkowicz.light.actor.Collecting;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.configuration.api.PlayerConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.PlayerCollectResolver;
 import com.mantkowicz.light.plugin.implementation.BoardMovementPlugin;
 import com.mantkowicz.light.plugin.implementation.CollectPlugin;
@@ -30,27 +30,27 @@ public class Player extends GameBoardActor implements Collecting {
     private Long lastIdleChange;
     private final Inventory inventory;
 
-    public Player(PlayerConfiguration configuration) {
-        super(PLAYER, configuration);
+    public Player(GameContext context) {
+        super(PLAYER, context);
 
-        gameEventService = configuration.getGameEventService();
+        gameEventService = context.getGameEventService();
         inventory = new Inventory(3, new ArrayList<Item>());
 
-        Texture avatarTexture = configuration.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
+        Texture avatarTexture = context.getResourcesService().getAssetManager().get(AVATAR_RESOURCE_NAME, Texture.class);
         createAvatar(avatarTexture);
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, SPEED, configuration);
+        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, SPEED, context);
         addPlugin(boardMovementPlugin);
 
-        PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, configuration);
+        PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);
 //        addPlugin(playerNotificationPlugin);
 
-        PlayerCollectResolver collectResolver = new PlayerCollectResolver(this, configuration);
-        CollectPlugin collectPlugin = new CollectPlugin(collectResolver, configuration);
+        PlayerCollectResolver collectResolver = new PlayerCollectResolver(this, context);
+        CollectPlugin collectPlugin = new CollectPlugin(collectResolver, context);
         addPlugin(collectPlugin);
 
         setStatus(IDLE);
-        addListener(new PlayerClickListener(this, configuration.getGameEventService()));
+        addListener(new PlayerClickListener(this, context.getGameEventService()));
     }
 
     @Override

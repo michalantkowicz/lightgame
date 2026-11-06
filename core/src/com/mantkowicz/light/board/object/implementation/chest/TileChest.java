@@ -5,7 +5,7 @@ import com.mantkowicz.light.actor.implementation.collectible.Chest;
 import com.mantkowicz.light.actor.implementation.item.Lighter;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,18 +18,18 @@ public class TileChest extends TileObject {
     }
 
     @Override
-    public void prepare(Tile tile, GamePrepareConfiguration configuration) {
-        Chest chest = new Chest(configuration);
+    public void prepare(Tile tile, GameContext context) {
+        Chest chest = new Chest(context);
         chest.setTile(tile);
 
-        List<Item> content = getContent(configuration);
+        List<Item> content = getContent(context);
         chest.getInventory().setItemsAndCompleteWithNulls(content);
 
-        configuration.getStage().addActor(chest);
+        context.getGameStage().addActor(chest);
     }
 
-    private List<Item> getContent(GamePrepareConfiguration configuration) {
-        Lighter lighter = new Lighter(configuration);
+    private List<Item> getContent(GameContext context) {
+        Lighter lighter = new Lighter(context);
 
         List<Item> content = new ArrayList<>();
         content.add(lighter);

@@ -3,7 +3,7 @@ package com.mantkowicz.light.board.tile.implementation;
 import com.badlogic.gdx.maps.MapProperties;
 import com.mantkowicz.light.board.object.TileObject;
 import com.mantkowicz.light.board.tile.AccessibleTile;
-import com.mantkowicz.light.configuration.GamePrepareConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.service.resources.ResourcesService;
 
 public class FloorTile extends AccessibleTile {
@@ -16,11 +16,11 @@ public class FloorTile extends AccessibleTile {
     }
 
     @Override
-    public void prepare(GamePrepareConfiguration configuration) {
+    public void prepare(GameContext context) {
         MapProperties attributes = getAttributes();
 
         if (attributes != null && attributes.containsKey(TEXTURE_NAME_ATTRIBUTE_NAME)) {
-            setBackground(configuration.getResourcesService(), attributes.get(TEXTURE_NAME_ATTRIBUTE_NAME, String.class));
+            setBackground(context.getResourcesService(), attributes.get(TEXTURE_NAME_ATTRIBUTE_NAME, String.class));
         }
 
         for (TileObject object : objects) {
@@ -29,7 +29,7 @@ public class FloorTile extends AccessibleTile {
             }
         }
 
-        super.prepare(configuration);
+        super.prepare(context);
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.mantkowicz.light.actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.service.BoardService;
 import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.configuration.api.PlayerConfiguration;
+import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.interaction.DescriptionInteraction;
 import com.mantkowicz.light.interaction.Interaction;
 import com.mantkowicz.light.interaction.Interactive;
@@ -18,12 +18,12 @@ public abstract class GameBoardActor extends GameActor implements Interactive {
     private final BoardService boardService;
     private Tile tile;
 
-    protected GameBoardActor(GameActorType gameActorType, PlayerConfiguration configuration) {
+    protected GameBoardActor(GameActorType gameActorType, GameContext context) {
         super(gameActorType);
-        this.boardService = configuration.getBoardService();
+        this.boardService = context.getBoardService();
 
-        interactions.add(new DescriptionInteraction(configuration.getResourcesService(), configuration.getGameEventService(), this, getDescription()));
-        addListener(new GameBoardActorListener(this, configuration.getGameEventService()));
+        interactions.add(new DescriptionInteraction(context.getResourcesService(), context.getGameEventService(), this, getDescription()));
+        addListener(new GameBoardActorListener(this, context.getGameEventService()));
     }
 
     protected abstract String getDescription();
