@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.mantkowicz.light.board.object.TileObjectAttribute.OBJECT_CLASS;
+import static com.mantkowicz.light.board.tile.TileAttribute.TEXTURE_NAME;
 import static com.mantkowicz.light.board.tile.TileAttribute.TILE_CLASS;
 import static com.mantkowicz.light.util.Tuple.of;
 
@@ -217,6 +218,10 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         TileType type = TileType.valueOf(propertiesMap.get(TILE_CLASS.getValue(), String.class));
         Tile tile = TileFactory.createTile(resourcesService, type);
         tile.setAttributes(propertiesMap);
+        String textureName = propertiesMap.get(TEXTURE_NAME.getValue(), String.class);
+        if (textureName != null) {
+            tile.setBackground(resourcesService, textureName);
+        }
         return tile;
     }
 }

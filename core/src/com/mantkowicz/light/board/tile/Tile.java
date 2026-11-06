@@ -53,7 +53,10 @@ public abstract class Tile {
         setBackground(resourcesService, backgroundTextureName);
     }
 
-    protected void setBackground(ResourcesService resourcesService, String backgroundTextureName) {
+    /**
+     * Replaces the class default background. Call it before {@link #setPosition}, because the size comes from the texture.
+     */
+    public void setBackground(ResourcesService resourcesService, String backgroundTextureName) {
         backgroundTexture = resourcesService.getTexture(backgroundTextureName);
         setSize(backgroundTexture.getRegionWidth(), backgroundTexture.getRegionHeight()); //TODO: move setSize to tile creation place
     }
@@ -65,11 +68,7 @@ public abstract class Tile {
     }
 
     protected Vector2[] getPolygonVertices() {
-        Vector2[] result = new Vector2[polygon.size];
-        for (int i = 0; i < polygon.size; i++) {
-            result[i] = polygon.get(i);
-        }
-        return result;
+        return polygon.toArray(Vector2[]::new);
     }
 
     public void setPosition(float x, float y) {
@@ -182,24 +181,6 @@ public abstract class Tile {
         return result;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Tile tile = (Tile) o;
-
-        if (id != tile.id) return false;
-        return polygon != null ? polygon.equals(tile.polygon) : tile.polygon == null;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (polygon != null ? polygon.hashCode() : 0);
-        return result;
-    }
-
     public void addTileObject(TileObject object) {
         objects.add(object);
     }
@@ -208,6 +189,7 @@ public abstract class Tile {
         batch.draw(backgroundTexture, x, y);
     }
 
+    // TODO bug B3: never implemented, so WallTile.prepare throws. The map has no wall tiles today.
     protected Vector2 stageToLocalCoordinates(Vector2 tilePosition) {
         throw new UnsupportedOperationException("to be implemented");
     }
