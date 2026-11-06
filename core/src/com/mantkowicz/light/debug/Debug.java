@@ -21,13 +21,13 @@ public final class Debug {
         CAMERA_TRACKING_BOX,
         /** Frames per second, shown next to the camera. */
         FPS_LABEL,
-        /** Debug lines of the collect window's table. On today by accident (bug B4). */
+        /** Debug lines of the collect window's table. */
         COLLECT_WINDOW_LINES,
         /** Switched-off feature: the player exclaims after standing in the dark for 2 seconds. */
         DARKNESS_EXCLAMATION
     }
 
-    private static final Set<Tool> enabledTools = EnumSet.of(Tool.FPS_LABEL, Tool.COLLECT_WINDOW_LINES);
+    private static final Set<Tool> enabledTools = EnumSet.of(Tool.FPS_LABEL);
     private static final Set<Class<?>> outlinedClasses = new HashSet<>();
 
     private Debug() {

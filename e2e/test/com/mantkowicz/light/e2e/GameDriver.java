@@ -214,6 +214,16 @@ public final class GameDriver {
         return "player=" + describe(player.getInventory()) + " chest=" + describe(chest.getInventory());
     }
 
+    /** Does any actor on the UI stage draw scene2d debug lines? */
+    public boolean uiDebugLinesShown() {
+        for (Actor actor : uiActors()) {
+            if (actor.getDebug()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /** What the open collect window shows, slot by slot ("-" is an empty slot). */
     public String collectWindowSlots() {
         return "chest=" + describeSlots(CollectItemType.COLLECTIBLE_ITEM) + " player=" + describeSlots(CollectItemType.COLLECTING_ITEM);

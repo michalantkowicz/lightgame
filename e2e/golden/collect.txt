@@ -23,6 +23,7 @@ text on ui stage: "COLLECT" at=(1056.0,2546.6) alpha=1.0 color=ffffffff
 text on ui stage: "CANCEL" at=(918.0,2778.6) alpha=1.0 color=ffffffff
 text on ui stage: "OK" at=(1194.0,2778.6) alpha=1.0 color=ffffffff
 inventories: player=[-, -, -] chest=[Lighter, -]
+debug lines: false
 ## after OK
 crash: none
 player: cell=(10,24) at=(1170.0,3087.0) status=IDLE
