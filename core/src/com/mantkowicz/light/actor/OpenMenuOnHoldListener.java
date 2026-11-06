@@ -4,9 +4,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
-import com.mantkowicz.light.service.event.GameEventService;
-import com.mantkowicz.light.service.event.implementation.MenuCloseEvent;
-import com.mantkowicz.light.service.event.implementation.MenuOpenEvent;
+import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.event.MenuCloseEvent;
+import com.mantkowicz.light.event.MenuOpenEvent;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;

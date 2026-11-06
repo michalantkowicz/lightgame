@@ -4,19 +4,18 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mantkowicz.light.board.tile.Tile;
+import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.event.TileTouchedEvent;
 import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.notification.MoveUpperAndFadeOutAnimation;
 import com.mantkowicz.light.notification.Notification;
-import com.mantkowicz.light.notification.animation.MoveUpperAndFadeOutAnimation;
-import com.mantkowicz.light.notification.factory.NotificationBuilder;
-import com.mantkowicz.light.service.event.GameEventService;
-import com.mantkowicz.light.service.event.implementation.TileTouchedEvent;
-import com.mantkowicz.light.service.phrase.PhraseService;
-import com.mantkowicz.light.stage.NotificationStage;
+import com.mantkowicz.light.notification.NotificationBuilder;
+import com.mantkowicz.light.resources.PhraseService;
+import com.mantkowicz.light.ui.NotificationStage;
 
 import static com.mantkowicz.light.notification.NotificationStyle.WARNING;
 import static com.mantkowicz.light.notification.NotificationType.NO_PATH_NOTIFICATION;
-import static com.mantkowicz.light.service.phrase.PhraseGroup.NO_PATH;
+import static com.mantkowicz.light.resources.PhraseGroup.NO_PATH;
 
 public class BoardClickListener extends ClickListener {
     private final Board board;

@@ -3,14 +3,14 @@ package com.mantkowicz.light.game;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mantkowicz.light.board.service.BoardService;
-import com.mantkowicz.light.service.event.GameEventService;
-import com.mantkowicz.light.service.phrase.PhraseService;
-import com.mantkowicz.light.service.resources.ResourcesService;
-import com.mantkowicz.light.stage.AbstractStage;
-import com.mantkowicz.light.stage.GameStage;
-import com.mantkowicz.light.stage.MenuStage;
-import com.mantkowicz.light.stage.NotificationStage;
+import com.mantkowicz.light.board.BoardService;
+import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.resources.PhraseService;
+import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.ui.AbstractStage;
+import com.mantkowicz.light.ui.GameStage;
+import com.mantkowicz.light.ui.MenuStage;
+import com.mantkowicz.light.ui.NotificationStage;
 
 import java.util.List;
 

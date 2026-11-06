@@ -1,7 +1,7 @@
 package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.board.tile.Tile;
-import com.mantkowicz.light.thumbnail.Thumbnail;
+import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.resources.Thumbnail;
 
 public interface Collectible extends Thumbnail, InventoryOwner {
     Collectible DEFAULT = null;

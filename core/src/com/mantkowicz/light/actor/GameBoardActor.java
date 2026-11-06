@@ -1,17 +1,17 @@
 package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mantkowicz.light.board.service.BoardService;
-import com.mantkowicz.light.board.tile.Tile;
+import com.mantkowicz.light.board.BoardService;
+import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.game.GameContext;
-import com.mantkowicz.light.interaction.DescriptionInteraction;
-import com.mantkowicz.light.interaction.Interaction;
-import com.mantkowicz.light.interaction.Interactive;
+import com.mantkowicz.light.ui.menu.DescriptionInteraction;
+import com.mantkowicz.light.ui.menu.Interaction;
+import com.mantkowicz.light.ui.menu.Interactive;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mantkowicz.light.board.tile.TilePoint.CENTER;
+import static com.mantkowicz.light.board.TilePoint.CENTER;
 
 public abstract class GameBoardActor extends GameActor implements Interactive {
     private final List<Interaction> interactions = new ArrayList<>();

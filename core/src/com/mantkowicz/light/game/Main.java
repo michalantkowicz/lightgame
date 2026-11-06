@@ -6,9 +6,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mantkowicz.light.screen.GameScreen;
-import com.mantkowicz.light.service.event.GameEventService;
-import com.mantkowicz.light.service.resources.ResourcesService;
+import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.resources.ResourcesService;
 
 public class Main extends Game {
     public static final float SCREEN_WIDTH = 800f, SCREEN_HEIGHT = 1280f;
