@@ -75,16 +75,20 @@ public class GameScreen implements Screen {
 
         gameStage.addActor(board);
 
+        createFeatures(context);
+    }
 
+    /**
+     * Features run every frame, in this order. Camera tracking needs the player, so it is only created once the player exists.
+     */
+    private void createFeatures(GameContext context) {
         PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
         if (playerCreatedEvent != null) {
-            CameraTrackingFeature cameraTrackingFeature = new CameraTrackingFeature(playerCreatedEvent.getPlayer(), context);
-            addFeature(cameraTrackingFeature);
+            addFeature(new CameraTrackingFeature(context, playerCreatedEvent.getPlayer()));
         }
-
         addFeature(new MenuFeature(context));
         addFeature(new StageFeature(context));
-        addFeature(new FPSFeature(gameStage, new Vector2(300, 520)));
+        addFeature(new FPSFeature(context, new Vector2(300, 520)));
     }
 
     private RayHandler prepareLights() {

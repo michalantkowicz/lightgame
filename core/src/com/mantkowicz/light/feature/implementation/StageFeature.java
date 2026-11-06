@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class StageFeature implements Feature {
     private final Map<StageType, Stage> stageMap = new HashMap<>();
-    private GameEventService eventService;
+    private final GameEventService eventService;
 
     public StageFeature(GameContext context) {
         this.eventService = context.getGameEventService();

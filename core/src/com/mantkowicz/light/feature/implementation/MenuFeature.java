@@ -27,12 +27,12 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
 
 public class MenuFeature implements Feature {
     private static final float MENU_RADIUS = 150f;
-    private final float BUTTON_OFFSET_DEGREES = 60f;
+    private static final float BUTTON_OFFSET_DEGREES = 60f;
+    private static final float MENU_ANIMATION_DURATION = .5f;
 
     private final Stage stage;
     private final GameEventService gameEventService;
     private final ResourcesService resourcesService;
-    private final float MENU_ANIMATION_DURATION = .5f;
 
     public MenuFeature(GameContext context) {
         this.stage = context.getMenuStage();

@@ -13,12 +13,12 @@ public class CameraTrackingFeature implements Feature {
     private static final float DISTANCE_LEFT_RIGHT = 420;
     private static final float DISTANCE_TOP_BOTTOM = 420;
 
+    private final CameraActor cameraActor;
+    private final GameEventService gameEventService;
     private GameBoardActor actor;
-    private CameraActor cameraActor;
     private Vector2 interval = new Vector2();
-    private GameEventService gameEventService;
 
-    public CameraTrackingFeature(GameBoardActor actor, GameContext context) {
+    public CameraTrackingFeature(GameContext context, GameBoardActor actor) {
         this.actor = actor;
         this.gameEventService = context.getGameEventService();
 
