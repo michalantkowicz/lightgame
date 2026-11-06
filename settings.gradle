@@ -8,7 +8,7 @@ pluginManagement {
 
 rootProject.name = 'light-game'
 
-include 'core', 'desktop', 'html'
+include 'core', 'desktop', 'html', 'e2e'
 
 // The Android module needs an Android SDK. Include it only when one is configured
 // (ANDROID_HOME / ANDROID_SDK_ROOT or sdk.dir in local.properties).
