@@ -35,3 +35,20 @@ tasks.named('test', Test) {
         exceptionFormat = 'full'
     }
 }
+
+// Coverage of the game code (core) by these tests: ./gradlew e2e:test e2e:jacocoTestReport
+// -> e2e/build/reports/jacoco/test/html/index.html. Not a gate - a tool to find behaviour no test exercises.
+apply plugin: 'jacoco'
+jacoco {
+    toolVersion = '0.8.16'
+}
+tasks.named('jacocoTestReport', JacocoReport) {
+    dependsOn tasks.named('test')
+    def core = project(':core')
+    sourceDirectories.from = files(core.sourceSets.main.java.srcDirs)
+    classDirectories.from = files(core.sourceSets.main.output.classesDirs)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}

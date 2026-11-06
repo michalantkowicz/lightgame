@@ -291,8 +291,8 @@ starting Phase 0. The tests **play the real game** headlessly and observe only w
 
 **0.5 Focused unit tests** (Risk L)
 - In `e2e/test/.../unit`:
-  - `MapSnapshotTest`: tile cells, positions, sizes, background region names and neighbour cells, plus each object's cell,
-    neutral kind and whether it blocks. Compared against `golden/map.txt`.
+  - `BoardLayoutTest`: tile cells, positions, sizes, background region names and neighbour cells, plus each object's kind and
+    whether it blocks. It is read from the running game, so the background is the final one. Compared against `golden/board-layout.txt`.
   - `PathFindingTest`: ~10 fixed start/end pairs on the loaded map, including an unreachable pair and an inaccessible target.
     Assert the length, that consecutive cells are neighbours, and that the path ends at the target and excludes the start.
   - `InventoryTest`: null padding up to capacity, re‑padding on set, and over capacity throws.
@@ -505,7 +505,7 @@ starting Phase 0. The tests **play the real game** headlessly and observe only w
   overwrites an earlier one (`objectsMap.put`, line 130). Replace the linear `addTileObjects` scan with `objects.get(cell)`, which is equivalent
   because there is at most one object per cell.
 - Keep `tiledMap.dispose()`.
-- `MapSnapshotTest` keeps the golden file **unchanged**.
+- `BoardLayoutTest` keeps the golden file **unchanged**.
 
 **5.6 Board service and movement** (Risk M) **[D4]**
 - Fold `GameActorsByTile` into `BoardService` (`Map<Tile, List<GameActor>>`). Collision checks stay the same: the same tile, plus `isDistant`
@@ -590,3 +590,37 @@ blocked by it.
 ## 8. Found during execution
 
 (Executing agents append here: date, step, finding, and what was done or deferred.)
+
+### 2026‑11‑06, Phase 0 (regression tests)
+
+**Done:**
+- `e2e` module with the headless game, `GameDriver`, 18 gameplay tests (S1–S16, grouped by topic in 7 classes) and 7 unit tests
+  (board layout, path finding, inventory). 16 golden files were recorded and reviewed by hand.
+- B1 is confirmed and pinned by `CollectTest`, whose golden records the crash.
+
+**Deviations from the testing design:**
+- S5 ("unreachable") clicks a cell without a tile, because every accessible tile on the map is reachable.
+- S7 walks back to (10,23), because (7,23) is off‑screen after walking east, and the driver refuses off‑screen clicks.
+- The chest at (10,24) blocks the only corridor south, so no walking scenario goes south (it would hit B1).
+- **Recording pitfall that was caught:** `MenuStage` polls `Gdx.input.getX()/getY()`, so the driver must move the scripted pointer
+  on every press or drag. Without that, descriptions never appeared and the goldens were wrong. They were fixed before committing.
+
+**Coverage** (`./gradlew e2e:test e2e:jacocoTestReport`): 82.5 % of `core` lines. Every uncovered line is one of:
+- dead code from §3.3;
+- reachable only through B1 or B3;
+- an error path for invalid data (factory `default` throws, missing‑texture fallbacks);
+- lifecycle code: `pause/resume/hide` are empty, and `dispose` is never called (B5).
+
+**New findings, not yet in §3** (handle in the step that touches the code):
+- `GameEventService.getEvent(..)` is never called. Remove it in 3.1.
+- **"Distant collectibles" are never used.** No collectible returns `isDistant() == true`, so the neighbour loop in
+  `BoardService.checkCollisions` never fires. Keep the behaviour in 5.6, because it's a cheap hook, but don't add tests for it.
+- **The `else` branch of `Player.draw` is dead.** `SpriteBatch.getShader()` never returns `null` (it returns the default shader).
+  The override simply means "draw the player without the custom shader". Simplify it in 5.1, keeping that behaviour.
+- **`CameraActor.setPosition(float, float)` is never called.** `GameActor.setPosition(Vector2)` calls `super.setPosition(..)`,
+  which skips the override; the camera is moved in `act()` instead. **Careful in 5.1:** if `GameActor.setPosition(Vector2)` stops using `super`,
+  the override starts running. Keep the current behaviour: the camera position is applied in `act()`.
+- `GameBoardActor.remove()` is only reached through dead code (`Chest.beforeCollect/afterCollect`). Keep it, because it's correct and
+  B1's fix may use it.
+- The `Inventory` constructor path for a `null` list is unused. 5.1 replaces the constructor anyway.
+- `LabelFactory.createLabel(WARNING, background, text)` (a warning with a background) is unused. It disappears in 4.3.

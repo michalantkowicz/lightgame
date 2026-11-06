@@ -61,7 +61,7 @@ e2e/
 │   ├── Snapshot.java           ← deterministic text rendering of observable state
 │   ├── headless/HeadlessGame.java   ← sets up Gdx globals, creates Main, runs frames
 │   ├── headless/NoOpGL.java, FixedGraphics.java, ScriptedInput.java
-│   ├── scenario/*Test.java     ← one JUnit class per scenario (S1–S16), written against GameDriver only
+│   ├── scenario/*Test.java     ← scenarios S1–S16 grouped by topic, written against GameDriver only
 │   └── unit/*Test.java         ← focused unit tests (§2)
 └── golden/
     └── <scenario>.txt          ← text goldens (platform independent)
@@ -144,7 +144,7 @@ The "Moments" column lists when snapshots are taken.
 | S2 | **Walk** | click a reachable cell 3–4 steps away; snapshot **every frame** while walking (cells only) | `walk-path` (cell sequence), `arrived` | Path follows neighbours, one tile per step, arrives, status back to idle |
 | S3 | **Re‑route** | click far cell A, then cell B after 1 step | `rerouted` | Changes target at the next tile boundary |
 | S4 | **No path** | click a visible blocked (furniture) cell; snapshot at 0 s, 1 s, 2.1 s | `np-0`, `np-1`, `np-gone` | Red "no path" text appears, rises 20 px, fades, is removed |
-| S5 | **Unreachable** | click a cell with no route (if the map has one; otherwise click outside the board) | `unreachable` | Player doesn't move, no text |
+| S5 | **Unreachable** | click a cell without a tile (every accessible tile on this map is reachable) | `unreachable` | Player doesn't move, no text |
 | S6 | **Look at me** | walk away from the player's centre, then click the player; snapshot at 0.5 s and 1.1 s | `look-mid`, `look-done` | The camera animates to the player |
 | S7 | **Camera tracking** | walk the player far, several times; snapshot each frame (camera only, 1 decimal) | `tracking` | Soft follow outside a 420×420 box and gentle stop (0.96 decay) |
 | S8 | **Menu → description** | press and hold the dog 0.6 s, hover the button, release over it; snapshots during the animation and after 1 s, 3 s, 4.1 s | `menu-anim`, `menu-hover`, `desc-1`, `desc-3`, `desc-gone` | Radial menu animation, hover scale 1.5, tooltip text and position, fade after 2 s |
