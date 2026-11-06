@@ -1,4 +1,4 @@
-// Regression tests: the real game played headlessly (see docs/regression-testing.md) plus a few unit tests.
+// Regression tests: the real game played headlessly (see e2e/README.md) plus a few unit tests.
 // Test code only - this module produces nothing that ships with the game.
 //
 //   ./gradlew e2e:test                          run all tests

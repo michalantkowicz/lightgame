@@ -265,47 +265,11 @@ Check that there are no console errors and that the screenshot shows the board, 
 
 Legend: **[D#]** = depends on that decision · **Risk**: L/M/H.
 
-### Phase 0: Safety net
+### Phase 0: Safety net (done, tag `refactor-cp0`)
 
-The full design, including the spike that proved it works, is in **[`regression-testing.md`](regression-testing.md)**. Read it before
-starting Phase 0. The tests **play the real game** headlessly and observe only what a player could see. Visual (screenshot) tests are deferred.
-
-**0.1 Baseline** (Risk L)
-- Check that the migration commit exists and `git status` is clean, and that `./gradlew build html:dist` passes.
-
-**0.2 `e2e` module and headless game** (Risk M)
-- Create the `e2e/` module (regression-testing §3.1): the `settings.gradle` include, dependencies and the `test` task.
-- Implement `NoOpGL`, `FixedGraphics`, `ScriptedInput` and `HeadlessGame` from the spike notes (§8).
-- Acceptance: a smoke test starts the game headless, runs 60 frames and stops it without errors.
-
-**0.3 `GameDriver` and `Snapshot`** (Risk M)
-- Implement the driver API (§3.3) and the observations (§3.4). The driver is the **only** code that references game classes.
-- Acceptance: running the same script twice produces identical snapshot text.
-
-**0.4 Scenarios and goldens** (Risk M)
-- Implement scenarios S1–S16 (§4). Hard‑code the cells; for S2/S3 pick targets with a **unique shortest path** (§4.1).
-- Record the goldens: `./gradlew e2e:test -Dgolden.update=true`.
-  **Review every golden by hand** against the behaviour in §1. A golden that records wrong behaviour
-  (other than the known bugs B1–B5) must be raised before CP0.
-- S15 records today's B1 crash on purpose.
-
-**0.5 Focused unit tests** (Risk L)
-- In `e2e/test/.../unit`:
-  - `BoardLayoutTest`: tile cells, positions, sizes, background region names and neighbour cells, plus each object's kind and
-    whether it blocks. It is read from the running game, so the background is the final one. Compared against `golden/board-layout.txt`.
-  - `PathFindingTest`: ~10 fixed start/end pairs on the loaded map, including an unreachable pair and an inaccessible target.
-    Assert the length, that consecutive cells are neighbours, and that the path ends at the target and excludes the start.
-  - `InventoryTest`: null padding up to capacity, re‑padding on set, and over capacity throws.
-- These go through `GameDriver`‑style helpers too, so that renames touch one place.
-
-**0.6 Coverage review and CI** (Risk L)
-- Add JaCoCo to `e2e:test` and review the `core` coverage report. Every uncovered line must be dead code listed in §3.3 or get a
-  scenario. Record the outcome in §8.
-- CI already exists: `.github/workflows/tests.yml` runs `./gradlew build` (which includes `e2e:test`) and `html:dist` on every push to `master` and every pull request into
-  `master`. Nothing to add. **Confirm** that the goldens recorded on macOS pass on the Linux runner: push the Phase 0 commits and
-  check the run. If a golden differs only by float noise, round that observation more coarsely in `Snapshot`, then re‑record and review.
-
-**▶ CP0**: tag `refactor-cp0`. Report: scenarios and goldens created, coverage summary, and any surprises found while recording.
+Regression tests that **play the real game** headlessly and observe only what a player could see. How they work, how to
+run them, the rules for golden files and the scenario ids S1–S16 are in **[`e2e/README.md`](../e2e/README.md)**. Read it
+before any phase. The outcome of Phase 0 (coverage, deviations, findings) is in §8. Visual (screenshot) tests are deferred.
 
 ### Phase 1: Delete dead code (pure deletions)
 
