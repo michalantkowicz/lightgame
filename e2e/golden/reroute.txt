@@ -1,18 +1,18 @@
-frame 0: player cell=(10,22) at=(1330.0,2932.6)
-frame 5: player cell=(10,22) at=(1330.0,2959.0)
-frame 10: player cell=(10,23) at=(1330.0,2925.9)
-frame 15: player cell=(10,23) at=(1330.0,2857.4)
-frame 20: player cell=(10,23) at=(1330.0,2831.0)
-frame 25: player cell=(10,22) at=(1296.9,2831.0)
-frame 30: player cell=(10,22) at=(1228.4,2831.0)
-frame 35: player cell=(10,22) at=(1202.0,2831.0)
-frame 40: player cell=(9,22) at=(1168.9,2831.0)
-frame 45: player cell=(9,22) at=(1100.4,2831.0)
-frame 50: player cell=(9,22) at=(1074.0,2831.0)
-frame 55: player cell=(8,22) at=(1050.5,2854.5)
-frame 60: player cell=(8,22) at=(996.7,2908.3)
-frame 65: player cell=(8,22) at=(959.3,2945.7)
-frame 70: player cell=(8,22) at=(946.0,2959.0)
+frame 0: player cell=(10,23) at=(1330.0,2916.3)
+frame 5: player cell=(10,22) at=(1330.0,2863.0)
+frame 10: player cell=(10,22) at=(1308.7,2831.0)
+frame 15: player cell=(9,22) at=(1255.3,2831.0)
+frame 20: player cell=(9,22) at=(1202.0,2831.0)
+frame 25: player cell=(9,22) at=(1148.7,2831.0)
+frame 30: player cell=(8,22) at=(1095.3,2831.0)
+frame 35: player cell=(8,22) at=(1051.4,2853.6)
+frame 40: player cell=(8,22) at=(1013.7,2891.3)
+frame 45: player cell=(7,23) at=(975.9,2929.1)
+frame 50: player cell=(7,23) at=(946.0,2959.0)
+frame 55: player cell=(7,23) at=(946.0,2959.0)
+frame 60: player cell=(7,23) at=(946.0,2959.0)
+frame 65: player cell=(7,23) at=(946.0,2959.0)
+frame 70: player cell=(7,23) at=(946.0,2959.0)
 frame 75: player cell=(7,23) at=(946.0,2959.0)
 frame 80: player cell=(7,23) at=(946.0,2959.0)
 frame 85: player cell=(7,23) at=(946.0,2959.0)
@@ -39,8 +39,8 @@ crash: none
 player: cell=(7,23) at=(946.0,2959.0) status=IDLE
 dog: cell=(9,22)
 chest: cell=(10,24)
-camera: at=(1085.5,2957.1) zoom=1.0 view=800.0x1280.0
+camera: at=(1085.4,2958.7) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=235.9 color=555555ff
 menu buttons: 0
-text on game stage: "60" at=(1385.5,3477.1) alpha=1.0 color=ffffffff
+text on game stage: "60" at=(1385.4,3478.7) alpha=1.0 color=ffffffff

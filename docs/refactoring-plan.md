@@ -782,3 +782,19 @@ blocked by it.
   the same rooms (living room, bedroom, kitchen, bathroom) as solid rectangles with doors, the corridor with the player (10,22), dog (9,22),
   chest (10,24) and torch (10,25) on their old cells, and the furniture in its rooms (a few pieces moved so nothing is walled off). All 45
   walkable tiles are reachable from the start. All goldens were re-recorded.
+
+### 2026‑11‑07, smooth movement (branch `smooth-movement`, on top of `square-tiles`)
+
+- **Constant speed:** `BoardMovementPlugin` walks the whole path with one `FollowPathAction` (a linear `TemporalAction` along a polyline),
+  `speed` seconds per 128 px, instead of a `sineOut` move per tile. The player is `MOVEMENT` for the whole walk and `IDLE` only at the end.
+- **Path smoothing:** `BoardService.getPath` still returns the A* tile path. The plugin keeps only its corners: from each point it jumps to
+  the furthest later tile centre reachable in a straight line (`BoardService.isWalkableLine`: sampled every 4 px with a quarter-tile
+  clearance square, so it never crosses or clips a missing or blocked tile).
+- **Tile bookkeeping:** `GameBoardActor.setTile` = new `enterTile` (unregister/register, collisions) + snap to the centre; walking uses
+  `enterTile` when the player's centre crosses into a tile. A `PlayerMoveEvent` ("left the tile") is posted that frame and the new tile is
+  entered the next frame, so a COLLECT button shown by the new tile isn't removed by the same event. Walking past the chest shows the
+  button briefly and fades it, as before.
+- **Re-routing:** a touch is taken at any time (not only between tiles): the walk restarts from where the player is, through the current
+  tile's centre if the straight line to the next tile isn't walkable.
+- Tests: new `SmoothMovementTest` (constant 10.67 px/frame, no stop, a diagonal stretch; no leftover COLLECT button after walking past the
+  chest). Movement goldens re-recorded (walk arrives 15 frames sooner: no idle frame per tile).

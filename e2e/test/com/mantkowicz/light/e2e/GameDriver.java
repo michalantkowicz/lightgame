@@ -314,6 +314,17 @@ public final class GameDriver {
         return Snapshot.point(player.getX(), player.getY());
     }
 
+    /** Where the player is drawn (bottom-left corner), as numbers for speed checks. */
+    public float[] playerXY() {
+        Actor player = actor(Kind.PLAYER);
+        return new float[]{player.getX(), player.getY()};
+    }
+
+    /** Is the player walking (MOVEMENT) or standing (IDLE)? */
+    public String playerStatus() {
+        return String.valueOf(((Player) actor(Kind.PLAYER)).getStatus());
+    }
+
     public String cameraPosition() {
         Camera camera = gameStage().getCamera();
         return Snapshot.point(camera.position.x, camera.position.y);
