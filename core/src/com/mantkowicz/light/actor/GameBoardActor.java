@@ -44,6 +44,17 @@ public abstract class GameBoardActor extends GameActor implements Interactive {
     }
 
     public void setTile(Tile tile) {
+        enterTile(tile);
+
+        Vector2 position = tile.calculatePositionForActorAt(this, CENTER);
+        this.setPosition(position.x, position.y);
+    }
+
+    /**
+     * Moves the actor onto the tile on the board (which triggers collisions) without changing where it is drawn.
+     * Used while walking, when the actor crosses into a tile somewhere between tile centres.
+     */
+    public void enterTile(Tile tile) {
         if (this.tile != null) {
             boardService.unregisterGameActor(this.tile, this);
         }
@@ -51,9 +62,6 @@ public abstract class GameBoardActor extends GameActor implements Interactive {
         this.tile = tile;
 
         boardService.registerGameActor(tile, this);
-
-        Vector2 position = tile.calculatePositionForActorAt(this, CENTER);
-        this.setPosition(position.x, position.y);
     }
 
     @Override

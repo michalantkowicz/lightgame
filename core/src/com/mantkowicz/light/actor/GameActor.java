@@ -21,6 +21,7 @@ public abstract class GameActor extends Group {
     private final List<Plugin> pluginsQueue;
     private final GameActorType gameActorType;
     private Status status = IDLE;
+    private Image avatar;
 
     protected GameActor(GameActorType gameActorType) {
         this.gameActorType = gameActorType;
@@ -50,9 +51,16 @@ public abstract class GameActor extends Group {
     }
 
     protected void createAvatar(TextureRegion region) {
-        Image avatar = new Image(region);
+        avatar = new Image(region);
         this.addActor(avatar);
         setSize(avatar.getWidth(), avatar.getHeight());
+    }
+
+    /**
+     * The actor's picture, or {@code null} if it has none. Moving it only changes how the actor looks, not where it is.
+     */
+    public Image getAvatar() {
+        return avatar;
     }
 
     public Vector2 getCenter() {

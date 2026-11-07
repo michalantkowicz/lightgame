@@ -1,69 +1,145 @@
 package com.mantkowicz.light.plugin;
 
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
+import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.actor.Player;
-import com.mantkowicz.light.board.BoardPath;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.event.TileTouchedEvent;
 import com.mantkowicz.light.game.GameContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.mantkowicz.light.actor.Status.IDLE;
 import static com.mantkowicz.light.actor.Status.MOVEMENT;
-import static com.mantkowicz.light.board.TilePoint.CENTER;
 
 /**
- * Walks the player tile by tile to the touched tile. A new touch is only taken while the player is idle,
- * which happens between two steps, so a walk can be re-routed at the next tile.
+ * Walks the player to the touched tile: along the A* path, but in straight lines wherever the line stays on walkable tiles,
+ * at a constant speed ({@code secondsPerTile} seconds per tile) and without stopping on the way. A touch during a walk re-routes it
+ * from where the player is.
+ * <p>
+ * The board still sees the walk tile by tile: when the player's centre crosses into a tile, a {@link PlayerMoveEvent} says it
+ * left its tile, and in the next frame it enters the new one (collisions, collecting). The frame in between keeps the
+ * "left" event from removing a COLLECT button that the new tile shows.
  */
 public class BoardMovementPlugin implements Plugin {
+    /** How far (in tiles) a straight line keeps away from blocked or missing tiles. */
+    private static final float CLEARANCE = 0.25f;
+
     private final Player player;
     private final GameEventService gameEventService;
     private final BoardService boardService;
-    private final float speed;
+    private final float secondsPerTile;
+    private Tile tileToEnter;
 
-    public BoardMovementPlugin(Player player, GameContext context, float speed) {
+    public BoardMovementPlugin(Player player, GameContext context, float secondsPerTile) {
         this.player = player;
         this.gameEventService = context.getGameEventService();
         this.boardService = context.getBoardService();
-        this.speed = speed;
+        this.secondsPerTile = secondsPerTile;
     }
 
     @Override
     public void run(float delta) {
-        if (IDLE.equals(player.getStatus())) {
-            TileTouchedEvent gameEvent = gameEventService.poll(TileTouchedEvent.class);
-            if (gameEvent != null) {
-                player.addAction(getMoveByPathAction(gameEvent));
+        TileTouchedEvent gameEvent = gameEventService.poll(TileTouchedEvent.class);
+        if (gameEvent != null) {
+            walkTo(gameEvent.getTile());
+        }
+        followTiles();
+    }
+
+    private void walkTo(Tile target) {
+        Tile current = tileUnderPlayer();
+        List<Tile> nodes = new ArrayList<>(boardService.getPath(current, target).getPathNodes());
+        if (nodes.isEmpty() && (target != current || IDLE.equals(player.getStatus()))) {
+            return; // unreachable, or already standing there
+        }
+        float tileSize = current.getHeight();
+        float clearance = CLEARANCE * tileSize;
+        Vector2 start = playerCenter();
+        // off-centre (re-routing mid-walk) the way to the first tile may not be straight: go through the current centre first
+        if (nodes.isEmpty() || !boardService.isWalkableLine(start, nodes.get(0).getCenter(), clearance)) {
+            nodes.add(0, current);
+        }
+
+        List<Vector2> positions = new ArrayList<>();
+        positions.add(toPosition(start));
+        float length = 0;
+        Vector2 previous = start;
+        for (Vector2 corner : corners(start, nodes, clearance)) {
+            length += previous.dst(corner);
+            positions.add(toPosition(corner));
+            previous = corner;
+        }
+
+        player.clearActions();
+        player.setStatus(MOVEMENT);
+        player.addAction(Actions.sequence(
+                new FollowPathAction(positions, secondsPerTile * length / tileSize),
+                Actions.run(this::arrive)
+        ));
+    }
+
+    /**
+     * Path smoothing: keeps only the corners of the path. From each point it jumps to the furthest later tile centre
+     * that can be reached in a straight walkable line.
+     */
+    private List<Vector2> corners(Vector2 start, List<Tile> nodes, float clearance) {
+        List<Vector2> corners = new ArrayList<>();
+        Vector2 from = start;
+        int index = 0;
+        while (index < nodes.size()) {
+            int furthest = index;
+            for (int candidate = nodes.size() - 1; candidate > index; candidate--) {
+                if (boardService.isWalkableLine(from, nodes.get(candidate).getCenter(), clearance)) {
+                    furthest = candidate;
+                    break;
+                }
             }
+            from = nodes.get(furthest).getCenter();
+            corners.add(from);
+            index = furthest + 1;
+        }
+        return corners;
+    }
+
+    /** Tells the board which tile the player is on, one frame behind the drawing (see the class comment). */
+    private void followTiles() {
+        enterPendingTile();
+        Tile under = boardService.getTileAt(playerCenter());
+        if (under != null && under != player.getTile()) {
+            gameEventService.post(new PlayerMoveEvent(player));
+            tileToEnter = under;
         }
     }
 
-    private SequenceAction getMoveByPathAction(TileTouchedEvent gameEvent) {
-        player.clearActions();
+    private void arrive() {
+        enterPendingTile();
+        player.setStatus(IDLE);
+    }
 
-        SequenceAction sequence = Actions.sequence();
-        BoardPath path = boardService.getPath(player.getTile(), gameEvent.getTile());
-
-        Tile previous = player.getTile();
-        for (Tile pathNode : path.getPathNodes()) {
-            Vector2 position = pathNode.calculatePositionForActorAt(player, CENTER);
-            // a diagonal step is longer, so it takes longer: the walking speed stays the same in every direction
-            float duration = speed * previous.getCenter().dst(pathNode.getCenter()) / previous.getHeight();
-            previous = pathNode;
-
-            SequenceAction moveToTileAction = Actions.sequence(
-                    Actions.run(() -> player.setStatus(MOVEMENT)),
-                    Actions.moveTo(position.x, position.y, duration, Interpolation.sineOut),
-                    Actions.run(() -> player.setTile(pathNode)),
-                    Actions.run(() -> player.setStatus(IDLE))
-            );
-            sequence.addAction(moveToTileAction);
+    private void enterPendingTile() {
+        if (tileToEnter != null) {
+            player.enterTile(tileToEnter);
+            tileToEnter = null;
         }
-        return sequence;
+    }
+
+    /** The tile under the player's centre (the board may not have been told about it yet). */
+    private Tile tileUnderPlayer() {
+        Tile under = boardService.getTileAt(playerCenter());
+        return under != null ? under : player.getTile();
+    }
+
+    private Vector2 playerCenter() {
+        return new Vector2(player.getX(Align.center), player.getY(Align.center));
+    }
+
+    private Vector2 toPosition(Vector2 center) {
+        return new Vector2(center.x - player.getWidth() / 2f, center.y - player.getHeight() / 2f);
     }
 }

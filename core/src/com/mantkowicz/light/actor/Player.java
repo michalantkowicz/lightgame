@@ -10,6 +10,7 @@ import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.BoardMovementPlugin;
 import com.mantkowicz.light.plugin.CollectPlugin;
+import com.mantkowicz.light.plugin.HopPlugin;
 import com.mantkowicz.light.plugin.PlayerNotificationPlugin;
 import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 
@@ -23,7 +24,11 @@ import static com.mantkowicz.light.debug.Debug.Tool.DARKNESS_EXCLAMATION;
 public class Player extends GameBoardActor implements Collecting {
     private static final String AVATAR_NAME = "player.png";
     private static final String DESCRIPTION = "player";
-    private static final float SPEED = 0.20f;
+    /** Walking pace: seconds to cross one tile (bigger is slower). */
+    private static final float SECONDS_PER_TILE = 0.4f;
+    /** How high the rabbit hops (px) and how long one hop takes: two hops per tile. */
+    private static final float HOP_HEIGHT = 10f;
+    private static final float HOP_DURATION = SECONDS_PER_TILE / 2;
     private static final int INVENTORY_SIZE = 3;
 
     private final GameEventService gameEventService;
@@ -37,8 +42,9 @@ public class Player extends GameBoardActor implements Collecting {
         lastIdleChange = TimeUtils.millis();
         createAvatar(context, AVATAR_NAME);
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SPEED);
+        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
+        addPlugin(new HopPlugin(this, HOP_HEIGHT, HOP_DURATION));
 
         PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);
         if (Debug.isOn(DARKNESS_EXCLAMATION)) {

@@ -309,9 +309,25 @@ public final class GameDriver {
         return cellOf(actor(kind).getTile());
     }
 
+    /** How far the player's picture is lifted above its position right now (0 = standing on the ground). */
+    public float playerHopHeight() {
+        return actor(Kind.PLAYER).getAvatar().getY();
+    }
+
     public String playerPosition() {
         Actor player = actor(Kind.PLAYER);
         return Snapshot.point(player.getX(), player.getY());
+    }
+
+    /** Where the player is drawn (bottom-left corner), as numbers for speed checks. */
+    public float[] playerXY() {
+        Actor player = actor(Kind.PLAYER);
+        return new float[]{player.getX(), player.getY()};
+    }
+
+    /** Is the player walking (MOVEMENT) or standing (IDLE)? */
+    public String playerStatus() {
+        return String.valueOf(((Player) actor(Kind.PLAYER)).getStatus());
     }
 
     public String cameraPosition() {
