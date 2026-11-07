@@ -41,7 +41,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         TiledMapTileSet tiledMapTileSet = getTileSet(tiledMap);
 
         float tileHeight = tileLayer.getTileHeight();
-        float tileWidth = cellWidth(tileHeight);
+        float tileWidth = tileLayer.getTileWidth();
 
         Map<GridPoint2, TileObject> objects = createObjects(tiledMap, tileLayer, tileWidth, tileHeight);
 
@@ -126,17 +126,10 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     }
 
     /**
-     * Width of a hex cell (flat top) of the given height.
-     */
-    private static float cellWidth(float tileHeight) {
-        return Math.round((Math.sqrt(3) * tileHeight) / 2f);
-    }
-
-    /**
-     * Bottom-left position of a cell. Odd columns are shifted down by half a cell (staggered odd columns).
+     * Bottom-left position of a cell in the square grid.
      */
     private static Vector2 cellPosition(int x, int y, float tileWidth, float tileHeight) {
-        return new Vector2(x * tileWidth, (y - (x % 2) / 2f) * tileHeight);
+        return new Vector2(x * tileWidth, y * tileHeight);
     }
 
     private static Vector2 cellCenter(int x, int y, float tileWidth, float tileHeight) {
@@ -144,17 +137,18 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     }
 
     /**
-     * The six cells around a cell in a staggered-odd hex grid (cells may lie outside the map).
+     * The eight cells around a cell: four sides first, then four diagonals (cells may lie outside the map).
      */
     private static GridPoint2[] neighbourCells(int x, int y) {
-        int shift = x % 2;
         return new GridPoint2[]{
-                new GridPoint2(x - 1, y - shift),
-                new GridPoint2(x + 1, y - shift),
-                new GridPoint2(x, y - 1),
                 new GridPoint2(x, y + 1),
-                new GridPoint2(x - 1, y + 1 - shift),
-                new GridPoint2(x + 1, y + 1 - shift)
+                new GridPoint2(x + 1, y),
+                new GridPoint2(x, y - 1),
+                new GridPoint2(x - 1, y),
+                new GridPoint2(x + 1, y + 1),
+                new GridPoint2(x + 1, y - 1),
+                new GridPoint2(x - 1, y - 1),
+                new GridPoint2(x - 1, y + 1)
         };
     }
 

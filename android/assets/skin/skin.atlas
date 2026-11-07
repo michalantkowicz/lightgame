@@ -76,8 +76,8 @@ depositItemDefault
 floor-tile
   rotate: false
   xy: 710, 244
-  size: 148, 128
-  orig: 148, 128
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1
 grass1
@@ -475,8 +475,8 @@ textButtonOkDown
 tileFloor
   rotate: false
   xy: 257, 244
-  size: 148, 128
-  orig: 148, 128
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1
 tooltip
@@ -490,14 +490,14 @@ tooltip
 woodenFloorEven
   rotate: false
   xy: 408, 244
-  size: 148, 128
-  orig: 148, 128
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1
 woodenFloorOdd
   rotate: false
   xy: 559, 244
-  size: 148, 128
-  orig: 148, 128
+  size: 128, 128
+  orig: 128, 128
   offset: 0, 0
   index: -1

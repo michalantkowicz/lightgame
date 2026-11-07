@@ -56,10 +56,8 @@ import java.util.TreeMap;
  * when the game is refactored, only this class may need (mechanical) changes - scenarios and goldens must not.
  */
 public final class GameDriver {
-    /** Hex geometry of map.tmx: 128 px tall cells, columns 111 px apart (staggered odd columns). */
-    private static final float CELL_HEIGHT = 128;
-    private static final float COLUMN_WIDTH = 111;
-    private static final float TILE_WIDTH = 148;
+    /** Geometry of map.tmx: a square grid of 128 px cells. */
+    private static final float CELL_SIZE = 128;
     private static final int START_FRAMES = 30;
     private static final int FRAMES_PER_SECOND = 60;
 
@@ -149,9 +147,7 @@ public final class GameDriver {
         ResourcesService resources = screenField("resourcesService");
         World world = screenField("world");
         WallTile wall = new WallTile(resources);
-        float x = cell.col() * COLUMN_WIDTH;
-        float y = (cell.row() - (cell.col() % 2) / 2f) * CELL_HEIGHT;
-        wall.setPosition(x, y);
+        wall.setPosition(cell.col() * CELL_SIZE, cell.row() * CELL_SIZE);
         wall.prepare(new GameContext(resources, null, null, world, null, null, null, null, null, null, null));
         frames(1);
     }
@@ -520,14 +516,12 @@ public final class GameDriver {
 
     /** Centre of a cell computed from the map geometry, so it also works for cells without a tile. */
     private static Vector2 cellCenter(Cell cell) {
-        float x = cell.col() * COLUMN_WIDTH;
-        float y = (cell.row() - (cell.col() % 2) / 2f) * CELL_HEIGHT;
-        return new Vector2(x + TILE_WIDTH / 2f, y + CELL_HEIGHT / 2f);
+        return new Vector2(cell.col() * CELL_SIZE + CELL_SIZE / 2f, cell.row() * CELL_SIZE + CELL_SIZE / 2f);
     }
 
     private static Cell cellOf(Tile tile) {
-        int col = Math.round(tile.getX() / COLUMN_WIDTH);
-        int row = Math.round(tile.getY() / CELL_HEIGHT + (col % 2) / 2f);
+        int col = Math.round(tile.getX() / CELL_SIZE);
+        int row = Math.round(tile.getY() / CELL_SIZE);
         return new Cell(col, row);
     }
 
