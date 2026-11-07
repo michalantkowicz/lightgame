@@ -309,6 +309,11 @@ public final class GameDriver {
         return cellOf(actor(kind).getTile());
     }
 
+    /** How far the player's picture is lifted above its position right now (0 = standing on the ground). */
+    public float playerHopHeight() {
+        return actor(Kind.PLAYER).getAvatar().getY();
+    }
+
     public String playerPosition() {
         Actor player = actor(Kind.PLAYER);
         return Snapshot.point(player.getX(), player.getY());

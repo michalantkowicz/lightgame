@@ -799,3 +799,7 @@ blocked by it.
   tile's centre if the straight line to the next tile isn't walkable.
 - Tests: new `SmoothMovementTest` (constant 5.33 px/frame, no stop, a diagonal stretch; no leftover COLLECT button after walking past the
   chest). Movement goldens re-recorded (walk arrives 15 frames sooner: no idle frame per tile).
+- **Hops (the player will be a rabbit):** new `HopPlugin` lifts only the actor's picture (`GameActor.getAvatar()`, the `Image` child) in a
+  sine arc while the status is `MOVEMENT`: `Player.HOP_HEIGHT = 10` px, `HOP_DURATION = SECONDS_PER_TILE / 2` (two hops per tile). The
+  walk ends, the rabbit comes down from where it is (a rising hop turns into a falling one), so it never hops once more after stopping.
+  Positions, tiles, camera and goldens are unaffected; `HopTest` checks height, landings, no hop after stopping and rest.
