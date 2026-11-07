@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset name="lightgame_tileset" tilewidth="148" tileheight="128" tilecount="25" columns="0">
+<tileset name="lightgame_tileset" tilewidth="128" tileheight="128" tilecount="25" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <properties>
   <property name="textureName" value="tileFloor"/>
@@ -9,34 +9,34 @@
   <properties>
    <property name="tileClass" value="FLOOR"/>
   </properties>
-  <image width="148" height="128" source="floor-tile.png"/>
+  <image width="128" height="128" source="floor-tile.png"/>
  </tile>
  <tile id="1">
   <properties>
    <property name="tileClass" value="WALL"/>
   </properties>
-  <image width="148" height="128" source="wall-tile.png"/>
+  <image width="128" height="128" source="wall-tile.png"/>
  </tile>
  <tile id="16">
   <properties>
    <property name="textureName" value="woodenFloorEven"/>
    <property name="tileClass" value="FLOOR"/>
   </properties>
-  <image width="148" height="128" source="woodenFloorEven.png"/>
+  <image width="128" height="128" source="woodenFloorEven.png"/>
  </tile>
  <tile id="17">
   <properties>
    <property name="textureName" value="woodenFloorOdd"/>
    <property name="tileClass" value="FLOOR"/>
   </properties>
-  <image width="148" height="128" source="woodenFloorOdd.png"/>
+  <image width="128" height="128" source="woodenFloorOdd.png"/>
  </tile>
  <tile id="19">
   <properties>
    <property name="textureName" value="tileFloor"/>
    <property name="tileClass" value="FLOOR"/>
   </properties>
-  <image width="148" height="128" source="tileFloor.png"/>
+  <image width="128" height="128" source="tileFloor.png"/>
  </tile>
  <tile id="20">
   <properties>

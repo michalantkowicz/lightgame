@@ -7,7 +7,7 @@ import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.ResourcesService;
 
 /**
- * A tile nobody walks through. It also blocks light: it adds a static body with the hexagon's outline to the physics world.
+ * A tile nobody walks through. It also blocks light: it adds a static body with the tile's outline to the physics world.
  */
 public class WallTile extends NoPathTile {
     public WallTile(ResourcesService resourcesService) {
@@ -21,10 +21,10 @@ public class WallTile extends NoPathTile {
         // the body stays at the world origin and the shape uses the tile's stage coordinates (the world uses stage units)
         Body wallBody = context.getWorld().createBody(new BodyDef());
 
-        ChainShape hexShape = new ChainShape();
-        hexShape.createLoop(this.getPolygonVertices());
-        wallBody.createFixture(hexShape, 0.0f);
+        ChainShape square = new ChainShape();
+        square.createLoop(this.getPolygonVertices());
+        wallBody.createFixture(square, 0.0f);
 
-        hexShape.dispose();
+        square.dispose();
     }
 }

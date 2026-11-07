@@ -765,3 +765,20 @@ blocked by it.
   default. The game was started for 45 s on JDK 25 with no warning and no error. LWJGL notes FFM is somewhat slower, which doesn't
   matter for this game.
 - **O1 and O2 skipped** by the human's decision. With that, every step of the plan is done or explicitly skipped.
+
+### 2026‑11‑07, square tiles (branch `square-tiles`)
+
+- Hexes are replaced by a square grid of 128×128 tiles with **8 neighbours**. Every step costs 1 in path finding, a diagonal one too
+  (review on PR #18), so the A* heuristic is the Chebyshev distance in steps. A diagonal step is only allowed when both tiles it passes
+  between are accessible (no cutting the corners of furniture). Diagonal steps take √2 longer to walk, so the walking speed is the same
+  in every direction.
+- Code: `TmxTiledMapLoader` (cell position `x·w, y·h`, `neighbourCells` returns 8), `Tile` + `TilePoint` (4 corners), `BorderLightPosition`
+  (TOP/RIGHT/BOTTOM/LEFT), `BoardGraph` (weighted connections, corner rule), `BoardMovementPlugin` (step duration by distance),
+  `GameDriver` geometry.
+- Assets: square versions of `floor-tile`, `wall-tile`, `tileFloor`, `woodenFloorEven`, `woodenFloorOdd` (PNG files, their atlas regions
+  and the tileset), generated from the hex art: flat tiles keep the hex edge shading; the wooden floors extend the planks along their
+  direction; the tiled floor maps the hex's triangles onto the square's four. Grass and road tiles are still hexes (not used by the map).
+- `map.tmx` is an orthogonal map. Copying the hex cells one to one left many tiles touching only at corners, so the map was laid out again:
+  the same rooms (living room, bedroom, kitchen, bathroom) as solid rectangles with doors, the corridor with the player (10,22), dog (9,22),
+  chest (10,24) and torch (10,25) on their old cells, and the furniture in its rooms (a few pieces moved so nothing is walled off). All 45
+  walkable tiles are reachable from the start. All goldens were re-recorded.
