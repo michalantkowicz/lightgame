@@ -21,10 +21,10 @@ public class WallTile extends NoPathTile {
         // the body stays at the world origin and the shape uses the tile's stage coordinates (the world uses stage units)
         Body wallBody = context.getWorld().createBody(new BodyDef());
 
-        ChainShape outline = new ChainShape();
-        outline.createLoop(this.getPolygonVertices());
-        wallBody.createFixture(outline, 0.0f);
+        ChainShape square = new ChainShape();
+        square.createLoop(this.getPolygonVertices());
+        wallBody.createFixture(square, 0.0f);
 
-        outline.dispose();
+        square.dispose();
     }
 }

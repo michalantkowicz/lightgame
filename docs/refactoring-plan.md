@@ -768,9 +768,10 @@ blocked by it.
 
 ### 2026‑11‑07, square tiles (branch `square-tiles`)
 
-- Hexes are replaced by a square grid of 128×128 tiles with **8 neighbours**. A diagonal step costs √2 and is only allowed when both
-  tiles it passes between are accessible (no cutting the corners of furniture). Diagonal steps also take √2 longer to walk, so the speed
-  is the same in every direction.
+- Hexes are replaced by a square grid of 128×128 tiles with **8 neighbours**. Every step costs 1 in path finding, a diagonal one too
+  (review on PR #18), so the A* heuristic is the Chebyshev distance in steps. A diagonal step is only allowed when both tiles it passes
+  between are accessible (no cutting the corners of furniture). Diagonal steps take √2 longer to walk, so the walking speed is the same
+  in every direction.
 - Code: `TmxTiledMapLoader` (cell position `x·w, y·h`, `neighbourCells` returns 8), `Tile` + `TilePoint` (4 corners), `BorderLightPosition`
   (TOP/RIGHT/BOTTOM/LEFT), `BoardGraph` (weighted connections, corner rule), `BoardMovementPlugin` (step duration by distance),
   `GameDriver` geometry.
