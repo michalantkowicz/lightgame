@@ -15,15 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mantkowicz.light.board.TilePoint.LEFT_BOTTOM_CORNER;
-import static com.mantkowicz.light.board.TilePoint.LEFT_CORNER;
 import static com.mantkowicz.light.board.TilePoint.LEFT_TOP_CORNER;
 import static com.mantkowicz.light.board.TilePoint.RIGHT_BOTTOM_CORNER;
-import static com.mantkowicz.light.board.TilePoint.RIGHT_CORNER;
 import static com.mantkowicz.light.board.TilePoint.RIGHT_TOP_CORNER;
 
 public abstract class Tile {
     private static final int NOTIFICATION_OFFSET = 5;
-    private static final float TAN_30_DIV_6 = 0.289f;
 
     private static int ID_SEQUENCE = 1;
 
@@ -81,14 +78,8 @@ public abstract class Tile {
         polygon = new Array<>();
         polygon.add(getTilePointPosition(LEFT_BOTTOM_CORNER));
         polygon.add(getTilePointPosition(RIGHT_BOTTOM_CORNER));
-        polygon.add(getTilePointPosition(RIGHT_CORNER));
         polygon.add(getTilePointPosition(RIGHT_TOP_CORNER));
         polygon.add(getTilePointPosition(LEFT_TOP_CORNER));
-        polygon.add(getTilePointPosition(LEFT_CORNER));
-    }
-
-    private float getCornerOffset() {
-        return TAN_30_DIV_6 * height;
     }
 
     public boolean doesContainPoint(Vector2 point) {
@@ -155,30 +146,19 @@ public abstract class Tile {
     }
 
     private Vector2 getTilePointPosition(TilePoint tilePoint) {
-        Vector2 result = getCenter();
         switch (tilePoint) {
             case RIGHT_TOP_CORNER:
-                result = new Vector2(x + width - getCornerOffset(), y + height);
-                break;
-            case RIGHT_CORNER:
-                result = new Vector2(x + width, y + height / 2f);
-                break;
+                return new Vector2(x + width, y + height);
             case RIGHT_BOTTOM_CORNER:
-                result = new Vector2(x + width - getCornerOffset(), y);
-                break;
+                return new Vector2(x + width, y);
             case LEFT_BOTTOM_CORNER:
-                result = new Vector2(x + getCornerOffset(), y);
-                break;
-            case LEFT_CORNER:
-                result = new Vector2(x, y + height / 2f);
-                break;
+                return new Vector2(x, y);
             case LEFT_TOP_CORNER:
-                result = new Vector2(x + getCornerOffset(), y + height);
-                break;
+                return new Vector2(x, y + height);
             case CENTER:
-                break;
+            default:
+                return getCenter();
         }
-        return result;
     }
 
     public void addTileObject(TileObject object) {

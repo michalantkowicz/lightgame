@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" tiledversion="1.1.6" orientation="hexagonal" renderorder="left-down" width="20" height="30" tilewidth="148" tileheight="128" infinite="0" hexsidelength="72" staggeraxis="x" staggerindex="odd" nextobjectid="46">
+<map version="1.0" tiledversion="1.1.6" orientation="orthogonal" renderorder="left-down" width="20" height="30" tilewidth="128" tileheight="128" infinite="0" nextobjectid="46">
  <tileset firstgid="1" source="lightgame_tileset.tsx"/>
  <layer name="Warstwa Kafelków 1" width="20" height="30">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,18,0,0,0,0,0,0,
-0,0,0,0,0,18,0,18,0,0,17,0,17,18,17,0,0,0,0,0,
-0,0,0,0,17,18,17,18,17,0,17,18,17,18,17,0,0,0,0,0,
-0,0,0,0,17,18,17,18,17,18,17,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,17,0,0,20,0,0,0,0,0,0,
-0,0,0,0,0,0,0,18,0,0,17,0,20,20,20,0,0,0,0,0,
-0,0,0,0,0,0,17,18,17,0,17,18,20,20,20,0,0,0,0,0,
-0,0,0,0,0,0,17,18,17,18,17,0,0,0,0,0,0,0,0,0,
+0,0,0,0,17,18,17,18,17,0,0,0,17,18,17,0,0,0,0,0,
+0,0,0,0,17,18,17,18,17,0,0,0,17,18,17,0,0,0,0,0,
+0,0,0,0,17,18,17,18,17,0,0,0,17,18,17,0,0,0,0,0,
+0,0,0,0,17,18,17,18,17,18,17,18,17,18,17,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,17,0,20,20,20,0,0,0,0,0,
+0,0,0,0,0,18,17,18,17,0,17,0,20,20,20,0,0,0,0,0,
+0,0,0,0,0,18,17,18,17,0,17,18,20,20,20,0,0,0,0,0,
+0,0,0,0,0,18,17,18,17,18,17,0,20,20,20,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -36,28 +36,28 @@
 </data>
  </layer>
  <objectgroup name="objects">
-  <object id="7" name="BED" x="1592.33" y="298" width="50" height="50">
+  <object id="7" name="BED" x="1831" y="295" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_bed"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="10" name="GUITAR" x="1479" y="363.667" width="50" height="50">
+  <object id="10" name="GUITAR" x="1831" y="39" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_guitar"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="11" name="TABLE" x="597.97" y="498.333" width="50" height="50">
+  <object id="11" name="TABLE" x="679" y="423" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_table"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="12" name="FIRE" x="595.788" y="230.879" width="50" height="50">
+  <object id="12" name="FIRE" x="679" y="167" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_fireplace"/>
@@ -65,28 +65,28 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="14" name="TV" x="1368.67" y="166.333" width="50" height="50">
+  <object id="14" name="TV" x="1575" y="167" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_tv"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="23" name="BOOKS" x="1481" y="109" width="50" height="50">
+  <object id="23" name="BOOKS" x="1575" y="39" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_bookshelf"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="24" name="ARMCHAIR" x="485" y="301" width="50" height="50">
+  <object id="24" name="ARMCHAIR" x="551" y="295" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_armchair"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="25" name="RADIO COMMODE" x="819" y="233" width="50" height="50">
+  <object id="25" name="RADIO COMMODE" x="935" y="167" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_radio_commode"/>
@@ -94,70 +94,70 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="26" name="WARDROBE" x="927" y="303" width="50" height="50">
+  <object id="26" name="WARDROBE" x="1063" y="295" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_wardrobe"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="27" name="CACTUS" x="488.97" y="430.333" width="50" height="50">
+  <object id="27" name="CACTUS" x="551" y="423" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_cactus"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="28" name="FRIDGE" x="817" y="751" width="50" height="50">
+  <object id="28" name="FRIDGE" x="679" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_fridge"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="29" name="STOVE" x="707" y="945" width="50" height="50">
+  <object id="29" name="STOVE" x="807" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_stove"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="30" name="CABINET" x="709" y="811" width="50" height="50">
+  <object id="30" name="CABINET" x="935" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_kitchen_cabinet"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="31" name="DRAWER" x="927" y="815" width="50" height="50">
+  <object id="31" name="DRAWER" x="679" y="935" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_kitchen_drawer"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="32" name="WASHER" x="1369" y="679.667" width="50" height="50">
+  <object id="32" name="WASHER" x="1575" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_washer"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="33" name="BATH" x="1479" y="872.333" width="50" height="50">
+  <object id="33" name="BATH" x="1575" y="935" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_bath"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="34" name="TOILET" x="1589.67" y="683" width="50" height="50">
+  <object id="34" name="TOILET" x="1831" y="551" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_toilet"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="35" name="LAUNDRY" x="1477" y="613" width="50" height="50">
+  <object id="35" name="LAUNDRY" x="1575" y="551" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_laundry"/>
@@ -165,14 +165,14 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="36" name="SINK" x="1586.33" y="807" width="50" height="50">
+  <object id="36" name="SINK" x="1831" y="807" width="50" height="50">
    <properties>
     <property name="objectClass" value="SPRITE"/>
     <property name="textureName" value="sprite_sink"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="37" name="LIGHT" x="1148.33" y="553.667" width="50" height="50">
+  <object id="37" name="LIGHT" x="1319" y="551" width="50" height="50">
    <properties>
     <property name="borderLightPosition" value="TOP"/>
     <property name="lightType" value="TORCH"/>
@@ -180,19 +180,19 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="38" name="CHEST" x="1148.33" y="672.333" width="50" height="50">
+  <object id="38" name="CHEST" x="1319" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="CHEST"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="39" name="PLAYER" x="1152.33" y="936.333" width="50" height="50">
+  <object id="39" name="PLAYER" x="1319" y="935" width="50" height="50">
    <properties>
     <property name="objectClass" value="PLAYER"/>
    </properties>
    <ellipse/>
   </object>
-  <object id="41" name="DOG" x="1037.67" y="1000.33" width="50" height="50">
+  <object id="41" name="DOG" x="1191" y="935" width="50" height="50">
    <properties>
     <property name="objectClass" value="DOG"/>
    </properties>

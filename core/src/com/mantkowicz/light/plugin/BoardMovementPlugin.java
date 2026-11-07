@@ -49,12 +49,16 @@ public class BoardMovementPlugin implements Plugin {
         SequenceAction sequence = Actions.sequence();
         BoardPath path = boardService.getPath(player.getTile(), gameEvent.getTile());
 
+        Tile previous = player.getTile();
         for (Tile pathNode : path.getPathNodes()) {
             Vector2 position = pathNode.calculatePositionForActorAt(player, CENTER);
+            // a diagonal step is longer, so it takes longer: the walking speed stays the same in every direction
+            float duration = speed * previous.getCenter().dst(pathNode.getCenter()) / previous.getHeight();
+            previous = pathNode;
 
             SequenceAction moveToTileAction = Actions.sequence(
                     Actions.run(() -> player.setStatus(MOVEMENT)),
-                    Actions.moveTo(position.x, position.y, speed, Interpolation.sineOut),
+                    Actions.moveTo(position.x, position.y, duration, Interpolation.sineOut),
                     Actions.run(() -> player.setTile(pathNode)),
                     Actions.run(() -> player.setStatus(IDLE))
             );
