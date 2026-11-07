@@ -23,7 +23,8 @@ import static com.mantkowicz.light.debug.Debug.Tool.DARKNESS_EXCLAMATION;
 public class Player extends GameBoardActor implements Collecting {
     private static final String AVATAR_NAME = "player.png";
     private static final String DESCRIPTION = "player";
-    private static final float SPEED = 0.20f;
+    /** Walking pace: seconds to cross one tile (bigger is slower). */
+    private static final float SECONDS_PER_TILE = 0.4f;
     private static final int INVENTORY_SIZE = 3;
 
     private final GameEventService gameEventService;
@@ -37,7 +38,7 @@ public class Player extends GameBoardActor implements Collecting {
         lastIdleChange = TimeUtils.millis();
         createAvatar(context, AVATAR_NAME);
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SPEED);
+        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
 
         PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);

@@ -12,14 +12,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The player walks at one constant speed (128 px in 0.2 s), never stops between tiles, and cuts straight lines
+ * The player walks at one constant speed (128 px in 0.4 s), never stops between tiles, and cuts straight lines
  * where the floor allows it (here: a diagonal into the kitchen).
  */
 class SmoothMovementTest {
     private static final Cell START = new Cell(10, 22);
     private static final Cell KITCHEN = new Cell(7, 23);
     private static final Cell BEHIND_CHEST = new Cell(10, 26);
-    private static final float PX_PER_FRAME = 128f / (0.2f * 60);
+    private static final float PX_PER_FRAME = 128f / (0.4f * 60);
 
     @Test
     void constantSpeedNoStopsAndADiagonal() {
@@ -29,7 +29,7 @@ class SmoothMovementTest {
 
         List<float[]> positions = new ArrayList<>();
         List<String> statuses = new ArrayList<>();
-        for (int frame = 0; frame < 120; frame++) {
+        for (int frame = 0; frame < 240; frame++) {
             positions.add(game.playerXY());
             statuses.add(game.playerStatus());
             game.frames(1);

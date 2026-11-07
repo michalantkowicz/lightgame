@@ -19,7 +19,7 @@ import static com.mantkowicz.light.actor.Status.MOVEMENT;
 
 /**
  * Walks the player to the touched tile: along the A* path, but in straight lines wherever the line stays on walkable tiles,
- * at a constant speed ({@code speed} seconds per tile) and without stopping on the way. A touch during a walk re-routes it
+ * at a constant speed ({@code secondsPerTile} seconds per tile) and without stopping on the way. A touch during a walk re-routes it
  * from where the player is.
  * <p>
  * The board still sees the walk tile by tile: when the player's centre crosses into a tile, a {@link PlayerMoveEvent} says it
@@ -33,14 +33,14 @@ public class BoardMovementPlugin implements Plugin {
     private final Player player;
     private final GameEventService gameEventService;
     private final BoardService boardService;
-    private final float speed;
+    private final float secondsPerTile;
     private Tile tileToEnter;
 
-    public BoardMovementPlugin(Player player, GameContext context, float speed) {
+    public BoardMovementPlugin(Player player, GameContext context, float secondsPerTile) {
         this.player = player;
         this.gameEventService = context.getGameEventService();
         this.boardService = context.getBoardService();
-        this.speed = speed;
+        this.secondsPerTile = secondsPerTile;
     }
 
     @Override
@@ -79,7 +79,7 @@ public class BoardMovementPlugin implements Plugin {
         player.clearActions();
         player.setStatus(MOVEMENT);
         player.addAction(Actions.sequence(
-                new FollowPathAction(positions, speed * length / tileSize),
+                new FollowPathAction(positions, secondsPerTile * length / tileSize),
                 Actions.run(this::arrive)
         ));
     }
