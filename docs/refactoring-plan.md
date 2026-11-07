@@ -803,3 +803,11 @@ blocked by it.
   sine arc while the status is `MOVEMENT`: `Player.HOP_HEIGHT = 10` px, `HOP_DURATION = SECONDS_PER_TILE / 2` (two hops per tile). The
   walk ends, the rabbit comes down from where it is (a rising hop turns into a falling one), so it never hops once more after stopping.
   Positions, tiles, camera and goldens are unaffected; `HopTest` checks height, landings, no hop after stopping and rest.
+
+---
+
+## 9. Possible improvements (not planned)
+
+- **Squash and stretch for the hops** (2026‑11‑07). `HopPlugin` could also scale the avatar: a little taller and narrower at the top
+  of the arc, flatter and wider just before and after touching the ground. The origin of the scaling would be the bottom centre of the picture. It's
+  purely visual, like the hop itself: positions, tiles and goldens stay the same, and `HopTest` would only need a check on the scale.
