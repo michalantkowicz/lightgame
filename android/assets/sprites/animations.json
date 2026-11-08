@@ -1,0 +1,160 @@
+{
+  "atlas": "sprites.atlas",
+  "packJsonSha1": "b5e2906523c969c55277e31b7e2d479d53587d2f",
+  "sheets": {
+    "rabbit": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 3,
+      "trimY": 10,
+      "width": 42,
+      "height": 31
+    }
+  },
+  "animations": {
+    "rabbit/chop_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    }
+  }
+}

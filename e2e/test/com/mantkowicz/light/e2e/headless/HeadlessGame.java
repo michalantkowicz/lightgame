@@ -24,13 +24,20 @@ public final class HeadlessGame {
     private final ScriptedInput input = new ScriptedInput();
     private final Main game;
 
+    /** The map the tests were written for (map.tmx, the original dark house). */
+    public static final String TEST_MAP = "map.tmx";
+
     public HeadlessGame() {
+        this(TEST_MAP);
+    }
+
+    public HeadlessGame(String mapName) {
         initializeGdx();
         Gdx.graphics = graphics;
         Gdx.input = input;
         MathUtils.random.setSeed(RANDOM_SEED);
 
-        game = new Main();
+        game = new Main(mapName);
         game.create();
         game.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
     }

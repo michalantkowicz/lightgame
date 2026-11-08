@@ -1,0 +1,55 @@
+tiles.png
+size:128,64
+filter:Nearest,Nearest
+repeat:none
+grass_tiles_v2
+  bounds:2,2,16,16
+  index:0
+grass_tiles_v2
+  bounds:20,2,16,16
+  index:1
+grass_tiles_v2
+  bounds:38,2,16,16
+  index:2
+grass_tiles_v2
+  bounds:56,2,16,16
+  index:11
+grass_tiles_v2
+  bounds:74,2,16,16
+  index:12
+grass_tiles_v2
+  bounds:92,2,16,16
+  index:13
+grass_tiles_v2
+  bounds:110,2,16,16
+  index:16
+grass_tiles_v2
+  bounds:2,20,16,16
+  index:17
+grass_tiles_v2
+  bounds:20,20,16,16
+  index:22
+grass_tiles_v2
+  bounds:38,20,16,16
+  index:23
+grass_tiles_v2
+  bounds:56,20,16,16
+  index:24
+grass_tiles_v2
+  bounds:74,20,16,16
+  index:27
+grass_tiles_v2
+  bounds:92,20,16,16
+  index:28
+water
+  bounds:110,20,16,16
+  index:0
+water
+  bounds:2,38,16,16
+  index:1
+water
+  bounds:20,38,16,16
+  index:2
+water
+  bounds:38,38,16,16
+  index:3

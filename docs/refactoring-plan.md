@@ -804,6 +804,35 @@ blocked by it.
   walk ends, the rabbit comes down from where it is (a rising hop turns into a falling one), so it never hops once more after stopping.
   Positions, tiles, camera and goldens are unaffected; `HopTest` checks height, landings, no hop after stopping and rest.
 
+### 2026‑11‑08, Sprout Lands assets (branch `sprout-lands-assets`)
+
+- **Tooling:** `tools/assets/build_assets.py` (Python + Pillow) turns the pack into Tiled tilesets (`assets-src/tilesets`,
+  terrains detected from transparency or borrowed from a clean sheet with the same layout, animated water) and game
+  atlases: `android/assets/maps/tiles.atlas` (only the tiles the levels use) and `android/assets/sprites/sprites.atlas`
+  (only the sheets in the `Sprite` enum, plus `animations.json`). Previews of the whole pack in `build/assets-preview/`. See
+  `tools/assets/README.md`.
+- **License:** the pack's own sheets are git-ignored (`assets-src/tilesets/images/`); packed atlases are committed with
+  `CREDITS.md`.
+- **Game:** `TmxTiledMapLoader` loads packed maps (any number of tile layers drawn per tile, `collision` and `walls`
+  layers, 16 px tiles scaled to 128 by `WorldScale`, map property `ambientLight`) via `AtlasTmxMapLoader` and the asset
+  manager; map.tmx still loads the old way. New `BlockedTile` (not walkable, doesn't block light). `Main` starts
+  `maps/level1.tmx`; the tests keep map.tmx (`HeadlessGame.TEST_MAP`).
+- **Rabbit:** the player is the rabbit sprite (one tile big, the picture sticks out), animated by `AnimationPlugin`
+  (`walk_` + direction from the actual movement, no flicker on diagonals; back to `idle_down` when it stops). `HopPlugin` hops relative to
+  `GameActor.getAvatarRestY()`. Goldens re-recorded: only the player's bottom-left corner (its size is now 128x128)
+  and the description label above it moved. New `LevelTest`.
+- **Typed animations:** `Sprite` (hand-written: the sheets the game uses, the only ones packed), `Action` (generated from
+  the row names in `pack.json`) and `Direction`; `ResourcesService.getAnimation(Sprite, Action[, Direction])`, so no
+  animation names are typed in Java. Missing sheets or frames fail at start. `AssetsUpToDateTest` (needs neither the
+  pack nor Python) fails when a level, `pack.json` or the `Sprite` enum changed without a run of the tool; generated
+  files record the SHA-1 of their sources. The tool is run with Python only, it isn't part of the Gradle build.
+- **Review fixes (PR #21):** map tiles keep Tiled's mirroring/rotation, layer opacity and offset (`TileGraphic`, drawn
+  like libGDX's renderer); a packed map is recognised by its map-level `atlas` property (parsed, not searched in the
+  text); the atlas loader is registered for that file only; 16 px tiles are checked; a non-numeric `ambientLight` is
+  explained; sprite frames are reachable through `getTexture`. Tool: mailbox grid fixed, the door sheet is a tileset
+  only (its frames overlap, no grid fits), packer edge case at the page border, embedded tilesets and infinite maps
+  rejected with a hint, UTF-8 files. New `PackedMapTest` (on `LevelVariant` copies of level1) and more `LevelTest`.
+
 ---
 
 ## 9. Possible improvements (not planned)

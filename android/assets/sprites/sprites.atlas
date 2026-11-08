@@ -1,0 +1,580 @@
+sprites.png
+size:1024,512
+filter:Nearest,Nearest
+repeat:none
+rabbit/chop_down
+  bounds:574,167,42,31
+  index:0
+rabbit/chop_down
+  bounds:618,167,42,31
+  index:1
+rabbit/chop_down
+  bounds:662,167,42,31
+  index:2
+rabbit/chop_down
+  bounds:706,167,42,31
+  index:3
+rabbit/chop_down
+  bounds:750,167,42,31
+  index:4
+rabbit/chop_down
+  bounds:794,167,42,31
+  index:5
+rabbit/chop_down
+  bounds:838,167,42,31
+  index:6
+rabbit/chop_down
+  bounds:882,167,42,31
+  index:7
+rabbit/chop_left
+  bounds:618,200,42,31
+  index:0
+rabbit/chop_left
+  bounds:662,200,42,31
+  index:1
+rabbit/chop_left
+  bounds:706,200,42,31
+  index:2
+rabbit/chop_left
+  bounds:750,200,42,31
+  index:3
+rabbit/chop_left
+  bounds:794,200,42,31
+  index:4
+rabbit/chop_left
+  bounds:838,200,42,31
+  index:5
+rabbit/chop_left
+  bounds:882,200,42,31
+  index:6
+rabbit/chop_left
+  bounds:926,200,42,31
+  index:7
+rabbit/chop_right
+  bounds:266,200,42,31
+  index:0
+rabbit/chop_right
+  bounds:310,200,42,31
+  index:1
+rabbit/chop_right
+  bounds:354,200,42,31
+  index:2
+rabbit/chop_right
+  bounds:398,200,42,31
+  index:3
+rabbit/chop_right
+  bounds:442,200,42,31
+  index:4
+rabbit/chop_right
+  bounds:486,200,42,31
+  index:5
+rabbit/chop_right
+  bounds:530,200,42,31
+  index:6
+rabbit/chop_right
+  bounds:574,200,42,31
+  index:7
+rabbit/chop_up
+  bounds:926,167,42,31
+  index:0
+rabbit/chop_up
+  bounds:970,167,42,31
+  index:1
+rabbit/chop_up
+  bounds:2,200,42,31
+  index:2
+rabbit/chop_up
+  bounds:46,200,42,31
+  index:3
+rabbit/chop_up
+  bounds:90,200,42,31
+  index:4
+rabbit/chop_up
+  bounds:134,200,42,31
+  index:5
+rabbit/chop_up
+  bounds:178,200,42,31
+  index:6
+rabbit/chop_up
+  bounds:222,200,42,31
+  index:7
+rabbit/idle_down
+  bounds:2,2,42,31
+  index:0
+rabbit/idle_down
+  bounds:46,2,42,31
+  index:1
+rabbit/idle_down
+  bounds:90,2,42,31
+  index:2
+rabbit/idle_down
+  bounds:134,2,42,31
+  index:3
+rabbit/idle_down
+  bounds:178,2,42,31
+  index:4
+rabbit/idle_down
+  bounds:222,2,42,31
+  index:5
+rabbit/idle_down
+  bounds:266,2,42,31
+  index:6
+rabbit/idle_down
+  bounds:310,2,42,31
+  index:7
+rabbit/idle_left
+  bounds:46,35,42,31
+  index:0
+rabbit/idle_left
+  bounds:90,35,42,31
+  index:1
+rabbit/idle_left
+  bounds:134,35,42,31
+  index:2
+rabbit/idle_left
+  bounds:178,35,42,31
+  index:3
+rabbit/idle_left
+  bounds:222,35,42,31
+  index:4
+rabbit/idle_left
+  bounds:266,35,42,31
+  index:5
+rabbit/idle_left
+  bounds:310,35,42,31
+  index:6
+rabbit/idle_left
+  bounds:354,35,42,31
+  index:7
+rabbit/idle_right
+  bounds:706,2,42,31
+  index:0
+rabbit/idle_right
+  bounds:750,2,42,31
+  index:1
+rabbit/idle_right
+  bounds:794,2,42,31
+  index:2
+rabbit/idle_right
+  bounds:838,2,42,31
+  index:3
+rabbit/idle_right
+  bounds:882,2,42,31
+  index:4
+rabbit/idle_right
+  bounds:926,2,42,31
+  index:5
+rabbit/idle_right
+  bounds:970,2,42,31
+  index:6
+rabbit/idle_right
+  bounds:2,35,42,31
+  index:7
+rabbit/idle_up
+  bounds:354,2,42,31
+  index:0
+rabbit/idle_up
+  bounds:398,2,42,31
+  index:1
+rabbit/idle_up
+  bounds:442,2,42,31
+  index:2
+rabbit/idle_up
+  bounds:486,2,42,31
+  index:3
+rabbit/idle_up
+  bounds:530,2,42,31
+  index:4
+rabbit/idle_up
+  bounds:574,2,42,31
+  index:5
+rabbit/idle_up
+  bounds:618,2,42,31
+  index:6
+rabbit/idle_up
+  bounds:662,2,42,31
+  index:7
+rabbit/run_down
+  bounds:794,68,42,31
+  index:0
+rabbit/run_down
+  bounds:838,68,42,31
+  index:1
+rabbit/run_down
+  bounds:882,68,42,31
+  index:2
+rabbit/run_down
+  bounds:926,68,42,31
+  index:3
+rabbit/run_down
+  bounds:970,68,42,31
+  index:4
+rabbit/run_down
+  bounds:2,101,42,31
+  index:5
+rabbit/run_down
+  bounds:46,101,42,31
+  index:6
+rabbit/run_down
+  bounds:90,101,42,31
+  index:7
+rabbit/run_left
+  bounds:838,101,42,31
+  index:0
+rabbit/run_left
+  bounds:882,101,42,31
+  index:1
+rabbit/run_left
+  bounds:926,101,42,31
+  index:2
+rabbit/run_left
+  bounds:970,101,42,31
+  index:3
+rabbit/run_left
+  bounds:2,134,42,31
+  index:4
+rabbit/run_left
+  bounds:46,134,42,31
+  index:5
+rabbit/run_left
+  bounds:90,134,42,31
+  index:6
+rabbit/run_left
+  bounds:134,134,42,31
+  index:7
+rabbit/run_right
+  bounds:486,101,42,31
+  index:0
+rabbit/run_right
+  bounds:530,101,42,31
+  index:1
+rabbit/run_right
+  bounds:574,101,42,31
+  index:2
+rabbit/run_right
+  bounds:618,101,42,31
+  index:3
+rabbit/run_right
+  bounds:662,101,42,31
+  index:4
+rabbit/run_right
+  bounds:706,101,42,31
+  index:5
+rabbit/run_right
+  bounds:750,101,42,31
+  index:6
+rabbit/run_right
+  bounds:794,101,42,31
+  index:7
+rabbit/run_up
+  bounds:134,101,42,31
+  index:0
+rabbit/run_up
+  bounds:178,101,42,31
+  index:1
+rabbit/run_up
+  bounds:222,101,42,31
+  index:2
+rabbit/run_up
+  bounds:266,101,42,31
+  index:3
+rabbit/run_up
+  bounds:310,101,42,31
+  index:4
+rabbit/run_up
+  bounds:354,101,42,31
+  index:5
+rabbit/run_up
+  bounds:398,101,42,31
+  index:6
+rabbit/run_up
+  bounds:442,101,42,31
+  index:7
+rabbit/till_down
+  bounds:178,134,42,31
+  index:0
+rabbit/till_down
+  bounds:222,134,42,31
+  index:1
+rabbit/till_down
+  bounds:266,134,42,31
+  index:2
+rabbit/till_down
+  bounds:310,134,42,31
+  index:3
+rabbit/till_down
+  bounds:354,134,42,31
+  index:4
+rabbit/till_down
+  bounds:398,134,42,31
+  index:5
+rabbit/till_down
+  bounds:442,134,42,31
+  index:6
+rabbit/till_down
+  bounds:486,134,42,31
+  index:7
+rabbit/till_left
+  bounds:222,167,42,31
+  index:0
+rabbit/till_left
+  bounds:266,167,42,31
+  index:1
+rabbit/till_left
+  bounds:310,167,42,31
+  index:2
+rabbit/till_left
+  bounds:354,167,42,31
+  index:3
+rabbit/till_left
+  bounds:398,167,42,31
+  index:4
+rabbit/till_left
+  bounds:442,167,42,31
+  index:5
+rabbit/till_left
+  bounds:486,167,42,31
+  index:6
+rabbit/till_left
+  bounds:530,167,42,31
+  index:7
+rabbit/till_right
+  bounds:882,134,42,31
+  index:0
+rabbit/till_right
+  bounds:926,134,42,31
+  index:1
+rabbit/till_right
+  bounds:970,134,42,31
+  index:2
+rabbit/till_right
+  bounds:2,167,42,31
+  index:3
+rabbit/till_right
+  bounds:46,167,42,31
+  index:4
+rabbit/till_right
+  bounds:90,167,42,31
+  index:5
+rabbit/till_right
+  bounds:134,167,42,31
+  index:6
+rabbit/till_right
+  bounds:178,167,42,31
+  index:7
+rabbit/till_up
+  bounds:530,134,42,31
+  index:0
+rabbit/till_up
+  bounds:574,134,42,31
+  index:1
+rabbit/till_up
+  bounds:618,134,42,31
+  index:2
+rabbit/till_up
+  bounds:662,134,42,31
+  index:3
+rabbit/till_up
+  bounds:706,134,42,31
+  index:4
+rabbit/till_up
+  bounds:750,134,42,31
+  index:5
+rabbit/till_up
+  bounds:794,134,42,31
+  index:6
+rabbit/till_up
+  bounds:838,134,42,31
+  index:7
+rabbit/walk_down
+  bounds:398,35,42,31
+  index:0
+rabbit/walk_down
+  bounds:442,35,42,31
+  index:1
+rabbit/walk_down
+  bounds:486,35,42,31
+  index:2
+rabbit/walk_down
+  bounds:530,35,42,31
+  index:3
+rabbit/walk_down
+  bounds:574,35,42,31
+  index:4
+rabbit/walk_down
+  bounds:618,35,42,31
+  index:5
+rabbit/walk_down
+  bounds:662,35,42,31
+  index:6
+rabbit/walk_down
+  bounds:706,35,42,31
+  index:7
+rabbit/walk_left
+  bounds:442,68,42,31
+  index:0
+rabbit/walk_left
+  bounds:486,68,42,31
+  index:1
+rabbit/walk_left
+  bounds:530,68,42,31
+  index:2
+rabbit/walk_left
+  bounds:574,68,42,31
+  index:3
+rabbit/walk_left
+  bounds:618,68,42,31
+  index:4
+rabbit/walk_left
+  bounds:662,68,42,31
+  index:5
+rabbit/walk_left
+  bounds:706,68,42,31
+  index:6
+rabbit/walk_left
+  bounds:750,68,42,31
+  index:7
+rabbit/walk_right
+  bounds:90,68,42,31
+  index:0
+rabbit/walk_right
+  bounds:134,68,42,31
+  index:1
+rabbit/walk_right
+  bounds:178,68,42,31
+  index:2
+rabbit/walk_right
+  bounds:222,68,42,31
+  index:3
+rabbit/walk_right
+  bounds:266,68,42,31
+  index:4
+rabbit/walk_right
+  bounds:310,68,42,31
+  index:5
+rabbit/walk_right
+  bounds:354,68,42,31
+  index:6
+rabbit/walk_right
+  bounds:398,68,42,31
+  index:7
+rabbit/walk_up
+  bounds:750,35,42,31
+  index:0
+rabbit/walk_up
+  bounds:794,35,42,31
+  index:1
+rabbit/walk_up
+  bounds:838,35,42,31
+  index:2
+rabbit/walk_up
+  bounds:882,35,42,31
+  index:3
+rabbit/walk_up
+  bounds:926,35,42,31
+  index:4
+rabbit/walk_up
+  bounds:970,35,42,31
+  index:5
+rabbit/walk_up
+  bounds:2,68,42,31
+  index:6
+rabbit/walk_up
+  bounds:46,68,42,31
+  index:7
+rabbit/water_down
+  bounds:970,200,42,31
+  index:0
+rabbit/water_down
+  bounds:2,233,42,31
+  index:1
+rabbit/water_down
+  bounds:46,233,42,31
+  index:2
+rabbit/water_down
+  bounds:90,233,42,31
+  index:3
+rabbit/water_down
+  bounds:134,233,42,31
+  index:4
+rabbit/water_down
+  bounds:178,233,42,31
+  index:5
+rabbit/water_down
+  bounds:222,233,42,31
+  index:6
+rabbit/water_down
+  bounds:266,233,42,31
+  index:7
+rabbit/water_left
+  bounds:2,266,42,31
+  index:0
+rabbit/water_left
+  bounds:46,266,42,31
+  index:1
+rabbit/water_left
+  bounds:90,266,42,31
+  index:2
+rabbit/water_left
+  bounds:134,266,42,31
+  index:3
+rabbit/water_left
+  bounds:178,266,42,31
+  index:4
+rabbit/water_left
+  bounds:222,266,42,31
+  index:5
+rabbit/water_left
+  bounds:266,266,42,31
+  index:6
+rabbit/water_left
+  bounds:310,266,42,31
+  index:7
+rabbit/water_right
+  bounds:662,233,42,31
+  index:0
+rabbit/water_right
+  bounds:706,233,42,31
+  index:1
+rabbit/water_right
+  bounds:750,233,42,31
+  index:2
+rabbit/water_right
+  bounds:794,233,42,31
+  index:3
+rabbit/water_right
+  bounds:838,233,42,31
+  index:4
+rabbit/water_right
+  bounds:882,233,42,31
+  index:5
+rabbit/water_right
+  bounds:926,233,42,31
+  index:6
+rabbit/water_right
+  bounds:970,233,42,31
+  index:7
+rabbit/water_up
+  bounds:310,233,42,31
+  index:0
+rabbit/water_up
+  bounds:354,233,42,31
+  index:1
+rabbit/water_up
+  bounds:398,233,42,31
+  index:2
+rabbit/water_up
+  bounds:442,233,42,31
+  index:3
+rabbit/water_up
+  bounds:486,233,42,31
+  index:4
+rabbit/water_up
+  bounds:530,233,42,31
+  index:5
+rabbit/water_up
+  bounds:574,233,42,31
+  index:6
+rabbit/water_up
+  bounds:618,233,42,31
+  index:7

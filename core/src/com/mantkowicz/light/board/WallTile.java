@@ -14,6 +14,12 @@ public class WallTile extends NoPathTile {
         super(resourcesService, "wall-tile.png");
     }
 
+    /**
+     * Without a background picture, for maps made with tools/assets: the map draws the wall.
+     */
+    public WallTile() {
+    }
+
     @Override
     public void prepare(GameContext context) {
         super.prepare(context);

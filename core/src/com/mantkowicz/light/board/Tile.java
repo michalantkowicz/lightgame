@@ -1,8 +1,11 @@
 package com.mantkowicz.light.board;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -43,11 +46,21 @@ public abstract class Tile {
 
     protected List<TileObject> objects = new ArrayList<>();
     private TextureRegion backgroundTexture;
+    /** Map tiles drawn instead of the background, bottom layer first (maps made of several tile layers). */
+    private List<TileGraphic> layers;
 
     protected Tile(ResourcesService resourcesService, String backgroundTextureName) {
+        this();
+        setBackground(resourcesService, backgroundTextureName);
+    }
+
+    /**
+     * A tile without a background picture: on maps made with tools/assets the picture comes from the map
+     * ({@link #setGraphics}), which also gives the tile its size. Until then it draws nothing.
+     */
+    protected Tile() {
         this.id = ID_SEQUENCE++;
         this.neighbours = new ArrayList<>();
-        setBackground(resourcesService, backgroundTextureName);
     }
 
     /**
@@ -56,6 +69,27 @@ public abstract class Tile {
     public void setBackground(ResourcesService resourcesService, String backgroundTextureName) {
         backgroundTexture = resourcesService.getTexture(backgroundTextureName);
         setSize(backgroundTexture.getRegionWidth(), backgroundTexture.getRegionHeight()); //TODO: move setSize to tile creation place
+    }
+
+    /**
+     * Draws these map tiles (bottom layer first) instead of the background, stretched to a square of the given size.
+     * Animated tiles animate by themselves. Call it before {@link #setPosition}.
+     */
+    public void setLayers(List<TiledMapTile> layers, float size) {
+        List<TileGraphic> graphics = new ArrayList<>();
+        for (TiledMapTile layer : layers) {
+            graphics.add(TileGraphic.of(layer));
+        }
+        setGraphics(graphics, size);
+    }
+
+    /**
+     * Like {@link #setLayers}, keeping how each map tile was placed in Tiled (mirrored, rotated) and its layer's opacity
+     * and offset.
+     */
+    public void setGraphics(List<TileGraphic> graphics, float size) {
+        this.layers = new ArrayList<>(graphics);
+        setSize(size, size);
     }
 
     public void prepare(GameContext context) {
@@ -166,7 +200,38 @@ public abstract class Tile {
     }
 
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(backgroundTexture, x, y);
+        if (layers == null) {
+            if (backgroundTexture != null) {
+                batch.draw(backgroundTexture, x, y);
+            }
+            return;
+        }
+        for (TileGraphic layer : layers) {
+            drawGraphic(batch, layer);
+        }
+    }
+
+    /**
+     * Draws a map tile stretched over the tile, with the layer's opacity. A mirrored tile is drawn with a scale of -1 and
+     * a rotated one turned around the tile's centre: mirror first, then turn counter-clockwise, like libGDX's map
+     * renderer.
+     */
+    private void drawGraphic(Batch batch, TileGraphic graphic) {
+        TextureRegion region = graphic.tile().getTextureRegion();
+        float drawX = x + graphic.offsetX();
+        float drawY = y + graphic.offsetY();
+        float tint = batch.getPackedColor();
+        if (graphic.opacity() != 1f) {
+            Color color = batch.getColor();
+            batch.setColor(color.r, color.g, color.b, color.a * graphic.opacity());
+        }
+        if (!graphic.flipHorizontally() && !graphic.flipVertically() && graphic.rotation() == Cell.ROTATE_0) {
+            batch.draw(region, drawX, drawY, width, height);
+        } else {
+            batch.draw(region, drawX, drawY, width / 2f, height / 2f, width, height,
+                    graphic.flipHorizontally() ? -1 : 1, graphic.flipVertically() ? -1 : 1, graphic.rotation() * 90f);
+        }
+        batch.setPackedColor(tint); // the next drawings keep the batch's own colour
     }
 
     /**

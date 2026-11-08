@@ -4,15 +4,19 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.Plugin;
+import com.mantkowicz.light.resources.SpriteSheet;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.mantkowicz.light.actor.Status.IDLE;
+import static com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
+import static com.mantkowicz.light.board.WorldScale.TILE_SIZE;
 
 public abstract class GameActor extends Group {
     private static long ID_COUNTER = 0;
@@ -22,6 +26,8 @@ public abstract class GameActor extends Group {
     private final GameActorType gameActorType;
     private Status status = IDLE;
     private Image avatar;
+    /** The avatar's y when nothing lifts it (hops add to it). */
+    private float avatarRestY;
 
     protected GameActor(GameActorType gameActorType) {
         this.gameActorType = gameActorType;
@@ -54,6 +60,30 @@ public abstract class GameActor extends Group {
         avatar = new Image(region);
         this.addActor(avatar);
         setSize(avatar.getWidth(), avatar.getHeight());
+        avatarRestY = 0;
+    }
+
+    /**
+     * Shows a frame of a pixel-art sprite sheet at the world's pixel scale, on an actor one tile big: what every
+     * Sprout Lands character uses. See the full version for other scales or bigger actors.
+     */
+    protected void createAvatar(TextureRegion frame, SpriteSheet sheet) {
+        createAvatar(frame, sheet, PIXEL_SCALE, TILE_SIZE, TILE_SIZE);
+    }
+
+    /**
+     * Shows a frame of a pixel-art sprite sheet, {@code scale} times bigger. The actor itself is only
+     * {@code width x height} (what it occupies on the board, what can be clicked); the picture is centred on it
+     * and may stick out, like a character holding a tool.
+     */
+    protected void createAvatar(TextureRegion frame, SpriteSheet sheet, float scale, float width, float height) {
+        avatar = new Image(frame);
+        avatar.setSize(frame.getRegionWidth() * scale, frame.getRegionHeight() * scale);
+        avatar.setTouchable(Touchable.disabled);
+        avatarRestY = height / 2f + (sheet.trimY() - sheet.frameHeight() / 2f) * scale;
+        avatar.setPosition(width / 2f + (sheet.trimX() - sheet.frameWidth() / 2f) * scale, avatarRestY);
+        this.addActor(avatar);
+        setSize(width, height);
     }
 
     /**
@@ -61,6 +91,13 @@ public abstract class GameActor extends Group {
      */
     public Image getAvatar() {
         return avatar;
+    }
+
+    /**
+     * The avatar's y when nothing lifts it, relative to the actor.
+     */
+    public float getAvatarRestY() {
+        return avatarRestY;
     }
 
     public Vector2 getCenter() {

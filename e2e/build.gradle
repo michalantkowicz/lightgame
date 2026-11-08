@@ -28,8 +28,12 @@ tasks.named('test', Test) {
     systemProperty 'golden.dir', goldenDir.absolutePath
     systemProperty 'golden.actual.dir', layout.buildDirectory.dir('golden-actual').get().asFile.absolutePath
     systemProperty 'golden.update', System.getProperty('golden.update', 'false')
+    systemProperty 'repo.root', rootProject.projectDir.absolutePath // AssetsUpToDateTest reads the asset sources
     inputs.dir(goldenDir).withPropertyName('goldens')
     inputs.dir(rootProject.file('android/assets')).withPropertyName('assets')
+    // sources of the generated assets: a level saved in Tiled must re-run AssetsUpToDateTest (images/ is git-ignored)
+    inputs.files(fileTree('../assets-src') { exclude 'tilesets/images/**' }).withPropertyName('assetSources')
+    inputs.file(rootProject.file('tools/assets/pack.json')).withPropertyName('packJson')
     testLogging {
         events = ['failed']
         exceptionFormat = 'full'
