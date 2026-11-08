@@ -874,3 +874,15 @@ blocked by it.
   drawn layer can block (an invisible one still works for invisible barriers). The loader reads the properties instead of
   names; the tool warns about leftovers (a layer named `collision` without the class, unknown properties). Needs:
   migrating `level1`, `PackedMapTest` (its `LevelVariant` layers), the READMEs.
+- **Animated objects placed from Tiled maps** (2026‑11‑08). Today sprite sheets reach the game only through the `Sprite`
+  enum and actors written in Java (the rabbit). For animals or objects placed in a level: a map object in the `objects`
+  layer with an `objectClass` (e.g. `ANIMAL`) and a `sprite` property holding a `Sprite` constant (e.g. `COW_BROWN`); the
+  loader checks it with `Sprite.valueOf` and creates the actor. The tool already reads every map, so it can also check
+  that each `sprite` value is in the enum (or pack those sheets too), and it can write the list of sheet names into
+  `assets-src/lightgame.tiled-project` as a custom enum property type, so Tiled shows a dropdown instead of free text.
+  Design it together with the first map-placed animal.
+- **Door animation** (2026‑11‑08). `Tilesets/Building parts/door animation sprites.png` is only a tileset: its frames
+  overlap (a 3px pillar plus the door leaf every 16px; the wide door the same with 48px), so no frame grid cuts them right
+  (see the note in `tools/assets/pack.json`). To animate doors, `pack.json` needs frames given as rectangles
+  (`"frames": [[x, y, w, h], ...]` per row, plus how to anchor frames of different widths), and `cut_frames` in the tool
+  has to support them. Check the result on the preview page.
