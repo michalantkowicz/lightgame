@@ -2,6 +2,14 @@
 
 A libGDX game (desktop, Android, HTML). Run it with `./gradlew desktop:run`.
 
+## Docs
+
+- [docs/changelog.md](docs/changelog.md): what each feature branch changed, and why.
+- [docs/ideas.md](docs/ideas.md): possible improvements, not planned yet.
+- [docs/refactoring-plan.md](docs/refactoring-plan.md): the finished refactoring (analysis, decisions, the phases).
+- [e2e/README.md](e2e/README.md): the headless regression tests; [tools/assets/README.md](tools/assets/README.md): the
+  asset tool.
+
 ## Assets
 
 The graphics come from the **Sprout Lands** pack by Cup Nooble. The pack itself stays out of the repo (its license
