@@ -11,9 +11,21 @@ import com.mantkowicz.light.resources.ResourcesService;
 
 public class Main extends Game {
     public static final float SCREEN_WIDTH = 800f, SCREEN_HEIGHT = 1280f;
+    /** The level the game starts with (made in Tiled, packed by tools/assets). */
+    public static final String DEFAULT_MAP = "maps/level1.tmx";
+
+    private final String mapName;
 
     private ResourcesService resourcesService;
     private World world;
+
+    public Main() {
+        this(DEFAULT_MAP);
+    }
+
+    public Main(String mapName) {
+        this.mapName = mapName;
+    }
 
     @Override
     public void create() {
@@ -23,7 +35,7 @@ public class Main extends Game {
         Box2D.init();
         world = new World(new Vector2(0, 0), true);
 
-        setScreen(new GameScreen(resourcesService, gameEventService, world));
+        setScreen(new GameScreen(mapName, resourcesService, gameEventService, world));
     }
 
     @Override

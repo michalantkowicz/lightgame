@@ -9,6 +9,8 @@ public class TileFactory {
                 return new FloorTile(resourcesService);
             case WALL:
                 return new WallTile(resourcesService);
+            case BLOCKED:
+                return new BlockedTile(resourcesService);
             default:
                 throw new IllegalArgumentException("There is no tile implementation for this tile type: " + tileType.name());
         }

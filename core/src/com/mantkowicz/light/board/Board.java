@@ -3,6 +3,7 @@ package com.mantkowicz.light.board;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.map.TiledMapLoader;
 import com.mantkowicz.light.map.TmxTileMapLoaderProperties;
 import com.mantkowicz.light.map.TmxTiledMapLoader;
@@ -52,9 +53,16 @@ public class Board extends Actor {
     }
 
     public static List<Tile> loadTiles(ResourcesService resourcesService, String mapName) {
+        return loadTileSet(resourcesService, mapName).getTiles();
+    }
+
+    /**
+     * The map's tiles together with its properties (tile size, ambient light).
+     */
+    public static TileSet loadTileSet(ResourcesService resourcesService, String mapName) {
         TmxTileMapLoaderProperties properties = new TmxTileMapLoaderProperties().setTileMapFileName(mapName);
         TiledMapLoader<TmxTileMapLoaderProperties> tmxTiledMapLoader = new TmxTiledMapLoader(resourcesService);
-        return tmxTiledMapLoader.loadTiles(properties).getTiles();
+        return tmxTiledMapLoader.loadTiles(properties);
     }
 
     public List<Tile> getTiles() {

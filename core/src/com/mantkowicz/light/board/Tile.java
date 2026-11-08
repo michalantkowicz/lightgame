@@ -3,6 +3,7 @@ package com.mantkowicz.light.board;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -43,6 +44,8 @@ public abstract class Tile {
 
     protected List<TileObject> objects = new ArrayList<>();
     private TextureRegion backgroundTexture;
+    /** Map tiles drawn instead of the background, bottom layer first (maps made of several tile layers). */
+    private List<TiledMapTile> layers;
 
     protected Tile(ResourcesService resourcesService, String backgroundTextureName) {
         this.id = ID_SEQUENCE++;
@@ -56,6 +59,15 @@ public abstract class Tile {
     public void setBackground(ResourcesService resourcesService, String backgroundTextureName) {
         backgroundTexture = resourcesService.getTexture(backgroundTextureName);
         setSize(backgroundTexture.getRegionWidth(), backgroundTexture.getRegionHeight()); //TODO: move setSize to tile creation place
+    }
+
+    /**
+     * Draws these map tiles (bottom layer first) instead of the background, stretched to a square of the given size.
+     * Animated tiles animate by themselves. Call it before {@link #setPosition}.
+     */
+    public void setLayers(List<TiledMapTile> layers, float size) {
+        this.layers = new ArrayList<>(layers);
+        setSize(size, size);
     }
 
     public void prepare(GameContext context) {
@@ -166,7 +178,13 @@ public abstract class Tile {
     }
 
     public void draw(Batch batch, float parentAlpha) {
-        batch.draw(backgroundTexture, x, y);
+        if (layers == null) {
+            batch.draw(backgroundTexture, x, y);
+            return;
+        }
+        for (TiledMapTile layer : layers) {
+            batch.draw(layer.getTextureRegion(), x, y, width, height);
+        }
     }
 
     /**

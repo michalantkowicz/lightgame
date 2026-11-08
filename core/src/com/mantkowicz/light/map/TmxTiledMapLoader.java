@@ -1,10 +1,15 @@
 package com.mantkowicz.light.map;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -14,6 +19,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileFactory;
 import com.mantkowicz.light.board.TileType;
+import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.map.TileSet.TilesetProperties;
 import com.mantkowicz.light.resources.ResourcesService;
 
@@ -27,7 +33,21 @@ import static com.mantkowicz.light.board.TileAttribute.TILE_CLASS;
 import static com.mantkowicz.light.map.TileObjectAttribute.OBJECT_CLASS;
 import static com.mantkowicz.light.util.Tuple.of;
 
+/**
+ * Loads a Tiled map into board tiles. Two kinds of maps:
+ * <ul>
+ * <li>packed maps (made with tools/assets, they have an 'atlas' property): any number of tile layers drawn on top of
+ * each other, 16 px tiles scaled to {@link WorldScale#TILE_SIZE}. A layer named {@value #COLLISION_LAYER} (never drawn)
+ * marks cells nobody can walk on, a layer named {@value #WALLS_LAYER} marks walls that also block light;</li>
+ * <li>the original map.tmx: one layer whose tiles say their class and texture in tile properties.</li>
+ * </ul>
+ * Both have an 'objects' layer with the player, chests, lights and furniture.
+ */
 public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderProperties> {
+    static final String COLLISION_LAYER = "collision";
+    static final String WALLS_LAYER = "walls";
+    private static final String AMBIENT_LIGHT = "ambientLight";
+
     private final ResourcesService resourcesService;
 
     public TmxTiledMapLoader(ResourcesService resourcesService) {
@@ -36,7 +56,11 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
 
     @Override
     public TileSet loadTiles(TmxTileMapLoaderProperties properties) {
-        TiledMap tiledMap = new TmxMapLoader().load(properties.getTileMapFileName());
+        String fileName = properties.getTileMapFileName();
+        if (isPackedMap(fileName)) {
+            return loadPackedMap(loadWithAtlas(fileName));
+        }
+        TiledMap tiledMap = new TmxMapLoader().load(fileName);
         TiledMapTileLayer tileLayer = getTileLayer(tiledMap);
         TiledMapTileSet tiledMapTileSet = getTileSet(tiledMap);
 
@@ -66,7 +90,108 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
             }
         }
 
-        // collect neighbours
+        connectNeighbours(tilesByCell);
+
+        TilesetProperties tilesetProperties = getTilesetProperties(tileLayer);
+        tiledMap.dispose();
+
+        TileSet tileSet = new TileSet();
+        tileSet.setTiles(tiles);
+        tileSet.setProperties(tilesetProperties);
+        return tileSet;
+    }
+
+    private static boolean isPackedMap(String fileName) {
+        return Gdx.files.internal(fileName).readString("UTF-8").contains("name=\"atlas\"");
+    }
+
+    /**
+     * Through the asset manager, so the map and its atlas live as long as the game's other resources (the tiles keep
+     * drawing the atlas' regions) and are disposed with them.
+     */
+    private TiledMap loadWithAtlas(String fileName) {
+        AssetManager assetManager = resourcesService.getAssetManager();
+        if (!assetManager.isLoaded(fileName, TiledMap.class)) {
+            assetManager.setLoader(TiledMap.class, new AtlasTmxMapLoader(new InternalFileHandleResolver()));
+            assetManager.load(fileName, TiledMap.class);
+            assetManager.finishLoadingAsset(fileName);
+        }
+        return assetManager.get(fileName, TiledMap.class);
+    }
+
+    private TileSet loadPackedMap(TiledMap tiledMap) {
+        List<TiledMapTileLayer> drawn = new ArrayList<>();
+        TiledMapTileLayer collision = null;
+        TiledMapTileLayer walls = null;
+        for (TiledMapTileLayer layer : tiledMap.getLayers().getByType(TiledMapTileLayer.class)) {
+            if (COLLISION_LAYER.equals(layer.getName())) {
+                collision = layer;
+            } else {
+                if (WALLS_LAYER.equals(layer.getName())) {
+                    walls = layer;
+                }
+                if (layer.isVisible()) {
+                    drawn.add(layer);
+                }
+            }
+        }
+        if (drawn.isEmpty()) {
+            throw new IllegalArgumentException("The map has no visible tile layer");
+        }
+        TiledMapTileLayer first = drawn.get(0);
+        float tileWidth = first.getTileWidth();
+        float tileHeight = first.getTileHeight();
+        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight);
+
+        Map<GridPoint2, Tile> tilesByCell = new HashMap<>();
+        List<Tile> tiles = new ArrayList<>();
+        for (int x = 0; x < first.getWidth(); x++) {
+            for (int y = 0; y < first.getHeight(); y++) {
+                List<TiledMapTile> cellLayers = new ArrayList<>();
+                for (TiledMapTileLayer layer : drawn) {
+                    TiledMapTileLayer.Cell cell = layer.getCell(x, y);
+                    if (cell != null && cell.getTile() != null) {
+                        cellLayers.add(cell.getTile());
+                    }
+                }
+                boolean wall = hasCell(walls, x, y);
+                boolean blocked = hasCell(collision, x, y);
+                if (cellLayers.isEmpty() && !wall && !blocked) {
+                    continue;
+                }
+                Tile tile = TileFactory.createTile(resourcesService, wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
+                tile.setAttributes(new MapProperties());
+                tile.setLayers(cellLayers, WorldScale.TILE_SIZE);
+                tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
+                GridPoint2 cellPosition = new GridPoint2(x, y);
+                TileObject object = objects.get(cellPosition);
+                if (object != null) {
+                    tile.addTileObject(object);
+                }
+                tilesByCell.put(cellPosition, tile);
+                tiles.add(tile);
+            }
+        }
+        connectNeighbours(tilesByCell);
+
+        TilesetProperties tilesetProperties = new TilesetProperties();
+        tilesetProperties.setTileSize(of(WorldScale.TILE_SIZE, WorldScale.TILE_SIZE));
+        MapProperties mapProperties = tiledMap.getProperties();
+        if (mapProperties.containsKey(AMBIENT_LIGHT)) {
+            tilesetProperties.setAmbientLight(Float.valueOf(String.valueOf(mapProperties.get(AMBIENT_LIGHT))));
+        }
+
+        TileSet tileSet = new TileSet();
+        tileSet.setTiles(tiles);
+        tileSet.setProperties(tilesetProperties);
+        return tileSet;
+    }
+
+    private static boolean hasCell(TiledMapTileLayer layer, int x, int y) {
+        return layer != null && layer.getCell(x, y) != null;
+    }
+
+    private static void connectNeighbours(Map<GridPoint2, Tile> tilesByCell) {
         for (Map.Entry<GridPoint2, Tile> entry : tilesByCell.entrySet()) {
             Tile tile = entry.getValue();
             for (GridPoint2 neighbourCell : neighbourCells(entry.getKey().x, entry.getKey().y)) {
@@ -76,14 +201,6 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 }
             }
         }
-
-        TilesetProperties tilesetProperties = getTilesetProperties(tileLayer);
-        tiledMap.dispose();
-
-        TileSet tileSet = new TileSet();
-        tileSet.setTiles(tiles);
-        tileSet.setProperties(tilesetProperties);
-        return tileSet;
     }
 
     private TilesetProperties getTilesetProperties(TiledMapTileLayer tileLayer) {
@@ -99,7 +216,11 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
      */
     private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth, float tileHeight) {
         Map<GridPoint2, TileObject> objects = new HashMap<>();
-        for (MapObject object : getObjectLayer(tiledMap).getObjects()) {
+        MapLayer objectLayer = getObjectLayer(tiledMap);
+        if (objectLayer == null) {
+            return objects;
+        }
+        for (MapObject object : objectLayer.getObjects()) {
             if (object instanceof EllipseMapObject) {
                 Ellipse ellipse = ((EllipseMapObject) object).getEllipse();
                 Vector2 objectCenter = new Vector2(ellipse.x + ellipse.width / 2f, ellipse.y + ellipse.height / 2f);

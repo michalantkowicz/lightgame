@@ -40,6 +40,6 @@ public class HopPlugin implements Plugin {
                 progress = walking ? progress - 1 : 0;
             }
         }
-        avatar.setY(hopHeight * MathUtils.sin(MathUtils.PI * progress));
+        avatar.setY(actor.getAvatarRestY() + hopHeight * MathUtils.sin(MathUtils.PI * progress));
     }
 }

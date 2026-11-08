@@ -803,3 +803,21 @@ blocked by it.
   sine arc while the status is `MOVEMENT`: `Player.HOP_HEIGHT = 10` px, `HOP_DURATION = SECONDS_PER_TILE / 2` (two hops per tile). The
   walk ends, the rabbit comes down from where it is (a rising hop turns into a falling one), so it never hops once more after stopping.
   Positions, tiles, camera and goldens are unaffected; `HopTest` checks height, landings, no hop after stopping and rest.
+
+### 2026‑11‑08, Sprout Lands assets (branch `sprout-lands-assets`)
+
+- **Tooling:** `tools/assets/build_assets.py` (Python + Pillow) turns the pack into Tiled tilesets (`assets-src/tilesets`,
+  terrains detected from transparency or borrowed from a clean sheet with the same layout, animated water) and game
+  atlases: `android/assets/maps/tiles.atlas` (only the tiles the levels use) and `android/assets/sprites/sprites.atlas`
+  (every animation in `tools/assets/pack.json`, plus `animations.json`). Previews in `build/assets-preview/`. See
+  `tools/assets/README.md`.
+- **License:** the pack's own sheets are git-ignored (`assets-src/tilesets/images/`); packed atlases are committed with
+  `CREDITS.md`.
+- **Game:** `TmxTiledMapLoader` loads packed maps (any number of tile layers drawn per tile, `collision` and `walls`
+  layers, 16 px tiles scaled to 128 by `WorldScale`, map property `ambientLight`) via `AtlasTmxMapLoader` and the asset
+  manager; map.tmx still loads the old way. New `BlockedTile` (not walkable, doesn't block light). `Main` starts
+  `maps/level1.tmx`; the tests keep map.tmx (`HeadlessGame.TEST_MAP`).
+- **Rabbit:** the player is the rabbit sprite (one tile big, the picture sticks out), animated by `AnimationPlugin`
+  (`walk_` + direction from the actual movement, no flicker on diagonals; back to `idle_down` when it stops). `HopPlugin` hops relative to
+  `GameActor.getAvatarRestY()`. Goldens re-recorded: only the player's bottom-left corner (its size is now 128x128)
+  and the description label above it moved. New `LevelTest`.

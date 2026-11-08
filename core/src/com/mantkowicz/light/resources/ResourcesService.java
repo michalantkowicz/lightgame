@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -13,18 +14,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
 public class ResourcesService {
     private static final String FONT = "font.fnt";
+    /** Animations made by tools/assets: names, frame durations and the atlas with the frames. */
+    private static final String ANIMATIONS = "sprites/animations.json";
 
     private final Skin skin;
     private final AssetManager assetManager;
     private final Array<TextureAtlas> atlases = new Array<>();
+    private final Map<String, Animation<TextureRegion>> animations = new HashMap<>();
+    private final Map<String, SpriteSheet> spriteSheets = new HashMap<>();
 
     public ResourcesService() {
         assetManager = new AssetManager();
@@ -47,6 +56,49 @@ public class ResourcesService {
 
         assetManager.getAll(TextureAtlas.class, atlases);
         skin = new Skin(Gdx.files.internal("skin/skin.json"), assetManager.get("skin/skin.atlas", TextureAtlas.class));
+        loadAnimations();
+    }
+
+    private void loadAnimations() {
+        FileHandle file = Gdx.files.internal(ANIMATIONS);
+        JsonValue root = new JsonReader().parse(file);
+        String atlasName = file.parent().child(root.getString("atlas")).path();
+        assetManager.load(atlasName, TextureAtlas.class);
+        assetManager.finishLoadingAsset(atlasName);
+        TextureAtlas atlas = assetManager.get(atlasName, TextureAtlas.class);
+
+        for (JsonValue sheet = root.get("sheets").child; sheet != null; sheet = sheet.next) {
+            spriteSheets.put(sheet.name, new SpriteSheet(sheet.getInt("frameWidth"), sheet.getInt("frameHeight"),
+                    sheet.getInt("trimX"), sheet.getInt("trimY")));
+        }
+        for (JsonValue animation = root.get("animations").child; animation != null; animation = animation.next) {
+            Array<AtlasRegion> frames = atlas.findRegions(animation.name);
+            animations.put(animation.name, new Animation<TextureRegion>(animation.getFloat("frameDuration"), frames,
+                    Animation.PlayMode.valueOf(animation.getString("playMode"))));
+        }
+    }
+
+    /**
+     * An animation from sprites/animations.json, e.g. "rabbit/walk_down" (sheet name / row name).
+     */
+    public Animation<TextureRegion> getAnimation(String name) {
+        Animation<TextureRegion> animation = animations.get(name);
+        if (animation == null) {
+            throw new IllegalArgumentException("Couldn't find animation: " + name);
+        }
+        return animation;
+    }
+
+    public boolean hasAnimation(String name) {
+        return animations.containsKey(name);
+    }
+
+    public SpriteSheet getSpriteSheet(String name) {
+        SpriteSheet sheet = spriteSheets.get(name);
+        if (sheet == null) {
+            throw new IllegalArgumentException("Couldn't find sprite sheet: " + name);
+        }
+        return sheet;
     }
 
     public TextureRegion getTexture(String textureName) {

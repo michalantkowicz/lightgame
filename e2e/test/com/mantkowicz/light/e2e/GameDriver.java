@@ -63,17 +63,23 @@ public final class GameDriver {
 
     public enum Kind {PLAYER, DOG, CHEST}
 
-    private final HeadlessGame game = new HeadlessGame();
+    private final HeadlessGame game;
     private final StringBuilder timeline = new StringBuilder();
     private String crash;
     private Vector2 pointer = new Vector2();
 
-    private GameDriver() {
+    private GameDriver(String mapName) {
+        game = new HeadlessGame(mapName);
     }
 
-    /** Starts the game and lets it settle for half a second. */
+    /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
     public static GameDriver start() {
-        GameDriver driver = new GameDriver();
+        return start(HeadlessGame.TEST_MAP);
+    }
+
+    /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
+    public static GameDriver start(String mapName) {
+        GameDriver driver = new GameDriver(mapName);
         driver.frames(START_FRAMES);
         return driver;
     }
@@ -311,7 +317,13 @@ public final class GameDriver {
 
     /** How far the player's picture is lifted above its position right now (0 = standing on the ground). */
     public float playerHopHeight() {
-        return actor(Kind.PLAYER).getAvatar().getY();
+        GameBoardActor player = actor(Kind.PLAYER);
+        return player.getAvatar().getY() - player.getAvatarRestY();
+    }
+
+    /** The player's animation right now, e.g. "rabbit/walk_left". */
+    public String playerAnimation() {
+        return ((Player) actor(Kind.PLAYER)).getCurrentAnimation();
     }
 
     public String playerPosition() {

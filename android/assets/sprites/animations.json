@@ -1,0 +1,3035 @@
+{
+  "atlas": "sprites.atlas",
+  "sheets": {
+    "chest": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 15,
+      "trimY": 16,
+      "width": 18,
+      "height": 21
+    },
+    "chicken": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 15
+    },
+    "chicken_baby": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14
+    },
+    "chicken_baby_blue": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14
+    },
+    "chicken_baby_brown": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14
+    },
+    "chicken_baby_green": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14
+    },
+    "chicken_baby_red": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14
+    },
+    "chicken_blue": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 15
+    },
+    "chicken_brown": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 15
+    },
+    "chicken_green": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 15
+    },
+    "chicken_red": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 15
+    },
+    "chicken_tall": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 15,
+      "height": 24
+    },
+    "chicken_tall_blue": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 15,
+      "height": 24
+    },
+    "chicken_tall_brown": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 15,
+      "height": 24
+    },
+    "chicken_tall_green": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 15,
+      "height": 24
+    },
+    "chicken_tall_red": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 15,
+      "height": 24
+    },
+    "cow_baby_brown": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 8,
+      "trimY": 2,
+      "width": 21,
+      "height": 24
+    },
+    "cow_baby_green": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 8,
+      "trimY": 2,
+      "width": 21,
+      "height": 24
+    },
+    "cow_baby_light": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 8,
+      "trimY": 2,
+      "width": 21,
+      "height": 24
+    },
+    "cow_baby_pink": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 8,
+      "trimY": 2,
+      "width": 21,
+      "height": 24
+    },
+    "cow_baby_purple": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 8,
+      "trimY": 2,
+      "width": 21,
+      "height": 24
+    },
+    "cow_brown": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
+    "cow_green": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
+    "cow_light": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
+    "cow_pink": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
+    "cow_purple": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
+    "door": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16
+    },
+    "door_wide": {
+      "frameWidth": 48,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 48,
+      "height": 16
+    },
+    "egg": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 4,
+      "trimY": 2,
+      "width": 8,
+      "height": 8
+    },
+    "egg_blue": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 4,
+      "trimY": 2,
+      "width": 8,
+      "height": 8
+    },
+    "egg_brown": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 4,
+      "trimY": 2,
+      "width": 8,
+      "height": 8
+    },
+    "egg_green": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 4,
+      "trimY": 2,
+      "width": 8,
+      "height": 8
+    },
+    "egg_hatch": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 22,
+      "height": 24
+    },
+    "egg_hatch_blue": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 22,
+      "height": 24
+    },
+    "egg_hatch_brown": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 6,
+      "trimY": 1,
+      "width": 20,
+      "height": 24
+    },
+    "egg_hatch_green": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 22,
+      "height": 24
+    },
+    "egg_hatch_red": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 22,
+      "height": 24
+    },
+    "egg_red": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 4,
+      "trimY": 2,
+      "width": 8,
+      "height": 8
+    },
+    "fruit_apple": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 6,
+      "width": 48,
+      "height": 27
+    },
+    "fruit_orange": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 44,
+      "height": 33
+    },
+    "fruit_peach": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 44,
+      "height": 34
+    },
+    "fruit_pear": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 45,
+      "height": 34
+    },
+    "gate": {
+      "frameWidth": 32,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 2,
+      "width": 32,
+      "height": 14
+    },
+    "gate_vertical": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 6,
+      "trimY": 0,
+      "width": 14,
+      "height": 32
+    },
+    "mailbox": {
+      "frameWidth": 32,
+      "frameHeight": 48,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 16,
+      "height": 48
+    },
+    "rabbit": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 3,
+      "trimY": 10,
+      "width": 42,
+      "height": 31
+    },
+    "rabbit_basic": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 17,
+      "trimY": 16,
+      "width": 14,
+      "height": 16
+    },
+    "rabbit_basic_actions": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 3,
+      "trimY": 10,
+      "width": 42,
+      "height": 31
+    },
+    "tools": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 48,
+      "height": 48
+    },
+    "tree": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 11,
+      "trimY": 4,
+      "width": 26,
+      "height": 33
+    },
+    "tree_apple": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 4,
+      "width": 48,
+      "height": 33
+    },
+    "tree_fall": {
+      "frameWidth": 64,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 52,
+      "height": 36
+    },
+    "tree_orange": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 44,
+      "height": 36
+    },
+    "tree_peach": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 44,
+      "height": 36
+    },
+    "tree_pear": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 45,
+      "height": 36
+    },
+    "watering": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 11,
+      "trimY": 13,
+      "width": 26,
+      "height": 11
+    }
+  },
+  "animations": {
+    "chest/open_front": {
+      "sheet": "chest",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "chest/open_side": {
+      "sheet": "chest",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "chicken/row_00": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_01": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_02": {
+      "sheet": "chicken",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_03": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_04": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_05": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_06": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_07": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_08": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_09": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_10": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_11": {
+      "sheet": "chicken",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_12": {
+      "sheet": "chicken",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_00": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_01": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_02": {
+      "sheet": "chicken_baby",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_03": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_04": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_05": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_06": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_07": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_08": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_09": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_10": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_11": {
+      "sheet": "chicken_baby",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_12": {
+      "sheet": "chicken_baby",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_13": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_14": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_15": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_16": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_17": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_18": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_00": {
+      "sheet": "chicken_baby_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_01": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_02": {
+      "sheet": "chicken_baby_blue",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_03": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_04": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_05": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_06": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_07": {
+      "sheet": "chicken_baby_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_08": {
+      "sheet": "chicken_baby_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_09": {
+      "sheet": "chicken_baby_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_10": {
+      "sheet": "chicken_baby_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_11": {
+      "sheet": "chicken_baby_blue",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_12": {
+      "sheet": "chicken_baby_blue",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_13": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_14": {
+      "sheet": "chicken_baby_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_15": {
+      "sheet": "chicken_baby_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_16": {
+      "sheet": "chicken_baby_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_17": {
+      "sheet": "chicken_baby_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_blue/row_18": {
+      "sheet": "chicken_baby_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_00": {
+      "sheet": "chicken_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_01": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_02": {
+      "sheet": "chicken_baby_brown",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_03": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_04": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_05": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_06": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_07": {
+      "sheet": "chicken_baby_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_08": {
+      "sheet": "chicken_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_09": {
+      "sheet": "chicken_baby_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_10": {
+      "sheet": "chicken_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_11": {
+      "sheet": "chicken_baby_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_12": {
+      "sheet": "chicken_baby_brown",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_13": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_14": {
+      "sheet": "chicken_baby_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_15": {
+      "sheet": "chicken_baby_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_16": {
+      "sheet": "chicken_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_17": {
+      "sheet": "chicken_baby_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_brown/row_18": {
+      "sheet": "chicken_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_00": {
+      "sheet": "chicken_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_01": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_02": {
+      "sheet": "chicken_baby_green",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_03": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_04": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_05": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_06": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_07": {
+      "sheet": "chicken_baby_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_08": {
+      "sheet": "chicken_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_09": {
+      "sheet": "chicken_baby_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_10": {
+      "sheet": "chicken_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_11": {
+      "sheet": "chicken_baby_green",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_12": {
+      "sheet": "chicken_baby_green",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_13": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_14": {
+      "sheet": "chicken_baby_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_15": {
+      "sheet": "chicken_baby_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_16": {
+      "sheet": "chicken_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_17": {
+      "sheet": "chicken_baby_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_green/row_18": {
+      "sheet": "chicken_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_00": {
+      "sheet": "chicken_baby_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_01": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_02": {
+      "sheet": "chicken_baby_red",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_03": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_04": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_05": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_06": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_07": {
+      "sheet": "chicken_baby_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_08": {
+      "sheet": "chicken_baby_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_09": {
+      "sheet": "chicken_baby_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_10": {
+      "sheet": "chicken_baby_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_11": {
+      "sheet": "chicken_baby_red",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_12": {
+      "sheet": "chicken_baby_red",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_13": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_14": {
+      "sheet": "chicken_baby_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_15": {
+      "sheet": "chicken_baby_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_16": {
+      "sheet": "chicken_baby_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_17": {
+      "sheet": "chicken_baby_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby_red/row_18": {
+      "sheet": "chicken_baby_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_00": {
+      "sheet": "chicken_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_01": {
+      "sheet": "chicken_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_02": {
+      "sheet": "chicken_blue",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_03": {
+      "sheet": "chicken_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_04": {
+      "sheet": "chicken_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_05": {
+      "sheet": "chicken_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_06": {
+      "sheet": "chicken_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_07": {
+      "sheet": "chicken_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_08": {
+      "sheet": "chicken_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_09": {
+      "sheet": "chicken_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_10": {
+      "sheet": "chicken_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_11": {
+      "sheet": "chicken_blue",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_blue/row_12": {
+      "sheet": "chicken_blue",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_00": {
+      "sheet": "chicken_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_01": {
+      "sheet": "chicken_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_02": {
+      "sheet": "chicken_brown",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_03": {
+      "sheet": "chicken_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_04": {
+      "sheet": "chicken_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_05": {
+      "sheet": "chicken_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_06": {
+      "sheet": "chicken_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_07": {
+      "sheet": "chicken_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_08": {
+      "sheet": "chicken_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_09": {
+      "sheet": "chicken_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_10": {
+      "sheet": "chicken_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_11": {
+      "sheet": "chicken_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_brown/row_12": {
+      "sheet": "chicken_brown",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_00": {
+      "sheet": "chicken_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_01": {
+      "sheet": "chicken_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_02": {
+      "sheet": "chicken_green",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_03": {
+      "sheet": "chicken_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_04": {
+      "sheet": "chicken_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_05": {
+      "sheet": "chicken_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_06": {
+      "sheet": "chicken_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_07": {
+      "sheet": "chicken_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_08": {
+      "sheet": "chicken_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_09": {
+      "sheet": "chicken_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_10": {
+      "sheet": "chicken_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_11": {
+      "sheet": "chicken_green",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_green/row_12": {
+      "sheet": "chicken_green",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_00": {
+      "sheet": "chicken_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_01": {
+      "sheet": "chicken_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_02": {
+      "sheet": "chicken_red",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_03": {
+      "sheet": "chicken_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_04": {
+      "sheet": "chicken_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_05": {
+      "sheet": "chicken_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_06": {
+      "sheet": "chicken_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_07": {
+      "sheet": "chicken_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_08": {
+      "sheet": "chicken_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_09": {
+      "sheet": "chicken_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_10": {
+      "sheet": "chicken_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_11": {
+      "sheet": "chicken_red",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_red/row_12": {
+      "sheet": "chicken_red",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_00": {
+      "sheet": "chicken_tall",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_01": {
+      "sheet": "chicken_tall",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_02": {
+      "sheet": "chicken_tall",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_03": {
+      "sheet": "chicken_tall",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_04": {
+      "sheet": "chicken_tall",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall/row_06": {
+      "sheet": "chicken_tall",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_00": {
+      "sheet": "chicken_tall_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_01": {
+      "sheet": "chicken_tall_blue",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_02": {
+      "sheet": "chicken_tall_blue",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_03": {
+      "sheet": "chicken_tall_blue",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_04": {
+      "sheet": "chicken_tall_blue",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_blue/row_06": {
+      "sheet": "chicken_tall_blue",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_00": {
+      "sheet": "chicken_tall_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_01": {
+      "sheet": "chicken_tall_brown",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_02": {
+      "sheet": "chicken_tall_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_03": {
+      "sheet": "chicken_tall_brown",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_04": {
+      "sheet": "chicken_tall_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_brown/row_06": {
+      "sheet": "chicken_tall_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_00": {
+      "sheet": "chicken_tall_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_01": {
+      "sheet": "chicken_tall_green",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_02": {
+      "sheet": "chicken_tall_green",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_03": {
+      "sheet": "chicken_tall_green",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_04": {
+      "sheet": "chicken_tall_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_green/row_06": {
+      "sheet": "chicken_tall_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_00": {
+      "sheet": "chicken_tall_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_01": {
+      "sheet": "chicken_tall_red",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_02": {
+      "sheet": "chicken_tall_red",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_03": {
+      "sheet": "chicken_tall_red",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_04": {
+      "sheet": "chicken_tall_red",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_tall_red/row_06": {
+      "sheet": "chicken_tall_red",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_00": {
+      "sheet": "cow_baby_brown",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_01": {
+      "sheet": "cow_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_02": {
+      "sheet": "cow_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_03": {
+      "sheet": "cow_baby_brown",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_04": {
+      "sheet": "cow_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_05": {
+      "sheet": "cow_baby_brown",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_06": {
+      "sheet": "cow_baby_brown",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_07": {
+      "sheet": "cow_baby_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_brown/row_08": {
+      "sheet": "cow_baby_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_00": {
+      "sheet": "cow_baby_green",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_01": {
+      "sheet": "cow_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_02": {
+      "sheet": "cow_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_03": {
+      "sheet": "cow_baby_green",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_04": {
+      "sheet": "cow_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_05": {
+      "sheet": "cow_baby_green",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_06": {
+      "sheet": "cow_baby_green",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_07": {
+      "sheet": "cow_baby_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_green/row_08": {
+      "sheet": "cow_baby_green",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_00": {
+      "sheet": "cow_baby_light",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_01": {
+      "sheet": "cow_baby_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_02": {
+      "sheet": "cow_baby_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_03": {
+      "sheet": "cow_baby_light",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_04": {
+      "sheet": "cow_baby_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_05": {
+      "sheet": "cow_baby_light",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_06": {
+      "sheet": "cow_baby_light",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_07": {
+      "sheet": "cow_baby_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_light/row_08": {
+      "sheet": "cow_baby_light",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_00": {
+      "sheet": "cow_baby_pink",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_01": {
+      "sheet": "cow_baby_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_02": {
+      "sheet": "cow_baby_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_03": {
+      "sheet": "cow_baby_pink",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_04": {
+      "sheet": "cow_baby_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_05": {
+      "sheet": "cow_baby_pink",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_06": {
+      "sheet": "cow_baby_pink",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_07": {
+      "sheet": "cow_baby_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_pink/row_08": {
+      "sheet": "cow_baby_pink",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_00": {
+      "sheet": "cow_baby_purple",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_01": {
+      "sheet": "cow_baby_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_02": {
+      "sheet": "cow_baby_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_03": {
+      "sheet": "cow_baby_purple",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_04": {
+      "sheet": "cow_baby_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_05": {
+      "sheet": "cow_baby_purple",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_06": {
+      "sheet": "cow_baby_purple",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_07": {
+      "sheet": "cow_baby_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_baby_purple/row_08": {
+      "sheet": "cow_baby_purple",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_00": {
+      "sheet": "cow_brown",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_01": {
+      "sheet": "cow_brown",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_02": {
+      "sheet": "cow_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_03": {
+      "sheet": "cow_brown",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_04": {
+      "sheet": "cow_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_05": {
+      "sheet": "cow_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_06": {
+      "sheet": "cow_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_07": {
+      "sheet": "cow_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_00": {
+      "sheet": "cow_green",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_01": {
+      "sheet": "cow_green",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_02": {
+      "sheet": "cow_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_03": {
+      "sheet": "cow_green",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_04": {
+      "sheet": "cow_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_05": {
+      "sheet": "cow_green",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_06": {
+      "sheet": "cow_green",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_green/row_07": {
+      "sheet": "cow_green",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_00": {
+      "sheet": "cow_light",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_01": {
+      "sheet": "cow_light",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_02": {
+      "sheet": "cow_light",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_03": {
+      "sheet": "cow_light",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_04": {
+      "sheet": "cow_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_05": {
+      "sheet": "cow_light",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_06": {
+      "sheet": "cow_light",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_light/row_07": {
+      "sheet": "cow_light",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_00": {
+      "sheet": "cow_pink",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_01": {
+      "sheet": "cow_pink",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_02": {
+      "sheet": "cow_pink",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_03": {
+      "sheet": "cow_pink",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_04": {
+      "sheet": "cow_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_05": {
+      "sheet": "cow_pink",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_06": {
+      "sheet": "cow_pink",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_pink/row_07": {
+      "sheet": "cow_pink",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_00": {
+      "sheet": "cow_purple",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_01": {
+      "sheet": "cow_purple",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_02": {
+      "sheet": "cow_purple",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_03": {
+      "sheet": "cow_purple",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_04": {
+      "sheet": "cow_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_05": {
+      "sheet": "cow_purple",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_06": {
+      "sheet": "cow_purple",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_purple/row_07": {
+      "sheet": "cow_purple",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "door/open": {
+      "sheet": "door",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "door_wide/open": {
+      "sheet": "door_wide",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "egg/row_00": {
+      "sheet": "egg",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg/row_01": {
+      "sheet": "egg",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg/row_02": {
+      "sheet": "egg",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg/row_03": {
+      "sheet": "egg",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_blue/row_00": {
+      "sheet": "egg_blue",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_blue/row_01": {
+      "sheet": "egg_blue",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_blue/row_02": {
+      "sheet": "egg_blue",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_blue/row_03": {
+      "sheet": "egg_blue",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_brown/row_00": {
+      "sheet": "egg_brown",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_brown/row_01": {
+      "sheet": "egg_brown",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_brown/row_02": {
+      "sheet": "egg_brown",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_brown/row_03": {
+      "sheet": "egg_brown",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_green/row_00": {
+      "sheet": "egg_green",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_green/row_01": {
+      "sheet": "egg_green",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_green/row_02": {
+      "sheet": "egg_green",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_green/row_03": {
+      "sheet": "egg_green",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_hatch/row_00": {
+      "sheet": "egg_hatch",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_01": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_02": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_03": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_04": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_05": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch/row_06": {
+      "sheet": "egg_hatch",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_00": {
+      "sheet": "egg_hatch_blue",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_01": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_02": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_03": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_04": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_05": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_blue/row_06": {
+      "sheet": "egg_hatch_blue",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_00": {
+      "sheet": "egg_hatch_brown",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_01": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_02": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_03": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_04": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_05": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_brown/row_06": {
+      "sheet": "egg_hatch_brown",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_00": {
+      "sheet": "egg_hatch_green",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_01": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_02": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_03": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_04": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_05": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_green/row_06": {
+      "sheet": "egg_hatch_green",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_00": {
+      "sheet": "egg_hatch_red",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_01": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_02": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_03": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_04": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_05": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_hatch_red/row_06": {
+      "sheet": "egg_hatch_red",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "NORMAL"
+    },
+    "egg_red/row_00": {
+      "sheet": "egg_red",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_red/row_01": {
+      "sheet": "egg_red",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_red/row_02": {
+      "sheet": "egg_red",
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "egg_red/row_03": {
+      "sheet": "egg_red",
+      "frames": 9,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "fruit_apple/row_00": {
+      "sheet": "fruit_apple",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_apple/row_01": {
+      "sheet": "fruit_apple",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_apple/row_02": {
+      "sheet": "fruit_apple",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_apple/row_03": {
+      "sheet": "fruit_apple",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_orange/row_00": {
+      "sheet": "fruit_orange",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_orange/row_01": {
+      "sheet": "fruit_orange",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_orange/row_02": {
+      "sheet": "fruit_orange",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_orange/row_03": {
+      "sheet": "fruit_orange",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_peach/row_00": {
+      "sheet": "fruit_peach",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_peach/row_01": {
+      "sheet": "fruit_peach",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_peach/row_02": {
+      "sheet": "fruit_peach",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_peach/row_03": {
+      "sheet": "fruit_peach",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_pear/row_00": {
+      "sheet": "fruit_pear",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_pear/row_01": {
+      "sheet": "fruit_pear",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_pear/row_02": {
+      "sheet": "fruit_pear",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fruit_pear/row_03": {
+      "sheet": "fruit_pear",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "gate/open_horizontal": {
+      "sheet": "gate",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "gate_vertical/open": {
+      "sheet": "gate_vertical",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "mailbox/row_00": {
+      "sheet": "mailbox",
+      "frames": 3,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_01": {
+      "sheet": "mailbox",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_02": {
+      "sheet": "mailbox",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_03": {
+      "sheet": "mailbox",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_04": {
+      "sheet": "mailbox",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_05": {
+      "sheet": "mailbox",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "mailbox/row_06": {
+      "sheet": "mailbox",
+      "frames": 3,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/chop_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/idle_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/run_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/till_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/walk_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_left": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_right": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit/water_up": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_basic/walk_down": {
+      "sheet": "rabbit_basic",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_basic/walk_left": {
+      "sheet": "rabbit_basic",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_basic/walk_right": {
+      "sheet": "rabbit_basic",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_basic/walk_up": {
+      "sheet": "rabbit_basic",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_basic_actions/chop_down": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/chop_left": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/chop_right": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/chop_up": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/till_down": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/till_left": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/till_right": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/till_up": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/water_down": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/water_left": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/water_right": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "rabbit_basic_actions/water_up": {
+      "sheet": "rabbit_basic_actions",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "tools/row_00": {
+      "sheet": "tools",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tools/row_01": {
+      "sheet": "tools",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree/row_00": {
+      "sheet": "tree",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree/row_01": {
+      "sheet": "tree",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree/row_02": {
+      "sheet": "tree",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree/row_03": {
+      "sheet": "tree",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree/row_04": {
+      "sheet": "tree",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_apple/row_00": {
+      "sheet": "tree_apple",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_apple/row_01": {
+      "sheet": "tree_apple",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_apple/row_02": {
+      "sheet": "tree_apple",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_apple/row_03": {
+      "sheet": "tree_apple",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_apple/row_04": {
+      "sheet": "tree_apple",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_fall/fall": {
+      "sheet": "tree_fall",
+      "frames": 13,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "tree_orange/row_00": {
+      "sheet": "tree_orange",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_orange/row_01": {
+      "sheet": "tree_orange",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_orange/row_02": {
+      "sheet": "tree_orange",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_orange/row_03": {
+      "sheet": "tree_orange",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_orange/row_04": {
+      "sheet": "tree_orange",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_peach/row_00": {
+      "sheet": "tree_peach",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_peach/row_01": {
+      "sheet": "tree_peach",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_peach/row_02": {
+      "sheet": "tree_peach",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_peach/row_03": {
+      "sheet": "tree_peach",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_peach/row_04": {
+      "sheet": "tree_peach",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_pear/row_00": {
+      "sheet": "tree_pear",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_pear/row_01": {
+      "sheet": "tree_pear",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_pear/row_02": {
+      "sheet": "tree_pear",
+      "frames": 6,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_pear/row_03": {
+      "sheet": "tree_pear",
+      "frames": 12,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "tree_pear/row_04": {
+      "sheet": "tree_pear",
+      "frames": 2,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "watering/row_00": {
+      "sheet": "watering",
+      "frames": 9,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "watering/row_01": {
+      "sheet": "watering",
+      "frames": 9,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "watering/row_02": {
+      "sheet": "watering",
+      "frames": 9,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    }
+  }
+}

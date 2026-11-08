@@ -1,3 +1,12 @@
+## Asset pipeline (tools/assets/build_assets.py)
+# The Sprout Lands license forbids redistributing the pack itself: its sheets (copied here for Tiled) stay local.
+# Only the packed atlases in android/assets (what the game uses) are committed, with CREDITS.md.
+/assets-src/tilesets/images/
+/tools/assets/.pack-path
+*.tiled-session
+__pycache__/
+*.pyc
+
 ## Java
 
 *.class
