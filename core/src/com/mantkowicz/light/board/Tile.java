@@ -217,19 +217,19 @@ public abstract class Tile {
      * renderer.
      */
     private void drawGraphic(Batch batch, TileGraphic graphic) {
-        TextureRegion region = graphic.getTile().getTextureRegion();
-        float drawX = x + graphic.getOffsetX();
-        float drawY = y + graphic.getOffsetY();
+        TextureRegion region = graphic.tile().getTextureRegion();
+        float drawX = x + graphic.offsetX();
+        float drawY = y + graphic.offsetY();
         float tint = batch.getPackedColor();
-        if (graphic.getOpacity() != 1f) {
+        if (graphic.opacity() != 1f) {
             Color color = batch.getColor();
-            batch.setColor(color.r, color.g, color.b, color.a * graphic.getOpacity());
+            batch.setColor(color.r, color.g, color.b, color.a * graphic.opacity());
         }
-        if (!graphic.isFlipHorizontally() && !graphic.isFlipVertically() && graphic.getRotation() == Cell.ROTATE_0) {
+        if (!graphic.flipHorizontally() && !graphic.flipVertically() && graphic.rotation() == Cell.ROTATE_0) {
             batch.draw(region, drawX, drawY, width, height);
         } else {
             batch.draw(region, drawX, drawY, width / 2f, height / 2f, width, height,
-                    graphic.isFlipHorizontally() ? -1 : 1, graphic.isFlipVertically() ? -1 : 1, graphic.getRotation() * 90f);
+                    graphic.flipHorizontally() ? -1 : 1, graphic.flipVertically() ? -1 : 1, graphic.rotation() * 90f);
         }
         batch.setPackedColor(tint); // the next drawings keep the batch's own colour
     }
