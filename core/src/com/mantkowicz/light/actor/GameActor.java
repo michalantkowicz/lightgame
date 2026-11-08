@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mantkowicz.light.actor.Status.IDLE;
+import static com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
+import static com.mantkowicz.light.board.WorldScale.TILE_SIZE;
 
 public abstract class GameActor extends Group {
     private static long ID_COUNTER = 0;
@@ -59,6 +61,14 @@ public abstract class GameActor extends Group {
         this.addActor(avatar);
         setSize(avatar.getWidth(), avatar.getHeight());
         avatarRestY = 0;
+    }
+
+    /**
+     * Shows a frame of a pixel-art sprite sheet at the world's pixel scale, on an actor one tile big: what every
+     * Sprout Lands character uses. See the full version for other scales or bigger actors.
+     */
+    protected void createAvatar(TextureRegion frame, SpriteSheet sheet) {
+        createAvatar(frame, sheet, PIXEL_SCALE, TILE_SIZE, TILE_SIZE);
     }
 
     /**

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import static com.mantkowicz.light.actor.GameActorType.PLAYER;
 import static com.mantkowicz.light.actor.Status.IDLE;
 import static com.mantkowicz.light.actor.Status.MOVEMENT;
-import static com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
-import static com.mantkowicz.light.board.WorldScale.TILE_SIZE;
 import static com.mantkowicz.light.debug.Debug.Tool.DARKNESS_EXCLAMATION;
 
 public class Player extends GameBoardActor implements Collecting {
@@ -51,7 +49,7 @@ public class Player extends GameBoardActor implements Collecting {
         lastIdleChange = TimeUtils.millis();
         ResourcesService resourcesService = context.getResourcesService();
         createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),
-                resourcesService.getSpriteSheet(SPRITE), PIXEL_SCALE, TILE_SIZE, TILE_SIZE);
+                resourcesService.getSpriteSheet(SPRITE));
 
         BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
