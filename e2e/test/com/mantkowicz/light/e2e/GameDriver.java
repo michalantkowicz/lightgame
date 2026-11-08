@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Chest;
 import com.mantkowicz.light.actor.Dog;
@@ -40,12 +42,16 @@ import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
+import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.Sprite;
+import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -75,6 +81,11 @@ public final class GameDriver {
     /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
     public static GameDriver start() {
         return start(HeadlessGame.TEST_MAP);
+    }
+
+    /** The map the real game starts with (Main.DEFAULT_MAP). */
+    public static String defaultMap() {
+        return Main.DEFAULT_MAP;
     }
 
     /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
@@ -294,6 +305,80 @@ public final class GameDriver {
             recorder.dispose();
         }
         return snapshot.toString();
+    }
+
+    /**
+     * What a cell draws, bottom layer first: the map tile of each layer as "tileset#id", then which corner of that
+     * tile's picture lands on the cell's bottom-left, top-left, top-right and bottom-right corners (BL,TL,TR,BR when
+     * drawn as it is; mirrored or rotated tiles show it), and the opacity.
+     */
+    public List<String> cellDrawing(Cell cell) {
+        List<float[]> quads = new ArrayList<>();
+        SpriteBatch recorder = new SpriteBatch() {
+            @Override
+            public void draw(Texture texture, float[] vertices, int offset, int count) {
+                quads.add(Arrays.copyOfRange(vertices, offset, offset + count));
+            }
+        };
+        try {
+            tile(cell).draw(recorder, 1);
+        } finally {
+            recorder.dispose();
+        }
+        List<String> drawn = new ArrayList<>();
+        for (float[] quad : quads) {
+            AtlasRegion region = regionOf(quad);
+            StringBuilder corners = new StringBuilder();
+            for (int corner = 0; corner < 4; corner++) {
+                float u = quad[corner * 5 + 3];
+                float v = quad[corner * 5 + 4];
+                corners.append(corner == 0 ? "" : ",").append(v == region.getV2() ? "B" : "T").append(u == region.getU() ? "L" : "R");
+            }
+            Color color = new Color();
+            Color.abgr8888ToColor(color, quad[2]);
+            float alpha = color.a;
+            drawn.add(String.format("%s#%d %s alpha=%s", region.name, region.index, corners, Snapshot.number(alpha)));
+        }
+        return drawn;
+    }
+
+    /** The atlas region whose texture coordinates a drawn quad uses. */
+    private AtlasRegion regionOf(float[] quad) {
+        ResourcesService resources = screenField("resourcesService");
+        Array<TextureAtlas> atlases = new Array<>();
+        resources.getAssetManager().getAll(TextureAtlas.class, atlases);
+        float minU = Math.min(Math.min(quad[3], quad[8]), Math.min(quad[13], quad[18]));
+        float minV = Math.min(Math.min(quad[4], quad[9]), Math.min(quad[14], quad[19]));
+        for (TextureAtlas atlas : atlases) {
+            for (AtlasRegion region : atlas.getRegions()) {
+                if (region.getU() == minU && region.getV() == minV) {
+                    return region;
+                }
+            }
+        }
+        throw new IllegalStateException("A drawn quad uses no atlas region: " + Arrays.toString(quad));
+    }
+
+    /** How bright unlit places are, as box2dlights' ambient colour "r,g,b,a" (a = brightness, 1 = daylight). */
+    public String ambientLight() {
+        RayHandler rayHandler = screenField("rayHandler");
+        Color ambient = field(rayHandler, RayHandler.class, "ambientLight");
+        return String.format(java.util.Locale.ROOT, "%.2f,%.2f,%.2f,%.2f", ambient.r, ambient.g, ambient.b, ambient.a);
+    }
+
+    /**
+     * Where the centre of the player's sprite frame (the 48x48 picture before trimming) is, relative to the player's
+     * bottom-left corner. The frame is drawn centred on the player's tile, so this is the tile's centre.
+     */
+    public float[] playerFrameCentre() {
+        Player player = (Player) actor(Kind.PLAYER);
+        ResourcesService resources = screenField("resourcesService");
+        SpriteSheet sheet = resources.getSpriteSheet(Sprite.RABBIT);
+        TextureRegion picture = ((TextureRegionDrawable) player.getAvatar().getDrawable()).getRegion();
+        float scale = player.getAvatar().getWidth() / picture.getRegionWidth();
+        return new float[]{
+                player.getAvatar().getX() + (sheet.getFrameWidth() / 2f - sheet.getTrimX()) * scale,
+                player.getAvatarRestY() + (sheet.getFrameHeight() / 2f - sheet.getTrimY()) * scale};
     }
 
     private static String regionName(TextureRegion region) {

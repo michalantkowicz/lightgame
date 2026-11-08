@@ -7,8 +7,13 @@ changes, or after editing a level in Tiled.
 pip3 install pillow                                   # once
 python3 tools/assets/build_assets.py "/path/to/Sprout Lands - Sprites - premium pack"
 python3 tools/assets/build_assets.py                  # same pack as last time
-python3 tools/assets/build_assets.py --maps           # only re-pack the levels (after editing them in Tiled)
 ```
+
+The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
+Python.
+
+If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
+(`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.
 
 ## What it makes
 
@@ -19,8 +24,9 @@ python3 tools/assets/build_assets.py --maps           # only re-pack the levels 
 | `assets-src/maps/*.tmx` | Your levels. `level1.tmx` is created once if there's no level yet | committed |
 | `assets-src/lightgame.tiled-project` | Tiled project with the maps and tilesets folders | committed |
 | `android/assets/maps/` | Game copies of the levels + `tiles.atlas`: **only the tiles the levels use** | committed |
-| `android/assets/sprites/` | `sprites.atlas` with every animation from `pack.json`, `animations.json` | committed |
-| `build/assets-preview/` | `index.html` (open in a browser): every animation playing, the levels, terrain overlays, warnings | ignored |
+| `android/assets/sprites/` | `sprites.atlas` with **only the sheets in the game's `Sprite` enum**, `animations.json` | committed |
+| `core/.../resources/Action.java` | Enum of the actions named in `pack.json` (`WALK`, `IDLE`, `OPEN`...) | committed |
+| `build/assets-preview/` | `index.html` (open in a browser): every animation of the pack playing, the levels, terrain overlays, warnings | ignored |
 
 Generated files are rewritten only when they change. Don't edit `.tsx` files by hand; change `pack.json` and run the
 tool again.
@@ -40,9 +46,13 @@ tool again.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
    (`PLAYER`, `CHEST`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
-7. Save, run `python3 tools/assets/build_assets.py --maps`, and start the game (`Main.DEFAULT_MAP`).
+7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 
-Tile layer format must be CSV or Base64 (uncompressed, zlib or gzip). libGDX can't read zstd.
+Mirrored (X, Y) and rotated (Z) tiles, layer opacity and layer offsets look in the game as in Tiled. Maps must have a
+fixed size (not infinite) and 16 px tiles; the tool or the game says so otherwise. Tile layer format must be CSV or
+Base64 (uncompressed, zlib or gzip). libGDX can't read zstd.
+The tool deletes game copies in `android/assets/maps/` whose level was removed from `assets-src/maps/`, so never put
+hand-made maps there.
 
 ## pack.json
 
@@ -53,12 +63,25 @@ It describes what's in the pack, so the tool doesn't need to be told again:
   instead (`layoutFrom`). `wang` sets pieces by hand. `animations` makes animated tiles (the water).
 - **sprites**: animation sheets cut into frames. `frame` is the frame size, `offset` where the grid starts, `rows`
   names the rows (`"auto"` gives `row_00`, `row_01`...). `duration` is ms per frame, `playMode` is `LOOP` or `NORMAL`
-  (play once). `variants` lists colours with the same layout. Empty frames are skipped. In the game an animation is
-  `sheet/row`, e.g. `rabbit/walk_left` → `resourcesService.getAnimation("rabbit/walk_left")`.
+  (play once). `variants` lists colours with the same layout. Empty frames are skipped. Name rows `action` or
+  `action_direction` (`open`, `walk_left`): every action becomes a constant of the generated `Action` enum.
 - **ignore**: previews and duplicates.
 
-The rabbit's rows have real names. Animals and objects use `row_NN` for now: check the GIFs in
-`build/assets-preview/animations/` and rename rows in `pack.json` when you need one.
+The rabbit's rows have real names. Animals and objects use `row_NN` for now: check the preview page and name rows in
+`pack.json` when you need them.
+
+## Sprites in the game
+
+Only the sheets listed in `core/src/com/mantkowicz/light/resources/Sprite.java` are packed (the license allows what the
+game uses, not the whole pack). To use another sheet, e.g. the brown cow:
+
+1. Add `COW_BROWN("cow_brown")` to `Sprite` (a typo stops the tool with a "did you mean" hint).
+2. Name the rows you need in `pack.json` (e.g. `walk_down`...) and run the tool.
+3. In the code: `resourcesService.getAnimation(Sprite.COW_BROWN, Action.WALK, Direction.DOWN)`, or without a direction
+   for rows like `open`. No animation names are typed in Java.
+
+A sheet in `Sprite` that wasn't packed, or a missing animation, stops the game at start with a message saying what to
+do, and `AssetsUpToDateTest` fails.
 
 **When the pack changes:** run the tool. Images that `pack.json` doesn't mention are listed as warnings, along with
 missing files, empty named rows and terrains that can't be detected reliably. The same list is in

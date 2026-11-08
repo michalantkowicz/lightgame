@@ -9,15 +9,16 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Ellipse;
 import com.badlogic.gdx.math.GridPoint2;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.XmlReader;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileFactory;
+import com.mantkowicz.light.board.TileGraphic;
 import com.mantkowicz.light.board.TileType;
 import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.map.TileSet.TilesetProperties;
@@ -47,6 +48,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     static final String COLLISION_LAYER = "collision";
     static final String WALLS_LAYER = "walls";
     private static final String AMBIENT_LIGHT = "ambientLight";
+    private static final String ATLAS = "atlas";
 
     private final ResourcesService resourcesService;
 
@@ -58,7 +60,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     public TileSet loadTiles(TmxTileMapLoaderProperties properties) {
         String fileName = properties.getTileMapFileName();
         if (isPackedMap(fileName)) {
-            return loadPackedMap(loadWithAtlas(fileName));
+            return loadPackedMap(loadWithAtlas(fileName), fileName);
         }
         TiledMap tiledMap = new TmxMapLoader().load(fileName);
         TiledMapTileLayer tileLayer = getTileLayer(tiledMap);
@@ -101,25 +103,37 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         return tileSet;
     }
 
+    /**
+     * Whether the map itself (not one of its objects or tiles) has the 'atlas' property that tools/assets writes.
+     */
     private static boolean isPackedMap(String fileName) {
-        return Gdx.files.internal(fileName).readString("UTF-8").contains("name=\"atlas\"");
+        XmlReader.Element properties = new XmlReader().parse(Gdx.files.internal(fileName)).getChildByName("properties");
+        if (properties != null) {
+            for (XmlReader.Element property : properties.getChildrenByName("property")) {
+                if (ATLAS.equals(property.getAttribute("name", null))) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
      * Through the asset manager, so the map and its atlas live as long as the game's other resources (the tiles keep
-     * drawing the atlas' regions) and are disposed with them.
+     * drawing the atlas' regions) and are disposed with them. The atlas loader is registered for this file name only,
+     * so other maps loaded through the asset manager keep their own loader.
      */
     private TiledMap loadWithAtlas(String fileName) {
         AssetManager assetManager = resourcesService.getAssetManager();
         if (!assetManager.isLoaded(fileName, TiledMap.class)) {
-            assetManager.setLoader(TiledMap.class, new AtlasTmxMapLoader(new InternalFileHandleResolver()));
+            assetManager.setLoader(TiledMap.class, fileName, new AtlasTmxMapLoader(new InternalFileHandleResolver()));
             assetManager.load(fileName, TiledMap.class);
             assetManager.finishLoadingAsset(fileName);
         }
         return assetManager.get(fileName, TiledMap.class);
     }
 
-    private TileSet loadPackedMap(TiledMap tiledMap) {
+    private TileSet loadPackedMap(TiledMap tiledMap, String fileName) {
         List<TiledMapTileLayer> drawn = new ArrayList<>();
         TiledMapTileLayer collision = null;
         TiledMapTileLayer walls = null;
@@ -141,17 +155,25 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         TiledMapTileLayer first = drawn.get(0);
         float tileWidth = first.getTileWidth();
         float tileHeight = first.getTileHeight();
+        if (tileWidth != WorldScale.PIXEL_ART_TILE_SIZE || tileHeight != WorldScale.PIXEL_ART_TILE_SIZE) {
+            throw new IllegalArgumentException(fileName + " has " + (int) tileWidth + "x" + (int) tileHeight
+                    + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE + " px");
+        }
+        float scale = WorldScale.TILE_SIZE / tileWidth;
         Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight);
 
         Map<GridPoint2, Tile> tilesByCell = new HashMap<>();
         List<Tile> tiles = new ArrayList<>();
         for (int x = 0; x < first.getWidth(); x++) {
             for (int y = 0; y < first.getHeight(); y++) {
-                List<TiledMapTile> cellLayers = new ArrayList<>();
+                List<TileGraphic> cellLayers = new ArrayList<>();
                 for (TiledMapTileLayer layer : drawn) {
                     TiledMapTileLayer.Cell cell = layer.getCell(x, y);
                     if (cell != null && cell.getTile() != null) {
-                        cellLayers.add(cell.getTile());
+                        // Tiled measures offsets downwards, the game upwards
+                        cellLayers.add(new TileGraphic(cell.getTile(), cell.getFlipHorizontally(), cell.getFlipVertically(),
+                                cell.getRotation(), layer.getOpacity(), layer.getRenderOffsetX() * scale,
+                                -layer.getRenderOffsetY() * scale));
                     }
                 }
                 boolean wall = hasCell(walls, x, y);
@@ -161,7 +183,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 }
                 Tile tile = TileFactory.createTile(resourcesService, wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
                 tile.setAttributes(new MapProperties());
-                tile.setLayers(cellLayers, WorldScale.TILE_SIZE);
+                tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
                 tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
                 GridPoint2 cellPosition = new GridPoint2(x, y);
                 TileObject object = objects.get(cellPosition);
@@ -178,7 +200,13 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         tilesetProperties.setTileSize(of(WorldScale.TILE_SIZE, WorldScale.TILE_SIZE));
         MapProperties mapProperties = tiledMap.getProperties();
         if (mapProperties.containsKey(AMBIENT_LIGHT)) {
-            tilesetProperties.setAmbientLight(Float.valueOf(String.valueOf(mapProperties.get(AMBIENT_LIGHT))));
+            String value = String.valueOf(mapProperties.get(AMBIENT_LIGHT));
+            try {
+                tilesetProperties.setAmbientLight(Float.valueOf(value));
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException(fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
+                        + "(dark) to 1 (daylight), not '" + value + "'", e);
+            }
         }
 
         TileSet tileSet = new TileSet();
@@ -205,7 +233,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
 
     private TilesetProperties getTilesetProperties(TiledMapTileLayer tileLayer) {
         TilesetProperties tilesetProperties = new TilesetProperties();
-        float tileHeight = tileLayer.getTileWidth();
+        float tileHeight = tileLayer.getTileHeight();
         float tileWidth = tileLayer.getTileWidth();
         tilesetProperties.setTileSize(of(tileWidth, tileHeight));
         return tilesetProperties;

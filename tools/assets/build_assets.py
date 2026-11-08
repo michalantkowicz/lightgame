@@ -8,8 +8,9 @@ Turns a sprite pack (Sprout Lands) into everything the project needs:
 
   android/assets/maps/*.tmx           game copies of the levels, pointing at the tiles atlas          (generated)
   android/assets/maps/tiles.atlas     ONLY the tiles the levels use, in one texture                   (generated)
-  android/assets/sprites/sprites.atlas  every animation frame from pack.json, in one texture          (generated)
+  android/assets/sprites/sprites.atlas  the sprite sheets listed in the game's Sprite enum, in one texture (generated)
   android/assets/sprites/animations.json  animation names, frame counts, durations                     (generated)
+  core/src/.../resources/Action.java  enum of the animation actions named in pack.json                 (generated)
 
   build/assets-preview/               animated GIF of every animation, terrain overlays, report        (git-ignored)
 
@@ -20,13 +21,14 @@ so a changed pack usually needs no change in pack.json. Files that pack.json doe
 Usage:
   python3 tools/assets/build_assets.py "/path/to/Sprout Lands - Sprites - premium pack"
   python3 tools/assets/build_assets.py            # same pack as last time
-  python3 tools/assets/build_assets.py --maps     # only re-pack the levels after editing them in Tiled
 
 Needs Pillow (pip3 install pillow).
 """
 import argparse
 import base64
+import difflib
 import gzip
+import hashlib
 import json
 import math
 import os
@@ -55,6 +57,10 @@ SRC_MAPS_DIR = SRC_DIR / "maps"
 GAME_ASSETS = ROOT / "android" / "assets"
 GAME_MAPS_DIR = GAME_ASSETS / "maps"
 GAME_SPRITES_DIR = GAME_ASSETS / "sprites"
+GAME_RESOURCES_SRC = ROOT / "core" / "src" / "com" / "mantkowicz" / "light" / "resources"
+SPRITE_ENUM = GAME_RESOURCES_SRC / "Sprite.java"  # written by hand: the sheets the game uses
+ACTION_ENUM = GAME_RESOURCES_SRC / "Action.java"  # generated from the row names in pack.json
+DIRECTIONS = ("down", "up", "left", "right")  # the game's Direction enum
 TILES_ATLAS = "tiles"
 SPRITES_ATLAS = "sprites"
 
@@ -86,11 +92,25 @@ def load_image(pack, relative):
     path = pack / relative
     if not path.exists():
         raise SystemExit(f"Missing in the pack: {relative} (fix tools/assets/pack.json)")
-    return Image.open(path).convert("RGBA")
+    try:
+        return Image.open(path).convert("RGBA")
+    except PermissionError:
+        raise SystemExit(f"Not allowed to read {path}. macOS protects Downloads, Desktop and Documents: give this "
+                         "terminal access in System Settings → Privacy & Security → Files and Folders, or move the pack "
+                         "elsewhere (e.g. next to the repo).")
 
 
 def is_empty(image):
     return image.getchannel("A").getbbox() is None
+
+
+def source_hash(path):
+    """
+    SHA-1 of a source file's text with \\n line ends. Generated files record the hash of what they were made from, so
+    e2e's AssetsUpToDateTest can tell when a source changed and the tool wasn't run (git checkouts don't keep times).
+    """
+    text = path.read_bytes().decode("utf-8").replace("\r\n", "\n")
+    return hashlib.sha1(text.encode("utf-8")).hexdigest()
 
 
 def save_if_changed(path, data):
@@ -362,7 +382,7 @@ def pack_regions(regions, padding=2, extrude=0):
         fits = True
         for region in order:
             w, h = region["image"].size
-            if x + w + padding > width:
+            if x + w + 2 * padding > width:  # the region, its padding and its extruded border must fit
                 x, y, shelf = 0, y + shelf, 0
             if w + 2 * padding > width:
                 fits = False
@@ -430,7 +450,7 @@ def cut_frames(image, entry):
     """{row name: [frame images]} for one sheet. Frames that are completely transparent are skipped."""
     fw, fh = entry["frame"]
     ox, oy = entry.get("offset", [0, 0])
-    columns = entry.get("columns") or max(1, (image.width - ox) // fw)
+    columns = entry.get("columns") or max(1, math.ceil((image.width - ox) / fw))
     rows = max(1, math.ceil((image.height - oy) / fh))
     rows = min(rows, entry.get("rowCount", rows))  # a sheet may switch to another grid further down
     result = {}
@@ -451,7 +471,81 @@ def cut_frames(image, entry):
     return result
 
 
+def used_sprites(all_sheets):
+    """
+    {sheet name: enum constant} from the game's Sprite enum, e.g. {"rabbit": "RABBIT"}. Only these sheets are packed,
+    so the committed atlas holds what the game uses and not the whole pack.
+    """
+    if not SPRITE_ENUM.exists():
+        raise SystemExit(f"Missing {SPRITE_ENUM.relative_to(ROOT)}: the enum of the sprite sheets the game uses")
+    code = re.sub(r"//[^\n]*|/\*.*?\*/", "", SPRITE_ENUM.read_text(encoding="utf-8"), flags=re.S)
+    used = {}
+    for constant, sheet in re.findall(r"\b([A-Z][A-Z0-9_]*)\s*\(\s*\"([^\"]*)\"\s*\)", code):
+        if sheet not in all_sheets:
+            close = difflib.get_close_matches(sheet, all_sheets, n=1)
+            hint = f", did you mean '{close[0]}'?" if close else " (see build/assets-preview/index.html)"
+            raise SystemExit(f"{SPRITE_ENUM.name}: {constant} names sheet '{sheet}', which isn't in pack.json{hint}")
+        if sheet in used:
+            raise SystemExit(f"{SPRITE_ENUM.name}: sheet '{sheet}' is listed twice ({used[sheet]} and {constant})")
+        used[sheet] = constant
+    return used
+
+
+def split_row(row):
+    """'walk_left' -> ('walk', 'left'), 'open' -> ('open', None); unnamed rows ('row_03') -> (None, None)."""
+    if re.fullmatch(r"row_\d+", row):
+        return None, None
+    for direction in DIRECTIONS:
+        if row.endswith("_" + direction):
+            return row[:-len(direction) - 1], direction
+    return row, None
+
+
+def write_action_enum(animations):
+    """core/.../Action.java: one constant per action named in pack.json, so the game never types animation names."""
+    actions = set()
+    for name in animations:
+        action, _ = split_row(name.split("/", 1)[1])
+        if action is None:
+            continue
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", action):
+            warn(f"pack.json: row '{name}' can't become an Action (use lower_case letters, digits and _)")
+            continue
+        actions.add(action)
+    constants = ",\n".join(f'    {action.upper()}("{action}")' for action in sorted(actions))
+    code = f"""// Generated by tools/assets/build_assets.py from the row names in tools/assets/pack.json: don't edit, rename rows there.
+package com.mantkowicz.light.resources;
+
+/**
+ * What an animation shows. A sheet's row in pack.json is named "action" or "action_direction" (e.g. "open",
+ * "walk_left"); rows still called row_00, row_01... aren't actions yet. Which sheet has which action: see
+ * build/assets-preview/index.html.
+ */
+public enum Action {{
+{constants};
+
+    private final String row;
+
+    Action(String row) {{
+        this.row = row;
+    }}
+
+    /**
+     * The row name in pack.json without the direction, e.g. "walk".
+     */
+    public String getRow() {{
+        return row;
+    }}
+}}
+"""
+    return save_if_changed(ACTION_ENUM, code)
+
+
 def build_sprites(config, pack):
+    """
+    Cuts every sheet in pack.json (all of them get a preview), packs the ones in the Sprite enum into sprites.atlas and
+    writes the Action enum. Returns (all animations, {sheet: Sprite constant}) for the preview page.
+    """
     print("Sprites")
     regions, animations, sheets = [], {}, {}
     for entry in config["sprites"]:
@@ -465,7 +559,12 @@ def build_sprites(config, pack):
                 for frame in frames:
                     b = frame.getchannel("A").getbbox()
                     box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+            if box is None:
+                warn(f"{file}: no visible frames for sheet '{sheet_name}' (check frame, offset and rowCount in pack.json)")
+                continue
             fw, fh = entry["frame"]
+            if sheet_name in sheets:
+                raise SystemExit(f"Sheet '{sheet_name}' is defined twice in pack.json")
             sheets[sheet_name] = {"frameWidth": fw, "frameHeight": fh,
                                   "trimX": box[0], "trimY": fh - box[3],  # from the bottom-left, like libGDX
                                   "width": box[2] - box[0], "height": box[3] - box[1]}
@@ -477,23 +576,32 @@ def build_sprites(config, pack):
                     regions.append({"name": name, "index": index, "image": frame.crop(box)})
                 animations[name] = {"sheet": sheet_name, "frames": len(frames),
                                     "frameDuration": duration, "playMode": play_mode}
-    page = pack_regions(regions)
+
+    used = used_sprites(sheets)
+    packed_regions = [r for r in regions if animations[r["name"]]["sheet"] in used]
+    packed = {name: a for name, a in animations.items() if a["sheet"] in used}
+    page = pack_regions(packed_regions)
     changed = save_png_if_changed(GAME_SPRITES_DIR / (SPRITES_ATLAS + ".png"), page)
     changed += save_if_changed(GAME_SPRITES_DIR / (SPRITES_ATLAS + ".atlas"),
-                               atlas_text(SPRITES_ATLAS + ".png", page, regions))
-    description = {"atlas": SPRITES_ATLAS + ".atlas", "sheets": dict(sorted(sheets.items())),
-                   "animations": dict(sorted(animations.items()))}
+                               atlas_text(SPRITES_ATLAS + ".png", page, packed_regions))
+    description = {"atlas": SPRITES_ATLAS + ".atlas", "packJsonSha1": source_hash(CONFIG_FILE),
+                   "sheets": {name: sheets[name] for name in sorted(used)},
+                   "animations": dict(sorted(packed.items()))}
     changed += save_if_changed(GAME_SPRITES_DIR / "animations.json", json.dumps(description, indent=2) + "\n")
-    print(f"  {len(animations)} animations from {len(sheets)} sheets, {len(regions)} frames, "
-          f"page {page.width}x{page.height}{'' if changed else ' (unchanged)'}")
+    changed += write_action_enum(animations)
+    print(f"  {len(sheets)} sheets, {len(animations)} animations in pack.json")
+    print(f"  packed for the game (Sprite enum): {', '.join(sorted(used)) or 'nothing'} -> {len(packed)} animations, "
+          f"{len(packed_regions)} frames, page {page.width}x{page.height}{'' if changed else ' (unchanged)'}")
     write_animation_previews(regions, animations, sheets)
+    return animations, used
 
 
-def write_preview_index():
-    """build/assets-preview/index.html: every animation playing, the levels, the terrain overlays and the warnings."""
+def write_preview_index(animations, used):
+    """
+    build/assets-preview/index.html: every animation of the pack playing (the ones in the game marked), the levels,
+    the terrain overlays and the warnings.
+    """
     from html import escape
-    description = GAME_SPRITES_DIR / "animations.json"
-    animations = json.loads(description.read_text())["animations"] if description.exists() else {}
     by_sheet = {}
     for name, animation in animations.items():
         by_sheet.setdefault(animation["sheet"], []).append((name, animation))
@@ -514,10 +622,15 @@ def write_preview_index():
              "<nav><a href='#animations'>Animations</a><a href='#maps'>Levels</a>",
              "<a href='#terrains'>Terrains</a><a href='#warnings'>Warnings</a></nav>",
              f"<h2 id='animations'>Animations ({len(animations)})</h2>",
-             "<p>In the game: <code>resourcesService.getAnimation(\"sheet/row\")</code>. Rename rows in "
+             "<p>Every sheet in the pack. Only the ones listed in the game's <code>Sprite</code> enum "
+             "(<code>core/.../resources/Sprite.java</code>) are packed for the game; add a line there to use another "
+             "one. In the game: <code>resourcesService.getAnimation(Sprite.RABBIT, Action.WALK, Direction.LEFT)</code> "
+             "for the row <code>walk_left</code>. Name rows (<code>row_03</code> → <code>eat</code>) in "
              "<code>tools/assets/pack.json</code>.</p>"]
-    for sheet in sorted(by_sheet):
-        parts.append(f"<h3>{escape(sheet)}</h3><div class='grid'>")
+    for sheet in sorted(by_sheet, key=lambda name: (name not in used, name)):
+        status = (f" <small>in the game: <code>Sprite.{used[sheet]}</code></small>" if sheet in used
+                  else " <small>(not in the game)</small>")
+        parts.append(f"<h3>{escape(sheet)}{status}</h3><div class='grid'>")
         for name, animation in sorted(by_sheet[sheet]):
             gif = "animations/" + name.replace("/", "__") + ".gif"
             info = f"{animation['frames']} × {int(animation['frameDuration'] * 1000)} ms, {animation['playMode'].lower()}"
@@ -532,7 +645,7 @@ def write_preview_index():
         parts.append(f"<h3>{escape(image.stem)}</h3><img src='terrains/{image.name}' alt=''>")
     parts.append(f"<h2 id='warnings'>Warnings ({len(warnings)})</h2>"
                  f"<pre>{escape(chr(10).join(warnings)) or 'none'}</pre>")
-    (PREVIEW_DIR / "index.html").write_text("\n".join(parts) + "\n")
+    (PREVIEW_DIR / "index.html").write_text("\n".join(parts) + "\n", encoding="utf-8")
 
 
 def write_animation_previews(regions, animations, sheets, scale=4):
@@ -595,7 +708,8 @@ def map_tilesets(map_path, root):
                 raise SystemExit(f"{map_path.name}: tileset {source} not found")
             result.append((firstgid, ET.parse(tsx).getroot()))
         else:
-            result.append((firstgid, element))
+            raise SystemExit(f"{map_path.name}: tileset '{element.get('name')}' is embedded in the map. In Tiled, use the "
+                             f"tilesets from assets-src/tilesets (Map → Add External Tileset) and remove this one.")
     return sorted(result, key=lambda t: t[0])
 
 
@@ -660,7 +774,8 @@ def game_map(map_path, root, tilesets, atlas_path):
                 embedded.append(child)
         game_root.insert(position, embedded)
         position += 1
-    note = f" Generated by tools/assets/build_assets.py from assets-src/maps/{map_path.name}: edit that one in Tiled. "
+    note = (f" Generated by tools/assets/build_assets.py from assets-src/maps/{map_path.name}: edit that one in Tiled."
+            f" source-sha1: {source_hash(map_path)} ")
     return xml_text(game_root).replace("?>\n", "?>\n<!--" + note + "-->\n", 1)
 
 
@@ -693,6 +808,9 @@ def build_maps(tilesets_by_name, pack_available):
     parsed = []
     for map_path in maps:
         root = ET.parse(map_path).getroot()
+        if root.get("infinite") == "1":
+            raise SystemExit(f"{map_path.name} is an infinite map; the game needs a fixed size. In Tiled: Map → Map "
+                             f"Properties → untick Infinite.")
         tilesets = map_tilesets(map_path, root)
         for name, ids in used_tiles(map_path, root, tilesets).items():
             used_total.setdefault(name, set()).update(ids)
@@ -838,32 +956,33 @@ def check_pack_coverage(config, pack):
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("pack", nargs="?", help="the pack's root directory (remembered for next time)")
-    parser.add_argument("--maps", action="store_true", help="only re-pack the levels (after editing them in Tiled)")
     args = parser.parse_args()
 
-    config = json.loads(CONFIG_FILE.read_text())
+    config = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
     PREVIEW_DIR.mkdir(parents=True, exist_ok=True)
 
-    if args.maps:
-        build_maps({}, pack_available=False)
-    else:
-        pack = Path(args.pack) if args.pack else None
-        if pack is None and PACK_PATH_FILE.exists():
-            pack = Path(PACK_PATH_FILE.read_text().strip())
-        if pack is None or not pack.is_dir():
-            sys.exit("Give the pack directory: python3 tools/assets/build_assets.py \"/path/to/pack\"")
-        PACK_PATH_FILE.write_text(str(pack.resolve()) + "\n")
-        print(f"Pack: {pack}")
-        check_pack_coverage(config, pack)
-        tilesets = build_tilesets(config, pack)
-        build_sprites(config, pack)
-        create_tiled_project()
-        create_starter_map(tilesets, config)
-        build_maps(tilesets, pack_available=True)
+    usage = 'python3 tools/assets/build_assets.py "/path/to/pack"'
+    pack = Path(args.pack) if args.pack else None
+    if pack is None and PACK_PATH_FILE.exists():
+        pack = Path(PACK_PATH_FILE.read_text(encoding="utf-8").strip())
+        if not pack.is_dir():
+            sys.exit(f"The pack isn't at {pack} any more (remembered from the last run). Give its directory: {usage}")
+    if pack is None:
+        sys.exit(f"Where is the Sprout Lands pack? Give its directory once (it's remembered): {usage}")
+    if not pack.is_dir():
+        sys.exit(f"Not a directory: {pack}. Give the pack's root directory: {usage}")
+    PACK_PATH_FILE.write_text(str(pack.resolve()) + "\n", encoding="utf-8")
+    print(f"Pack: {pack}")
+    check_pack_coverage(config, pack)
+    tilesets = build_tilesets(config, pack)
+    animations, used = build_sprites(config, pack)
+    create_tiled_project()
+    create_starter_map(tilesets, config)
+    build_maps(tilesets, pack_available=True)
 
     report = PREVIEW_DIR / "report.txt"
-    report.write_text("\n".join(warnings) + "\n" if warnings else "no warnings\n")
-    write_preview_index()
+    report.write_text("\n".join(warnings) + "\n" if warnings else "no warnings\n", encoding="utf-8")
+    write_preview_index(animations, used)
     print(f"Done. {len(warnings)} warnings. Open {(PREVIEW_DIR / 'index.html').relative_to(ROOT)} in a browser.")
 
 

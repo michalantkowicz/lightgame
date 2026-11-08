@@ -9,7 +9,9 @@
     "  ('auto' = row_00, row_01 ...; a list or {row: name} for real names), 'duration' is ms per frame,",
     "  'variants' lists sheets with the same layout (colours), 'rowCount' stops after that many rows (when a sheet",
     "  switches to another grid further down, add a second entry with its own 'offset'). Empty frames are skipped.",
-    "ignore: files that are neither (previews, duplicates). Paths are relative to the pack directory."
+    "ignore: files that are neither (previews, duplicates). Paths are relative to the pack directory.",
+    "'door animation sprites.png' is a tileset only, not a sprite sheet: its frames overlap (a 3px pillar + the door",
+    "  leaf every 16px), so no grid cuts them right. Animating doors needs frames given as rectangles (not supported yet)."
   ],
   "tileSize": 16,
   "starterMap": {"water": "water", "grass": "grass_tiles_v2"},
@@ -179,16 +181,12 @@
 
     {"name": "chest", "file": "Tilesets/Building parts/Chest.png", "frame": [48, 48], "duration": 100,
      "playMode": "NORMAL", "rows": ["open_front", "open_side"]},
-    {"name": "door", "file": "Tilesets/Building parts/door animation sprites.png", "frame": [16, 16], "duration": 100,
-     "playMode": "NORMAL", "rows": {"0": "open"}},
-    {"name": "door_wide", "file": "Tilesets/Building parts/door animation sprites.png", "frame": [48, 16],
-     "offset": [0, 16], "duration": 100, "playMode": "NORMAL", "rows": ["open"]},
     {"name": "gate", "file": "Tilesets/Building parts/Fence gates animation sprites .png", "frame": [32, 16],
      "duration": 100, "playMode": "NORMAL", "rows": {"0": "open_horizontal"}},
     {"name": "gate_vertical", "file": "Tilesets/Building parts/Fence gates animation sprites .png", "frame": [32, 32],
      "offset": [0, 16], "duration": 100, "playMode": "NORMAL", "rows": ["open"]},
     {"name": "mailbox", "file": "Tilesets/Building parts/Mailbox Animation Frames.png", "frame": [32, 48],
-     "offset": [0, 16], "duration": 100}
+     "duration": 100}
   ],
 
   "ignore": [

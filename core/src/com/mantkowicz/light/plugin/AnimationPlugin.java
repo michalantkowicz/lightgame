@@ -6,33 +6,39 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.resources.Action;
+import com.mantkowicz.light.resources.Direction;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.Sprite;
 
 import static com.mantkowicz.light.actor.Status.MOVEMENT;
+import static com.mantkowicz.light.resources.Direction.DOWN;
+import static com.mantkowicz.light.resources.Direction.LEFT;
+import static com.mantkowicz.light.resources.Direction.RIGHT;
+import static com.mantkowicz.light.resources.Direction.UP;
 
 /**
- * Animates an actor's picture from its sprite sheet: "walk_&lt;direction&gt;" while it moves (e.g. "rabbit/walk_left"),
- * and when it stops it turns back to the default "idle_down". The direction follows the way the actor actually moves;
- * on a diagonal it keeps the direction it had if that one still fits, so it doesn't flicker between two.
+ * Animates an actor's picture from its sprite sheet: WALK in the direction it moves while it moves (e.g. the rabbit's
+ * "walk_left"), and when it stops it turns back to the default IDLE facing DOWN. The direction follows the way the
+ * actor actually moves; on a diagonal it keeps the direction it had if that one still fits, so it doesn't flicker.
  */
 public class AnimationPlugin implements Plugin {
-    static final String DOWN = "down", UP = "up", LEFT = "left", RIGHT = "right";
     /** How much one axis must dominate to switch the direction to it. */
     private static final float DOMINANCE = 1.2f;
 
     private final GameActor actor;
     private final ResourcesService resourcesService;
-    private final String sheet;
+    private final Sprite sprite;
     private Vector2 lastCenter;
-    private String direction = DOWN;
+    private Direction direction = DOWN;
     private String current;
     private Animation<TextureRegion> animation;
     private float stateTime;
 
-    public AnimationPlugin(GameActor actor, ResourcesService resourcesService, String sheet) {
+    public AnimationPlugin(GameActor actor, ResourcesService resourcesService, Sprite sprite) {
         this.actor = actor;
         this.resourcesService = resourcesService;
-        this.sheet = sheet;
+        this.sprite = sprite;
     }
 
     @Override
@@ -50,10 +56,11 @@ public class AnimationPlugin implements Plugin {
         }
         lastCenter = center;
 
-        String name = sheet + "/" + (walking ? "walk_" : "idle_") + direction;
+        Action action = walking ? Action.WALK : Action.IDLE;
+        String name = ResourcesService.animationName(sprite, action, direction);
         if (!name.equals(current)) {
             current = name;
-            animation = resourcesService.getAnimation(name);
+            animation = resourcesService.getAnimation(sprite, action, direction);
             stateTime = 0;
         } else {
             stateTime += delta;
@@ -67,21 +74,21 @@ public class AnimationPlugin implements Plugin {
         if (ax < 0.001f && ay < 0.001f) {
             return;
         }
-        String horizontal = dx > 0 ? RIGHT : LEFT;
-        String vertical = dy > 0 ? UP : DOWN;
+        Direction horizontal = dx > 0 ? RIGHT : LEFT;
+        Direction vertical = dy > 0 ? UP : DOWN;
         if (ax > ay * DOMINANCE) {
             direction = horizontal;
         } else if (ay > ax * DOMINANCE) {
             direction = vertical;
-        } else if (!direction.equals(horizontal) && !direction.equals(vertical)) {
+        } else if (direction != horizontal && direction != vertical) {
             direction = horizontal;
         }
     }
 
     /**
-     * The direction the actor faces: "down", "up", "left" or "right".
+     * The direction the actor faces.
      */
-    public String getDirection() {
+    public Direction getDirection() {
         return direction;
     }
 
