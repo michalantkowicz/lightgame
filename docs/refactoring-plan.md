@@ -828,3 +828,9 @@ blocked by it.
   notifications that point at things in the world stay on the world camera. Then add `Main.CAMERA_ZOOM` (1 = today,
   below 1 = closer) and set `((OrthographicCamera) gameStage.getCamera()).zoom` once in `GameScreen.show()`. Clicks
   and lights already take zoom into account. UI goldens will change (positions only); keep zoom 1 in the e2e tests.
+- **Retire the old single-texture pictures** (2026‑11‑08). Maps made with tools/assets draw everything from the atlases
+  (their tiles are built without a background: `TileFactory.createMapTile`). The old pictures (`floor-tile.png`,
+  `wall-tile.png`, `player.png`, `dog.png`, `chest.png`, …, preloaded in `ResourcesService`) are still used by the
+  original house map `android/assets/map.tmx`, which most e2e tests and goldens run on. To remove them: rebuild the house
+  as a level in Tiled (or drop it), move the tests to it and re-record their goldens, then delete the pictures, their
+  preload list and the background constructors of `FloorTile`/`WallTile`. Do it once the atlases feel settled.
