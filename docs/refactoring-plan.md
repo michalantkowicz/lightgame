@@ -834,3 +834,14 @@ blocked by it.
   original house map `android/assets/map.tmx`, which most e2e tests and goldens run on. To remove them: rebuild the house
   as a level in Tiled (or drop it), move the tests to it and re-record their goldens, then delete the pictures, their
   preload list and the background constructors of `FloorTile`/`WallTile`. Do it once the atlases feel settled.
+- **Map roles from Tiled custom types instead of layer names** (2026‑11‑08). Today the game reads roles from names typed
+  by hand in Tiled: layers called `collision` (not walkable, never drawn) and `walls` (not walkable, blocks light), and
+  the map property `ambientLight` (`TmxTiledMapLoader` constants). Problems: a typo or rename (`Collision`, `walls 2`)
+  silently turns the layer into a plain drawn one; blocking things must be painted twice (once to see, once on
+  `collision`); only one layer per role. (`atlas` is fine: the tool writes it, nobody types it.)
+  Suggested fix: the tool defines custom types in `assets-src/lightgame.tiled-project` (Tiled 1.9+): a layer class
+  `GameLayer` with checkboxes `blocksWalking` and `blocksLight`, and a map class `GameMap` with `ambientLight` (float,
+  default 1). In Tiled roles are picked from a dropdown and ticked, layers can have any name (`fences`, `rocks`), and any
+  drawn layer can block (an invisible one still works for invisible barriers). The loader reads the properties instead of
+  names; the tool warns about leftovers (a layer named `collision` without the class, unknown properties). Needs:
+  migrating `level1`, `PackedMapTest` (its `LevelVariant` layers), the READMEs.
