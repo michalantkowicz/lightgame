@@ -63,6 +63,7 @@ class PackedMapTest {
                         upsideDown, grass | FLIP_VERTICALLY,
                         turned, grass | FLIP_DIAGONALLY | FLIP_HORIZONTALLY)) // Tiled's "rotate clockwise" (Z)
                 .addLayer("shadow", Map.of(plain, grass), 0.5f)
+                .addLayer("top", Map.of(plain, grass))
                 .write("flips.tmx");
         GameDriver game = GameDriver.start(map);
 
@@ -71,6 +72,7 @@ class PackedMapTest {
         assertEquals("TL,BL,BR,TR", corners(game.cellDrawing(upsideDown).get(2)), "top and bottom swapped");
         assertEquals("BR,BL,TL,TR", corners(game.cellDrawing(turned).get(2)), "the picture's top-left is now top-right");
         assertTrue(game.cellDrawing(plain).get(3).endsWith("alpha=0.5"), "the shadow layer is half transparent");
+        assertTrue(game.cellDrawing(plain).get(4).endsWith("alpha=1.0"), "the layer above it is opaque again");
     }
 
     @Test

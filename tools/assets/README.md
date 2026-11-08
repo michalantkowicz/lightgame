@@ -5,7 +5,7 @@ changes, or after editing a level in Tiled.
 
 ```sh
 pip3 install pillow                                   # once
-python3 tools/assets/build_assets.py "/path/to/Sprout Lands - Sprites - premium pack"
+python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same pack as last time
 ```
 

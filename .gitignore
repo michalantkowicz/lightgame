@@ -2,6 +2,8 @@
 # The Sprout Lands license forbids redistributing the pack itself: its sheets (copied here for Tiled) stay local.
 # Only the packed atlases in android/assets (what the game uses) are committed, with CREDITS.md.
 /assets-src/tilesets/images/
+# the pack itself, when kept in the suggested place (README.md)
+/tools/assets/Sprout Lands - Sprites - premium pack/
 /tools/assets/.pack-path
 *.tiled-session
 __pycache__/

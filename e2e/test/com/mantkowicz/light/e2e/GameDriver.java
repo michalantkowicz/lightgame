@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -51,7 +50,6 @@ import com.mantkowicz.light.ui.collect.CollectItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -313,11 +311,27 @@ public final class GameDriver {
      * drawn as it is; mirrored or rotated tiles show it), and the opacity.
      */
     public List<String> cellDrawing(Cell cell) {
-        List<float[]> quads = new ArrayList<>();
+        List<String> drawn = new ArrayList<>();
         SpriteBatch recorder = new SpriteBatch() {
             @Override
-            public void draw(Texture texture, float[] vertices, int offset, int count) {
-                quads.add(Arrays.copyOfRange(vertices, offset, offset + count));
+            public void draw(TextureRegion region, float x, float y, float width, float height) {
+                record(region, 0, 0, 1, 1, 0);
+            }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                             float height, float scaleX, float scaleY, float rotation) {
+                record(region, originX - width / 2f, originY - height / 2f, scaleX, scaleY, rotation);
+            }
+
+            private void record(TextureRegion region, float originOffsetX, float originOffsetY, float scaleX, float scaleY,
+                                float rotation) {
+                if (originOffsetX != 0 || originOffsetY != 0) {
+                    throw new IllegalStateException("map tiles should turn around their centre");
+                }
+                AtlasRegion atlasRegion = (AtlasRegion) region;
+                drawn.add(String.format("%s#%d %s alpha=%s", atlasRegion.name, atlasRegion.index,
+                        landedCorners(scaleX, scaleY, rotation), Snapshot.number(getColor().a)));
             }
         };
         try {
@@ -325,38 +339,25 @@ public final class GameDriver {
         } finally {
             recorder.dispose();
         }
-        List<String> drawn = new ArrayList<>();
-        for (float[] quad : quads) {
-            AtlasRegion region = regionOf(quad);
-            StringBuilder corners = new StringBuilder();
-            for (int corner = 0; corner < 4; corner++) {
-                float u = quad[corner * 5 + 3];
-                float v = quad[corner * 5 + 4];
-                corners.append(corner == 0 ? "" : ",").append(v == region.getV2() ? "B" : "T").append(u == region.getU() ? "L" : "R");
-            }
-            Color color = new Color();
-            Color.abgr8888ToColor(color, quad[2]);
-            float alpha = color.a;
-            drawn.add(String.format("%s#%d %s alpha=%s", region.name, region.index, corners, Snapshot.number(alpha)));
-        }
         return drawn;
     }
 
-    /** The atlas region whose texture coordinates a drawn quad uses. */
-    private AtlasRegion regionOf(float[] quad) {
-        ResourcesService resources = screenField("resourcesService");
-        Array<TextureAtlas> atlases = new Array<>();
-        resources.getAssetManager().getAll(TextureAtlas.class, atlases);
-        float minU = Math.min(Math.min(quad[3], quad[8]), Math.min(quad[13], quad[18]));
-        float minV = Math.min(Math.min(quad[4], quad[9]), Math.min(quad[14], quad[19]));
-        for (TextureAtlas atlas : atlases) {
-            for (AtlasRegion region : atlas.getRegions()) {
-                if (region.getU() == minU && region.getV() == minV) {
-                    return region;
-                }
-            }
+    /**
+     * Scales and turns (around the centre, like the batch) each corner of a picture and says which picture corner ends
+     * up on the cell's BL, TL, TR and BR corners.
+     */
+    private static String landedCorners(float scaleX, float scaleY, float rotation) {
+        String[] names = {"BL", "TL", "TR", "BR"};
+        float[][] corners = {{-1, -1}, {-1, 1}, {1, 1}, {1, -1}};
+        String[] landed = new String[4];
+        double cos = Math.cos(Math.toRadians(rotation)), sin = Math.sin(Math.toRadians(rotation));
+        for (int i = 0; i < 4; i++) {
+            double x = corners[i][0] * scaleX, y = corners[i][1] * scaleY;
+            double turnedX = x * cos - y * sin, turnedY = x * sin + y * cos;
+            int target = turnedX < 0 ? (turnedY < 0 ? 0 : 1) : (turnedY < 0 ? 3 : 2);
+            landed[target] = names[i];
         }
-        throw new IllegalStateException("A drawn quad uses no atlas region: " + Arrays.toString(quad));
+        return String.join(",", landed);
     }
 
     /** How bright unlit places are, as box2dlights' ambient colour "r,g,b,a" (a = brightness, 1 = daylight). */

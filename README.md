@@ -10,10 +10,11 @@ forbids redistributing it). A tool turns it into what the game and Tiled need, a
 ### Setup (once per machine)
 
 1. Install Pillow: `pip3 install pillow`.
-2. Put the pack anywhere outside the repo.
+2. Unzip the pack into `tools/assets/`, keeping its folder name (`tools/assets/Sprout Lands - Sprites - premium pack/`).
+   That folder is git-ignored. Anywhere else works too, as long as it isn't committed.
 3. Run the tool with the pack's path. It remembers the path for next time:
    ```sh
-   python3 tools/assets/build_assets.py "/path/to/Sprout Lands pack"
+   python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"
    ```
 
 ### Day to day
