@@ -6,6 +6,9 @@ import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import com.mantkowicz.light.game.Main;
 
 public class HtmlLauncher extends GwtApplication {
+    /** The browser's camera zoom, see {@link Main#CAMERA_ZOOM} (1 = as designed, below 1 = closer). */
+    private static final float CAMERA_ZOOM = Main.CAMERA_ZOOM;
+
     @Override
     public GwtApplicationConfiguration getConfig() {
         // fill the browser window and follow its size; the game uses an ExtendViewport
@@ -18,6 +21,6 @@ public class HtmlLauncher extends GwtApplication {
 
     @Override
     public ApplicationListener createApplicationListener() {
-        return new Main();
+        return new Main(CAMERA_ZOOM);
     }
 }

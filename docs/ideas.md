@@ -15,14 +15,6 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   so tree canopies or roofs painted on a layer end up under the rabbit. Add a layer property in Tiled, e.g. `above = true`:
   the loader keeps those layers apart and the game draws them after the actors (still per tile, still from the atlas).
   Do it before painting trees or roofs that the player should walk behind.
-- **UI in its own screen viewport, world zoom from one constant** (2026‑11‑08). All four stages (game, notification,
-  menu, UI) share one `ExtendViewport`, so one camera. UI widgets sit in world coordinates and follow `camera.position` by
-  hand (`ActionButton`, `CenterActorByCameraPlugin`, `FPSFeature`, the size of `CollectWindow`'s background), so setting
-  `camera.zoom` would scale the buttons and windows with the world. Fix: give `UiStage` its own fixed screen-space
-  viewport (resized in `GameScreen.resize`) and drop the manual camera-following from those widgets. Menus and
-  notifications that point at things in the world stay on the world camera. Then add `Main.CAMERA_ZOOM` (1 = today,
-  below 1 = closer) and set `((OrthographicCamera) gameStage.getCamera()).zoom` once in `GameScreen.show()`. Clicks
-  and lights already take zoom into account. UI goldens will change (positions only); keep zoom 1 in the e2e tests.
 - **Retire the old single-texture pictures** (2026‑11‑08). Maps made with tools/assets draw everything from the atlases
   (their tiles are built without a background: `TileFactory.createMapTile`). The old pictures (`floor-tile.png`,
   `wall-tile.png`, `player.png`, `dog.png`, `chest.png`, …, preloaded in `ResourcesService`) are still used by the

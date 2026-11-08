@@ -70,3 +70,19 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   explained; sprite frames are reachable through `getTexture`. Tool: mailbox grid fixed, the door sheet is a tileset
   only (its frames overlap, no grid fits), packer edge case at the page border, embedded tilesets and infinite maps
   rejected with a hint, UTF-8 files. New `PackedMapTest` (on `LevelVariant` copies of level1) and more `LevelTest`.
+
+## 2026‑11‑09, UI viewport and camera zoom (branch `ui-viewport`)
+
+- **Camera zoom:** `Main.CAMERA_ZOOM` (1 = as designed, below 1 = closer, above 1 = see more) is set once on the world
+  camera in `GameScreen.show()`. Clicks and lights already take it into account. The tests don't depend on it:
+  `HeadlessGame` passes `TEST_CAMERA_ZOOM = 1` through the new `Main(mapName, cameraZoom)`.
+  The HTML and Android launchers have their own `CAMERA_ZOOM` constant (`Main.CAMERA_ZOOM` for now), passed with
+  `new Main(cameraZoom)`; desktop uses `Main.CAMERA_ZOOM`.
+- **UI split:** the world (game, menu and notification stages: things that point at the board) keeps one
+  `ExtendViewport`; the UI stage got its own, which never moves, so buttons and windows keep their place and size at any
+  zoom. Both are resized in `GameScreen.resize`. `CenterActorByCameraPlugin` now centres an actor on its own stage's
+  camera (no more following the world camera by hand); the debug FPS label moved to the UI stage.
+- Goldens re-recorded: only UI positions changed (now in UI-stage coordinates; each button is at the same place
+  relative to its camera, so the same place on screen) and the FPS label's stage. New `CameraZoomTest`: at zoom 0.5
+  cells are twice as big and still clickable while the COLLECT button doesn't move or grow; at zoom 2 cells are half as
+  big.

@@ -78,7 +78,7 @@ public class CollectWindow extends GameActor {
 
         setSize(mainTable.getWidth(), mainTable.getHeight());
 
-        Plugin plugin = new CenterActorByCameraPlugin(this, context, new Vector2());
+        Plugin plugin = new CenterActorByCameraPlugin(this, new Vector2());
         addPlugin(plugin);
     }
 

@@ -7,5 +7,5 @@ camera: at=(1344.0,2880.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=239.9 color=555555ff
 menu buttons: 0
-text on game stage: "60" at=(1644.0,3400.0) alpha=1.0 color=ffffffff
 text on notification stage: "player" at=(1408.0,2944.0) alpha=1.0 color=ffffffff
+text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
