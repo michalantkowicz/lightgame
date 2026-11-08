@@ -8,6 +8,12 @@ public abstract class AccessibleTile extends Tile {
         super(resourcesService, backgroundTextureName);
     }
 
+    /**
+     * Without a background picture: the map draws it (see {@link Tile#Tile()}).
+     */
+    protected AccessibleTile() {
+    }
+
     @Override
     public boolean isAccessible() {
         return true;

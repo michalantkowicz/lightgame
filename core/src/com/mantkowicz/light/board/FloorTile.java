@@ -11,6 +11,12 @@ public class FloorTile extends AccessibleTile {
     }
 
     /**
+     * Without a background picture, for maps made with tools/assets: the map draws the floor.
+     */
+    public FloorTile() {
+    }
+
+    /**
      * A floor tile is blocked when any of its objects blocks.
      */
     @Override

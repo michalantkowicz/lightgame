@@ -181,7 +181,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 if (cellLayers.isEmpty() && !wall && !blocked) {
                     continue;
                 }
-                Tile tile = TileFactory.createTile(resourcesService, wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
+                Tile tile = TileFactory.createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
                 tile.setAttributes(new MapProperties());
                 tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
                 tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);

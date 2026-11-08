@@ -52,9 +52,17 @@ public abstract class Tile {
     private List<TileGraphic> layers;
 
     protected Tile(ResourcesService resourcesService, String backgroundTextureName) {
+        this();
+        setBackground(resourcesService, backgroundTextureName);
+    }
+
+    /**
+     * A tile without a background picture: on maps made with tools/assets the picture comes from the map
+     * ({@link #setGraphics}), which also gives the tile its size. Until then it draws nothing.
+     */
+    protected Tile() {
         this.id = ID_SEQUENCE++;
         this.neighbours = new ArrayList<>();
-        setBackground(resourcesService, backgroundTextureName);
     }
 
     /**
@@ -195,7 +203,9 @@ public abstract class Tile {
 
     public void draw(Batch batch, float parentAlpha) {
         if (layers == null) {
-            batch.draw(backgroundTexture, x, y);
+            if (backgroundTexture != null) {
+                batch.draw(backgroundTexture, x, y);
+            }
             return;
         }
         for (TileGraphic layer : layers) {
