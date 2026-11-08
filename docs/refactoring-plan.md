@@ -811,3 +811,20 @@ blocked by it.
 - **Squash and stretch for the hops** (2026‑11‑07). `HopPlugin` could also scale the avatar: a little taller and narrower at the top
   of the arc, flatter and wider just before and after touching the ground. The origin of the scaling would be the bottom centre of the picture. It's
   purely visual, like the hop itself: positions, tiles and goldens stay the same, and `HopTest` would only need a check on the scale.
+- **Draw only what the camera sees** (2026‑11‑08). `Board.draw` draws every tile each frame, also the ones off screen; each
+  tile draws all its painted map layers. Cheap for small maps (24x16 with ~4 painted layers per cell is ~1,500 drawings per
+  frame, all from one atlas texture), but a 100x100 map would be ~40,000, which costs frame time on mobile and in the browser.
+  Fix: draw only the tiles inside the camera's view (about 7x11 tiles on screen), so any map stays around ~1,000 drawings. Do
+  it once maps grow beyond roughly 50x50. Pixel output for visible tiles stays the same.
+- **Map layers above the characters** (2026‑11‑08). All map layers are drawn under the actors (the board is drawn first),
+  so tree canopies or roofs painted on a layer end up under the rabbit. Add a layer property in Tiled, e.g. `above = true`:
+  the loader keeps those layers apart and the game draws them after the actors (still per tile, still from the atlas).
+  Do it before painting trees or roofs that the player should walk behind.
+- **UI in its own screen viewport, world zoom from one constant** (2026‑11‑08). All four stages (game, notification,
+  menu, UI) share one `ExtendViewport`, so one camera. UI widgets sit in world coordinates and follow `camera.position` by
+  hand (`ActionButton`, `CenterActorByCameraPlugin`, `FPSFeature`, the size of `CollectWindow`'s background), so setting
+  `camera.zoom` would scale the buttons and windows with the world. Fix: give `UiStage` its own fixed screen-space
+  viewport (resized in `GameScreen.resize`) and drop the manual camera-following from those widgets. Menus and
+  notifications that point at things in the world stay on the world camera. Then add `Main.CAMERA_ZOOM` (1 = today,
+  below 1 = closer) and set `((OrthographicCamera) gameStage.getCamera()).zoom` once in `GameScreen.show()`. Clicks
+  and lights already take zoom into account. UI goldens will change (positions only); keep zoom 1 in the e2e tests.
