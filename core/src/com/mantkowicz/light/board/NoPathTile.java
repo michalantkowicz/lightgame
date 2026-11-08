@@ -8,6 +8,12 @@ public abstract class NoPathTile extends Tile {
         super(resourcesService, backgroundTextureName);
     }
 
+    /**
+     * Without a background picture: the map draws it (see {@link Tile#Tile()}).
+     */
+    protected NoPathTile() {
+    }
+
     @Override
     public boolean isAccessible() {
         return false;

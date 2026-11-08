@@ -8,10 +8,15 @@ import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.plugin.AnimationPlugin;
 import com.mantkowicz.light.plugin.BoardMovementPlugin;
 import com.mantkowicz.light.plugin.CollectPlugin;
 import com.mantkowicz.light.plugin.HopPlugin;
 import com.mantkowicz.light.plugin.PlayerNotificationPlugin;
+import com.mantkowicz.light.resources.Action;
+import com.mantkowicz.light.resources.Direction;
+import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 
 import java.util.ArrayList;
@@ -22,7 +27,8 @@ import static com.mantkowicz.light.actor.Status.MOVEMENT;
 import static com.mantkowicz.light.debug.Debug.Tool.DARKNESS_EXCLAMATION;
 
 public class Player extends GameBoardActor implements Collecting {
-    private static final String AVATAR_NAME = "player.png";
+    /** The rabbit's sprite sheet; the player is one tile big, the picture sticks out. */
+    private static final Sprite SPRITE = Sprite.RABBIT;
     private static final String DESCRIPTION = "player";
     /** Walking pace: seconds to cross one tile (bigger is slower). */
     private static final float SECONDS_PER_TILE = 0.4f;
@@ -33,6 +39,7 @@ public class Player extends GameBoardActor implements Collecting {
 
     private final GameEventService gameEventService;
     private final Inventory inventory;
+    private final AnimationPlugin animationPlugin;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
@@ -40,11 +47,15 @@ public class Player extends GameBoardActor implements Collecting {
         gameEventService = context.getGameEventService();
         inventory = new Inventory(INVENTORY_SIZE, new ArrayList<Item>());
         lastIdleChange = TimeUtils.millis();
-        createAvatar(context, AVATAR_NAME);
+        ResourcesService resourcesService = context.getResourcesService();
+        createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),
+                resourcesService.getSpriteSheet(SPRITE));
 
         BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
         addPlugin(new HopPlugin(this, HOP_HEIGHT, HOP_DURATION));
+        animationPlugin = new AnimationPlugin(this, resourcesService, SPRITE);
+        addPlugin(animationPlugin);
 
         PlayerNotificationPlugin playerNotificationPlugin = new PlayerNotificationPlugin(this, context);
         if (Debug.isOn(DARKNESS_EXCLAMATION)) {
@@ -86,6 +97,13 @@ public class Player extends GameBoardActor implements Collecting {
             return TimeUtils.millis() - lastIdleChange;
         }
         return 0;
+    }
+
+    /**
+     * The animation being played, e.g. "rabbit/walk_left".
+     */
+    public String getCurrentAnimation() {
+        return animationPlugin.getCurrentAnimation();
     }
 
     @Override

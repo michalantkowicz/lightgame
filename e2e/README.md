@@ -38,9 +38,10 @@ test/com/mantkowicz/light/e2e/
 ├── Cell.java           (col,row) address of a tile; the stable way to point at the map
 ├── Snapshot.java       sorted, rounded, line-based text, so golden files diff nicely
 ├── Golden.java         compares with golden/<name>.txt, or rewrites it in update mode
+├── LevelVariant.java   changed copies of the packed starter level (walls, mirrored tiles...), in e2e/build/test-maps
 ├── headless/           HeadlessGame, NoOpGL, FixedGraphics, ScriptedInput
 ├── scenario/           gameplay tests, written against GameDriver only
-└── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, WallTest, InventoryTest
+└── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, WallTest, InventoryTest, AssetsUpToDateTest
 ```
 
 Scenario ids are used in `docs/refactoring-plan.md`:
@@ -54,6 +55,8 @@ Scenario ids are used in `docs/refactoring-plan.md`:
 | S12, S13 | Q/W fade shader; torch flicker | `ShaderAndLightTest` | `fade-shader`, `torch-flicker` |
 | S14 | Resize | `ResizeTest` | `resize` |
 | S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button | `CollectTest` | `collect`, `collect-cancel` |
+| — | The packed starter level (the game's default): water blocks walking, the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile | `LevelTest` | — |
+| — | Packed maps: layers drawn bottom first, animated water, mirrored/rotated/transparent tiles, `walls` and `collision` layers, `ambientLight`, clear errors | `PackedMapTest` | — |
 
 ## How the headless game works
 

@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Chest;
 import com.mantkowicz.light.actor.Dog;
@@ -40,7 +41,10 @@ import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
+import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.Sprite;
+import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
 
@@ -63,17 +67,28 @@ public final class GameDriver {
 
     public enum Kind {PLAYER, DOG, CHEST}
 
-    private final HeadlessGame game = new HeadlessGame();
+    private final HeadlessGame game;
     private final StringBuilder timeline = new StringBuilder();
     private String crash;
     private Vector2 pointer = new Vector2();
 
-    private GameDriver() {
+    private GameDriver(String mapName) {
+        game = new HeadlessGame(mapName);
     }
 
-    /** Starts the game and lets it settle for half a second. */
+    /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
     public static GameDriver start() {
-        GameDriver driver = new GameDriver();
+        return start(HeadlessGame.TEST_MAP);
+    }
+
+    /** The map the real game starts with (Main.DEFAULT_MAP). */
+    public static String defaultMap() {
+        return Main.DEFAULT_MAP;
+    }
+
+    /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
+    public static GameDriver start(String mapName) {
+        GameDriver driver = new GameDriver(mapName);
         driver.frames(START_FRAMES);
         return driver;
     }
@@ -290,6 +305,83 @@ public final class GameDriver {
         return snapshot.toString();
     }
 
+    /**
+     * What a cell draws, bottom layer first: the map tile of each layer as "tileset#id", then which corner of that
+     * tile's picture lands on the cell's bottom-left, top-left, top-right and bottom-right corners (BL,TL,TR,BR when
+     * drawn as it is; mirrored or rotated tiles show it), and the opacity.
+     */
+    public List<String> cellDrawing(Cell cell) {
+        List<String> drawn = new ArrayList<>();
+        SpriteBatch recorder = new SpriteBatch() {
+            @Override
+            public void draw(TextureRegion region, float x, float y, float width, float height) {
+                record(region, 0, 0, 1, 1, 0);
+            }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                             float height, float scaleX, float scaleY, float rotation) {
+                record(region, originX - width / 2f, originY - height / 2f, scaleX, scaleY, rotation);
+            }
+
+            private void record(TextureRegion region, float originOffsetX, float originOffsetY, float scaleX, float scaleY,
+                                float rotation) {
+                if (originOffsetX != 0 || originOffsetY != 0) {
+                    throw new IllegalStateException("map tiles should turn around their centre");
+                }
+                AtlasRegion atlasRegion = (AtlasRegion) region;
+                drawn.add(String.format("%s#%d %s alpha=%s", atlasRegion.name, atlasRegion.index,
+                        landedCorners(scaleX, scaleY, rotation), Snapshot.number(getColor().a)));
+            }
+        };
+        try {
+            tile(cell).draw(recorder, 1);
+        } finally {
+            recorder.dispose();
+        }
+        return drawn;
+    }
+
+    /**
+     * Scales and turns (around the centre, like the batch) each corner of a picture and says which picture corner ends
+     * up on the cell's BL, TL, TR and BR corners.
+     */
+    private static String landedCorners(float scaleX, float scaleY, float rotation) {
+        String[] names = {"BL", "TL", "TR", "BR"};
+        float[][] corners = {{-1, -1}, {-1, 1}, {1, 1}, {1, -1}};
+        String[] landed = new String[4];
+        double cos = Math.cos(Math.toRadians(rotation)), sin = Math.sin(Math.toRadians(rotation));
+        for (int i = 0; i < 4; i++) {
+            double x = corners[i][0] * scaleX, y = corners[i][1] * scaleY;
+            double turnedX = x * cos - y * sin, turnedY = x * sin + y * cos;
+            int target = turnedX < 0 ? (turnedY < 0 ? 0 : 1) : (turnedY < 0 ? 3 : 2);
+            landed[target] = names[i];
+        }
+        return String.join(",", landed);
+    }
+
+    /** How bright unlit places are, as box2dlights' ambient colour "r,g,b,a" (a = brightness, 1 = daylight). */
+    public String ambientLight() {
+        RayHandler rayHandler = screenField("rayHandler");
+        Color ambient = field(rayHandler, RayHandler.class, "ambientLight");
+        return String.format(java.util.Locale.ROOT, "%.2f,%.2f,%.2f,%.2f", ambient.r, ambient.g, ambient.b, ambient.a);
+    }
+
+    /**
+     * Where the centre of the player's sprite frame (the 48x48 picture before trimming) is, relative to the player's
+     * bottom-left corner. The frame is drawn centred on the player's tile, so this is the tile's centre.
+     */
+    public float[] playerFrameCentre() {
+        Player player = (Player) actor(Kind.PLAYER);
+        ResourcesService resources = screenField("resourcesService");
+        SpriteSheet sheet = resources.getSpriteSheet(Sprite.RABBIT);
+        TextureRegion picture = ((TextureRegionDrawable) player.getAvatar().getDrawable()).getRegion();
+        float scale = player.getAvatar().getWidth() / picture.getRegionWidth();
+        return new float[]{
+                player.getAvatar().getX() + (sheet.frameWidth() / 2f - sheet.trimX()) * scale,
+                player.getAvatarRestY() + (sheet.frameHeight() / 2f - sheet.trimY()) * scale};
+    }
+
     private static String regionName(TextureRegion region) {
         if (region instanceof AtlasRegion atlasRegion) {
             return atlasRegion.name;
@@ -311,7 +403,13 @@ public final class GameDriver {
 
     /** How far the player's picture is lifted above its position right now (0 = standing on the ground). */
     public float playerHopHeight() {
-        return actor(Kind.PLAYER).getAvatar().getY();
+        GameBoardActor player = actor(Kind.PLAYER);
+        return player.getAvatar().getY() - player.getAvatarRestY();
+    }
+
+    /** The player's animation right now, e.g. "rabbit/walk_left". */
+    public String playerAnimation() {
+        return ((Player) actor(Kind.PLAYER)).getCurrentAnimation();
     }
 
     public String playerPosition() {

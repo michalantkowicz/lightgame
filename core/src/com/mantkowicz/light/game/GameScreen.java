@@ -6,6 +6,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -21,6 +22,7 @@ import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.StageFeature;
+import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.resources.PhraseService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.GameStage;
@@ -36,6 +38,9 @@ import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 public class GameScreen extends ScreenAdapter {
+    private static final float DEFAULT_AMBIENT_LIGHT = 0.02f;
+
+    private final String mapName;
     private final ResourcesService resourcesService;
     private final GameEventService gameEventService;
     private final World world;
@@ -47,7 +52,8 @@ public class GameScreen extends ScreenAdapter {
     private RayHandler rayHandler;
     private final List<Feature> features = new ArrayList<>();
 
-    public GameScreen(ResourcesService resourcesService, GameEventService gameEventService, World world) {
+    public GameScreen(String mapName, ResourcesService resourcesService, GameEventService gameEventService, World world) {
+        this.mapName = mapName;
         this.resourcesService = resourcesService;
         this.gameEventService = gameEventService;
         this.world = world;
@@ -67,9 +73,10 @@ public class GameScreen extends ScreenAdapter {
         multiplexer.addProcessor(gameStage);
         Gdx.input.setInputProcessor(multiplexer);
 
-        rayHandler = prepareLights();
+        TileSet tileSet = Board.loadTileSet(resourcesService, mapName);
+        rayHandler = prepareLights(tileSet.getProperties().getAmbientLight());
 
-        List<Tile> tiles = Board.loadTiles(resourcesService, "map.tmx");
+        List<Tile> tiles = tileSet.getTiles();
         BoardService boardService = new BoardService(gameEventService, tiles);
         GameContext context = createContext(boardService);
         board = new Board(context, tiles);
@@ -98,9 +105,19 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    private RayHandler prepareLights() {
+    /**
+     * box2dlights (without diffuse light) takes the brightness of unlit places from the ambient alpha and adds the
+     * ambient colour on top, so a daylight map gets no colour and full alpha (a colour of 1 would paint everything white).
+     *
+     * @param ambientLight how bright the map is without lights (0 dark .. 1 daylight), {@code null} for the house's setting
+     */
+    private RayHandler prepareLights(Float ambientLight) {
         RayHandler rayHandler = new RayHandler(world);
-        rayHandler.setAmbientLight(0.02f, 0.02f, 0.02f, 2 * 0.5f);
+        if (ambientLight == null) {
+            rayHandler.setAmbientLight(DEFAULT_AMBIENT_LIGHT, DEFAULT_AMBIENT_LIGHT, DEFAULT_AMBIENT_LIGHT, 2 * 0.5f);
+        } else {
+            rayHandler.setAmbientLight(0, 0, 0, ambientLight);
+        }
         return rayHandler;
     }
 
@@ -129,6 +146,7 @@ public class GameScreen extends ScreenAdapter {
             gameStage.fadeIn();
         }
 
+        AnimatedTiledMapTile.updateAnimationBaseTime(); // animated map tiles (water)
         world.step(1 / 60f, 6, 2);
         gameStage.act(delta);
         gameStage.draw();
