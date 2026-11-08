@@ -80,8 +80,8 @@ public abstract class GameActor extends Group {
         avatar = new Image(frame);
         avatar.setSize(frame.getRegionWidth() * scale, frame.getRegionHeight() * scale);
         avatar.setTouchable(Touchable.disabled);
-        avatarRestY = height / 2f + (sheet.getTrimY() - sheet.getFrameHeight() / 2f) * scale;
-        avatar.setPosition(width / 2f + (sheet.getTrimX() - sheet.getFrameWidth() / 2f) * scale, avatarRestY);
+        avatarRestY = height / 2f + (sheet.trimY() - sheet.frameHeight() / 2f) * scale;
+        avatar.setPosition(width / 2f + (sheet.trimX() - sheet.frameWidth() / 2f) * scale, avatarRestY);
         this.addActor(avatar);
         setSize(width, height);
     }

@@ -378,8 +378,8 @@ public final class GameDriver {
         TextureRegion picture = ((TextureRegionDrawable) player.getAvatar().getDrawable()).getRegion();
         float scale = player.getAvatar().getWidth() / picture.getRegionWidth();
         return new float[]{
-                player.getAvatar().getX() + (sheet.getFrameWidth() / 2f - sheet.getTrimX()) * scale,
-                player.getAvatarRestY() + (sheet.getFrameHeight() / 2f - sheet.getTrimY()) * scale};
+                player.getAvatar().getX() + (sheet.frameWidth() / 2f - sheet.trimX()) * scale,
+                player.getAvatarRestY() + (sheet.frameHeight() / 2f - sheet.trimY()) * scale};
     }
 
     private static String regionName(TextureRegion region) {
