@@ -55,7 +55,7 @@ Scenario ids are used in `docs/refactoring-plan.md`:
 | S12, S13 | Q/W fade shader; torch flicker | `ShaderAndLightTest` | `fade-shader`, `torch-flicker` |
 | S14 | Resize | `ResizeTest` | `resize` |
 | S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button | `CollectTest` | `collect`, `collect-cancel` |
-| — | The packed starter level (the game's default): water blocks walking, the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile | `LevelTest` | — |
+| — | The packed starter level (the game's default): water blocks walking, the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile; the cow's idle animation; the chest used from next to it, opening and shutting with the collect window | `LevelTest` | — |
 | — | Camera zoom: the world gets bigger or smaller, clicks still hit the right cell, buttons keep their place and size | `CameraZoomTest` | — |
 | — | Packed maps: layers drawn bottom first, animated water, mirrored/rotated/transparent tiles, `walls` and `collision` layers, `ambientLight`, clear errors | `PackedMapTest` | — |
 

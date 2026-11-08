@@ -180,7 +180,7 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="38" name="CHEST" x="1319" y="679" width="50" height="50">
+  <object id="38" name="CHEST" x="1063" y="679" width="50" height="50">
    <properties>
     <property name="objectClass" value="CHEST"/>
    </properties>

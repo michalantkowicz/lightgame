@@ -10,6 +10,10 @@ import java.util.List;
 
 import static com.mantkowicz.light.map.TileObjectType.CHEST;
 
+/**
+ * A chest placed in a Tiled map (an ellipse with objectClass CHEST), holding a lighter. It blocks its tile: the player
+ * opens it from a neighbouring one.
+ */
 public class TileChest extends TileActorObject<Chest> {
     public TileChest() {
         super(CHEST);
@@ -31,5 +35,10 @@ public class TileChest extends TileActorObject<Chest> {
         List<Item> content = new ArrayList<>();
         content.add(lighter);
         return content;
+    }
+
+    @Override
+    public boolean isAccessible() {
+        return false;
     }
 }

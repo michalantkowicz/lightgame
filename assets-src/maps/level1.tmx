@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="2">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="4">
  <properties>
   <property name="ambientLight" type="float" value="1" />
  </properties>
@@ -70,6 +70,18 @@
    <ellipse />
    <properties>
     <property name="objectClass" value="PLAYER" />
+   </properties>
+  </object>
+  <object id="2" name="COW" x="68" y="100" width="8" height="8">
+   <ellipse />
+   <properties>
+    <property name="objectClass" value="COW" />
+   </properties>
+  </object>
+  <object id="3" name="CHEST" x="132" y="100" width="8" height="8">
+   <ellipse />
+   <properties>
+    <property name="objectClass" value="CHEST" />
    </properties>
   </object>
  </objectgroup>

@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Chest;
+import com.mantkowicz.light.actor.Cow;
 import com.mantkowicz.light.actor.Dog;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
@@ -36,6 +37,7 @@ import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.map.TileChest;
+import com.mantkowicz.light.map.TileCow;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
@@ -65,7 +67,7 @@ public final class GameDriver {
     private static final int START_FRAMES = 30;
     private static final int FRAMES_PER_SECOND = 60;
 
-    public enum Kind {PLAYER, DOG, CHEST}
+    public enum Kind {PLAYER, DOG, CHEST, COW}
 
     private final HeadlessGame game;
     private final StringBuilder timeline = new StringBuilder();
@@ -416,6 +418,16 @@ public final class GameDriver {
         return player.getAvatar().getY() - player.getAvatarRestY();
     }
 
+    /** The cow's animation right now, e.g. "cow_brown/idle". */
+    public String cowAnimation() {
+        return ((Cow) actor(Kind.COW)).getCurrentAnimation();
+    }
+
+    /** The chest's animation right now: "chest/open_front" while opening or open, "... (backwards)" closing or closed. */
+    public String chestAnimation() {
+        return ((Chest) actor(Kind.CHEST)).getCurrentAnimation();
+    }
+
     /** The player's animation right now, e.g. "rabbit/walk_left". */
     public String playerAnimation() {
         return ((Player) actor(Kind.PLAYER)).getCurrentAnimation();
@@ -590,6 +602,7 @@ public final class GameDriver {
             case PLAYER -> Player.class;
             case DOG -> Dog.class;
             case CHEST -> Chest.class;
+            case COW -> Cow.class;
         };
         for (Actor actor : gameStage().getActors()) {
             if (type.isInstance(actor)) {
@@ -603,6 +616,7 @@ public final class GameDriver {
         if (object instanceof TileSprite) return "SPRITE";
         if (object instanceof TileChest) return "CHEST";
         if (object instanceof TileDog) return "DOG";
+        if (object instanceof TileCow) return "COW";
         if (object instanceof TilePlayer) return "PLAYER";
         if (object instanceof TileLight) return "LIGHT";
         throw new IllegalStateException("Unknown tile object " + object.getClass());

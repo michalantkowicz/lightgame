@@ -1,7 +1,23 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "b5e2906523c969c55277e31b7e2d479d53587d2f",
+  "packJsonSha1": "b843a12e2c62061added28f4af0f7b9ddadcb2b4",
   "sheets": {
+    "chest": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 15,
+      "trimY": 16,
+      "width": 18,
+      "height": 21
+    },
+    "cow_brown": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 2,
+      "width": 29,
+      "height": 28
+    },
     "rabbit": {
       "frameWidth": 48,
       "frameHeight": 48,
@@ -12,6 +28,66 @@
     }
   },
   "animations": {
+    "chest/open_front": {
+      "sheet": "chest",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "chest/open_side": {
+      "sheet": "chest",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "cow_brown/idle": {
+      "sheet": "cow_brown",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_02": {
+      "sheet": "cow_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_03": {
+      "sheet": "cow_brown",
+      "frames": 3,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_04": {
+      "sheet": "cow_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_05": {
+      "sheet": "cow_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_06": {
+      "sheet": "cow_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/row_07": {
+      "sheet": "cow_brown",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "cow_brown/walk": {
+      "sheet": "cow_brown",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "rabbit/chop_down": {
       "sheet": "rabbit",
       "frames": 8,

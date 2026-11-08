@@ -86,3 +86,20 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   relative to its camera, so the same place on screen) and the FPS label's stage. New `CameraZoomTest`: at zoom 0.5
   cells are twice as big and still clickable while the COLLECT button doesn't move or grow; at zoom 2 cells are half as
   big.
+
+## 2026‑11‑09, a cow and the Sprout Lands chest (branch `cow-and-chest`)
+
+- **Cow:** new `Cow` actor (`Sprite.COW_BROWN`, plays its `idle` row) and map object `COW` (`TileCow`, blocks its tile).
+  The brown cow's first two rows are named `idle` and `walk` in `pack.json`; the rest stay `row_02`… for now. On level1 at (4,9).
+- **Chest:** drawn from the Sprout Lands sheet everywhere (`Sprite.CHEST`; `chest.png` is no longer used). It blocks
+  its tile and is used from a neighbouring one (`isDistant()`); clicking it walks to the free neighbour with the
+  shortest walk (`BoardMovementPlugin.walkTarget`, `BoardService.isUsedFromNeighbour`, no "no path" notification).
+  The lid opens when the collect window opens and shuts when it closes: `Collectible.beforeCollect()`/`afterCollect()`
+  (unused until now) are called by `CollectWindow`. On level1 at (8,9).
+- **`SpriteAnimationPlugin`:** plays one animation on an actor's picture (forwards, or backwards for the closing lid);
+  used by the cow and the chest.
+- **House map:** its chest stood in the corridor at (10,24), which a blocking chest would cut; it moved to the corner at
+  (8,24), where blocking changes no route. Goldens re-recorded: the chest's cell, the player stopping next to it at
+  (8,23), the camera following, the board layout, and a COLLECT button where a walk now ends next to the chest.
+  `CollectTest`, `CameraZoomTest` and `SmoothMovementTest` point at the new spot. New `LevelTest` cases for the cow and
+  the chest.

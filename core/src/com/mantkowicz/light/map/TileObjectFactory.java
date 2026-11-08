@@ -20,6 +20,8 @@ public class TileObjectFactory {
                 return new TilePlayer();
             case DOG:
                 return new TileDog();
+            case COW:
+                return new TileCow();
             default:
                 throw new IllegalArgumentException("There is no tile implementation for this tile object type: " + objectType.name());
         }
