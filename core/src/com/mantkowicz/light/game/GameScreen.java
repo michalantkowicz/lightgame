@@ -41,6 +41,7 @@ public class GameScreen extends ScreenAdapter {
     private static final float DEFAULT_AMBIENT_LIGHT = 0.02f;
 
     private final String mapName;
+    private final float cameraZoom;
     private final ResourcesService resourcesService;
     private final GameEventService gameEventService;
     private final World world;
@@ -52,8 +53,10 @@ public class GameScreen extends ScreenAdapter {
     private RayHandler rayHandler;
     private final List<Feature> features = new ArrayList<>();
 
-    public GameScreen(String mapName, ResourcesService resourcesService, GameEventService gameEventService, World world) {
+    public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService, GameEventService gameEventService,
+                      World world) {
         this.mapName = mapName;
+        this.cameraZoom = cameraZoom;
         this.resourcesService = resourcesService;
         this.gameEventService = gameEventService;
         this.world = world;
@@ -61,11 +64,15 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        Viewport viewport = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT);
-        gameStage = new GameStage(viewport, resourcesService);
-        menuStage = new MenuStage(viewport);
-        notificationStage = new NotificationStage(viewport);
-        uiStage = new UiStage(viewport);
+        // the world (board, actors, menus and notifications next to them) moves and zooms with the camera;
+        // the UI (buttons, windows) has its own fixed camera, so it stays in place and keeps its size
+        Viewport worldViewport = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT);
+        ((OrthographicCamera) worldViewport.getCamera()).zoom = cameraZoom;
+        Viewport uiViewport = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT);
+        gameStage = new GameStage(worldViewport, resourcesService);
+        menuStage = new MenuStage(worldViewport);
+        notificationStage = new NotificationStage(worldViewport);
+        uiStage = new UiStage(uiViewport);
 
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(uiStage);
@@ -177,6 +184,7 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         gameStage.getViewport().update(width, height, true);
+        uiStage.getViewport().update(width, height, true);
     }
 
     @Override

@@ -7,7 +7,7 @@ camera: at=(1604.1,2987.4) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=239.9 color=555555ff
 menu buttons: 0
-text on game stage: "60" at=(1904.1,3507.4) alpha=1.0 color=ffffffff
+text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## camera moving
 crash: none
 player: cell=(13,24) at=(1664.0,3072.0) status=IDLE
@@ -17,7 +17,7 @@ camera: at=(1697.0,3098.8) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=235.9 color=555555ff
 menu buttons: 0
-text on game stage: "60" at=(1997.0,3618.8) alpha=1.0 color=ffffffff
+text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## camera centered
 crash: none
 player: cell=(13,24) at=(1664.0,3072.0) status=IDLE
@@ -27,4 +27,4 @@ camera: at=(1728.0,3136.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=244.4 color=555555ff
 menu buttons: 0
-text on game stage: "60" at=(2028.0,3656.0) alpha=1.0 color=ffffffff
+text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff

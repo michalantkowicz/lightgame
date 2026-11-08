@@ -72,8 +72,8 @@ public final class GameDriver {
     private String crash;
     private Vector2 pointer = new Vector2();
 
-    private GameDriver(String mapName) {
-        game = new HeadlessGame(mapName);
+    private GameDriver(String mapName, float cameraZoom) {
+        game = new HeadlessGame(mapName, cameraZoom);
     }
 
     /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
@@ -88,7 +88,16 @@ public final class GameDriver {
 
     /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
     public static GameDriver start(String mapName) {
-        GameDriver driver = new GameDriver(mapName);
+        return start(mapName, HeadlessGame.TEST_CAMERA_ZOOM);
+    }
+
+    /** Starts the game on the test map with another camera zoom (0.5 = everything in the world twice as big). */
+    public static GameDriver startZoomed(float cameraZoom) {
+        return start(HeadlessGame.TEST_MAP, cameraZoom);
+    }
+
+    private static GameDriver start(String mapName, float cameraZoom) {
+        GameDriver driver = new GameDriver(mapName, cameraZoom);
         driver.frames(START_FRAMES);
         return driver;
     }
@@ -687,6 +696,27 @@ public final class GameDriver {
             throw new IllegalStateException("The collect window is not open");
         }
         return slots;
+    }
+
+    /** How many screen pixels wide a cell is drawn right now. */
+    public float cellSizeOnScreen(Cell cell) {
+        Vector2 left = gameStage().stageToScreenCoordinates(new Vector2(cell.col() * CELL_SIZE, cell.row() * CELL_SIZE));
+        Vector2 right = gameStage().stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
+        return right.x - left.x;
+    }
+
+    /** Where a button is on the screen and how big: "x,y wxh" in screen pixels (bottom-left corner, y down). */
+    public String buttonOnScreen(String text) {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
+                Vector2 corner = uiStage().stageToScreenCoordinates(button.localToStageCoordinates(new Vector2()));
+                Vector2 opposite = uiStage().stageToScreenCoordinates(
+                        button.localToStageCoordinates(new Vector2(button.getWidth(), button.getHeight())));
+                return Snapshot.number(corner.x) + "," + Snapshot.number(corner.y) + " "
+                        + Snapshot.number(opposite.x - corner.x) + "x" + Snapshot.number(corner.y - opposite.y);
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
     }
 
     private Vector2 uiScreenPosition(Actor actor) {

@@ -26,18 +26,24 @@ public final class HeadlessGame {
 
     /** The map the tests were written for (map.tmx, the original dark house). */
     public static final String TEST_MAP = "map.tmx";
+    /** The goldens were recorded at the designed zoom, whatever Main.CAMERA_ZOOM is set to. */
+    public static final float TEST_CAMERA_ZOOM = 1f;
 
     public HeadlessGame() {
         this(TEST_MAP);
     }
 
     public HeadlessGame(String mapName) {
+        this(mapName, TEST_CAMERA_ZOOM);
+    }
+
+    public HeadlessGame(String mapName, float cameraZoom) {
         initializeGdx();
         Gdx.graphics = graphics;
         Gdx.input = input;
         MathUtils.random.setSeed(RANDOM_SEED);
 
-        game = new Main(mapName);
+        game = new Main(mapName, cameraZoom);
         game.create();
         game.resize(SCREEN_WIDTH, SCREEN_HEIGHT);
     }

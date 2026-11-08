@@ -17,9 +17,10 @@ public class FPSFeature implements Feature {
 
     public FPSFeature(GameContext context, Vector2 offset) {
         this.offset = offset;
-        camera = context.getGameStage().getCamera();
+        // on the UI stage: it stays in place and keeps its size whatever the world camera does
+        camera = context.getUiStage().getCamera();
         fpsLabel = createLabel(context.getResourcesService().getFont(), NotificationStyle.DEFAULT, "");
-        context.getGameStage().addActor(fpsLabel);
+        context.getUiStage().addActor(fpsLabel);
     }
 
     @Override
