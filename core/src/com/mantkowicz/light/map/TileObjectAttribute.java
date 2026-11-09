@@ -2,6 +2,7 @@ package com.mantkowicz.light.map;
 
 public enum TileObjectAttribute {
     OBJECT_CLASS("objectClass"),
+    SPRITE("sprite"),
     TEXTURE_NAME("textureName"),
     TEXTURE_OFFSET("textureOffset"),
     LIGHT_TYPE("lightType"),

@@ -11,6 +11,7 @@ Turns a sprite pack (Sprout Lands) into everything the project needs:
   android/assets/sprites/sprites.atlas  the sprite sheets listed in the game's Sprite enum, in one texture (generated)
   android/assets/sprites/animations.json  animation names, frame counts, durations                     (generated)
   core/src/.../resources/Action.java  enum of the animation actions named in pack.json                 (generated)
+  assets-src/lightgame.tiled-project  Tiled project: dropdowns for objectClass and sprite (from the game's enums)
 
   build/assets-preview/               animated GIF of every animation, terrain overlays, report        (git-ignored)
 
@@ -60,6 +61,9 @@ GAME_SPRITES_DIR = GAME_ASSETS / "sprites"
 GAME_RESOURCES_SRC = ROOT / "core" / "src" / "com" / "mantkowicz" / "light" / "resources"
 SPRITE_ENUM = GAME_RESOURCES_SRC / "Sprite.java"  # written by hand: the sheets the game uses
 ACTION_ENUM = GAME_RESOURCES_SRC / "Action.java"  # generated from the row names in pack.json
+OBJECT_TYPE_ENUM = ROOT / "core" / "src" / "com" / "mantkowicz" / "light" / "map" / "TileObjectType.java"  # by hand
+OBJECT_CLASS, SPRITE = "objectClass", "sprite"  # map object properties, offered as dropdowns in Tiled
+PROPERTY_TYPES = {OBJECT_CLASS: "ObjectClass", SPRITE: "Sprite"}  # property -> its enum in lightgame.tiled-project
 DIRECTIONS = ("down", "up", "left", "right")  # the game's Direction enum
 TILES_ATLAS = "tiles"
 SPRITES_ATLAS = "sprites"
@@ -491,6 +495,31 @@ def used_sprites(all_sheets):
     return used
 
 
+def java_enum_body(path):
+    """The constants part of a Java enum (up to the first ';'), without comments."""
+    code = re.sub(r"//[^\n]*|/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+    body = re.search(r"\benum\s+\w+\s*\{(.*?);", code, flags=re.S)
+    if body is None:
+        raise SystemExit(f"Can't read the constants of {path.relative_to(ROOT)}")
+    return body.group(1)
+
+
+def object_types(sprites):
+    """
+    {objectClass: [sprites it can be drawn with, default first]} from the game's TileObjectType enum, e.g.
+    {"PLAYER": [], "COW": ["COW_BROWN", "COW_PINK"]}. Every sprite must be in the Sprite enum (so it's packed).
+    """
+    types = {}
+    for constant, arguments in re.findall(r"\b([A-Z][A-Z0-9_]*)\s*(?:\(([^()]*)\))?\s*(?=,|$)", java_enum_body(OBJECT_TYPE_ENUM)):
+        types[constant] = re.findall(r"\bSprite\.([A-Z][A-Z0-9_]*)", arguments)
+        for sprite in types[constant]:
+            if sprite not in sprites:
+                raise SystemExit(f"{OBJECT_TYPE_ENUM.name}: {constant} uses Sprite.{sprite}, which isn't in {SPRITE_ENUM.name}")
+    if not types:
+        raise SystemExit(f"No constants found in {OBJECT_TYPE_ENUM.relative_to(ROOT)}")
+    return types
+
+
 def split_row(row):
     """'walk_left' -> ('walk', 'left'), 'open' -> ('open', None); unnamed rows ('row_03') -> (None, None)."""
     if re.fullmatch(r"row_\d+", row):
@@ -779,6 +808,42 @@ def game_map(map_path, root, tilesets, atlas_path):
     return xml_text(game_root).replace("?>\n", "?>\n<!--" + note + "-->\n", 1)
 
 
+def use_dropdowns(map_path):
+    """
+    Marks objectClass and sprite properties typed as plain text (older maps, or added by hand) with their enum, so Tiled
+    shows a dropdown for them. Only adds the propertytype attribute; the rest of the file stays as it is.
+    """
+    text = map_path.read_text(encoding="utf-8")
+    pattern = r'<property name="(%s)"(?![^>]*\bpropertytype=)' % "|".join(PROPERTY_TYPES)
+    marked = re.sub(pattern, lambda m: f'{m.group(0)} propertytype="{PROPERTY_TYPES[m.group(1)]}"', text)
+    if marked != text:
+        map_path.write_text(marked, encoding="utf-8")
+        print(f"  {map_path.name}: objectClass and sprite are dropdowns now")
+
+
+def check_objects(map_path, root, types):
+    """Every map object the game reads (an ellipse) has a known objectClass and, if it picks one, one of its sprites."""
+    for group in root.iter("objectgroup"):
+        for obj in group.iter("object"):
+            if obj.find("ellipse") is None:
+                continue
+            where = f"{map_path.name}: object {obj.get('id')}" + (f" ('{obj.get('name')}')" if obj.get("name") else "")
+            props = {p.get("name"): p.get("value", p.text) for p in obj.iter("property")}
+            object_class = props.get(OBJECT_CLASS)
+            if not object_class:
+                raise SystemExit(f"{where} has no {OBJECT_CLASS}: pick one in Tiled ({', '.join(sorted(types))})")
+            if object_class not in types:
+                close = difflib.get_close_matches(object_class, types, n=1)
+                hint = f", did you mean {close[0]}?" if close else f" ({', '.join(sorted(types))})"
+                raise SystemExit(f"{where}: {OBJECT_CLASS} {object_class} isn't in {OBJECT_TYPE_ENUM.name}{hint}")
+            sprite = props.get(SPRITE)
+            if sprite and sprite not in types[object_class]:
+                allowed = types[object_class]
+                raise SystemExit(f"{where}: {object_class} can't be drawn with {SPRITE} {sprite}"
+                                 + (f", only with {', '.join(allowed)}" if allowed else f": remove the {SPRITE} property")
+                                 + f" (the {object_class} line in {OBJECT_TYPE_ENUM.name})")
+
+
 def render_map(root, tilesets, tile_images, scale=2):
     """The visible tile layers drawn in order (first frame of animated tiles), as a quick look without Tiled."""
     width, height = int(root.get("width")), int(root.get("height"))
@@ -798,7 +863,7 @@ def render_map(root, tilesets, tile_images, scale=2):
     return canvas.resize((canvas.width * scale, canvas.height * scale), Image.NEAREST)
 
 
-def build_maps(tilesets_by_name, pack_available):
+def build_maps(tilesets_by_name, pack_available, types):
     print("Maps")
     maps = sorted(SRC_MAPS_DIR.glob("*.tmx"))
     if not maps:
@@ -807,7 +872,9 @@ def build_maps(tilesets_by_name, pack_available):
     regions, used_total = [], {}
     parsed = []
     for map_path in maps:
+        use_dropdowns(map_path)
         root = ET.parse(map_path).getroot()
+        check_objects(map_path, root, types)
         if root.get("infinite") == "1":
             raise SystemExit(f"{map_path.name} is an infinite map; the game needs a fixed size. In Tiled: Map → Map "
                              f"Properties → untick Infinite.")
@@ -869,10 +936,17 @@ def autotile(tileset, wangset_index, filled, width, height):
     return grid
 
 
-def create_tiled_project():
-    """assets-src/lightgame.tiled-project: open it in Tiled (File > Open Project) to see all maps and tilesets."""
+def create_tiled_project(types, sprites):
+    """
+    assets-src/lightgame.tiled-project: open it in Tiled (File > Open Project) to see all maps and tilesets. It defines
+    the enums ObjectClass (TileObjectType) and Sprite, so objectClass and sprite are picked from dropdowns in Tiled.
+    """
+    values = {OBJECT_CLASS: sorted(types), SPRITE: sorted(sprites)}
+    property_types = [{"id": index + 1, "name": PROPERTY_TYPES[prop], "storageType": "string", "type": "enum",
+                       "values": values[prop], "valuesAsFlags": False}
+                      for index, prop in enumerate((OBJECT_CLASS, SPRITE))]
     project = {"automappingRulesFile": "", "commands": [], "compatibilityVersion": 1100, "extensionsPath": "extensions",
-               "folders": ["maps", "tilesets"], "properties": [], "propertyTypes": []}
+               "folders": ["maps", "tilesets"], "properties": [], "propertyTypes": property_types}
     save_if_changed(SRC_DIR / "lightgame.tiled-project", json.dumps(project, indent=4) + "\n")
 
 
@@ -924,7 +998,7 @@ def create_starter_map(tilesets_by_name, config):
                                                "y": str(10 * tile + 4), "width": "8", "height": "8"})
     ET.SubElement(player, "ellipse")
     props = ET.SubElement(player, "properties")
-    ET.SubElement(props, "property", {"name": "objectClass", "value": "PLAYER"})
+    ET.SubElement(props, "property", {"name": OBJECT_CLASS, "propertytype": PROPERTY_TYPES[OBJECT_CLASS], "value": "PLAYER"})
     save_if_changed(SRC_MAPS_DIR / "level1.tmx", xml_text(root))
     print("  created assets-src/maps/level1.tmx")
 
@@ -976,9 +1050,10 @@ def main():
     check_pack_coverage(config, pack)
     tilesets = build_tilesets(config, pack)
     animations, used = build_sprites(config, pack)
-    create_tiled_project()
+    types = object_types(set(used.values()))
+    create_tiled_project(types, used.values())
     create_starter_map(tilesets, config)
-    build_maps(tilesets, pack_available=True)
+    build_maps(tilesets, pack_available=True, types=types)
 
     report = PREVIEW_DIR / "report.txt"
     report.write_text("\n".join(warnings) + "\n" if warnings else "no warnings\n", encoding="utf-8")

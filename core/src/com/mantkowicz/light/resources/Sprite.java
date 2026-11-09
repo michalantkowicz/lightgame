@@ -8,6 +8,10 @@ package com.mantkowicz.light.resources;
 public enum Sprite {
     RABBIT("rabbit"),
     COW_BROWN("cow_brown"),
+    COW_GREEN("cow_green"),
+    COW_LIGHT("cow_light"),
+    COW_PINK("cow_pink"),
+    COW_PURPLE("cow_purple"),
     CHEST("chest");
 
     private final String sheet;

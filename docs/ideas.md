@@ -33,16 +33,6 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   drawn layer can block (an invisible one still works for invisible barriers). The loader reads the properties instead of
   names; the tool warns about leftovers (a layer named `collision` without the class, unknown properties). Needs:
   migrating `level1`, `PackedMapTest` (its `LevelVariant` layers), the READMEs.
-- **Colours and a dropdown for map-placed objects** (2026‑11‑08, trimmed 2026‑11‑09). Animated objects are already
-  placed from Tiled: an object with `objectClass` `COW` or `CHEST` becomes a `SpriteActor` through its `TileObjectType`
-  line. What's left: (1) **colours**: `Cow` always uses `Sprite.COW_BROWN`, though the pack has five cows sharing one
-  layout. An optional `sprite` property (e.g. `COW_PINK`) could pick the variant, checked with `Sprite.valueOf` and
-  passed to the actor's constructor; only colours listed in `Sprite` are packed. (2) **no free text in Tiled**:
-  `objectClass` is typed by hand, and a typo only shows when the game starts (`TileObjectType.valueOf` fails without
-  saying which object or map). The tool already reads every map and writes `assets-src/lightgame.tiled-project` (its
-  `propertyTypes` are empty), so it could write the `TileObjectType` and `Sprite` names there as custom enum property
-  types, which makes Tiled show dropdowns, and stop on unknown values with the map and object. Do it with the second
-  colour of an animal or when a typo in a map costs time.
 - **Door animation** (2026‑11‑08). `Tilesets/Building parts/door animation sprites.png` is only a tileset: its frames
   overlap (a 3px pillar plus the door leaf every 16px; the wide door the same with 48px), so no frame grid cuts them right
   (see the note in `tools/assets/pack.json`). To animate doors, `pack.json` needs frames given as rectangles
