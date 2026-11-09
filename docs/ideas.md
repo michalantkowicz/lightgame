@@ -46,11 +46,15 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   (`"frames": [[x, y, w, h], ...]` per row, plus how to anchor frames of different widths), and `cut_frames` in the tool
   has to support them. Check the result on the preview page.
 - **Row names out of `pack.json`** (2026‑11‑09). `tools/assets/pack.json` mixes two things: the pack's layout (files,
-  frame sizes, offsets, terrains), which changes only with a new version of the pack, and the names of animation rows
-  (`idle`, `walk_left`…), which change whenever the game starts using another animation. So a file that reads as
-  "describe the pack once" gets edited for game decisions (e.g. naming the brown cow's `idle` and `walk`). Fix: move the
-  row names to a game-owned file, e.g. `tools/assets/animation-names.json` (`{"cow_brown": ["idle", "walk"], "rabbit":
-  ["idle_down", …]}`, keyed by sheet; a variant could inherit its entry's names); the tool merges it with `pack.json`, the
-  output (`animations.json`, the `Action` enum) stays the same. Then `pack.json` is touched only when the pack changes,
-  and adding a sprite means a line in the `Sprite` enum plus its row names in that file. Update the READMEs (step 2 of
-  "Adding an animated sprite") and the `_help` notes in `pack.json`.
+  frame sizes, offsets, variants, terrains), which changes only with a new version of the pack, and the names of
+  animation rows (`idle`, `walk_left`, `open_front`…), which change whenever the game starts using another animation.
+  So a file that reads as "describe the pack once" gets edited for game decisions: naming the cow's `idle` and `walk`
+  and the chest's `open_front` for `Cow` and `Chest` did exactly that. Fix: move the row names to a game-owned file,
+  e.g. `tools/assets/animation-names.json` (`{"cow": ["idle", "walk"], "chest": ["open_front", "open_side"], "rabbit":
+  ["idle_down", …]}`), keyed by the `pack.json` entry, so the colour variants (`cow_brown`, `cow_pink`…) share their
+  entry's names as they do now. The tool merges it with `pack.json` and warns about names for entries that don't exist;
+  the output (`animations.json`, the `Action` enum) stays the same. Then `pack.json` is touched only when the pack
+  changes, and a new animated object means its `Sprite` line, its row names in that file and, when it's placed from a
+  map, a `SpriteActor` subclass with its `TileObjectType` line. Update the READMEs (step 2 of "Adding an animated
+  sprite" in README.md, "Sprites in the game" in tools/assets/README.md, whose note that animals still use `row_NN` is
+  already out of date) and the `_help` notes in `pack.json`.
