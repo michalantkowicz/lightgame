@@ -89,8 +89,13 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
 
 ## 2026‑11‑09, a cow and the Sprout Lands chest (branch `cow-and-chest`)
 
-- **Cow:** new `Cow` actor (`Sprite.COW_BROWN`, plays its `idle` row) and map object `COW` (`TileCow`, blocks its tile).
-  The brown cow's first two rows are named `idle` and `walk` in `pack.json`; the rest stay `row_02`… for now. On level1 at (4,9).
+- **Sprite actors:** a board actor drawn from one Sprout Lands sheet is a small class extending `SpriteActor` (picture
+  one tile big, blocks its tile, `playAnimation`/`playBackwards(Action)`), with behaviours added as plugins. It is
+  registered with one `TileObjectType` line, e.g. `COW(Cow::new)`, `CHEST(Chest::new)`; the generic `TileSpriteActor`
+  creates it from the map (no per-type tile class: `TileCow`/`TileChest` are gone). Adding one = its class + that line +
+  its `Sprite` line. No `Creature` layer in between: nothing shares more than `SpriteActor` gives yet.
+- **Cow:** `Cow` (`Sprite.COW_BROWN`, plays its `idle` row), placed in Tiled with objectClass `COW`. The brown cow's
+  first two rows are named `idle` and `walk` in `pack.json`; the rest stay `row_02`… for now. On level1 at (4,9).
 - **Chest:** drawn from the Sprout Lands sheet everywhere (`Sprite.CHEST`; `chest.png` is no longer used). It blocks
   its tile and is used from a neighbouring one (`isDistant()`); clicking it walks to the free neighbour with the
   shortest walk (`BoardMovementPlugin.walkTarget`, `BoardService.isUsedFromNeighbour`, no "no path" notification).

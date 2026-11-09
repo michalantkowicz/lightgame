@@ -7,12 +7,13 @@ import static com.mantkowicz.light.map.TileObjectAttribute.TEXTURE_NAME;
 
 public class TileObjectFactory {
     public static TileObject createTileObject(TileObjectType objectType, MapProperties objectProperties) {
+        if (objectType.getSpriteActor() != null) {
+            return new TileSpriteActor(objectType, objectType.getSpriteActor());
+        }
         switch (objectType) {
             case SPRITE:
                 assertMandatoryProperties(objectProperties, TEXTURE_NAME);
                 return new TileSprite(objectProperties);
-            case CHEST:
-                return new TileChest();
             case LIGHT:
                 assertMandatoryProperties(objectProperties, LIGHT_TYPE);
                 return new TileLight(objectProperties);
@@ -20,8 +21,6 @@ public class TileObjectFactory {
                 return new TilePlayer();
             case DOG:
                 return new TileDog();
-            case COW:
-                return new TileCow();
             default:
                 throw new IllegalArgumentException("There is no tile implementation for this tile object type: " + objectType.name());
         }

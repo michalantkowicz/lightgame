@@ -36,8 +36,7 @@ import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
-import com.mantkowicz.light.map.TileChest;
-import com.mantkowicz.light.map.TileCow;
+import com.mantkowicz.light.map.TileSpriteActor;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
@@ -614,9 +613,8 @@ public final class GameDriver {
 
     private static String kindOf(TileObject object) {
         if (object instanceof TileSprite) return "SPRITE";
-        if (object instanceof TileChest) return "CHEST";
         if (object instanceof TileDog) return "DOG";
-        if (object instanceof TileCow) return "COW";
+        if (object instanceof TileSpriteActor) return object.getObjectType().name();
         if (object instanceof TilePlayer) return "PLAYER";
         if (object instanceof TileLight) return "LIGHT";
         throw new IllegalStateException("Unknown tile object " + object.getClass());

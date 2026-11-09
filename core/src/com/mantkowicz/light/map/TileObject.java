@@ -11,6 +11,10 @@ public abstract class TileObject {
         this.objectType = objectType;
     }
 
+    public TileObjectType getObjectType() {
+        return objectType;
+    }
+
     public abstract void prepare(Tile tile, GameContext context);
 
     public abstract boolean isAccessible();
