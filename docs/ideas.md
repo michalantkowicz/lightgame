@@ -44,3 +44,17 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   (see the note in `tools/assets/pack.json`). To animate doors, `pack.json` needs frames given as rectangles
   (`"frames": [[x, y, w, h], ...]` per row, plus how to anchor frames of different widths), and `cut_frames` in the tool
   has to support them. Check the result on the preview page.
+- **Feature tests on their own small maps** (2026‑11‑09). Most e2e tests check general features (collecting, walking,
+  hops, camera and zoom, smooth movement, lights, resizing) but run on the shipped level1 and house maps at fixed cells,
+  with goldens of those maps. That ties them to level design: moving the house chest from (10,24) to (8,24) re-recorded
+  16 goldens and changed three tests (`CollectTest`, `CameraZoomTest`, `SmoothMovementTest`) without catching any bug,
+  and it makes editing maps feel risky. (It made sense while they were characterization tests for the refactoring.)
+  Suggested fix, three kinds of tests:
+  - **feature tests** on small fixture maps built for them (e.g. a 6x6 room with a chest, a cow and one corridor), from a
+    small builder or committed `.tmx` files under `e2e/`, using the game's atlases (no pack pictures copied).
+    `LevelVariant` is halfway there but copies level1, so it keeps the coupling;
+  - **content checks** on every shipped map, without coordinates or goldens: it loads, every object type and sprite
+    resolves, every interactive object (chest, cow) has a free neighbour the player can reach. `LevelTest` and
+    `PackedMapTest` move this way;
+  - **unit tests** without a map (path finding, inventory, board layout), already fine.
+  Do it step by step on its own branch: `CollectTest` first to prove the fixture builder, then the others.
