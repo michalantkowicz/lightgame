@@ -48,7 +48,9 @@ tool again.
    dropdown (the tool defines the type in the project from the game's `TileObjectType`, and turns plain text
    `objectClass` properties into it). Sprite actors take an optional `sprite` property (type `Sprite`) that picks how
    they look, e.g. `COW_PINK` for a pink cow; the allowed ones are on the actor's line in `TileObjectType`. The tool
-   stops on an unknown `objectClass` or a `sprite` the object can't use, naming the map and object.
+   stops on an unknown `objectClass` or a `sprite` the object can't use, naming the map and object. Tiled reads the
+   project only when it opens it: after the tool changed the dropdowns (a new `TileObjectType` or `Sprite` line),
+   reopen the project or restart Tiled to see the new values.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 

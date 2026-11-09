@@ -63,7 +63,8 @@ The preview page shows every sheet in the pack, so you can pick what to use.
    direction for rows like `eat`. Animations are never named by strings in Java.
 6. To place it in a map: a `SpriteActor` subclass (like `Cow`) and its line in `TileObjectType` listing the sprites it
    can use, e.g. `COW(Cow::new, Sprite.COW_BROWN, Sprite.COW_PINK)`. In Tiled pick `COW` in the object's `objectClass`
-   dropdown, and optionally a `sprite` (`COW_PINK`); the first one on the line is the default.
+   dropdown, and optionally a `sprite` (`COW_PINK`); the first one on the line is the default. Run the tool and reopen
+   the project in Tiled (or restart it) to see new values in the dropdowns.
 
 Mistakes are caught early:
 - a typo in the `Sprite` enum stops the tool with a "did you mean" hint;
