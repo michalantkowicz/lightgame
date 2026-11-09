@@ -11,8 +11,14 @@ public interface Collectible extends Thumbnail, InventoryOwner {
      */
     boolean isDistant();
 
+    /**
+     * The collect window for this collectible opens (e.g. a chest opens its lid).
+     */
     void beforeCollect();
 
+    /**
+     * The collect window for this collectible closes, with OK or CANCEL (e.g. a chest shuts its lid).
+     */
     void afterCollect();
 
     String getName();

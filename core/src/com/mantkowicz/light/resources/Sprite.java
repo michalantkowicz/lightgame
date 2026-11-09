@@ -6,7 +6,9 @@ package com.mantkowicz.light.resources;
  * shown in build/assets-preview/index.html.
  */
 public enum Sprite {
-    RABBIT("rabbit");
+    RABBIT("rabbit"),
+    COW_BROWN("cow_brown"),
+    CHEST("chest");
 
     private final String sheet;
 

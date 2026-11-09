@@ -84,6 +84,18 @@ public class BoardService {
         }
     }
 
+    /**
+     * Whether the tile holds something used from a neighbouring tile (a chest): clicking it means "walk next to it".
+     */
+    public boolean isUsedFromNeighbour(Tile tile) {
+        for (GameActor actor : gameActorsByTile.getGameActors(tile)) {
+            if (actor instanceof Collectible && ((Collectible) actor).isDistant()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void unregisterGameActor(Tile tile, GameActor gameActor) {
         gameActorsByTile.removeGameActor(tile, gameActor);
     }
