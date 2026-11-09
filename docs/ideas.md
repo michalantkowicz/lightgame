@@ -44,3 +44,12 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   (see the note in `tools/assets/pack.json`). To animate doors, `pack.json` needs frames given as rectangles
   (`"frames": [[x, y, w, h], ...]` per row, plus how to anchor frames of different widths), and `cut_frames` in the tool
   has to support them. Check the result on the preview page.
+- **Row names out of `pack.json`** (2026‑11‑09). `tools/assets/pack.json` mixes two things: the pack's layout (files,
+  frame sizes, offsets, terrains), which changes only with a new version of the pack, and the names of animation rows
+  (`idle`, `walk_left`…), which change whenever the game starts using another animation. So a file that reads as
+  "describe the pack once" gets edited for game decisions (e.g. naming the brown cow's `idle` and `walk`). Fix: move the
+  row names to a game-owned file, e.g. `tools/assets/animation-names.json` (`{"cow_brown": ["idle", "walk"], "rabbit":
+  ["idle_down", …]}`, keyed by sheet; a variant could inherit its entry's names); the tool merges it with `pack.json`, the
+  output (`animations.json`, the `Action` enum) stays the same. Then `pack.json` is touched only when the pack changes,
+  and adding a sprite means a line in the `Sprite` enum plus its row names in that file. Update the READMEs (step 2 of
+  "Adding an animated sprite") and the `_help` notes in `pack.json`.
