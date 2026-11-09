@@ -38,9 +38,10 @@ frame 175: player cell=(7,23) at=(896.0,2944.0)
 crash: none
 player: cell=(7,23) at=(896.0,2944.0) status=IDLE
 dog: cell=(9,22)
-chest: cell=(10,24)
+chest: cell=(8,24)
 camera: at=(1111.3,2932.9) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 torch: at=(1344.0,3323.0) distance=235.9 color=555555ff
 menu buttons: 0
+text on ui stage: "COLLECT" at=(272.0,176.0) alpha=1.0 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff

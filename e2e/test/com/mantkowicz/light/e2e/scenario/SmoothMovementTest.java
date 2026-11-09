@@ -18,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SmoothMovementTest {
     private static final Cell START = new Cell(10, 22);
     private static final Cell KITCHEN = new Cell(7, 23);
-    private static final Cell BEHIND_CHEST = new Cell(10, 26);
+    /** Up the corridor, away from the chest (the chest at (8,24) is used from (7,23), (7,24) or (8,23)). */
+    private static final Cell UP_THE_CORRIDOR = new Cell(10, 26);
     private static final float PX_PER_FRAME = 128f / (0.4f * 60);
 
     @Test
@@ -54,10 +55,13 @@ class SmoothMovementTest {
     @Test
     void walkingPastTheChestLeavesNoCollectButton() {
         GameDriver game = GameDriver.start();
-        game.click(BEHIND_CHEST);
+        game.click(KITCHEN); // next to the chest: the COLLECT button shows
         game.seconds(3);
-        String scene = game.snapshot("behind the chest");
-        assertEquals(BEHIND_CHEST, game.playerCell());
+        assertTrue(game.snapshot("next to the chest").contains("COLLECT"));
+        game.click(UP_THE_CORRIDOR); // walks on past the chest without stopping
+        game.seconds(3);
+        String scene = game.snapshot("up the corridor");
+        assertEquals(UP_THE_CORRIDOR, game.playerCell());
         assertFalse(scene.contains("COLLECT"), "the COLLECT button fades out once the player walks on:\n" + scene);
     }
 }

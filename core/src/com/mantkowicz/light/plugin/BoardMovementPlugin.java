@@ -52,8 +52,32 @@ public class BoardMovementPlugin implements Plugin {
         followTiles();
     }
 
-    private void walkTo(Tile target) {
+    /**
+     * The clicked tile, or for something used from a neighbouring tile (a chest) the free neighbour with the shortest
+     * walk (where the player stands if it's already next to it).
+     */
+    private Tile walkTarget(Tile clicked, Tile current) {
+        if (clicked.isAccessible() || !boardService.isUsedFromNeighbour(clicked)) {
+            return clicked;
+        }
+        if (clicked.getNeighbours().contains(current)) {
+            return current;
+        }
+        Tile best = clicked;
+        int shortest = Integer.MAX_VALUE;
+        for (Tile neighbour : clicked.getNeighbours()) {
+            int length = neighbour.isAccessible() ? boardService.getPath(current, neighbour).getPathNodes().size() : 0;
+            if (length > 0 && length < shortest) {
+                best = neighbour;
+                shortest = length;
+            }
+        }
+        return best;
+    }
+
+    private void walkTo(Tile clicked) {
         Tile current = tileUnderPlayer();
+        Tile target = walkTarget(clicked, current);
         List<Tile> nodes = new ArrayList<>(boardService.getPath(current, target).getPathNodes());
         if (nodes.isEmpty() && (target != current || IDLE.equals(player.getStatus()))) {
             return; // unreachable, or already standing there

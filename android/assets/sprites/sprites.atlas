@@ -2,6 +2,162 @@ sprites.png
 size:1024,512
 filter:Nearest,Nearest
 repeat:none
+chest/open_front
+  bounds:653,299,18,21
+  index:0
+chest/open_front
+  bounds:673,299,18,21
+  index:1
+chest/open_front
+  bounds:693,299,18,21
+  index:2
+chest/open_front
+  bounds:713,299,18,21
+  index:3
+chest/open_front
+  bounds:733,299,18,21
+  index:4
+chest/open_side
+  bounds:753,299,18,21
+  index:0
+chest/open_side
+  bounds:773,299,18,21
+  index:1
+chest/open_side
+  bounds:793,299,18,21
+  index:2
+chest/open_side
+  bounds:813,299,18,21
+  index:3
+chest/open_side
+  bounds:833,299,18,21
+  index:4
+cow_brown/idle
+  bounds:354,266,29,28
+  index:0
+cow_brown/idle
+  bounds:385,266,29,28
+  index:1
+cow_brown/idle
+  bounds:416,266,29,28
+  index:2
+cow_brown/row_02
+  bounds:695,266,29,28
+  index:0
+cow_brown/row_02
+  bounds:726,266,29,28
+  index:1
+cow_brown/row_02
+  bounds:757,266,29,28
+  index:2
+cow_brown/row_02
+  bounds:788,266,29,28
+  index:3
+cow_brown/row_02
+  bounds:819,266,29,28
+  index:4
+cow_brown/row_02
+  bounds:850,266,29,28
+  index:5
+cow_brown/row_02
+  bounds:881,266,29,28
+  index:6
+cow_brown/row_03
+  bounds:912,266,29,28
+  index:0
+cow_brown/row_03
+  bounds:943,266,29,28
+  index:1
+cow_brown/row_03
+  bounds:974,266,29,28
+  index:2
+cow_brown/row_04
+  bounds:2,299,29,28
+  index:0
+cow_brown/row_04
+  bounds:33,299,29,28
+  index:1
+cow_brown/row_04
+  bounds:64,299,29,28
+  index:2
+cow_brown/row_04
+  bounds:95,299,29,28
+  index:3
+cow_brown/row_05
+  bounds:126,299,29,28
+  index:0
+cow_brown/row_05
+  bounds:157,299,29,28
+  index:1
+cow_brown/row_05
+  bounds:188,299,29,28
+  index:2
+cow_brown/row_05
+  bounds:219,299,29,28
+  index:3
+cow_brown/row_05
+  bounds:250,299,29,28
+  index:4
+cow_brown/row_05
+  bounds:281,299,29,28
+  index:5
+cow_brown/row_05
+  bounds:312,299,29,28
+  index:6
+cow_brown/row_06
+  bounds:343,299,29,28
+  index:0
+cow_brown/row_06
+  bounds:374,299,29,28
+  index:1
+cow_brown/row_06
+  bounds:405,299,29,28
+  index:2
+cow_brown/row_06
+  bounds:436,299,29,28
+  index:3
+cow_brown/row_07
+  bounds:467,299,29,28
+  index:0
+cow_brown/row_07
+  bounds:498,299,29,28
+  index:1
+cow_brown/row_07
+  bounds:529,299,29,28
+  index:2
+cow_brown/row_07
+  bounds:560,299,29,28
+  index:3
+cow_brown/row_07
+  bounds:591,299,29,28
+  index:4
+cow_brown/row_07
+  bounds:622,299,29,28
+  index:5
+cow_brown/walk
+  bounds:447,266,29,28
+  index:0
+cow_brown/walk
+  bounds:478,266,29,28
+  index:1
+cow_brown/walk
+  bounds:509,266,29,28
+  index:2
+cow_brown/walk
+  bounds:540,266,29,28
+  index:3
+cow_brown/walk
+  bounds:571,266,29,28
+  index:4
+cow_brown/walk
+  bounds:602,266,29,28
+  index:5
+cow_brown/walk
+  bounds:633,266,29,28
+  index:6
+cow_brown/walk
+  bounds:664,266,29,28
+  index:7
 rabbit/chop_down
   bounds:574,167,42,31
   index:0
