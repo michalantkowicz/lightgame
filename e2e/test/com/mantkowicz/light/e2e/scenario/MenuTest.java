@@ -1,16 +1,25 @@
 package com.mantkowicz.light.e2e.scenario;
 
-import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver.Kind;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
+import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
 /** S8-S11: press and hold an actor for the radial menu; release over a button for its description. */
 class MenuTest {
+    /** a is next to the dog, away from the menu's buttons. */
+    private static final TestMap MAP = TestMap.of(
+            "~~~~~~~",
+            "~...a.~",
+            "~..D..~",
+            "~.....~",
+            "~..P..~",
+            "~.....~",
+            "~~~~~~~");
     @Test
     void holdDogAndReleaseOverButtonShowsDescription() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(MAP.write("menu"));
         game.press(Kind.DOG);
         game.seconds(0.6f);
         game.snapshot("menu opening");
@@ -31,10 +40,10 @@ class MenuTest {
 
     @Test
     void releasingAwayFromButtonClosesMenu() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(MAP.write("menu"));
         game.press(Kind.DOG);
         game.seconds(1.1f);
-        game.dragTo(new Cell(10, 23));
+        game.dragTo(MAP.cell('a'));
         game.release();
         game.seconds(0.5f);
         game.snapshot("released away");
@@ -43,7 +52,7 @@ class MenuTest {
 
     @Test
     void shortTapDoesNotOpenMenu() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(MAP.write("menu"));
         game.click(Kind.DOG);
         game.seconds(1);
         game.snapshot("after tap");
@@ -52,7 +61,7 @@ class MenuTest {
 
     @Test
     void holdPlayerShowsPlayerDescription() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(MAP.write("menu"));
         game.press(Kind.PLAYER);
         game.seconds(1.1f);
         game.dragToMenuButton(0);

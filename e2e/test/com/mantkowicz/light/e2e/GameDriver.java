@@ -311,6 +311,17 @@ public final class GameDriver {
             public void draw(TextureRegion region, float x, float y) {
                 snapshot.line("%s at=%s", regionName(region), Snapshot.point(x, y));
             }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float width, float height) {
+                draw(region, x, y);
+            }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                             float height, float scaleX, float scaleY, float rotation) {
+                draw(region, x, y);
+            }
         };
         try {
             board().draw(recorder, 1);
@@ -636,8 +647,33 @@ public final class GameDriver {
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 
+    /**
+     * The tile's own picture, or for a map drawn from an atlas its layers' tilesets bottom first, e.g. "water+grass_tiles_v2"
+     * (without the tile number: animated water changes it with the clock).
+     */
     private static String backgroundName(Tile tile) {
         TextureRegion region = field(tile, Tile.class, "backgroundTexture");
+        if (region == null) {
+            List<String> layers = new ArrayList<>();
+            SpriteBatch recorder = new SpriteBatch() {
+                @Override
+                public void draw(TextureRegion region, float x, float y, float width, float height) {
+                    layers.add(regionName(region));
+                }
+
+                @Override
+                public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                                 float height, float scaleX, float scaleY, float rotation) {
+                    layers.add(regionName(region));
+                }
+            };
+            try {
+                tile.draw(recorder, 1);
+            } finally {
+                recorder.dispose();
+            }
+            return layers.isEmpty() ? "none" : String.join("+", layers);
+        }
         if (region instanceof AtlasRegion atlasRegion) {
             return atlasRegion.name;
         }
