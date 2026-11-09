@@ -1,6 +1,5 @@
 package com.mantkowicz.light.e2e.scenario;
 
-import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver.Kind;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
@@ -10,8 +9,8 @@ import org.junit.jupiter.api.Test;
 class CameraTest {
     @Test
     void clickingPlayerCentersCamera() {
-        GameDriver game = GameDriver.start();
-        game.click(new Cell(13, 24));
+        GameDriver game = GameDriver.start(WalkingTest.CORRIDOR.write("corridor"));
+        game.click(WalkingTest.CORRIDOR.cell('e'));
         game.seconds(2.5f);
         game.snapshot("after walk");
         game.click(Kind.PLAYER);
@@ -24,10 +23,10 @@ class CameraTest {
 
     @Test
     void cameraFollowsWalkingPlayer() {
-        GameDriver game = GameDriver.start();
-        game.click(new Cell(13, 24));
+        GameDriver game = GameDriver.start(WalkingTest.CORRIDOR.write("corridor"));
+        game.click(WalkingTest.CORRIDOR.cell('e'));
         traceCamera(game, 2.5f);
-        game.click(new Cell(10, 23));
+        game.click(WalkingTest.CORRIDOR.cell('P')); // back where it started
         traceCamera(game, 4);
         game.snapshot("end");
         Golden.assertMatches("camera-tracking", game.timeline());

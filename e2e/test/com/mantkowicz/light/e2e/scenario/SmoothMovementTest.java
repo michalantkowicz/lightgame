@@ -2,6 +2,7 @@ package com.mantkowicz.light.e2e.scenario;
 
 import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
+import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -13,20 +14,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The player walks at one constant speed (128 px in 0.4 s), never stops between tiles, and cuts straight lines
- * where the floor allows it (here: a diagonal into the kitchen).
+ * where the floor allows it (here: a diagonal line three cells left and one up).
  */
 class SmoothMovementTest {
-    private static final Cell START = new Cell(10, 22);
-    private static final Cell KITCHEN = new Cell(7, 23);
-    /** Up the corridor, away from the chest (the chest at (8,24) is used from (7,23), (7,24) or (8,23)). */
-    private static final Cell UP_THE_CORRIDOR = new Cell(10, 26);
+    /** k is next to the chest; u is three cells up from k, on the other side of the chest. */
+    private static final TestMap MAP = TestMap.of(
+            "~~~~~~~~~",
+            "~...u...~",
+            "~.......~",
+            "~..C....~",
+            "~..k....~",
+            "~.....P.~",
+            "~~~~~~~~~");
+    private static final Cell START = MAP.cell('P');
+    private static final Cell NEXT_TO_CHEST = MAP.cell('k');
+    private static final Cell PAST_THE_CHEST = MAP.cell('u');
     private static final float PX_PER_FRAME = 128f / (0.4f * 60);
 
     @Test
     void constantSpeedNoStopsAndADiagonal() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(MAP.write("smooth-movement"));
         assertEquals(START, game.playerCell());
-        game.click(KITCHEN);
+        game.click(NEXT_TO_CHEST);
 
         List<float[]> positions = new ArrayList<>();
         List<String> statuses = new ArrayList<>();
@@ -48,20 +57,20 @@ class SmoothMovementTest {
             diagonal |= Math.abs(dx) > 1 && Math.abs(dy) > 1;
         }
         assertTrue(diagonal, "part of the walk is a straight diagonal line");
-        assertEquals(KITCHEN, game.playerCell());
+        assertEquals(NEXT_TO_CHEST, game.playerCell());
         assertEquals("IDLE", game.playerStatus());
     }
 
     @Test
     void walkingPastTheChestLeavesNoCollectButton() {
-        GameDriver game = GameDriver.start();
-        game.click(KITCHEN); // next to the chest: the COLLECT button shows
+        GameDriver game = GameDriver.start(MAP.write("smooth-movement"));
+        game.click(NEXT_TO_CHEST); // next to the chest: the COLLECT button shows
         game.seconds(3);
         assertTrue(game.snapshot("next to the chest").contains("COLLECT"));
-        game.click(UP_THE_CORRIDOR); // walks on past the chest without stopping
+        game.click(PAST_THE_CHEST); // walks on past the chest without stopping
         game.seconds(3);
         String scene = game.snapshot("up the corridor");
-        assertEquals(UP_THE_CORRIDOR, game.playerCell());
+        assertEquals(PAST_THE_CHEST, game.playerCell());
         assertFalse(scene.contains("COLLECT"), "the COLLECT button fades out once the player walks on:\n" + scene);
     }
 }

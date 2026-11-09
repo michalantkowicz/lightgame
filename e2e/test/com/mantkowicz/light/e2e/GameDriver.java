@@ -97,6 +97,11 @@ public final class GameDriver {
         return start(HeadlessGame.TEST_MAP, cameraZoom);
     }
 
+    /** Starts the game on a map (e.g. a {@link TestMap}) with another camera zoom. */
+    public static GameDriver startZoomed(String mapName, float cameraZoom) {
+        return start(mapName, cameraZoom);
+    }
+
     private static GameDriver start(String mapName, float cameraZoom) {
         GameDriver driver = new GameDriver(mapName, cameraZoom);
         driver.frames(START_FRAMES);

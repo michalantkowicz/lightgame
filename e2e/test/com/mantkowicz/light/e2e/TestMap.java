@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,9 @@ import java.util.Map;
  * <li>{@code x} blocked grass: drawn, nobody walks on it, light passes (collision layer);</li>
  * <li>{@code #} wall: drawn, blocks walking and light (walls layer);</li>
  * <li>a space: no tile at all;</li>
- * <li>{@code P} player, {@code C} chest, {@code M} cow, {@code D} dog, {@code *} torch: that object on grass;</li>
- * <li>{@code a}…{@code z}: grass marked for the test, found with {@link #cell(char)}.</li>
+ * <li>{@code P} player, {@code C} chest, {@code M} cow, {@code D} dog, {@code *} torch (on the cell's top edge): that object on grass;</li>
+ * <li>{@code a}…{@code z}: grass marked for the test, found with {@link #cell(char)};</li>
+ * <li>any other character given with {@link #with}: an object with properties, e.g. furniture.</li>
  * </ul>
  * Cells are counted like the game does: column from the left, row from the bottom. It is written as a packed map (like
  * tools/assets makes) drawing the game's own tiles atlas, so it can only use tiles a shipped level uses: plain water and
@@ -38,14 +41,16 @@ public final class TestMap {
     private static final Path ATLAS = ROOT.resolve("android/assets/maps/tiles.atlas");
     private static final Path OUTPUT = ROOT.resolve("e2e/build/test-maps");
     private static final int TILE = 16;
-    /** Tiles of the atlas: the first water tile, and plain grass (id 12 of grass_tiles_v2). */
-    private static final int WATER = 1, GRASS = 5 + 12;
-    private static final Map<Character, String> OBJECTS = Map.of(
-            'P', "PLAYER", 'C', "CHEST", 'M', "COW", 'D', "DOG", '*', "LIGHT");
+    /** Tiles of the atlas (gids of the written map): the first water tile (animated), and plain grass. */
+    public static final long WATER = 1, GRASS = 5 + 12;
 
     private final String[] lines;
     private final int width;
     private final int height;
+    private final Map<Character, MapObject> objects = new HashMap<>();
+
+    private record MapObject(String objectClass, Map<String, String> properties) {
+    }
 
     private TestMap(String[] lines) {
         this.lines = lines;
@@ -55,16 +60,25 @@ public final class TestMap {
             if (line.length() != width) {
                 throw new IllegalArgumentException("Every line needs " + width + " cells: '" + line + "'");
             }
-            for (char c : line.toCharArray()) {
-                if (".~x# ".indexOf(c) < 0 && !OBJECTS.containsKey(c) && !(c >= 'a' && c <= 'z')) {
-                    throw new IllegalArgumentException("Unknown cell '" + c + "' in '" + line + "'");
-                }
-            }
         }
+        with('P', "PLAYER", Map.of());
+        with('C', "CHEST", Map.of());
+        with('M', "COW", Map.of());
+        with('D', "DOG", Map.of());
+        with('*', "LIGHT", Map.of("lightType", "TORCH", "borderLightPosition", "TOP")); // like the house's torch
     }
 
     public static TestMap of(String... lines) {
         return new TestMap(lines);
+    }
+
+    /**
+     * Puts an object on every cell showing this character (on grass), e.g.
+     * {@code with('F', "SPRITE", Map.of("textureName", "sprite_table"))}.
+     */
+    public TestMap with(char c, String objectClass, Map<String, String> properties) {
+        objects.put(c, new MapObject(objectClass, new LinkedHashMap<>(properties)));
+        return this;
     }
 
     /**
@@ -92,6 +106,13 @@ public final class TestMap {
      * Writes the map as e2e/build/test-maps/{name}.tmx and returns its path, for {@link GameDriver#start(String)}.
      */
     public String write(String name) {
+        for (String line : lines) {
+            for (char c : line.toCharArray()) {
+                if (".~x# ".indexOf(c) < 0 && !objects.containsKey(c) && !(c >= 'a' && c <= 'z')) {
+                    throw new IllegalArgumentException("Unknown cell '" + c + "' in '" + line + "'");
+                }
+            }
+        }
         StringBuilder tmx = new StringBuilder();
         tmx.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         tmx.append(String.format("<map version=\"1.10\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"%d\" "
@@ -102,6 +123,11 @@ public final class TestMap {
         tmx.append(" </properties>\n");
         tmx.append(" <tileset firstgid=\"1\" name=\"water\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"4\" columns=\"4\">\n");
         tmx.append("  <image source=\"water.png\" width=\"64\" height=\"16\"/>\n");
+        tmx.append("  <tile id=\"0\"><animation>");
+        for (int frame = 0; frame < 4; frame++) {
+            tmx.append(String.format("<frame tileid=\"%d\" duration=\"500\"/>", frame));
+        }
+        tmx.append("</animation></tile>\n");
         tmx.append(" </tileset>\n");
         tmx.append(" <tileset firstgid=\"5\" name=\"grass_tiles_v2\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"77\" columns=\"11\">\n");
         tmx.append("  <image source=\"grass_tiles_v2.png\" width=\"176\" height=\"112\"/>\n");
@@ -122,7 +148,7 @@ public final class TestMap {
     }
 
     private interface Gid {
-        int of(char c);
+        long of(char c);
     }
 
     private void layer(StringBuilder tmx, int id, String name, Gid gid) {
@@ -145,14 +171,15 @@ public final class TestMap {
         int id = 1;
         for (int line = 0; line < height; line++) {
             for (int col = 0; col < width; col++) {
-                String objectClass = OBJECTS.get(lines[line].charAt(col));
-                if (objectClass != null) {
+                MapObject object = objects.get(lines[line].charAt(col));
+                if (object != null) {
                     tmx.append(String.format("  <object id=\"%d\" x=\"%d\" y=\"%d\" width=\"8\" height=\"8\">\n", id++,
                             col * TILE + 4, line * TILE + 4));
-                    tmx.append("   <ellipse/>\n");
-                    tmx.append(String.format("   <properties><property name=\"objectClass\" value=\"%s\"/></properties>\n",
-                            objectClass));
-                    tmx.append("  </object>\n");
+                    tmx.append("   <ellipse/>\n   <properties>\n");
+                    tmx.append(String.format("    <property name=\"objectClass\" value=\"%s\"/>\n", object.objectClass()));
+                    object.properties().forEach((name, value) -> tmx.append(
+                            String.format("    <property name=\"%s\" value=\"%s\"/>\n", name, value)));
+                    tmx.append("   </properties>\n  </object>\n");
                 }
             }
         }

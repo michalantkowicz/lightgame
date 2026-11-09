@@ -2,6 +2,7 @@ package com.mantkowicz.light.e2e.scenario;
 
 import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
+import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,18 +13,26 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * clicks, while buttons keep their place and size on the screen (the UI has its own camera).
  */
 class CameraZoomTest {
-    private static final Cell START = new Cell(10, 22);
-    private static final Cell CHEST = new Cell(8, 24);
+    private static final TestMap MAP = TestMap.of(
+            "~~~~~~~",
+            "~.....~",
+            "~..C..~",
+            "~.....~",
+            "~..P..~",
+            "~.....~",
+            "~~~~~~~");
+    private static final Cell START = MAP.cell('P');
+    private static final Cell CHEST = MAP.cell('C');
     /** The chest blocks its cell: clicking it walks to the nearest free cell next to it. */
-    private static final Cell NEXT_TO_CHEST = new Cell(8, 23);
+    private static final Cell NEXT_TO_CHEST = new Cell(3, 3);
 
     @Test
     void zoomingInMakesTheWorldBiggerButNotTheButtons() {
-        GameDriver normal = GameDriver.start();
-        assertEquals(2 * normal.cellSizeOnScreen(START), GameDriver.startZoomed(0.5f).cellSizeOnScreen(START), 0.01f,
+        GameDriver normal = GameDriver.start(MAP.write("zoom"));
+        assertEquals(2 * normal.cellSizeOnScreen(START), GameDriver.startZoomed(MAP.write("zoom"), 0.5f).cellSizeOnScreen(START), 0.01f,
                 "cells twice as big");
 
-        GameDriver close = GameDriver.startZoomed(0.75f); // close enough, and the chest is still on screen
+        GameDriver close = GameDriver.startZoomed(MAP.write("zoom"), 0.75f); // close enough, and the chest is still on screen
         assertEquals(normal.cellSizeOnScreen(START) / 0.75f, close.cellSizeOnScreen(START), 0.01f);
 
         for (GameDriver game : new GameDriver[]{normal, close}) {
@@ -37,8 +46,8 @@ class CameraZoomTest {
 
     @Test
     void zoomingOutShowsMoreOfTheWorld() {
-        GameDriver normal = GameDriver.start();
-        GameDriver far = GameDriver.startZoomed(2f);
+        GameDriver normal = GameDriver.start(MAP.write("zoom"));
+        GameDriver far = GameDriver.startZoomed(MAP.write("zoom"), 2f);
         assertEquals(normal.cellSizeOnScreen(START) / 2, far.cellSizeOnScreen(START), 0.01f, "cells half as big");
     }
 }

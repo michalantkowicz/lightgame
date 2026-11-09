@@ -15,15 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * not affected. When the walk ends it comes down (it never starts another hop after stopping) and rests on the ground.
  */
 class HopTest {
-    private static final Cell EAST_ROOM = new Cell(13, 24);
+    private static final Cell EAST = WalkingTest.CORRIDOR.cell('e');
     private static final float HOP_HEIGHT = 10f;
 
     @Test
     void hopsWhileWalkingAndLandsAtTheEnd() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(WalkingTest.CORRIDOR.write("corridor"));
         assertEquals(0f, game.playerHopHeight(), "standing still: no hop");
 
-        game.click(EAST_ROOM);
+        game.click(EAST);
         List<Float> heights = new ArrayList<>();
         List<Float> afterStop = new ArrayList<>();
         for (int frame = 0; frame < 180; frame++) {
@@ -49,7 +49,7 @@ class HopTest {
         }
         assertEquals(0f, afterStop.get(Math.min(12, afterStop.size() - 1)), "landed within half a hop: " + afterStop.subList(0, Math.min(15, afterStop.size())));
 
-        assertEquals(EAST_ROOM, game.playerCell());
+        assertEquals(EAST, game.playerCell());
         assertEquals(0f, game.playerHopHeight(), "after the walk the rabbit rests on the ground");
     }
 }
