@@ -51,6 +51,7 @@ import com.mantkowicz.light.ui.collect.CollectItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -61,7 +62,7 @@ import java.util.TreeMap;
  * when the game is refactored, only this class may need (mechanical) changes - scenarios and goldens must not.
  */
 public final class GameDriver {
-    /** Geometry of map.tmx: a square grid of 128 px cells. */
+    /** Geometry of every map: a square grid of 128 px cells. */
     private static final float CELL_SIZE = 128;
     private static final int START_FRAMES = 30;
     private static final int FRAMES_PER_SECOND = 60;
@@ -77,7 +78,7 @@ public final class GameDriver {
         game = new HeadlessGame(mapName, cameraZoom);
     }
 
-    /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
+    /** Starts the game on the original house map (map.tmx) and lets it settle for half a second. Tests use a {@link TestMap} instead. */
     public static GameDriver start() {
         return start(HeadlessGame.TEST_MAP);
     }
@@ -87,7 +88,7 @@ public final class GameDriver {
         return Main.DEFAULT_MAP;
     }
 
-    /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
+    /** Starts the game on a map (a {@link TestMap}, or a shipped one like "maps/level1.tmx") and lets it settle for half a second. */
     public static GameDriver start(String mapName) {
         return start(mapName, HeadlessGame.TEST_CAMERA_ZOOM);
     }
@@ -95,6 +96,11 @@ public final class GameDriver {
     /** Starts the game on the test map with another camera zoom (0.5 = everything in the world twice as big). */
     public static GameDriver startZoomed(float cameraZoom) {
         return start(HeadlessGame.TEST_MAP, cameraZoom);
+    }
+
+    /** Starts the game on a map (e.g. a {@link TestMap}) with another camera zoom. */
+    public static GameDriver startZoomed(String mapName, float cameraZoom) {
+        return start(mapName, cameraZoom);
     }
 
     private static GameDriver start(String mapName, float cameraZoom) {
@@ -306,6 +312,17 @@ public final class GameDriver {
             public void draw(TextureRegion region, float x, float y) {
                 snapshot.line("%s at=%s", regionName(region), Snapshot.point(x, y));
             }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float width, float height) {
+                draw(region, x, y);
+            }
+
+            @Override
+            public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                             float height, float scaleX, float scaleY, float rotation) {
+                draw(region, x, y);
+            }
         };
         try {
             board().draw(recorder, 1);
@@ -488,6 +505,17 @@ public final class GameDriver {
         return snapshot.toString();
     }
 
+    /** The objects placed on the map, by cell: "PLAYER", "CHEST", "COW", "DOG", "LIGHT", "SPRITE". */
+    public Map<Cell, List<String>> objectsByCell() {
+        Map<Cell, List<String>> objects = new TreeMap<>(Comparator.comparing(Cell::toString));
+        for (Map.Entry<Cell, Tile> entry : tilesByCell().entrySet()) {
+            for (TileObject object : tileObjects(entry.getValue())) {
+                objects.computeIfAbsent(entry.getKey(), cell -> new ArrayList<>()).add(kindOf(object));
+            }
+        }
+        return objects;
+    }
+
     /** The path the game would walk from one cell to another (start excluded), or an empty list. */
     public List<Cell> path(Cell from, Cell to) {
         List<Cell> cells = new ArrayList<>();
@@ -516,7 +544,9 @@ public final class GameDriver {
     private void describeScene(Snapshot snapshot) {
         Player player = (Player) actor(Kind.PLAYER);
         snapshot.line("player: cell=%s at=%s status=%s", cellOf(player.getTile()), playerPosition(), player.getStatus());
-        snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
+        if (has(Kind.DOG)) {
+            snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
+        }
         snapshot.line("chest: cell=%s", chestCell());
         OrthographicCamera camera = (OrthographicCamera) gameStage().getCamera();
         snapshot.line("camera: at=%s zoom=%s view=%sx%s", cameraPosition(), Snapshot.number(camera.zoom),
@@ -596,6 +626,15 @@ public final class GameDriver {
 
     // ---------------------------------------------------------------------------------------------- game internals
 
+    private boolean has(Kind kind) {
+        try {
+            actor(kind);
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
+
     private GameBoardActor actor(Kind kind) {
         Class<? extends GameBoardActor> type = switch (kind) {
             case PLAYER -> Player.class;
@@ -620,8 +659,33 @@ public final class GameDriver {
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 
+    /**
+     * The tile's own picture, or for a map drawn from an atlas its layers' tilesets bottom first, e.g. "water+grass_tiles_v2"
+     * (without the tile number: animated water changes it with the clock).
+     */
     private static String backgroundName(Tile tile) {
         TextureRegion region = field(tile, Tile.class, "backgroundTexture");
+        if (region == null) {
+            List<String> layers = new ArrayList<>();
+            SpriteBatch recorder = new SpriteBatch() {
+                @Override
+                public void draw(TextureRegion region, float x, float y, float width, float height) {
+                    layers.add(regionName(region));
+                }
+
+                @Override
+                public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
+                                 float height, float scaleX, float scaleY, float rotation) {
+                    layers.add(regionName(region));
+                }
+            };
+            try {
+                tile.draw(recorder, 1);
+            } finally {
+                recorder.dispose();
+            }
+            return layers.isEmpty() ? "none" : String.join("+", layers);
+        }
         if (region instanceof AtlasRegion atlasRegion) {
             return atlasRegion.name;
         }

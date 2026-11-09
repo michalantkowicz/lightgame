@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class ShaderAndLightTest {
     @Test
     void qFadesAndWRestores() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(StartAndStopTest.ROOM.write("room"));
         game.pressKey(Keys.Q);
         game.snapshot("after Q");
         game.pressKey(Keys.W);
@@ -19,7 +19,7 @@ class ShaderAndLightTest {
 
     @Test
     void torchFlickers() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(StartAndStopTest.ROOM.write("room"));
         for (int frame = 0; frame < 72; frame++) {
             game.note("frame " + frame + ": torch distance " + game.torchDistances());
             game.frames(1);

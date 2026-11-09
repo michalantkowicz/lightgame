@@ -108,3 +108,23 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   (8,23), the camera following, the board layout, and a COLLECT button where a walk now ends next to the chest.
   `CollectTest`, `CameraZoomTest` and `SmoothMovementTest` point at the new spot. New `LevelTest` cases for the cow and
   the chest.
+
+## 2026‑11‑09, tests on their own maps (branch `test-maps`)
+
+- Done: the idea "Feature tests on their own small maps". Every e2e test now brings its own map, so editing a level
+  never breaks a feature test. `TestMap.of("~~~~~", "~.P.~", ...)` draws one cell per character (`.` grass, `~` water,
+  `x` blocked, `#` wall, space = no tile, `P`/`C`/`M`/`D`/`*` player, chest, cow, dog, torch, `a`…`z` marked cells
+  found with `cell('a')`, other characters as objects with properties through `with`) and writes a packed map that
+  draws the game's `tiles.atlas` (plain grass and animated water only).
+- `LevelVariant` now changes copies of a `TestMap` instead of level1 (`LevelVariant.of(map)`), for what text can't
+  show: extra layers, mirrored tiles, opacity, map properties.
+- `LevelTest` is split: `AnimationTest` (rabbit, cow and chest animations, on test maps) and `ShippedMapsTest`, which
+  checks every map in android/assets without cells or goldens: it loads, the rabbit starts on a free cell, every chest
+  has a free neighbour the rabbit can reach (a copy of level1 with the chest out at sea fails it). The old hexagonal
+  `map2_outer.tmx` passes too.
+- All goldens re-recorded, checked by comparing them without the lines that depend on the map (cells, camera, dog,
+  torch). Identical: collect, collect-cancel, walk, no-tile, camera-tracking, look-at-player, resize, start,
+  fade-shader, menu-tap, menu-cancel; unchanged: stop, torch-flicker. `no-path` and the menu goldens keep their texts'
+  offsets from the clicked cell, the dog and the player. `reroute` lost a COLLECT line (the house route passed the
+  chest). `board-layout`, `board-drawing` and `path-lengths` describe the new maps.
+- Snapshots leave out the dog line on maps without a dog; board descriptions also cover tiles drawn from an atlas.

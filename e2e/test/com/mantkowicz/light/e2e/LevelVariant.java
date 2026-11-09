@@ -16,16 +16,15 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
- * A changed copy of the packed starter level (android/assets/maps/level1.tmx) for tests that need something the real
- * level doesn't have: a walls layer, mirrored tiles, another ambient light. Written to e2e/build/test-maps; it keeps
- * using the game's tiles atlas, so it can only use tiles the real level uses (take their gids with {@link #gidAt}).
+ * A changed copy of a {@link TestMap} for what can't be drawn as text: extra layers, mirrored tiles, layer opacity, map
+ * properties and attributes. Written to e2e/build/test-maps; it keeps using the game's tiles atlas, so it can only use
+ * the tiles a test map uses ({@link TestMap#GRASS}, {@link TestMap#WATER}, or {@link #gidAt}).
  */
 public final class LevelVariant {
     /** Tiled's flags in the high bits of a gid: mirrored left-right, mirrored top-bottom, mirrored on the diagonal. */
     public static final long FLIP_HORIZONTALLY = 0x80000000L, FLIP_VERTICALLY = 0x40000000L, FLIP_DIAGONALLY = 0x20000000L;
 
     private static final Path ROOT = Path.of(System.getProperty("repo.root", "../..")).toAbsolutePath().normalize();
-    private static final Path LEVEL = ROOT.resolve("android/assets/maps/level1.tmx");
     private static final Path OUTPUT = ROOT.resolve("e2e/build/test-maps");
 
     private final Document document;
@@ -33,21 +32,22 @@ public final class LevelVariant {
     private final int width;
     private final int height;
 
-    private LevelVariant() {
+    private LevelVariant(Path source) {
         try {
-            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(LEVEL.toFile());
+            document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(source.toFile());
         } catch (Exception e) {
-            throw new IllegalStateException("Can't read " + LEVEL, e);
+            throw new IllegalStateException("Can't read " + source, e);
         }
         map = document.getDocumentElement();
         width = Integer.parseInt(map.getAttribute("width"));
         height = Integer.parseInt(map.getAttribute("height"));
-        // the copy lives elsewhere: point it back at the game's atlas
-        mapProperty("atlas", OUTPUT.relativize(LEVEL.resolveSibling("tiles.atlas")).toString().replace('\\', '/'));
     }
 
-    public static LevelVariant ofLevel1() {
-        return new LevelVariant();
+    /**
+     * A copy of the test map to change (the copy is written next to it, so it finds the atlas the same way).
+     */
+    public static LevelVariant of(TestMap testMap) {
+        return new LevelVariant(Path.of(testMap.write("variant-source")));
     }
 
     /**
@@ -72,7 +72,7 @@ public final class LevelVariant {
     }
 
     /**
-     * The gid (tile) a layer of the real level has on a cell, e.g. a grass tile to reuse elsewhere.
+     * The gid (tile) a layer of the map has on a cell, e.g. a grass tile to reuse elsewhere.
      */
     public long gidAt(String layerName, Cell cell) {
         return gids(layer(layerName))[index(cell)];
@@ -144,7 +144,7 @@ public final class LevelVariant {
                 return layer;
             }
         }
-        throw new IllegalArgumentException("level1 has no layer " + name);
+        throw new IllegalArgumentException("The map has no layer " + name);
     }
 
     private static long[] gids(Element layer) {
