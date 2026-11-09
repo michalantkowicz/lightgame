@@ -51,6 +51,7 @@ import com.mantkowicz.light.ui.collect.CollectItemType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -61,7 +62,7 @@ import java.util.TreeMap;
  * when the game is refactored, only this class may need (mechanical) changes - scenarios and goldens must not.
  */
 public final class GameDriver {
-    /** Geometry of map.tmx: a square grid of 128 px cells. */
+    /** Geometry of every map: a square grid of 128 px cells. */
     private static final float CELL_SIZE = 128;
     private static final int START_FRAMES = 30;
     private static final int FRAMES_PER_SECOND = 60;
@@ -77,7 +78,7 @@ public final class GameDriver {
         game = new HeadlessGame(mapName, cameraZoom);
     }
 
-    /** Starts the game on the test map (map.tmx) and lets it settle for half a second. */
+    /** Starts the game on the original house map (map.tmx) and lets it settle for half a second. Tests use a {@link TestMap} instead. */
     public static GameDriver start() {
         return start(HeadlessGame.TEST_MAP);
     }
@@ -87,7 +88,7 @@ public final class GameDriver {
         return Main.DEFAULT_MAP;
     }
 
-    /** Starts the game on another map (e.g. "maps/level1.tmx") and lets it settle for half a second. */
+    /** Starts the game on a map (a {@link TestMap}, or a shipped one like "maps/level1.tmx") and lets it settle for half a second. */
     public static GameDriver start(String mapName) {
         return start(mapName, HeadlessGame.TEST_CAMERA_ZOOM);
     }
@@ -502,6 +503,17 @@ public final class GameDriver {
                     Snapshot.number(tile.getHeight()), backgroundName(tile), tile.isAccessible(), neighbours, objects);
         }
         return snapshot.toString();
+    }
+
+    /** The objects placed on the map, by cell: "PLAYER", "CHEST", "COW", "DOG", "LIGHT", "SPRITE". */
+    public Map<Cell, List<String>> objectsByCell() {
+        Map<Cell, List<String>> objects = new TreeMap<>(Comparator.comparing(Cell::toString));
+        for (Map.Entry<Cell, Tile> entry : tilesByCell().entrySet()) {
+            for (TileObject object : tileObjects(entry.getValue())) {
+                objects.computeIfAbsent(entry.getKey(), cell -> new ArrayList<>()).add(kindOf(object));
+            }
+        }
+        return objects;
     }
 
     /** The path the game would walk from one cell to another (start excluded), or an empty list. */

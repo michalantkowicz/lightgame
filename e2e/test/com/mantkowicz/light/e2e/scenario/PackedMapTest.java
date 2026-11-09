@@ -3,6 +3,7 @@ package com.mantkowicz.light.e2e.scenario;
 import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.LevelVariant;
+import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,44 +20,50 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * How the game reads Tiled maps made with tools/assets: tile layers drawn on top of each other (mirrored, rotated and
- * transparent as in Tiled), animated water, a walls layer that blocks light, and the map's ambient light. Things the
- * starter level doesn't have are tried on changed copies of it ({@link LevelVariant}).
+ * transparent as in Tiled), animated water, a walls layer that blocks light, a collision layer that doesn't, and the
+ * map's ambient light. Runs on {@link TestMap}s; what can't be drawn as text is added on changed copies of them
+ * ({@link LevelVariant}).
  */
 class PackedMapTest {
-    private static final String LEVEL = "maps/level1.tmx";
-    private static final Cell DEEP_WATER = new Cell(0, 0);
-    private static final Cell ISLAND = new Cell(8, 8);
+    /** A wall (#) on the top row and a cell on the collision layer (x) on the bottom row. */
+    private static final TestMap MAP = TestMap.of(
+            "~~~~~~~~~",
+            "~..#....~",
+            "~.......~",
+            "~..x...P~",
+            "~~~~~~~~~");
+    private static final Cell SEA = new Cell(0, 0);
     private static final String AS_IT_IS = "BL,TL,TR,BR";
 
     @Test
     void layersAreDrawnBottomFirst() {
-        GameDriver game = GameDriver.start(LEVEL);
-        List<String> island = game.cellDrawing(ISLAND);
-        assertEquals(2, island.size(), "water below, grass on top: " + island);
-        assertTrue(island.get(0).startsWith("water#"), island.toString());
-        assertTrue(island.get(1).startsWith("grass_tiles_v2#"), island.toString());
-        assertTrue(island.get(1).endsWith(AS_IT_IS + " alpha=1.0"), island.toString());
+        Cell cell = new Cell(1, 2);
+        String map = LevelVariant.of(MAP).addLayer("puddle", Map.of(cell, TestMap.WATER)).write("puddle.tmx");
+        List<String> drawn = GameDriver.start(map).cellDrawing(cell);
+        assertEquals(2, drawn.size(), "grass below, the puddle on top: " + drawn);
+        assertTrue(drawn.get(0).startsWith("grass_tiles_v2#"), drawn.toString());
+        assertTrue(drawn.get(0).endsWith(AS_IT_IS + " alpha=1.0"), drawn.toString());
+        assertTrue(drawn.get(1).startsWith("water#"), drawn.toString());
 
-        List<String> water = game.cellDrawing(DEEP_WATER);
+        List<String> water = GameDriver.start(MAP.write("packed")).cellDrawing(SEA);
         assertEquals(1, water.size(), "only water out at sea: " + water);
     }
 
     @Test
     void waterIsAnimated() throws InterruptedException {
-        GameDriver game = GameDriver.start(LEVEL);
-        String before = game.cellDrawing(DEEP_WATER).get(0);
+        GameDriver game = GameDriver.start(MAP.write("packed"));
+        String before = game.cellDrawing(SEA).get(0);
         // map tile animations run on the clock (4 frames of 500 ms): 1.1 s later it's 2 or 3 frames further
         Thread.sleep(1100);
         game.frames(1);
-        assertNotEquals(before, game.cellDrawing(DEEP_WATER).get(0));
+        assertNotEquals(before, game.cellDrawing(SEA).get(0));
     }
 
     @Test
     void mirroredRotatedAndTransparentTilesLookAsInTiled() {
-        LevelVariant variant = LevelVariant.ofLevel1();
-        long grass = variant.gidAt("ground", ISLAND);
-        Cell plain = new Cell(8, 9), mirrored = new Cell(9, 9), upsideDown = new Cell(10, 9), turned = new Cell(11, 9);
-        String map = variant
+        Cell plain = new Cell(1, 2), mirrored = new Cell(2, 2), upsideDown = new Cell(4, 2), turned = new Cell(6, 2);
+        long grass = TestMap.GRASS;
+        String map = LevelVariant.of(MAP)
                 .addLayer("decor", Map.of(
                         plain, grass,
                         mirrored, grass | FLIP_HORIZONTALLY,
@@ -67,49 +74,50 @@ class PackedMapTest {
                 .write("flips.tmx");
         GameDriver game = GameDriver.start(map);
 
-        assertEquals(AS_IT_IS, corners(game.cellDrawing(plain).get(2)));
-        assertEquals("BR,TR,TL,BL", corners(game.cellDrawing(mirrored).get(2)), "left and right swapped");
-        assertEquals("TL,BL,BR,TR", corners(game.cellDrawing(upsideDown).get(2)), "top and bottom swapped");
-        assertEquals("BR,BL,TL,TR", corners(game.cellDrawing(turned).get(2)), "the picture's top-left is now top-right");
-        assertTrue(game.cellDrawing(plain).get(3).endsWith("alpha=0.5"), "the shadow layer is half transparent");
-        assertTrue(game.cellDrawing(plain).get(4).endsWith("alpha=1.0"), "the layer above it is opaque again");
+        assertEquals(AS_IT_IS, corners(game.cellDrawing(plain).get(1)));
+        assertEquals("BR,TR,TL,BL", corners(game.cellDrawing(mirrored).get(1)), "left and right swapped");
+        assertEquals("TL,BL,BR,TR", corners(game.cellDrawing(upsideDown).get(1)), "top and bottom swapped");
+        assertEquals("BR,BL,TL,TR", corners(game.cellDrawing(turned).get(1)), "the picture's top-left is now top-right");
+        assertTrue(game.cellDrawing(plain).get(2).endsWith("alpha=0.5"), "the shadow layer is half transparent");
+        assertTrue(game.cellDrawing(plain).get(3).endsWith("alpha=1.0"), "the layer above it is opaque again");
     }
 
     @Test
     void theWallsLayerBlocksWalkingAndLight() {
-        Cell above = new Cell(8, 8), wall = new Cell(8, 7), below = new Cell(8, 6), beside = new Cell(10, 8);
-        LevelVariant variant = LevelVariant.ofLevel1();
-        String map = variant.addLayer("walls", Map.of(wall, variant.gidAt("ground", wall))).write("walls.tmx");
-        GameDriver game = GameDriver.start(map);
+        Cell wall = new Cell(3, 3), left = new Cell(1, 3), right = new Cell(5, 3), below = new Cell(3, 2);
+        GameDriver game = GameDriver.start(MAP.write("packed"));
 
         assertFalse(game.isAccessible(wall));
-        assertFalse(game.lightReaches(above, below), "the wall casts a shadow");
-        assertTrue(game.lightReaches(above, beside), "only behind the wall");
-        assertEquals(3, game.cellDrawing(wall).size(), "a visible walls layer is drawn too");
+        assertFalse(game.lightReaches(left, right), "the wall casts a shadow");
+        assertTrue(game.lightReaches(left, below), "only behind the wall");
+        assertEquals(2, game.cellDrawing(wall).size(), "a visible walls layer is drawn too (over the ground)");
     }
 
     @Test
     void theCollisionLayerBlocksWalkingButNotLight() {
-        GameDriver game = GameDriver.start(LEVEL);
-        assertFalse(game.isAccessible(new Cell(15, 3)), "the pond is on the collision layer");
-        assertTrue(game.lightReaches(new Cell(13, 4), new Cell(18, 4)), "light crosses the pond");
+        Cell blocked = new Cell(3, 1), left = new Cell(1, 1), right = new Cell(5, 1);
+        GameDriver game = GameDriver.start(MAP.write("packed"));
+        assertFalse(game.isAccessible(blocked), "x is on the collision layer");
+        assertTrue(game.lightReaches(left, right), "light crosses it");
     }
 
     @Test
     void ambientLightComesFromTheMap() {
-        assertEquals("0.00,0.00,0.00,1.00", GameDriver.start(LEVEL).ambientLight(), "level1 is daylight (ambientLight 1)");
-        String dusk = LevelVariant.ofLevel1().mapProperty("ambientLight", "0.3").write("dusk.tmx");
+        String daylight = LevelVariant.of(MAP).mapProperty("ambientLight", "1").write("daylight.tmx");
+        assertEquals("0.00,0.00,0.00,1.00", GameDriver.start(daylight).ambientLight(), "ambientLight 1 is daylight");
+        String dusk = LevelVariant.of(MAP).mapProperty("ambientLight", "0.3").write("dusk.tmx");
         assertEquals("0.00,0.00,0.00,0.30", GameDriver.start(dusk).ambientLight());
-        assertEquals("0.02,0.02,0.02,1.00", GameDriver.start().ambientLight(), "a map without it keeps the house's dim light");
+        assertEquals("0.02,0.02,0.02,1.00", GameDriver.start(MAP.write("packed")).ambientLight(),
+                "a map without it keeps the house's dim light");
     }
 
     @Test
     void mistakesInTheMapAreExplained() {
-        String words = LevelVariant.ofLevel1().mapProperty("ambientLight", "bright").write("bad-ambient.tmx");
+        String words = LevelVariant.of(MAP).mapProperty("ambientLight", "bright").write("bad-ambient.tmx");
         RuntimeException ambient = assertThrows(RuntimeException.class, () -> GameDriver.start(words));
         assertTrue(message(ambient).contains("ambientLight must be a number"), message(ambient));
 
-        String bigTiles = LevelVariant.ofLevel1().mapAttribute("tilewidth", "32").mapAttribute("tileheight", "32")
+        String bigTiles = LevelVariant.of(MAP).mapAttribute("tilewidth", "32").mapAttribute("tileheight", "32")
                 .write("big-tiles.tmx");
         RuntimeException size = assertThrows(RuntimeException.class, () -> GameDriver.start(bigTiles));
         assertTrue(message(size).contains("made for 16 px"), message(size));
