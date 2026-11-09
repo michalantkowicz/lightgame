@@ -61,14 +61,9 @@ The preview page shows every sheet in the pack, so you can pick what to use.
 4. Run the tool. It packs the sheet and adds any new actions to the generated `Action` enum (e.g. `Action.EAT`).
 5. Use it in code: `resourcesService.getAnimation(Sprite.COW_BROWN, Action.WALK, Direction.LEFT)`, or without a
    direction for rows like `eat`. Animations are never named by strings in Java.
-6. To place it in a map: a `SpriteActor` subclass (like `Cow`) and its line in `TileObjectType` listing the sprites it
-   can use, e.g. `COW(Cow::new, Sprite.COW_BROWN, Sprite.COW_PINK)`. In Tiled pick `COW` in the object's `objectClass`
-   dropdown, and optionally a `sprite` (`COW_PINK`); the first one on the line is the default. Run the tool and reopen
-   the project in Tiled (or restart it) to see new values in the dropdowns.
 
 Mistakes are caught early:
 - a typo in the `Sprite` enum stops the tool with a "did you mean" hint;
-- an unknown `objectClass` or a `sprite` an object can't use stops the tool (and the game), naming the map and object;
 - a sheet that isn't packed, or an animation that doesn't exist, stops the game at start with a message;
 - `./gradlew e2e:test` fails if you forgot to run the tool.
 

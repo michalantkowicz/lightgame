@@ -23,22 +23,6 @@
                 "SPRITE"
             ],
             "valuesAsFlags": false
-        },
-        {
-            "id": 2,
-            "name": "Sprite",
-            "storageType": "string",
-            "type": "enum",
-            "values": [
-                "CHEST",
-                "COW_BROWN",
-                "COW_GREEN",
-                "COW_LIGHT",
-                "COW_PINK",
-                "COW_PURPLE",
-                "RABBIT"
-            ],
-            "valuesAsFlags": false
         }
     ]
 }

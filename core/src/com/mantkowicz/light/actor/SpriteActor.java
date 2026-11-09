@@ -8,15 +8,15 @@ import com.mantkowicz.light.resources.Sprite;
 
 /**
  * A board actor drawn from one Sprout Lands sheet: a picture one tile big (it may stick out) that plays the sheet's
- * animations. A subclass only picks its description and behaviours (plugins); the sprite comes from the map, e.g.
+ * animations. A subclass only picks its sprite, description and behaviours (plugins), e.g.
  * <pre>{@code
- * public Cow(GameContext context, Sprite sprite) {
- *     super(COW, context, sprite, Action.IDLE, "A cow.");
+ * public Cow(GameContext context) {
+ *     super(COW, context, Sprite.COW_BROWN, Action.IDLE, "A brown cow.");
  *     playAnimation(Action.IDLE);
  * }
  * }</pre>
- * and is placed in Tiled with the objectClass of its {@link com.mantkowicz.light.map.TileObjectType} line, which lists
- * the sprites it can be drawn with, e.g. {@code COW(Cow::new, Sprite.COW_BROWN, Sprite.COW_PINK)}. It blocks its tile.
+ * and is placed in Tiled with the objectClass of its {@link com.mantkowicz.light.map.TileObjectType} line, e.g.
+ * {@code COW(Cow::new)}. It blocks its tile.
  */
 public abstract class SpriteActor extends GameBoardActor {
     private final Sprite sprite;

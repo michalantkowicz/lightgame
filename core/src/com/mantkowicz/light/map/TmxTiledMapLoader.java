@@ -25,7 +25,6 @@ import com.mantkowicz.light.map.TileSet.TilesetProperties;
 import com.mantkowicz.light.resources.ResourcesService;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         float tileHeight = tileLayer.getTileHeight();
         float tileWidth = tileLayer.getTileWidth();
 
-        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, tileLayer, tileWidth, tileHeight, fileName);
+        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, tileLayer, tileWidth, tileHeight);
 
         // create tiles, in cell order
         Map<GridPoint2, Tile> tilesByCell = new HashMap<>();
@@ -161,7 +160,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                     + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE + " px");
         }
         float scale = WorldScale.TILE_SIZE / tileWidth;
-        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight, fileName);
+        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight);
 
         Map<GridPoint2, Tile> tilesByCell = new HashMap<>();
         List<Tile> tiles = new ArrayList<>();
@@ -242,10 +241,8 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
 
     /**
      * Each object goes to the cell whose centre is nearest to the object's centre. A later object on the same cell replaces an earlier one.
-     * A mistake in an object's properties stops the game with the map, the cell and what's wrong.
      */
-    private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth, float tileHeight,
-                                                      String fileName) {
+    private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth, float tileHeight) {
         Map<GridPoint2, TileObject> objects = new HashMap<>();
         MapLayer objectLayer = getObjectLayer(tiledMap);
         if (objectLayer == null) {
@@ -270,29 +267,11 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 }
 
                 MapProperties objectProperties = object.getProperties();
-                try {
-                    TileObjectType objectType = objectType(objectProperties.get(OBJECT_CLASS.getValue(), String.class));
-                    objects.put(new GridPoint2(objectX, objectY), TileObjectFactory.createTileObject(objectType, objectProperties));
-                } catch (RuntimeException e) {
-                    throw new IllegalArgumentException(fileName + ": the object on cell (" + objectX + "," + objectY + "): "
-                            + e.getMessage(), e);
-                }
+                TileObjectType objectType = TileObjectType.valueOf(objectProperties.get(OBJECT_CLASS.getValue(), String.class));
+                objects.put(new GridPoint2(objectX, objectY), TileObjectFactory.createTileObject(objectType, objectProperties));
             }
         }
         return objects;
-    }
-
-    private static TileObjectType objectType(String name) {
-        if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException(OBJECT_CLASS.getValue() + " is missing");
-        }
-        for (TileObjectType type : TileObjectType.values()) {
-            if (type.name().equals(name)) {
-                return type;
-            }
-        }
-        throw new IllegalArgumentException(OBJECT_CLASS.getValue() + " '" + name + "' isn't one of "
-                + Arrays.toString(TileObjectType.values()));
     }
 
     /**

@@ -22,8 +22,8 @@ public class Chest extends SpriteActor implements Collectible {
 
     private final Inventory inventory;
 
-    public Chest(GameContext context, Sprite sprite) {
-        super(CHEST, context, sprite, OPEN, DESCRIPTION);
+    public Chest(GameContext context) {
+        super(CHEST, context, Sprite.CHEST, OPEN, DESCRIPTION);
         setName("Nice Chest");
         setTouchable(Touchable.disabled);
 

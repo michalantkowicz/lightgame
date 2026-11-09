@@ -129,19 +129,11 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   chest). `board-layout`, `board-drawing` and `path-lengths` describe the new maps.
 - Snapshots leave out the dog line on maps without a dog; board descriptions also cover tiles drawn from an atlas.
 
-## 2026‑11‑09, colours and dropdowns for map objects (branch `idea-map-placed-sprites`)
+## 2026‑11‑09, objectClass dropdown in Tiled (branch `idea-map-placed-sprites`)
 
-- **Colours:** each sprite actor's `TileObjectType` line lists the sprites it can be drawn with, the default first
-  (`COW(Cow::new, Sprite.COW_BROWN, Sprite.COW_GREEN, …)`); the actor gets its sprite in the constructor. In Tiled an
-  optional `sprite` property on the object picks another one (`COW_PINK`). All five cow colours are in `Sprite` now
-  (the sprites atlas stays 1024×512). The cow's description names its colour.
-- **Dropdowns in Tiled:** the tool reads `TileObjectType` (like it reads `Sprite`) and writes the enums `ObjectClass`
-  and `Sprite` into `assets-src/lightgame.tiled-project`. It marks `objectClass`/`sprite` properties typed as plain
-  text with their enum (only adds `propertytype`; `level1.tmx` got it), so Tiled shows dropdowns.
-- **Mistakes are explained:** the tool stops on an unknown `objectClass` (with a "did you mean"), a `sprite` the object
-  can't use, or an object without `objectClass`, naming the map and object. The game says the same with the map and
-  cell (it used to fail on `TileObjectType.valueOf` without saying where), for maps that didn't go through the tool.
-- Tests: `MapObjectsTest` (default and picked colour, the four mistakes). The tool's checks were tried on broken copies
-  of `level1`.
-- Keep `TileObjectType` lines in the form `NAME(Class::new, Sprite.A, Sprite.B)`: the tool reads them with a regex.
+- The asset tool reads the constants of the game's `TileObjectType` enum and writes them into
+  `assets-src/lightgame.tiled-project` as the enum property type `ObjectClass`. It marks `objectClass` properties typed as
+  plain text with it (adds only `propertytype="ObjectClass"`; `level1.tmx` got it), so Tiled shows a dropdown.
+- No game code changed: the game reads `objectClass` as before (`propertytype` is ignored by libGDX).
+- Tiled reads the project only when it opens it: after the tool changes the list, reopen the project or restart Tiled.
 

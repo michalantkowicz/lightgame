@@ -45,12 +45,9 @@ tool again.
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a property `objectClass` (`PLAYER`,
    `CHEST`, `COW`, `LIGHT`, `DOG`, `SPRITE`). Add it as a property of type `ObjectClass` and pick the value from the
-   dropdown (the tool defines the type in the project from the game's `TileObjectType`, and turns plain text
-   `objectClass` properties into it). Sprite actors take an optional `sprite` property (type `Sprite`) that picks how
-   they look, e.g. `COW_PINK` for a pink cow; the allowed ones are on the actor's line in `TileObjectType`. The tool
-   stops on an unknown `objectClass` or a `sprite` the object can't use, naming the map and object. Tiled reads the
-   project only when it opens it: after the tool changed the dropdowns (a new `TileObjectType` or `Sprite` line),
-   reopen the project or restart Tiled to see the new values.
+   dropdown. The tool fills the dropdown from the game's `TileObjectType` enum and turns `objectClass` properties typed
+   as plain text into it. Tiled reads the project only when it opens it: after a new `TileObjectType` constant, run the
+   tool and reopen the project (or restart Tiled).
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 
@@ -85,8 +82,6 @@ game uses, not the whole pack). To use another sheet, e.g. the brown cow:
 2. Name the rows you need in `pack.json` (e.g. `walk_down`...) and run the tool.
 3. In the code: `resourcesService.getAnimation(Sprite.COW_BROWN, Action.WALK, Direction.DOWN)`, or without a direction
    for rows like `open`. No animation names are typed in Java.
-4. To place it in maps: a `SpriteActor` subclass and its line in `TileObjectType`, e.g. `COW(Cow::new, Sprite.COW_BROWN,
-   Sprite.COW_PINK)`; for another colour of an existing actor, add the sprite to `Sprite` and to the actor's line.
 
 A sheet in `Sprite` that wasn't packed, or a missing animation, stops the game at start with a message saying what to
 do, and `AssetsUpToDateTest` fails.
