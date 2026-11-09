@@ -108,3 +108,13 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   (8,23), the camera following, the board layout, and a COLLECT button where a walk now ends next to the chest.
   `CollectTest`, `CameraZoomTest` and `SmoothMovementTest` point at the new spot. New `LevelTest` cases for the cow and
   the chest.
+
+## 2026‑11‑09, test maps drawn as text (branch `test-maps-collect`)
+
+- First step of the idea "Feature tests on their own small maps": feature tests get their own small map instead of the
+  shipped levels, so editing a level doesn't break them. `TestMap.of("~~~~~", "~.P.~", ...)` draws one cell per
+  character (`.` grass, `~` water, `x` blocked, `#` wall, space = no tile, `P`/`C`/`M`/`D`/`*` player, chest, cow, dog,
+  torch, `a`…`z` marked cells found with `cell('a')`) and writes a packed map using the game's `tiles.atlas`.
+- `CollectTest` runs on a 7x7 island with the chest two cells above the rabbit. Its goldens were re-recorded: apart from
+  the cells, the camera and the house's dog/torch lines, they are identical (buttons, windows, inventories).
+- Snapshots leave out the dog line on maps without a dog.

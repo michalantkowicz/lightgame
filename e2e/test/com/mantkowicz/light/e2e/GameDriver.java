@@ -516,7 +516,9 @@ public final class GameDriver {
     private void describeScene(Snapshot snapshot) {
         Player player = (Player) actor(Kind.PLAYER);
         snapshot.line("player: cell=%s at=%s status=%s", cellOf(player.getTile()), playerPosition(), player.getStatus());
-        snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
+        if (has(Kind.DOG)) {
+            snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
+        }
         snapshot.line("chest: cell=%s", chestCell());
         OrthographicCamera camera = (OrthographicCamera) gameStage().getCamera();
         snapshot.line("camera: at=%s zoom=%s view=%sx%s", cameraPosition(), Snapshot.number(camera.zoom),
@@ -595,6 +597,15 @@ public final class GameDriver {
     }
 
     // ---------------------------------------------------------------------------------------------- game internals
+
+    private boolean has(Kind kind) {
+        try {
+            actor(kind);
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
+    }
 
     private GameBoardActor actor(Kind kind) {
         Class<? extends GameBoardActor> type = switch (kind) {

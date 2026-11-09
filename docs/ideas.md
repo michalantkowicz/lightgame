@@ -58,3 +58,7 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
     `PackedMapTest` move this way;
   - **unit tests** without a map (path finding, inventory, board layout), already fine.
   Do it step by step on its own branch: `CollectTest` first to prove the fixture builder, then the others.
+  **Started:** `TestMap` (maps drawn as text in the test) and `CollectTest` on it (branch `test-maps-collect`). Next:
+  the walking group (`WalkingTest`, `HopTest`, `SmoothMovementTest`, `DeterminismTest`, `PathFindingTest`), then
+  camera/zoom/resize, menu (needs the dog), lights (`ShaderAndLightTest`, `WallTest`, torches), board layout/drawing,
+  and last `LevelTest`/`PackedMapTest` turned into content checks (`LevelVariant` rebuilt on `TestMap`).

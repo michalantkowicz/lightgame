@@ -25,7 +25,9 @@ and uploads those files when it fails. The golden files are recorded on macOS an
   approved behaviour change (for example a bug fix), and review the diff in the commit.
 - **Record only what a player sees or what defines game state.** Never record object counts or internal fields that a
   refactoring can change invisibly. Texts are recorded only while visible (effective alpha > 0.01).
-- **Hard-code cells**, for example `new Cell(10, 23)`. Don't compute them from iteration order. Pick walking targets
+- **Give a feature test its own map** (`TestMap`, drawn as text in the test) instead of the shipped levels, so editing
+  a level never breaks it. Point at cells with letters on that map (`map.cell('a')`), or hard-code them, for example
+  `new Cell(10, 23)`. Don't compute them from iteration order. Pick walking targets
   with a unique shortest path, so a different path-finding algorithm gives the same golden.
 - **Click only what is on screen.** The driver throws if a target is outside the camera view, like a real player can't
   click it.
@@ -38,6 +40,7 @@ test/com/mantkowicz/light/e2e/
 ├── Cell.java           (col,row) address of a tile; the stable way to point at the map
 ├── Snapshot.java       sorted, rounded, line-based text, so golden files diff nicely
 ├── Golden.java         compares with golden/<name>.txt, or rewrites it in update mode
+├── TestMap.java        small maps drawn as text for one test (`.` grass, `~` water, `P` player, `C` chest...)
 ├── LevelVariant.java   changed copies of the packed starter level (walls, mirrored tiles...), in e2e/build/test-maps
 ├── headless/           HeadlessGame, NoOpGL, FixedGraphics, ScriptedInput
 ├── scenario/           gameplay tests, written against GameDriver only
@@ -54,7 +57,7 @@ Scenario ids are used in `docs/refactoring-plan.md`:
 | S8–S11 | Radial menu: dog description, cancel, short tap, player description | `MenuTest` | `menu-*` |
 | S12, S13 | Q/W fade shader; torch flicker | `ShaderAndLightTest` | `fade-shader`, `torch-flicker` |
 | S14 | Resize | `ResizeTest` | `resize` |
-| S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button | `CollectTest` | `collect`, `collect-cancel` |
+| S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button (on its own `TestMap`) | `CollectTest` | `collect`, `collect-cancel` |
 | — | The packed starter level (the game's default): water blocks walking, the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile; the cow's idle animation; the chest used from next to it, opening and shutting with the collect window | `LevelTest` | — |
 | — | Camera zoom: the world gets bigger or smaller, clicks still hit the right cell, buttons keep their place and size | `CameraZoomTest` | — |
 | — | Packed maps: layers drawn bottom first, animated water, mirrored/rotated/transparent tiles, `walls` and `collision` layers, `ambientLight`, clear errors | `PackedMapTest` | — |

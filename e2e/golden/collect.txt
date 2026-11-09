@@ -1,22 +1,18 @@
 ## on chest
 crash: none
-player: cell=(8,23) at=(1024.0,2944.0) status=IDLE
-dog: cell=(9,22)
-chest: cell=(8,24)
-camera: at=(1214.5,2884.4) zoom=1.0 view=800.0x1280.0
+player: cell=(3,3) at=(384.0,384.0) status=IDLE
+chest: cell=(3,4)
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
-torch: at=(1344.0,3323.0) distance=236.0 color=555555ff
 menu buttons: 0
 text on ui stage: "COLLECT" at=(272.0,176.0) alpha=1.0 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## window open
 crash: none
-player: cell=(8,23) at=(1024.0,2944.0) status=IDLE
-dog: cell=(9,22)
-chest: cell=(8,24)
-camera: at=(1214.5,2884.4) zoom=1.0 view=800.0x1280.0
+player: cell=(3,3) at=(384.0,384.0) status=IDLE
+chest: cell=(3,4)
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
-torch: at=(1344.0,3323.0) distance=235.9 color=555555ff
 menu buttons: 0
 text on ui stage: "COLLECT" at=(272.0,176.0) alpha=1.0 color=ffffffff
 text on ui stage: "CANCEL" at=(134.0,408.0) alpha=1.0 color=ffffffff
@@ -26,12 +22,10 @@ inventories: player=[-, -, -] chest=[Lighter, -]
 debug lines: false
 ## after OK
 crash: none
-player: cell=(8,23) at=(1024.0,2944.0) status=IDLE
-dog: cell=(9,22)
-chest: cell=(8,24)
-camera: at=(1214.5,2884.4) zoom=1.0 view=800.0x1280.0
+player: cell=(3,3) at=(384.0,384.0) status=IDLE
+chest: cell=(3,4)
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
-torch: at=(1344.0,3323.0) distance=240.0 color=555555ff
 menu buttons: 0
 text on ui stage: "COLLECT" at=(272.0,176.0) alpha=1.0 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
@@ -39,11 +33,9 @@ inventories: player=[Lighter, -, -] chest=[-, -]
 reopened window: chest=[-, -] player=[Lighter, -, -]
 ## walked away
 crash: none
-player: cell=(10,22) at=(1280.0,2816.0) status=IDLE
-dog: cell=(9,22)
-chest: cell=(8,24)
-camera: at=(1214.5,2884.4) zoom=1.0 view=800.0x1280.0
+player: cell=(3,2) at=(384.0,256.0) status=IDLE
+chest: cell=(3,4)
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
-torch: at=(1344.0,3323.0) distance=237.0 color=555555ff
 menu buttons: 0
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
