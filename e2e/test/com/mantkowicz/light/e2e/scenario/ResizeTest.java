@@ -1,6 +1,5 @@
 package com.mantkowicz.light.e2e.scenario;
 
-import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
 import org.junit.jupiter.api.Test;
@@ -9,10 +8,10 @@ import org.junit.jupiter.api.Test;
 class ResizeTest {
     @Test
     void resizeKeepsGamePlayable() {
-        GameDriver game = GameDriver.start();
+        GameDriver game = GameDriver.start(WalkingTest.CORRIDOR.write("corridor"));
         game.resize(800, 1280);
         game.snapshot("800x1280");
-        game.click(new Cell(13, 24));
+        game.click(WalkingTest.CORRIDOR.cell('e'));
         game.seconds(2.5f);
         game.snapshot("walked after resize");
         game.resize(300, 500);

@@ -24,7 +24,7 @@ public final class HeadlessGame {
     private final ScriptedInput input = new ScriptedInput();
     private final Main game;
 
-    /** The map the tests were written for (map.tmx, the original dark house). */
+    /** The original dark house (map.tmx), where the game starts when no map is given. Tests use their own maps. */
     public static final String TEST_MAP = "map.tmx";
     /** The goldens were recorded at the designed zoom, whatever Main.CAMERA_ZOOM is set to. */
     public static final float TEST_CAMERA_ZOOM = 1f;

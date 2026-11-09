@@ -18,9 +18,10 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
 - **Retire the old single-texture pictures** (2026‑11‑08). Maps made with tools/assets draw everything from the atlases
   (their tiles are built without a background: `TileFactory.createMapTile`). The old pictures (`floor-tile.png`,
   `wall-tile.png`, `player.png`, `dog.png`, `chest.png`, …, preloaded in `ResourcesService`) are still used by the
-  original house map `android/assets/map.tmx`, which most e2e tests and goldens run on. To remove them: rebuild the house
-  as a level in Tiled (or drop it), move the tests to it and re-record their goldens, then delete the pictures, their
-  preload list and the background constructors of `FloorTile`/`WallTile`. Do it once the atlases feel settled.
+  original house map `android/assets/map.tmx` (e2e tests no longer run on it, only `ShippedMapsTest` loads it, and the
+  board tests place a few furniture pictures through `TestMap.with`). To remove them: rebuild the house as a level in
+  Tiled (or drop it), then delete the pictures, their preload list and the background constructors of
+  `FloorTile`/`WallTile`. Do it once the atlases feel settled.
 - **Map roles from Tiled custom types instead of layer names** (2026‑11‑08). Today the game reads roles from names typed
   by hand in Tiled: layers called `collision` (not walkable, never drawn) and `walls` (not walkable, blocks light), and
   the map property `ambientLight` (`TmxTiledMapLoader` constants). Problems: a typo or rename (`Collision`, `walls 2`)
