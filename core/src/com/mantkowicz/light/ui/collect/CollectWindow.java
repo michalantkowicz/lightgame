@@ -43,6 +43,7 @@ public class CollectWindow extends GameActor {
     private final List<CollectItem> collectItems;
     private CollectItem chosenItem;
     private final Table mainTable;
+    private boolean closed;
 
     public CollectWindow(GameContext context, Collecting collecting, Collectible collectible) {
         super(COLLECT_WINDOW);
@@ -80,6 +81,21 @@ public class CollectWindow extends GameActor {
 
         Plugin plugin = new CenterActorByCameraPlugin(this, new Vector2());
         addPlugin(plugin);
+
+        collectible.beforeCollect();
+    }
+
+    /**
+     * Closes the window (OK or CANCEL) and tells the collectible, once.
+     */
+    @Override
+    public boolean remove() {
+        boolean removed = super.remove();
+        if (!closed) {
+            closed = true;
+            collectible.afterCollect();
+        }
+        return removed;
     }
 
     public void onItemChosen() {

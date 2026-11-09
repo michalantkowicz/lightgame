@@ -28,6 +28,8 @@ class LevelTest {
     private static final Cell NORTH_EAST = new Cell(8, 7);
     private static final Cell NORTH_WEST = new Cell(4, 7);
     private static final int MAX_WALK_FRAMES = 300;
+    private static final Cell COW = new Cell(4, 9);
+    private static final Cell CHEST = new Cell(8, 9);
 
     @Test
     void theGameStartsOnThisLevel() {
@@ -60,6 +62,35 @@ class LevelTest {
         game.seconds(3);
         assertEquals(EAST, game.playerCell());
         assertEquals("rabbit/idle_down", game.playerAnimation(), "back to the default pose after the walk");
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void theCowStandsInItsPlaceChewingAway() {
+        GameDriver game = GameDriver.start(LEVEL);
+        assertEquals(COW, game.cellOf(GameDriver.Kind.COW));
+        assertEquals("cow_brown/idle", game.cowAnimation(), "its default animation");
+        assertFalse(game.isAccessible(COW), "nobody walks through a cow");
+    }
+
+    @Test
+    void theChestOpensWithTheCollectWindowAndShutsAfterIt() {
+        GameDriver game = GameDriver.start(LEVEL);
+        assertEquals(CHEST, game.cellOf(GameDriver.Kind.CHEST));
+        assertFalse(game.isAccessible(CHEST), "the chest blocks its cell");
+        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "closed at the start");
+
+        game.click(CHEST);
+        game.seconds(3);
+        assertTrue(game.neighbours(CHEST).contains(game.playerCell()), "clicking the chest walks next to it");
+
+        game.clickButton("COLLECT");
+        game.seconds(1);
+        assertEquals("chest/open_front", game.chestAnimation(), "the lid opens with the window");
+
+        game.clickButton("CANCEL");
+        game.seconds(1);
+        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "and shuts when it closes");
         assertFalse(game.crashed());
     }
 

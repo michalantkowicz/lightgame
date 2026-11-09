@@ -19,6 +19,7 @@ import static com.mantkowicz.light.resources.PhraseGroup.NO_PATH;
 
 public class BoardClickListener extends ClickListener {
     private final Board board;
+    private final BoardService boardService;
     private final GameEventService gameEventService;
     private final NotificationStage notificationStage;
     private final PhraseService phraseService;
@@ -27,6 +28,7 @@ public class BoardClickListener extends ClickListener {
 
     public BoardClickListener(GameContext context, Board board) {
         this.board = board;
+        boardService = context.getBoardService();
         gameEventService = context.getGameEventService();
         notificationStage = context.getNotificationStage();
         phraseService = context.getPhraseService();
@@ -46,7 +48,7 @@ public class BoardClickListener extends ClickListener {
     public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
         Tile touchedTile = resolveTile(x, y);
         if (touchedTile != null) {
-            if (!touchedTile.isAccessible()) {
+            if (!touchedTile.isAccessible() && !boardService.isUsedFromNeighbour(touchedTile)) {
                 handleNoPathTile(touchedTile);
             } else if (touchedTile.isMarked()) {
                 touchedTile.unmark();

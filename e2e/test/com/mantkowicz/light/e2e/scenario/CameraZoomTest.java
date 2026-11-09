@@ -13,18 +13,23 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 class CameraZoomTest {
     private static final Cell START = new Cell(10, 22);
-    private static final Cell CHEST = new Cell(10, 24);
+    private static final Cell CHEST = new Cell(8, 24);
+    /** The chest blocks its cell: clicking it walks to the nearest free cell next to it. */
+    private static final Cell NEXT_TO_CHEST = new Cell(8, 23);
 
     @Test
     void zoomingInMakesTheWorldBiggerButNotTheButtons() {
         GameDriver normal = GameDriver.start();
-        GameDriver close = GameDriver.startZoomed(0.5f);
-        assertEquals(2 * normal.cellSizeOnScreen(START), close.cellSizeOnScreen(START), 0.01f, "cells twice as big");
+        assertEquals(2 * normal.cellSizeOnScreen(START), GameDriver.startZoomed(0.5f).cellSizeOnScreen(START), 0.01f,
+                "cells twice as big");
+
+        GameDriver close = GameDriver.startZoomed(0.75f); // close enough, and the chest is still on screen
+        assertEquals(normal.cellSizeOnScreen(START) / 0.75f, close.cellSizeOnScreen(START), 0.01f);
 
         for (GameDriver game : new GameDriver[]{normal, close}) {
             game.click(CHEST);
             game.seconds(2);
-            assertEquals(CHEST, game.playerCell(), "clicks hit the right cell at any zoom");
+            assertEquals(NEXT_TO_CHEST, game.playerCell(), "clicks hit the right cell at any zoom");
             assertFalse(game.crashed());
         }
         assertEquals(normal.buttonOnScreen("COLLECT"), close.buttonOnScreen("COLLECT"), "the button doesn't move or grow");
