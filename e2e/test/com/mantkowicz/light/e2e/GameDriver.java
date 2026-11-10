@@ -164,6 +164,17 @@ public final class GameDriver {
         throw new IllegalStateException("No \"" + text + "\" button on screen");
     }
 
+    /** The effective alpha of every UI button with this text, e.g. [1.0] for one fully shown COLLECT button. */
+    public List<Float> buttonAlphas(String text) {
+        List<Float> alphas = new ArrayList<>();
+        for (Actor actor : uiActors()) {
+            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
+                alphas.add(effectiveAlpha(button));
+            }
+        }
+        return alphas;
+    }
+
     /** Short click on a slot of the collect window: the chest's row or the player's row. */
     public void clickChestSlot(int index) {
         tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTIBLE_ITEM).get(index)));

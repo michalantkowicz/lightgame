@@ -3,13 +3,19 @@ package com.mantkowicz.light.e2e.scenario;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
 import com.mantkowicz.light.e2e.TestMap;
+import com.mantkowicz.light.e2e.Cell;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * S15: the collect flow. Clicking the chest walks next to it (it blocks its cell) and shows a COLLECT button; it
  * opens a window with the chest's and the player's slots; items are moved by clicking a full slot and then a free one;
  * OK saves, CANCEL drops the changes;
- * walking away removes the button. Every COLLECT click opens a fresh window showing the saved inventories.
+ * walking to another cell next to the chest keeps the button (no fading), walking away removes it. Every COLLECT click opens a fresh window showing the saved inventories.
  * (Was bug B1: the game crashed when the button appeared; B7: a cancelled window was reopened with its unsaved changes.)
  */
 class CollectTest {
@@ -74,5 +80,26 @@ class CollectTest {
         game.seconds(1);
         game.note("reopened window: " + game.collectWindowSlots());
         Golden.assertMatches("collect-cancel", game.timeline());
+    }
+
+    /** Bug: stepping to another cell next to the chest faded the button out while a new one popped up. */
+    @Test
+    void buttonStaysWhileWalkingAroundTheChest() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.click(MAP.cell('C'));
+        game.seconds(2);
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
+
+        Cell besideTheChest = new Cell(2, 3);
+        game.click(besideTheChest);
+        for (int frame = 0; frame < 120; frame++) {
+            game.frames(1);
+            assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "frame " + frame);
+        }
+        assertEquals(besideTheChest, game.playerCell());
+
+        game.click(new Cell(2, 1));
+        game.seconds(3);
+        assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the button is gone once the player left the chest");
     }
 }

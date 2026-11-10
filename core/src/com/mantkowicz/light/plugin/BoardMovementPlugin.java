@@ -23,8 +23,7 @@ import static com.mantkowicz.light.actor.Status.MOVEMENT;
  * from where the player is.
  * <p>
  * The board still sees the walk tile by tile: when the player's centre crosses into a tile, a {@link PlayerMoveEvent} says it
- * left its tile, and in the next frame it enters the new one (collisions, collecting). The frame in between keeps the
- * "left" event from removing a COLLECT button that the new tile shows.
+ * left its tile, and in the next frame it enters the new one (collisions, collecting).
  */
 public class BoardMovementPlugin implements Plugin {
     /** How far (in tiles) a straight line keeps away from blocked or missing tiles. */

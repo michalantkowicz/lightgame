@@ -128,3 +128,15 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   offsets from the clicked cell, the dog and the player. `reroute` lost a COLLECT line (the house route passed the
   chest). `board-layout`, `board-drawing` and `path-lengths` describe the new maps.
 - Snapshots leave out the dog line on maps without a dog; board descriptions also cover tiles drawn from an atlas.
+
+## 2026‑11‑10, COLLECT button stays next to the chest (branch `claude/collect-button-stays-near-chest`)
+
+- **Bug:** standing next to the chest and stepping to another cell that is also next to it, the COLLECT button started fading out
+  (any player move removed it) and a new button popped up on the new cell.
+- **Fix:** the button now stays while the player is within reach of the collectible: on its cell, or for a distant one (the chest) on
+  any of its 8 neighbours. It fades out only once the player's cell leaves that area. `RemoveOnPlayerMovePlugin` is replaced by
+  `RemoveWhenUnavailablePlugin` (fades out when a condition stops holding), `ActionButton` takes that condition, and
+  `PlayerCollectResolver` keeps one button per collectible, so entering another cell in reach doesn't add a second one.
+- Side effect: the button stays clickable while walking within reach (before, it was disabled as soon as the walk started).
+- Test: `CollectTest.buttonStaysWhileWalkingAroundTheChest` checks every frame of the step that exactly one COLLECT button is shown at
+  full alpha, and that it's gone after walking away (fails on the old code at the first frame). The goldens are unchanged.

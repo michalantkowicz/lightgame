@@ -7,15 +7,21 @@ import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.CenterActorByCameraPlugin;
 import com.mantkowicz.light.plugin.Plugin;
-import com.mantkowicz.light.plugin.RemoveOnPlayerMovePlugin;
+import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
+
+import java.util.function.BooleanSupplier;
 
 import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
+/**
+ * A button at the bottom of the screen that stays while its action is available and fades out when it no longer is.
+ */
 public class ActionButton extends GameActor {
     private final TextButton button;
+    private final RemoveWhenUnavailablePlugin removeWhenUnavailablePlugin;
 
-    public ActionButton(GameContext context, String text, EventListener listener) {
+    public ActionButton(GameContext context, String text, EventListener listener, BooleanSupplier available) {
         super(ACTION_BUTTON);
 
         button = new TextButton(text, context.getResourcesService().getSkin(), "action");
@@ -28,7 +34,12 @@ public class ActionButton extends GameActor {
         Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, new Vector2(0, SCREEN_WIDTH / 2f));
         addPlugin(centerActorByCameraPlugin);
 
-        RemoveOnPlayerMovePlugin removeOnPlayerMovePlugin = new RemoveOnPlayerMovePlugin(this, context);
-        addPlugin(removeOnPlayerMovePlugin);
+        removeWhenUnavailablePlugin = new RemoveWhenUnavailablePlugin(this, available);
+        addPlugin(removeWhenUnavailablePlugin);
+    }
+
+    /** Still on screen and usable: not fading out or removed. */
+    public boolean isShown() {
+        return getStage() != null && !removeWhenUnavailablePlugin.isLeaving();
     }
 }
