@@ -75,7 +75,7 @@ public class BoardService {
                 gameEventService.post(new CollectEvent((Collectible) tileActor));
             }
         }
-        for (Tile neighbour : tile.getNeighbours()) {
+        for (Tile neighbour : tile.getSideNeighbours()) {
             for (GameActor tileActor : gameActorsByTile.getGameActors(neighbour)) {
                 if (!tileActor.equals(gameActor) && tileActor instanceof Collectible && ((Collectible) tileActor).isDistant()) {
                     gameEventService.post(new CollectEvent((Collectible) tileActor));
@@ -85,7 +85,7 @@ public class BoardService {
     }
 
     /**
-     * Whether the tile holds something used from a neighbouring tile (a chest): clicking it means "walk next to it".
+     * Whether the tile holds something used from a side neighbour (a chest): clicking it means "walk next to it".
      */
     public boolean isUsedFromNeighbour(Tile tile) {
         for (GameActor actor : gameActorsByTile.getGameActors(tile)) {

@@ -138,6 +138,23 @@ public abstract class Tile {
         return neighbours;
     }
 
+    /**
+     * The neighbours sharing a side with this tile (up, down, left, right), without the diagonal ones. Walking uses all
+     * {@link #getNeighbours()}; actions (collecting from a chest) only reach these, because the characters face only these
+     * four directions.
+     */
+    public List<Tile> getSideNeighbours() {
+        List<Tile> sides = new ArrayList<>();
+        Vector2 center = getCenter();
+        for (Tile neighbour : neighbours) {
+            Vector2 other = neighbour.getCenter();
+            if (Math.abs(other.x - center.x) < 0.5f || Math.abs(other.y - center.y) < 0.5f) {
+                sides.add(neighbour);
+            }
+        }
+        return sides;
+    }
+
     public void addNeighbour(Tile neighbour) {
         this.neighbours.add(neighbour);
     }

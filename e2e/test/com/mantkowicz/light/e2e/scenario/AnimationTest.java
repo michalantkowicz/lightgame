@@ -90,7 +90,7 @@ class AnimationTest {
 
         game.click(chest);
         game.seconds(3);
-        assertTrue(game.neighbours(chest).contains(game.playerCell()), "clicking the chest walks next to it");
+        assertTrue(game.sideNeighbours(chest).contains(game.playerCell()), "clicking the chest walks next to its side");
 
         game.clickButton("COLLECT");
         game.seconds(1);

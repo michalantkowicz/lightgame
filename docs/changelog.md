@@ -128,3 +128,33 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   offsets from the clicked cell, the dog and the player. `reroute` lost a COLLECT line (the house route passed the
   chest). `board-layout`, `board-drawing` and `path-lengths` describe the new maps.
 - Snapshots leave out the dog line on maps without a dog; board descriptions also cover tiles drawn from an atlas.
+
+## 2026‑11‑10, COLLECT button stays next to the chest (branch `claude/collect-button-stays-near-chest`)
+
+- **Bug:** standing next to the chest and stepping to another cell that is also next to it, the COLLECT button started fading out
+  (any player move removed it) and a new button popped up on the new cell.
+- **Fix:** the button now stays while the player is within reach of the collectible: on its cell, or for a distant one (the chest) on
+  any of its 8 neighbours. It fades out only once the player's cell leaves that area. `RemoveOnPlayerMovePlugin` is replaced by
+  `RemoveWhenUnavailablePlugin` (fades out when a condition stops holding), `ActionButton` takes that condition, and
+  `PlayerCollectResolver` keeps one button per collectible, so entering another cell in reach doesn't add a second one.
+- The button stays clickable while walking within reach, but the window opens only where the player stands still: COLLECT
+  clicked during a walk works like clicking the chest (`TileTouchedEvent` on its cell), so `BoardMovementPlugin` re-routes to the
+  cell in reach the player is on (or the nearest one) and the window opens on arrival (`CollectResolver.update`, run every frame by
+  `CollectPlugin`). Before, clicking COLLECT while walking away opened the window with the player leaving the chest.
+  `OpenCollectWindowButtonListener` is gone; `PlayerCollectResolver` opens the windows (still a fresh one per click).
+- **Reach is the 4 side cells only.** A chest is used from up, down, left or right, not diagonally, because the characters
+  only face those four directions (and later actions, like chopping a tree, need the same). `Tile.getSideNeighbours()` gives
+  them; collecting (`BoardService.checkCollisions`), "walk next to the chest" (`BoardMovementPlugin.walkTarget`) and the
+  button's reach use it. Walking and path finding still use all 8 neighbours.
+- Going around a chest now passes a corner cell, out of reach: the button starts fading there, and fades back in (the same
+  button) when the player reaches the next side cell before it's gone (`RemoveWhenUnavailablePlugin`).
+- The fading button stays touchable: before, a click on it went through to the board under it and walked the player
+  there. Now it catches the click, and the click does nothing while the player is out of reach (no window, the walk goes
+  on). Test: `CollectTest.clickOnFadingButtonDoesNothing` (on a taller map, so there are cells under the button).
+- Test: `CollectTest.walkingAroundTheChestKeepsOneButton` (was `buttonStaysWhileWalkingAroundTheChest`) checks every frame of the step that exactly one COLLECT button is shown at
+  full alpha (now: from below the chest to its left side, exactly one button on every frame, back at full alpha on arrival),
+  and that it's gone after walking away (fails on the old code at the first frame). `noButtonDiagonallyNextToTheChest`: no
+  button on a corner cell, and clicking the chest from there walks to a side. `AnimationTest` and `ShippedMapsTest` check
+  side cells for chests.
+  `CollectTest.collectWhileWalkingAwayStopsNextToTheChest` clicks COLLECT just after starting to walk away: no window during the
+  walk, then the player stands next to the chest with the window open. The goldens are unchanged.
