@@ -23,8 +23,7 @@ import static com.mantkowicz.light.actor.Status.MOVEMENT;
  * from where the player is.
  * <p>
  * The board still sees the walk tile by tile: when the player's centre crosses into a tile, a {@link PlayerMoveEvent} says it
- * left its tile, and in the next frame it enters the new one (collisions, collecting). The frame in between keeps the
- * "left" event from removing a COLLECT button that the new tile shows.
+ * left its tile, and in the next frame it enters the new one (collisions, collecting).
  */
 public class BoardMovementPlugin implements Plugin {
     /** How far (in tiles) a straight line keeps away from blocked or missing tiles. */
@@ -53,19 +52,19 @@ public class BoardMovementPlugin implements Plugin {
     }
 
     /**
-     * The clicked tile, or for something used from a neighbouring tile (a chest) the free neighbour with the shortest
-     * walk (where the player stands if it's already next to it).
+     * The clicked tile, or for something used from a neighbouring tile (a chest) the free side neighbour (not a diagonal
+     * one) with the shortest walk (where the player stands if it's already there).
      */
     private Tile walkTarget(Tile clicked, Tile current) {
         if (clicked.isAccessible() || !boardService.isUsedFromNeighbour(clicked)) {
             return clicked;
         }
-        if (clicked.getNeighbours().contains(current)) {
+        if (clicked.getSideNeighbours().contains(current)) {
             return current;
         }
         Tile best = clicked;
         int shortest = Integer.MAX_VALUE;
-        for (Tile neighbour : clicked.getNeighbours()) {
+        for (Tile neighbour : clicked.getSideNeighbours()) {
             int length = neighbour.isAccessible() ? boardService.getPath(current, neighbour).getPathNodes().size() : 0;
             if (length > 0 && length < shortest) {
                 best = neighbour;

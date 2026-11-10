@@ -22,5 +22,6 @@ public class CollectPlugin implements Plugin {
             Collectible collectible = gameEvent.getCollectible();
             collectResolver.resolveCollect(collectible);
         }
+        collectResolver.update();
     }
 }

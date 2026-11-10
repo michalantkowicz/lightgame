@@ -48,6 +48,7 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
+import com.mantkowicz.light.ui.collect.CollectWindow;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -162,6 +163,27 @@ public final class GameDriver {
             }
         }
         throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** Is a collect window open? */
+    public boolean collectWindowOpen() {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof CollectWindow) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /** The effective alpha of every UI button with this text, e.g. [1.0] for one fully shown COLLECT button. */
+    public List<Float> buttonAlphas(String text) {
+        List<Float> alphas = new ArrayList<>();
+        for (Actor actor : uiActors()) {
+            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
+                alphas.add(effectiveAlpha(button));
+            }
+        }
+        return alphas;
     }
 
     /** Short click on a slot of the collect window: the chest's row or the player's row. */
@@ -528,6 +550,15 @@ public final class GameDriver {
     public List<Cell> neighbours(Cell cell) {
         List<Cell> cells = new ArrayList<>();
         for (Tile tile : tile(cell).getNeighbours()) {
+            cells.add(cellOf(tile));
+        }
+        return cells;
+    }
+
+    /** The cells sharing a side with this one: from where a chest on it can be used. */
+    public List<Cell> sideNeighbours(Cell cell) {
+        List<Cell> cells = new ArrayList<>();
+        for (Tile tile : tile(cell).getSideNeighbours()) {
             cells.add(cellOf(tile));
         }
         return cells;
