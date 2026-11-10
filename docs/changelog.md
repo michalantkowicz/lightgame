@@ -137,6 +137,12 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   any of its 8 neighbours. It fades out only once the player's cell leaves that area. `RemoveOnPlayerMovePlugin` is replaced by
   `RemoveWhenUnavailablePlugin` (fades out when a condition stops holding), `ActionButton` takes that condition, and
   `PlayerCollectResolver` keeps one button per collectible, so entering another cell in reach doesn't add a second one.
-- Side effect: the button stays clickable while walking within reach (before, it was disabled as soon as the walk started).
+- The button stays clickable while walking within reach, but the window opens only where the player stands still: COLLECT
+  clicked during a walk works like clicking the chest (`TileTouchedEvent` on its cell), so `BoardMovementPlugin` re-routes to the
+  cell in reach the player is on (or the nearest one) and the window opens on arrival (`CollectResolver.update`, run every frame by
+  `CollectPlugin`). Before, clicking COLLECT while walking away opened the window with the player leaving the chest.
+  `OpenCollectWindowButtonListener` is gone; `PlayerCollectResolver` opens the windows (still a fresh one per click).
 - Test: `CollectTest.buttonStaysWhileWalkingAroundTheChest` checks every frame of the step that exactly one COLLECT button is shown at
-  full alpha, and that it's gone after walking away (fails on the old code at the first frame). The goldens are unchanged.
+  full alpha, and that it's gone after walking away (fails on the old code at the first frame).
+  `CollectTest.collectWhileWalkingAwayStopsNextToTheChest` clicks COLLECT just after starting to walk away: no window during the
+  walk, then the player stands next to the chest with the window open. The goldens are unchanged.

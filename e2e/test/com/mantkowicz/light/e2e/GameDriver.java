@@ -48,6 +48,7 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
+import com.mantkowicz.light.ui.collect.CollectWindow;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -162,6 +163,16 @@ public final class GameDriver {
             }
         }
         throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** Is a collect window open? */
+    public boolean collectWindowOpen() {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof CollectWindow) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** The effective alpha of every UI button with this text, e.g. [1.0] for one fully shown COLLECT button. */

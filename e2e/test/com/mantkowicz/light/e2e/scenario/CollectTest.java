@@ -9,13 +9,15 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * S15: the collect flow. Clicking the chest walks next to it (it blocks its cell) and shows a COLLECT button; it
  * opens a window with the chest's and the player's slots; items are moved by clicking a full slot and then a free one;
  * OK saves, CANCEL drops the changes;
- * walking to another cell next to the chest keeps the button (no fading), walking away removes it. Every COLLECT click opens a fresh window showing the saved inventories.
+ * walking to another cell next to the chest keeps the button (no fading), walking away removes it; COLLECT clicked
+ * while walking away stops the player next to the chest and opens the window there. Every COLLECT click opens a fresh window showing the saved inventories.
  * (Was bug B1: the game crashed when the button appeared; B7: a cancelled window was reopened with its unsaved changes.)
  */
 class CollectTest {
@@ -101,5 +103,25 @@ class CollectTest {
         game.click(new Cell(2, 1));
         game.seconds(3);
         assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the button is gone once the player left the chest");
+    }
+
+    /** COLLECT clicked while walking away (still next to the chest) must not open the window with the player leaving. */
+    @Test
+    void collectWhileWalkingAwayStopsNextToTheChest() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.click(MAP.cell('C'));
+        game.seconds(2);
+        Cell besideTheChest = game.playerCell();
+
+        game.click(new Cell(3, 1));
+        game.frames(3);
+        game.clickButton("COLLECT");
+        assertFalse(game.collectWindowOpen(), "no window while the player is still walking");
+
+        game.seconds(1);
+        assertEquals(besideTheChest, game.playerCell());
+        assertEquals("IDLE", game.playerStatus());
+        assertTrue(game.collectWindowOpen(), "the window opens once the player stands next to the chest");
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "one COLLECT button, never faded");
     }
 }
