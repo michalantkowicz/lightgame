@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * opens a window with the chest's and the player's slots; items are moved by clicking a full slot and then a free one;
  * OK saves, CANCEL drops the changes;
  * the chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
- * walking away removes it; COLLECT clicked
+ * walking away removes it; a click on the fading button does nothing; COLLECT clicked
  * while walking away stops the player next to the chest and opens the window there. Every COLLECT click opens a fresh window showing the saved inventories.
  * (Was bug B1: the game crashed when the button appeared; B7: a cancelled window was reopened with its unsaved changes.)
  */
@@ -29,6 +29,22 @@ class CollectTest {
             "~..C..~",
             "~.....~",
             "~..P..~",
+            "~.....~",
+            "~~~~~~~");
+
+    /** Like {@link #MAP}, with grass far below the chest, so there are cells under the COLLECT button at the bottom. */
+    private static final TestMap TALL_MAP = TestMap.of(
+            "~~~~~~~",
+            "~.....~",
+            "~..C..~",
+            "~.....~",
+            "~..P..~",
+            "~.....~",
+            "~.....~",
+            "~.....~",
+            "~.....~",
+            "~.....~",
+            "~.....~",
             "~.....~",
             "~~~~~~~");
 
@@ -109,6 +125,31 @@ class CollectTest {
         game.click(new Cell(2, 1));
         game.seconds(3);
         assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the button is gone once the player left the chest");
+    }
+
+    /**
+     * Bug: clicking the button while it faded (on the chest's corner cell) went through it to the board below and walked
+     * the player there. The fading button catches the click and does nothing: no window, the walk goes on.
+     */
+    @Test
+    void clickOnFadingButtonDoesNothing() {
+        GameDriver game = GameDriver.start(TALL_MAP.write("collect-tall"));
+        game.click(TALL_MAP.cell('C'));
+        game.seconds(2);
+
+        Cell leftOfTheChest = new Cell(2, 10);
+        game.click(leftOfTheChest);
+        while (game.buttonAlphas("COLLECT").get(0) > 0.7f) {
+            game.frames(1);
+        }
+        assertEquals(new Cell(2, 9), game.playerCell(), "on the corner cell, out of reach");
+        game.clickButton("COLLECT");
+        assertFalse(game.collectWindowOpen());
+
+        game.seconds(2);
+        assertEquals(leftOfTheChest, game.playerCell(), "the click didn't walk the player anywhere else");
+        assertFalse(game.collectWindowOpen());
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 
     /** A chest is used only from its four sides: diagonally next to it there is no button. */

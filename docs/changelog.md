@@ -148,6 +148,9 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   button's reach use it. Walking and path finding still use all 8 neighbours.
 - Going around a chest now passes a corner cell, out of reach: the button starts fading there, and fades back in (the same
   button) when the player reaches the next side cell before it's gone (`RemoveWhenUnavailablePlugin`).
+- The fading button stays touchable: before, a click on it went through to the board under it and walked the player
+  there. Now it catches the click, and the click does nothing while the player is out of reach (no window, the walk goes
+  on). Test: `CollectTest.clickOnFadingButtonDoesNothing` (on a taller map, so there are cells under the button).
 - Test: `CollectTest.walkingAroundTheChestKeepsOneButton` (was `buttonStaysWhileWalkingAroundTheChest`) checks every frame of the step that exactly one COLLECT button is shown at
   full alpha (now: from below the chest to its left side, exactly one button on every frame, back at full alpha on arrival),
   and that it's gone after walking away (fails on the old code at the first frame). `noButtonDiagonallyNextToTheChest`: no

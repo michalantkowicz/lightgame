@@ -22,7 +22,8 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * <p>
  * Clicking COLLECT opens the collect window only where the player stands still: during a walk the click works like a
  * click on the collectible, so the player stops on (or steps back to) the nearest cell in reach, and the window opens
- * on arrival. Every click opens a fresh window, so a cancelled window never shows its unsaved changes again.
+ * on arrival. While the button fades (out of reach, e.g. passing a chest's corner) it still catches clicks, so they
+ * don't walk the player to the board under it, but does nothing. Every click opens a fresh window, so a cancelled window never shows its unsaved changes again.
  */
 public class PlayerCollectResolver implements CollectResolver {
     private final GameContext context;
@@ -68,6 +69,9 @@ public class PlayerCollectResolver implements CollectResolver {
     }
 
     private void requestWindow(Collectible collectible) {
+        if (!isInReach(collectible)) {
+            return; // a fading button (the player is out of reach) catches the click but does nothing
+        }
         if (IDLE.equals(player.getStatus())) {
             openWindow(collectible);
         } else {
