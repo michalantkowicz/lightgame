@@ -58,3 +58,17 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   map, a `SpriteActor` subclass with its `TileObjectType` line. Update the READMEs (step 2 of "Adding an animated
   sprite" in README.md, "Sprites in the game" in tools/assets/README.md, whose note that animals still use `row_NN` is
   already out of date) and the `_help` notes in `pack.json`.
+- **Interactable objects: one reach rule for chests, fields, trees** (2026‑11‑10). After PR #29 a chest is used only from
+  its four side cells (`Tile.getSideNeighbours()`, because the characters face only up, down, left and right), but the
+  code using that rule knows only `Collectible`: `BoardService.checkCollisions` (shows the button), `BoardMovementPlugin.walkTarget`
+  with `BoardService.isUsedFromNeighbour` (walks next to it) and `PlayerCollectResolver.isInReach` (keeps or fades the
+  button), and the button always says COLLECT and opens the collect window. A field to harvest or a tree to chop would
+  have to pretend to be a `Collectible`. Suggested fix: an `Interactable` interface (its tile or tiles; its reach: from
+  the sides like a chest or a tree, or standing on it like a crop cell; the button text: COLLECT, HARVEST, CHOP; and the
+  action), `Collectible` becoming one kind of it. One reach check in `BoardService` (e.g. `isInReach(interactable, tile)`)
+  used by all three places, so they can't drift apart. `PlayerCollectResolver` becomes a general action resolver: one
+  button per object, fading out and back in as now, the action left to the object. Open questions: does the player
+  harvest standing on the field or next to it, and is a patch one object per crop cell (simplest, each ripens on its own)
+  or one object over several cells (reach = side cells of any of them, which also fits a big tree)? Pairs well with
+  "Animated objects placed from Tiled maps": fields and trees would be placed in Tiled the same way. Do it with the first
+  object that isn't a chest; prove it with one harvestable field cell.
