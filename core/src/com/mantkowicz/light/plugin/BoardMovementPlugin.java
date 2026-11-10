@@ -52,19 +52,19 @@ public class BoardMovementPlugin implements Plugin {
     }
 
     /**
-     * The clicked tile, or for something used from a neighbouring tile (a chest) the free neighbour with the shortest
-     * walk (where the player stands if it's already next to it).
+     * The clicked tile, or for something used from a neighbouring tile (a chest) the free side neighbour (not a diagonal
+     * one) with the shortest walk (where the player stands if it's already there).
      */
     private Tile walkTarget(Tile clicked, Tile current) {
         if (clicked.isAccessible() || !boardService.isUsedFromNeighbour(clicked)) {
             return clicked;
         }
-        if (clicked.getNeighbours().contains(current)) {
+        if (clicked.getSideNeighbours().contains(current)) {
             return current;
         }
         Tile best = clicked;
         int shortest = Integer.MAX_VALUE;
-        for (Tile neighbour : clicked.getNeighbours()) {
+        for (Tile neighbour : clicked.getSideNeighbours()) {
             int length = neighbour.isAccessible() ? boardService.getPath(current, neighbour).getPathNodes().size() : 0;
             if (length > 0 && length < shortest) {
                 best = neighbour;

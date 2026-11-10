@@ -16,8 +16,9 @@ import static com.mantkowicz.light.actor.Status.IDLE;
 
 /**
  * Shows a COLLECT button for a collectible the player reaches. The button stays while the player is within reach (on
- * the collectible's tile, or for a distant one like a chest also on a neighbouring tile), even while walking from one
- * such tile to another, and fades out once the player leaves.
+ * the collectible's tile, or for a distant one like a chest also on a side neighbour, not a diagonal one) and fades out
+ * once the player leaves. Coming back before it is gone brings the same button back, so walking around a chest (past
+ * its corner cells) never shows two buttons.
  * <p>
  * Clicking COLLECT opens the collect window only where the player stands still: during a walk the click works like a
  * click on the collectible, so the player stops on (or steps back to) the nearest cell in reach, and the window opens
@@ -38,7 +39,7 @@ public class PlayerCollectResolver implements CollectResolver {
     @Override
     public void resolveCollect(Collectible collectible) {
         ActionButton shown = buttons.get(collectible);
-        if (shown != null && shown.isShown()) {
+        if (shown != null && shown.isOnStage()) {
             return;
         }
 
@@ -83,6 +84,6 @@ public class PlayerCollectResolver implements CollectResolver {
         Tile playerTile = player.getTile();
         Tile collectibleTile = collectible.getTile();
         return playerTile == collectibleTile
-                || (collectible.isDistant() && collectibleTile.getNeighbours().contains(playerTile));
+                || (collectible.isDistant() && collectibleTile.getSideNeighbours().contains(playerTile));
     }
 }

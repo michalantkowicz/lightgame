@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * S15: the collect flow. Clicking the chest walks next to it (it blocks its cell) and shows a COLLECT button; it
  * opens a window with the chest's and the player's slots; items are moved by clicking a full slot and then a free one;
  * OK saves, CANCEL drops the changes;
- * walking to another cell next to the chest keeps the button (no fading), walking away removes it; COLLECT clicked
+ * the chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
+ * walking away removes it; COLLECT clicked
  * while walking away stops the player next to the chest and opens the window there. Every COLLECT click opens a fresh window showing the saved inventories.
  * (Was bug B1: the game crashed when the button appeared; B7: a cancelled window was reopened with its unsaved changes.)
  */
@@ -84,25 +85,46 @@ class CollectTest {
         Golden.assertMatches("collect-cancel", game.timeline());
     }
 
-    /** Bug: stepping to another cell next to the chest faded the button out while a new one popped up. */
+    /**
+     * Bug: stepping to another cell next to the chest faded the button out while a new one popped up. Walking from below
+     * the chest to its left side passes its corner cell (out of reach): the button may dim there, but it is always the same
+     * single button and it is fully back on the side cell.
+     */
     @Test
-    void buttonStaysWhileWalkingAroundTheChest() {
+    void walkingAroundTheChestKeepsOneButton() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
         game.click(MAP.cell('C'));
         game.seconds(2);
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
 
-        Cell besideTheChest = new Cell(2, 3);
-        game.click(besideTheChest);
+        Cell leftOfTheChest = new Cell(2, 4);
+        game.click(leftOfTheChest);
         for (int frame = 0; frame < 120; frame++) {
             game.frames(1);
-            assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "frame " + frame);
+            assertEquals(1, game.buttonAlphas("COLLECT").size(), "frame " + frame);
         }
-        assertEquals(besideTheChest, game.playerCell());
+        assertEquals(leftOfTheChest, game.playerCell());
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
 
         game.click(new Cell(2, 1));
         game.seconds(3);
         assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the button is gone once the player left the chest");
+    }
+
+    /** A chest is used only from its four sides: diagonally next to it there is no button. */
+    @Test
+    void noButtonDiagonallyNextToTheChest() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        Cell cornerOfTheChest = new Cell(2, 3);
+        game.click(cornerOfTheChest);
+        game.seconds(2);
+        assertEquals(cornerOfTheChest, game.playerCell());
+        assertTrue(game.buttonAlphas("COLLECT").isEmpty());
+
+        game.click(MAP.cell('C'));
+        game.seconds(2);
+        assertTrue(game.sideNeighbours(MAP.cell('C')).contains(game.playerCell()), "clicking the chest walks to its side");
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 
     /** COLLECT clicked while walking away (still next to the chest) must not open the window with the player leaving. */

@@ -142,7 +142,16 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   cell in reach the player is on (or the nearest one) and the window opens on arrival (`CollectResolver.update`, run every frame by
   `CollectPlugin`). Before, clicking COLLECT while walking away opened the window with the player leaving the chest.
   `OpenCollectWindowButtonListener` is gone; `PlayerCollectResolver` opens the windows (still a fresh one per click).
-- Test: `CollectTest.buttonStaysWhileWalkingAroundTheChest` checks every frame of the step that exactly one COLLECT button is shown at
-  full alpha, and that it's gone after walking away (fails on the old code at the first frame).
+- **Reach is the 4 side cells only.** A chest is used from up, down, left or right, not diagonally, because the characters
+  only face those four directions (and later actions, like chopping a tree, need the same). `Tile.getSideNeighbours()` gives
+  them; collecting (`BoardService.checkCollisions`), "walk next to the chest" (`BoardMovementPlugin.walkTarget`) and the
+  button's reach use it. Walking and path finding still use all 8 neighbours.
+- Going around a chest now passes a corner cell, out of reach: the button starts fading there, and fades back in (the same
+  button) when the player reaches the next side cell before it's gone (`RemoveWhenUnavailablePlugin`).
+- Test: `CollectTest.walkingAroundTheChestKeepsOneButton` (was `buttonStaysWhileWalkingAroundTheChest`) checks every frame of the step that exactly one COLLECT button is shown at
+  full alpha (now: from below the chest to its left side, exactly one button on every frame, back at full alpha on arrival),
+  and that it's gone after walking away (fails on the old code at the first frame). `noButtonDiagonallyNextToTheChest`: no
+  button on a corner cell, and clicking the chest from there walks to a side. `AnimationTest` and `ShippedMapsTest` check
+  side cells for chests.
   `CollectTest.collectWhileWalkingAwayStopsNextToTheChest` clicks COLLECT just after starting to walk away: no window during the
   walk, then the player stands next to the chest with the window open. The goldens are unchanged.

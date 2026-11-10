@@ -15,11 +15,11 @@ import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 /**
- * A button at the bottom of the screen that stays while its action is available and fades out when it no longer is.
+ * A button at the bottom of the screen that stays while its action is available and fades out when it no longer is
+ * (and fades back in if it becomes available again before it is gone).
  */
 public class ActionButton extends GameActor {
     private final TextButton button;
-    private final RemoveWhenUnavailablePlugin removeWhenUnavailablePlugin;
 
     public ActionButton(GameContext context, String text, EventListener listener, BooleanSupplier available) {
         super(ACTION_BUTTON);
@@ -34,12 +34,11 @@ public class ActionButton extends GameActor {
         Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, new Vector2(0, SCREEN_WIDTH / 2f));
         addPlugin(centerActorByCameraPlugin);
 
-        removeWhenUnavailablePlugin = new RemoveWhenUnavailablePlugin(this, available);
-        addPlugin(removeWhenUnavailablePlugin);
+        addPlugin(new RemoveWhenUnavailablePlugin(this, available));
     }
 
-    /** Still on screen and usable: not fading out or removed. */
-    public boolean isShown() {
-        return getStage() != null && !removeWhenUnavailablePlugin.isLeaving();
+    /** Not removed yet (possibly fading out). */
+    public boolean isOnStage() {
+        return getStage() != null;
     }
 }

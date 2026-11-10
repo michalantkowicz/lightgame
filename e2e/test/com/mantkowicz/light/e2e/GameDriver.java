@@ -555,6 +555,15 @@ public final class GameDriver {
         return cells;
     }
 
+    /** The cells sharing a side with this one: from where a chest on it can be used. */
+    public List<Cell> sideNeighbours(Cell cell) {
+        List<Cell> cells = new ArrayList<>();
+        for (Tile tile : tile(cell).getSideNeighbours()) {
+            cells.add(cellOf(tile));
+        }
+        return cells;
+    }
+
     public List<Cell> cells() {
         return new ArrayList<>(tilesByCell().keySet());
     }
