@@ -72,3 +72,28 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   or one object over several cells (reach = side cells of any of them, which also fits a big tree)? Pairs well with
   "Animated objects placed from Tiled maps": fields and trees would be placed in Tiled the same way. Do it with the first
   object that isn't a chest; prove it with one harvestable field cell.
+- **Game modes by age: a simple backpack for the youngest** (2026‑11‑10). **Needs more discussion before any
+  implementation: how the backpack should look and behave (for each mode) isn't decided yet.** The game should suit kids
+  from about 3 years old up, with easier mechanics for the youngest. Today `Player` has a fixed `Inventory(3)` and every
+  chest goes through the COLLECT button and the collect window (moving items slot by slot), which is too much for a
+  3-year-old. Notes so far:
+  - *Older kids:* a proper backpack, e.g. 8 slots, items of one type stacked in a slot, using and dropping items, maybe
+    simple crafting. Refusing a pickup when full is fine at this age, with a hint like "drop something to make room".
+  - *Youngest (around 3):* they can't read or plan ahead, and drags between slots are too fiddly, so everything is
+    explained by animation and nothing is refused or lost. One carried item (or at most three) with no moving around;
+    items are used automatically (carrying a carrot next to the cow feeds it, with a big happy reaction).
+  - *Full slot for the youngest:* suggested is a **swap**: picking up a new item puts the carried one down where the new
+    one came from (back into the chest, or on the ground), as one animation. Nothing is lost, it can be undone by walking
+    back, and it matches "my hands are full". Rejected: refusing the pickup (feels like being told off), dropping the oldest
+    item (something vanishes unchosen), asking which one to drop (a decision dialog), a bottomless backpack (carrying
+    stops meaning anything). With three slots, one per kind (food, tool, gift), so a new item only replaces its own kind.
+  - *Ideas to make "full" rare:* show the carried item in the rabbit's paws (above its head) instead of a backpack screen;
+    pick up automatically on reaching a chest (no COLLECT button); split carried things (carrot, key, bucket) from
+    collected treasures (flowers, eggs, coins), which fly into a counter or sticker album and never take a slot; place
+    items near where they're used.
+  - *Choosing the mode:* by the parent (first start, behind a simple parent gate, changeable in settings), named by play
+    style rather than age (e.g. "Explorer" and "Adventurer").
+  - *Code, once decided:* a game mode setting choosing the rules: what a pickup does (stack, refuse or swap), whether items
+    are used by hand or automatically, and the presentation (item in the paws with auto-pickup, or the backpack window).
+    Builds on "Interactable objects" above: using an item automatically is an action that runs without a button when the
+    player is in reach.
