@@ -5,6 +5,8 @@ import com.mantkowicz.light.event.AddToStageEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.ThumbnailType;
+import com.mantkowicz.light.resources.UiImage;
+import com.mantkowicz.light.ui.UiStyle;
 
 public class DescriptionInteraction implements Interaction {
     private final GameEventService eventService;
@@ -16,7 +18,7 @@ public class DescriptionInteraction implements Interaction {
         this.actor = actor;
 
         descriptionDefinition = new DescriptionDefinition();
-        descriptionDefinition.setBackground(context.getResourcesService().getNinePatch("tooltip"));
+        descriptionDefinition.setBackground(UiStyle.stretching(context.getResourcesService(), UiImage.DIALOG_BOX));
         descriptionDefinition.setFont(context.getResourcesService().getFont());
         descriptionDefinition.setDescription(description);
         descriptionDefinition.setParent(actor);

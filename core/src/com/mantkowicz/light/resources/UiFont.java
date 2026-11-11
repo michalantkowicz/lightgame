@@ -5,7 +5,7 @@ package com.mantkowicz.light.resources;
  * fonts (ui-pack/fonts), so to use another one add a line here and run the tool. Names are the ones in tools/assets/ui.json.
  */
 public enum UiFont {
-    PIXEL_8X14("pixel_8x14");
+    PIXEL_7X7("pixel_7x7");
 
     private final String font;
 

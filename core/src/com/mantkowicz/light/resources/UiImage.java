@@ -8,7 +8,16 @@ package com.mantkowicz.light.resources;
  */
 public enum UiImage {
     DIALOG_BOX("dialog_box"),
-    CONTINUE_INDICATOR("continue_indicator");
+    CONTINUE_INDICATOR("continue_indicator"),
+    BUTTON("play_button/blank"),
+    BUTTON_DOWN("play_button/blank_down"),
+    PANEL("settings_menu/panel"),
+    SLOT("inventory/slot"),
+    SLOT_PRESSED("inventory/slot_pressed"),
+    SLOT_CHOSEN("inventory/slot_chosen"),
+    SLOT_FREE("inventory/slot_free"),
+    QUESTION_BUTTON("icon_buttons/question"),
+    SUN("emojis/sun");
 
     private final String piece;
 

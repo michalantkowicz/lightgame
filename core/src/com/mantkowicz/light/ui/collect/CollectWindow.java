@@ -4,7 +4,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -18,6 +17,8 @@ import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.CenterActorByCameraPlugin;
 import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.UiImage;
+import com.mantkowicz.light.ui.UiStyle;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,6 @@ public class CollectWindow extends GameActor {
     private static final CollectItem NO_ITEM = null;
     private final Collectible collectible;
     private final Collecting collecting;
-    private final Skin skin;
     private final ResourcesService resourcesService;
     private final List<CollectItem> collectItems;
     private CollectItem chosenItem;
@@ -50,7 +50,6 @@ public class CollectWindow extends GameActor {
 
         this.collectible = collectible;
         this.collecting = collecting;
-        this.skin = context.getResourcesService().getSkin();
         this.resourcesService = context.getResourcesService();
         this.collectItems = new ArrayList<>();
 
@@ -71,7 +70,7 @@ public class CollectWindow extends GameActor {
 
         mainTable.addListener(stopClickThrough());
 
-        mainTable.setBackground(resourcesService.getDrawable("table_background.png"));
+        mainTable.setBackground(UiStyle.stretching(resourcesService, UiImage.PANEL));
 
         mainTable.add(getContent(HEIGHT - 2 * PADDING)).pad(PADDING).expand().center();
 
@@ -128,8 +127,8 @@ public class CollectWindow extends GameActor {
 
     private Table getButtonsTable() {
         Table buttonsTable = new Table();
-        TextButton cancelButton = new TextButton("CANCEL", skin, "no");
-        TextButton okButton = new TextButton("OK", skin, "ok");
+        TextButton cancelButton = UiStyle.textButton(resourcesService, "CANCEL");
+        TextButton okButton = UiStyle.textButton(resourcesService, "OK");
 
         cancelButton.addListener(new ClickListener() {
             @Override
@@ -145,10 +144,10 @@ public class CollectWindow extends GameActor {
             }
         });
 
-        Cell<TextButton> cancelButtonCell = buttonsTable.add(cancelButton);
+        Cell<TextButton> cancelButtonCell = buttonsTable.add(cancelButton).size(cancelButton.getWidth(), cancelButton.getHeight());
         setItemPadding(cancelButtonCell);
 
-        Cell<TextButton> okButtonCell = buttonsTable.add(okButton);
+        Cell<TextButton> okButtonCell = buttonsTable.add(okButton).size(okButton.getWidth(), okButton.getHeight());
         setItemPadding(okButtonCell);
 
         return buttonsTable;

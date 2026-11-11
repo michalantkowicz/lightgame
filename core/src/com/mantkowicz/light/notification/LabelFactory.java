@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.mantkowicz.light.ui.UiStyle;
 
 public class LabelFactory {
     public static Label createLabel(BitmapFont font, NotificationStyle notificationStyle, String text) {
@@ -25,6 +26,9 @@ public class LabelFactory {
                 break;
             case WARNING:
                 labelStyle.fontColor = Color.FIREBRICK;
+                break;
+            case ON_PANEL:
+                labelStyle.fontColor = UiStyle.TEXT;
                 break;
             default:
                 throw new IllegalArgumentException("There is no style defined for notification style: " + notificationStyle.name());

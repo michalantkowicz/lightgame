@@ -31,6 +31,10 @@ public class ResourcesService {
     private static final String RUN_TOOL = "run python3 tools/assets/build_assets.py";
     /** UI pieces and fonts made by tools/assets from the Sprout Lands UI pack (only what UiImage and UiFont list). */
     private static final String UI = "ui-pack/ui.json";
+    /** How much bigger than in the pack UI pieces and fonts are drawn: one pack pixel is 3x3 screen pixels. */
+    public static final int UI_SCALE = 3;
+    /** The font of all game text. */
+    private static final UiFont GAME_FONT = UiFont.PIXEL_7X7;
 
     private final Skin skin;
     private final AssetManager assetManager;
@@ -86,6 +90,11 @@ public class ResourcesService {
         }
         assetManager.finishLoading();
         uiAtlas = assetManager.get(atlasName, TextureAtlas.class);
+        for (UiFont font : UiFont.values()) {
+            BitmapFont bitmapFont = getFont(font);
+            bitmapFont.getData().setScale(UI_SCALE);
+            bitmapFont.setUseIntegerPositions(true);
+        }
 
         // fail at start, not when a widget first needs its piece
         JsonValue images = root.get("images");
@@ -137,7 +146,7 @@ public class ResourcesService {
     }
 
     /**
-     * A pixel font of the UI pack, at its pixel size (scale it by whole numbers to keep it sharp).
+     * A pixel font of the UI pack, drawn at {@link #UI_SCALE} like the UI pieces.
      */
     public BitmapFont getFont(UiFont font) {
         return assetManager.get(uiFonts.get(font), BitmapFont.class);
@@ -266,15 +275,18 @@ public class ResourcesService {
         return new NinePatchDrawable(new NinePatch(assetManager.get(textureName, Texture.class)));
     }
 
+    /**
+     * A thumbnail's picture as it is in the UI pack; draw it at {@link #UI_SCALE} (UiStyle does).
+     */
     public TextureRegion getThumbnail(ThumbnailType thumbnailType) {
-        return getTexture(thumbnailType.getRegionName());
+        return getUiImage(thumbnailType.getImage());
     }
 
     /**
-     * The one game font, loaded once and disposed with the asset manager.
+     * The font of all game text: a pixel font of the UI pack, at UI scale. Loaded once, disposed with the asset manager.
      */
     public BitmapFont getFont() {
-        return assetManager.get(FONT, BitmapFont.class);
+        return getFont(GAME_FONT);
     }
 
     public Skin getSkin() {

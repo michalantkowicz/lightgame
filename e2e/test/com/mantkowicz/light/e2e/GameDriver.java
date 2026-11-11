@@ -440,8 +440,8 @@ public final class GameDriver {
     /**
      * Every UI piece and font the game lists (UiImage, UiFont) as the game loads it, one line each, e.g.
      * "DIALOG_BOX 30x28, nine-patch, borders 15x12" (the
-     * smallest it can be drawn), "CONTINUE_INDICATOR 7x6, animation of 7 frames, 0.7 s", "PIXEL_8X14 line height 15, 'HELLO'
-     * is 50 px wide".
+     * smallest it can be drawn), "CONTINUE_INDICATOR 7x6, animation of 7 frames, 0.7 s", "PIXEL_7X7 line height 24, 'HELLO'
+     * is 87 px wide".
      */
     public List<String> describeUi() {
         ResourcesService resources = screenField("resourcesService");

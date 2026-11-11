@@ -37,6 +37,6 @@ class UiAssetsTest {
         List<String> ui = GameDriver.start().describeUi();
         assertTrue(ui.contains("DIALOG_BOX 30x28, nine-patch, borders 15x12"), ui.toString());
         assertTrue(ui.contains("CONTINUE_INDICATOR 7x6, animation of 7 frames, 0.7 s"), ui.toString());
-        assertTrue(ui.contains("PIXEL_8X14 line height 15, 'HELLO' is 50 px wide"), ui.toString());
+        assertTrue(ui.contains("PIXEL_7X7 line height 24, 'HELLO' is 87 px wide"), ui.toString());
     }
 }

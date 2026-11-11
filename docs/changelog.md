@@ -183,3 +183,23 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   `inventory`), so such sheets may need a grid later; the dialog boxes' splits keep the tail on the left in the
   stretching middle, so a tall box stretches the tail too.
 
+## 2026‑11‑12, the UI drawn with the UI pack (branch `ui-pack`)
+
+- All UI comes from the Sprout Lands UI pack, drawn at `ResourcesService.UI_SCALE` = 3 (one pack pixel is 3x3 screen
+  pixels, the font's too), built by `ui/UiStyle`:
+  - COLLECT, OK, CANCEL: the blank wide button (`play_button/blank`, pressed `blank_down`), a nine-patch, 220x81 at
+    least, dark brown text (`UiStyle.TEXT`);
+  - the collect window: the blank settings panel (`settings_menu/panel`, nine-patch) on the same dimmed screen; slots
+    are the inventory's octagons: light (empty or holding), darker when pressed, dark when chosen, the square one
+    where the chosen item can go;
+  - the description bubble: `dialog_box` (nine-patch) with dark text, up to 420 px wide;
+  - pictures (`ThumbnailType` now names a `UiImage`): the radial menu's describe button is the "?" icon button, the
+    lighter is the sun emoji (the pack has no lighter);
+  - all text (buttons, notifications, descriptions, FPS) uses the pack's 7x7 pixel font (`getFont()`), capitals only.
+- `ui.json` names the pieces used (`names`) and gives the panel and button their nine-patch borders.
+- Goldens re-recorded (approved look change): only texts' positions and colours changed (COLLECT/OK/CANCEL brown and
+  moved with the new button sizes, menu "button" labels and "no path" moved with the new font, descriptions brown).
+  Walking, collecting, inventories and menu behaviour are the same.
+- Not used any more, kept for now: the old skin (`skin/`, still loaded), `font.fnt`, `table_background.png`,
+  `item_background*.png`, and the unused old `android/assets/ui/` skin.
+

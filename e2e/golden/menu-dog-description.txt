@@ -7,7 +7,7 @@ camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 1
   button at=(448.0,687.6) scale=0.7 alpha=0.4
-text on menu stage: "button" at=(424.2,711.4) alpha=0.4 color=ffffffff
+text on menu stage: "button" at=(413.3,715.5) alpha=0.4 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## menu open
 crash: none
@@ -18,7 +18,7 @@ camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 1
   button at=(448.0,726.0) scale=1.0 alpha=1.0
-text on menu stage: "button" at=(413.0,761.0) alpha=1.0 color=ffffffff
+text on menu stage: "button" at=(397.0,767.0) alpha=1.0 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## hovering button
 crash: none
@@ -29,7 +29,7 @@ camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 1
   button at=(448.0,726.0) scale=1.5 alpha=1.0
-text on menu stage: "button" at=(395.5,778.5) alpha=1.0 color=ffffffff
+text on menu stage: "button" at=(371.5,787.5) alpha=1.0 color=ffffffff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## description after 1 s
 crash: none
@@ -39,7 +39,7 @@ chest: cell=gone
 camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(471.0,599.0) alpha=1.0 color=ffffffff
+text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(471.0,599.0) alpha=1.0 color=5c3b2eff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## description after 3 s
 crash: none
@@ -49,7 +49,7 @@ chest: cell=gone
 camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(471.0,599.0) alpha=0.5 color=ffffffff
+text on notification stage: "This is the dog that I know from the very beginning and I like him very much" at=(471.0,599.0) alpha=0.5 color=5c3b2eff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## description after 4.1 s
 crash: none

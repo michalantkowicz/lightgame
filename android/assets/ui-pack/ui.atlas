@@ -1,29 +1,59 @@
 ui.png
-size:64,64
+size:256,256
 filter:Nearest,Nearest
 repeat:none
 continue_indicator
-  bounds:34,2,7,6
+  bounds:26,160,7,6
   index:0
 continue_indicator
-  bounds:43,2,7,6
+  bounds:35,160,7,6
   index:1
 continue_indicator
-  bounds:52,2,7,6
+  bounds:44,160,7,6
   index:2
 continue_indicator
-  bounds:2,32,7,6
+  bounds:53,160,7,6
   index:3
 continue_indicator
-  bounds:11,32,7,6
+  bounds:62,160,7,6
   index:4
 continue_indicator
-  bounds:20,32,7,6
+  bounds:71,160,7,6
   index:5
 continue_indicator
-  bounds:29,32,7,6
+  bounds:80,160,7,6
   index:6
 dialog_box
-  bounds:2,2,30,28
+  bounds:34,126,30,28
   split:9,6,6,6
+  index:0
+emojis/sun
+  bounds:110,2,32,32
+  index:0
+icon_buttons/question
+  bounds:2,160,22,24
+  index:0
+inventory/slot
+  bounds:144,2,30,32
+  index:0
+inventory/slot_chosen
+  bounds:208,2,30,32
+  index:0
+inventory/slot_free
+  bounds:2,126,30,32
+  index:0
+inventory/slot_pressed
+  bounds:176,2,30,32
+  index:0
+play_button/blank
+  bounds:66,126,90,27
+  split:6,6,5,7
+  index:0
+play_button/blank_down
+  bounds:158,126,90,25
+  split:6,6,5,7
+  index:0
+settings_menu/panel
+  bounds:2,2,106,122
+  split:7,7,7,9
   index:0

@@ -9,16 +9,16 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 import static com.mantkowicz.light.actor.GameActorType.DESCRIPTION;
-import static com.mantkowicz.light.notification.NotificationStyle.DEFAULT;
+import static com.mantkowicz.light.notification.NotificationStyle.ON_PANEL;
 
 public class Description extends GameActor {
-    private static final int DESCRIPTION_MAX_WIDTH = 200;
+    private static final int DESCRIPTION_MAX_WIDTH = 420;
     private final Label label;
 
     protected Description(DescriptionDefinition definition) {
         super(DESCRIPTION);
 
-        label = LabelFactory.createLabel(definition.getFont(), DEFAULT, definition.getBackground(), definition.getDescription());
+        label = LabelFactory.createLabel(definition.getFont(), ON_PANEL, definition.getBackground(), definition.getDescription());
         if (label.getWidth() > DESCRIPTION_MAX_WIDTH) {
             label.setWrap(true);
             label.setWidth(DESCRIPTION_MAX_WIDTH);
