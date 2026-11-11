@@ -9,6 +9,10 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -46,6 +50,8 @@ import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
+import com.mantkowicz.light.resources.UiFont;
+import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.collect.CollectItem;
 import com.mantkowicz.light.ui.collect.CollectItemType;
 import com.mantkowicz.light.ui.collect.CollectWindow;
@@ -429,6 +435,42 @@ public final class GameDriver {
         return new float[]{
                 player.getAvatar().getX() + (sheet.frameWidth() / 2f - sheet.trimX()) * scale,
                 player.getAvatarRestY() + (sheet.frameHeight() / 2f - sheet.trimY()) * scale};
+    }
+
+    /**
+     * Every UI piece and font the game lists (UiImage, UiFont) as the game loads it, one line each, e.g.
+     * "DIALOG_BOX 30x28, nine-patch, borders 15x12" (the
+     * smallest it can be drawn), "CONTINUE_INDICATOR 7x6, animation of 7 frames, 0.7 s", "PIXEL_8X14 line height 15, 'HELLO'
+     * is 50 px wide".
+     */
+    public List<String> describeUi() {
+        ResourcesService resources = screenField("resourcesService");
+        List<String> lines = new ArrayList<>();
+        for (UiImage image : UiImage.values()) {
+            TextureRegion region = resources.getUiImage(image);
+            StringBuilder line = new StringBuilder(image + " " + region.getRegionWidth() + "x" + region.getRegionHeight());
+            try {
+                NinePatch patch = resources.getUiNinePatch(image);
+                line.append(", nine-patch, borders ").append((int) (patch.getLeftWidth() + patch.getRightWidth())).append("x")
+                        .append((int) (patch.getTopHeight() + patch.getBottomHeight()));
+            } catch (IllegalArgumentException notANinePatch) {
+                // a plain piece
+            }
+            try {
+                Animation<TextureRegion> animation = resources.getUiAnimation(image);
+                line.append(", animation of ").append(animation.getKeyFrames().length).append(" frames, ")
+                        .append(Snapshot.number(animation.getAnimationDuration())).append(" s");
+            } catch (IllegalArgumentException notAnAnimation) {
+                // a still piece
+            }
+            lines.add(line.toString());
+        }
+        for (UiFont font : UiFont.values()) {
+            BitmapFont bitmapFont = resources.getFont(font);
+            lines.add(font + " line height " + (int) bitmapFont.getLineHeight() + ", 'HELLO' is "
+                    + (int) new GlyphLayout(bitmapFont, "HELLO").width + " px wide");
+        }
+        return lines;
     }
 
     private static String regionName(TextureRegion region) {

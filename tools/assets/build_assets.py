@@ -12,7 +12,13 @@ Turns a sprite pack (Sprout Lands) into everything the project needs:
   android/assets/sprites/animations.json  animation names, frame counts, durations                     (generated)
   core/src/.../resources/Action.java  enum of the animation actions named in pack.json                 (generated)
 
+  android/assets/ui-pack/ui.atlas          the UI pieces listed in the game's UiImage enum, in one texture   (generated)
+  android/assets/ui-pack/ui.json           UI piece names, animations, fonts                                (generated)
+  android/assets/ui-pack/fonts/*.fnt       bitmap fonts made from the UI pack's TTF fonts (UiFont enum)     (generated)
+
   build/assets-preview/               animated GIF of every animation, terrain overlays, report        (git-ignored)
+
+A second pack, the Sprout Lands UI pack (buttons, dialog boxes, icons, fonts), is described in tools/assets/ui.json.
 
 What is in the pack is described in tools/assets/pack.json (which sheet is a tileset, which one has terrains,
 how animation sheets are cut). Terrains are detected from the tiles' transparency, empty animation frames are skipped,
@@ -20,7 +26,8 @@ so a changed pack usually needs no change in pack.json. Files that pack.json doe
 
 Usage:
   python3 tools/assets/build_assets.py "/path/to/Sprout Lands - Sprites - premium pack"
-  python3 tools/assets/build_assets.py            # same pack as last time
+  python3 tools/assets/build_assets.py            # same packs as last time
+  python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # the UI pack, once
 
 Needs Pillow (pip3 install pillow).
 """
@@ -40,7 +47,7 @@ import zlib
 from pathlib import Path
 
 try:
-    from PIL import Image
+    from PIL import Image, ImageDraw, ImageFont
 except ImportError:
     sys.exit("Pillow is missing: pip3 install pillow")
 
@@ -48,6 +55,8 @@ ROOT = Path(__file__).resolve().parents[2]
 TOOL_DIR = Path(__file__).resolve().parent
 CONFIG_FILE = TOOL_DIR / "pack.json"
 PACK_PATH_FILE = TOOL_DIR / ".pack-path"  # remembers the last pack directory (git-ignored)
+UI_CONFIG_FILE = TOOL_DIR / "ui.json"
+UI_PACK_PATH_FILE = TOOL_DIR / ".ui-pack-path"  # remembers the UI pack's directory (git-ignored)
 
 SRC_DIR = ROOT / "assets-src"
 TILESETS_DIR = SRC_DIR / "tilesets"
@@ -63,6 +72,11 @@ ACTION_ENUM = GAME_RESOURCES_SRC / "Action.java"  # generated from the row names
 DIRECTIONS = ("down", "up", "left", "right")  # the game's Direction enum
 TILES_ATLAS = "tiles"
 SPRITES_ATLAS = "sprites"
+GAME_UI_DIR = GAME_ASSETS / "ui-pack"  # not "ui": that holds an old, unused libGDX skin
+UI_ATLAS = "ui"
+UI_IMAGE_ENUM = GAME_RESOURCES_SRC / "UiImage.java"  # written by hand: the UI pieces the game uses
+UI_FONT_ENUM = GAME_RESOURCES_SRC / "UiFont.java"  # written by hand: the fonts the game uses
+FONT_CHARS = [chr(c) for c in range(32, 127)]  # ASCII: the pack's fonts have no other letters
 
 PREVIEW_DIR = ROOT / "build" / "assets-preview"
 
@@ -422,6 +436,8 @@ def atlas_text(page_name, page, regions):
         w, h = region["image"].size
         lines.append(region["name"])
         lines.append(f"  bounds:{region['x']},{region['y']},{w},{h}")
+        if region.get("split"):
+            lines.append("  split:" + ",".join(str(v) for v in region["split"]))  # nine-patch: atlas.createPatch
         lines.append(f"  index:{region['index']}")
     return "\n".join(lines) + "\n"
 
@@ -596,10 +612,10 @@ def build_sprites(config, pack):
     return animations, used
 
 
-def write_preview_index(animations, used):
+def write_preview_index(animations, used, ui):
     """
-    build/assets-preview/index.html: every animation of the pack playing (the ones in the game marked), the levels,
-    the terrain overlays and the warnings.
+    build/assets-preview/index.html: every animation of the pack playing (the ones in the game marked), the UI pack's
+    pieces and fonts, the levels, the terrain overlays and the warnings.
     """
     from html import escape
     by_sheet = {}
@@ -619,7 +635,7 @@ def write_preview_index(animations, used):
              ".card span{display:block;color:#fff;margin-top:4px}",
              "nav a{margin-right:12px}pre{background:#d6d6d6;padding:8px;white-space:pre-wrap}",
              "</style><h1>Asset preview</h1>",
-             "<nav><a href='#animations'>Animations</a><a href='#maps'>Levels</a>",
+             "<nav><a href='#animations'>Animations</a><a href='#ui'>UI</a><a href='#maps'>Levels</a>",
              "<a href='#terrains'>Terrains</a><a href='#warnings'>Warnings</a></nav>",
              f"<h2 id='animations'>Animations ({len(animations)})</h2>",
              "<p>Every sheet in the pack. Only the ones listed in the game's <code>Sprite</code> enum "
@@ -636,6 +652,7 @@ def write_preview_index(animations, used):
             info = f"{animation['frames']} × {int(animation['frameDuration'] * 1000)} ms, {animation['playMode'].lower()}"
             parts.append(f"<div class='card'><img src='{gif}' alt=''><span>{escape(name)}<br>{info}</span></div>")
         parts.append("</div>")
+    parts += ui_preview_html(ui)
     parts.append("<h2 id='maps'>Levels</h2>")
     for image in images("maps"):
         parts.append(f"<h3>{escape(image.stem)}</h3><img src='maps/{image.name}' alt=''>")
@@ -930,6 +947,356 @@ def create_starter_map(tilesets_by_name, config):
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# UI pack (ui.json)
+# ----------------------------------------------------------------------------------------------------------------------
+
+def java_enum_values(path):
+    """{value: constant} of an enum written like Sprite, CONSTANT("value"), e.g. {"dialog_box": "DIALOG_BOX"}."""
+    if not path.exists():
+        raise SystemExit(f"Missing {path.relative_to(ROOT)}")
+    code = re.sub(r"//[^\n]*|/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.S)
+    values = {}
+    for constant, value in re.findall(r"\b([A-Z][A-Z0-9_]*)\s*\(\s*\"([^\"]*)\"\s*\)", code):
+        if value in values:
+            raise SystemExit(f"{path.name}: '{value}' is listed twice ({values[value]} and {constant})")
+        values[value] = constant
+    return values
+
+
+def unknown_name(enum_path, constant, name, names, what):
+    close = difflib.get_close_matches(name, names, n=1)
+    hint = f", did you mean '{close[0]}'?" if close else " (see build/assets-preview/index.html#ui)"
+    return SystemExit(f"{enum_path.name}: {constant} names '{name}', which isn't {what} in ui.json{hint}")
+
+
+def ui_sources(pack, entry):
+    """[(sheet name, file)] of a ui.json entry: one file, or every file matching a glob (each named after its file)."""
+    pattern = entry["file"]
+    if not any(c in pattern for c in "*?["):
+        return [(entry.get("name") or slug(pattern), pattern)]
+    files = sorted(path.relative_to(pack).as_posix() for path in pack.glob(pattern))
+    if not files:
+        raise SystemExit(f"ui.json: nothing in the UI pack matches '{pattern}'")
+    return [(entry.get("prefix", "") + slug(file), file) for file in files]
+
+
+def shapes(image, gap=0):
+    """
+    Boxes of the separate shapes of an image (touching visible pixels, diagonals too), in reading order: top to bottom
+    by line, left to right in a line. Shapes whose boxes overlap, or are closer than gap px, are one piece.
+    """
+    width, height = image.size
+    alpha = image.getchannel("A").tobytes()
+    seen = bytearray(width * height)
+    boxes = []
+    for start in range(width * height):
+        if not alpha[start] or seen[start]:
+            continue
+        seen[start] = 1
+        stack, x0, y0, x1, y1 = [start], width, height, 0, 0
+        while stack:
+            at = stack.pop()
+            x, y = at % width, at // width
+            x0, y0, x1, y1 = min(x0, x), min(y0, y), max(x1, x + 1), max(y1, y + 1)
+            for ny in (y - 1, y, y + 1):
+                for nx in (x - 1, x, x + 1):
+                    if 0 <= nx < width and 0 <= ny < height:
+                        n = ny * width + nx
+                        if alpha[n] and not seen[n]:
+                            seen[n] = 1
+                            stack.append(n)
+        boxes.append((x0, y0, x1, y1))
+    joined = True
+    while joined:
+        joined = False
+        for i, a in enumerate(boxes):
+            for j in range(i + 1, len(boxes)):
+                b = boxes[j]
+                if a[0] - gap < b[2] and b[0] - gap < a[2] and a[1] - gap < b[3] and b[1] - gap < a[3]:
+                    boxes[i] = (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
+                    del boxes[j]
+                    joined = True
+                    break
+            if joined:
+                break
+    lines = []
+    for box in sorted(boxes, key=lambda b: b[1]):
+        if lines and box[1] < lines[-1][0]:
+            lines[-1][1].append(box)
+        else:
+            lines.append([box[3], [box]])
+    return [box for _, line in lines for box in sorted(line)]
+
+
+def nine_patch_split(entry, short_name, piece, where):
+    """[left, right, top, bottom] borders of a nine-patch piece, or None."""
+    split = entry.get("split")
+    if isinstance(split, dict):
+        split = split.get(short_name)
+    if split is None:
+        return None
+    left, right, top, bottom = split
+    if left + right >= piece.width or top + bottom >= piece.height:
+        raise SystemExit(f"ui.json: {where}: split {split} leaves nothing to stretch in a {piece.width}x{piece.height} piece")
+    return split
+
+
+def cut_ui(pack, entry):
+    """
+    Pieces of one ui.json entry, as atlas regions ({"name", "index", "image", "sheet", "split"}), and its animations
+    ({name: {"frames", "frameDuration", "playMode"}}). Animation frames share one trim box, so they don't jump.
+    """
+    pieces, animations = [], {}
+    for sheet, file in ui_sources(pack, entry):
+        image = load_image(pack, file)
+        if "animation" in entry:
+            if "frame" not in entry:
+                raise SystemExit(f"ui.json: {file}: an animation needs a 'frame' grid")
+            rows = cut_frames(image, dict(entry, file=file))
+            box = None
+            for frame in (f for frames in rows.values() for f in frames):
+                b = frame.getchannel("A").getbbox()
+                box = b if box is None else (min(box[0], b[0]), min(box[1], b[1]), max(box[2], b[2]), max(box[3], b[3]))
+            one_row = len(rows) == 1 and entry.get("rows", "auto") == "auto"
+            for row, frames in rows.items():
+                name = sheet if one_row else f"{sheet}/{row}"
+                for index, frame in enumerate(frames):
+                    pieces.append({"name": name, "index": index, "image": frame.crop(box), "sheet": sheet})
+                animations[name] = {"frames": len(frames),
+                                    "frameDuration": entry["animation"].get("duration", 100) / 1000,
+                                    "playMode": entry["animation"].get("playMode", "LOOP")}
+            continue
+        if "frame" in entry:
+            fw, fh = entry["frame"]
+            ox, oy = entry.get("offset", [0, 0])
+            columns, rows = (image.width - ox) // fw, (image.height - oy) // fh
+            boxes = [(ox + c * fw, oy + r * fh, ox + (c + 1) * fw, oy + (r + 1) * fh)
+                     for r in range(rows) for c in range(columns)]
+        elif entry.get("pieces") == "auto":
+            boxes = shapes(image, entry.get("gap", 0))
+        else:
+            boxes = None  # the whole image is one piece
+        names = {int(number): name for number, name in entry.get("names", {}).items()}
+        for number, box in enumerate(boxes or [(0, 0, image.width, image.height)]):
+            visible = image.crop(box)
+            trim = visible.getchannel("A").getbbox()
+            if trim is None:
+                continue  # an empty grid cell
+            piece = visible.crop(trim)
+            short = names.get(number, f"{number:0{len(str(len(boxes) - 1))}d}" if boxes else "")
+            name = f"{sheet}/{short}" if boxes else sheet
+            pieces.append({"name": name, "index": 0, "image": piece, "sheet": sheet,
+                           "split": nine_patch_split(entry, short or sheet, piece, f"{file} ({name})")})
+        for number in names:
+            if not boxes or number >= len(boxes):
+                warn(f"ui.json: {file}: 'names' has {number}, but there's no such piece")
+    return pieces, animations
+
+
+def native_font_size(path):
+    """The smallest size at which a pixel font's edges are sharp (no grey pixels): one font pixel per screen pixel."""
+    for size in range(4, 65):
+        mask = ImageFont.truetype(str(path), size).getmask("Hello ABC xyz 0123", mode="L")
+        if set(bytes(mask)) <= {0, 255}:
+            return size
+    raise SystemExit(f"{path.name}: no size draws it with sharp edges; give it a 'size' in ui.json")
+
+
+def build_font(pack, entry):
+    """
+    A libGDX bitmap font (AngelCode .fnt text + one page) from a TTF of the UI pack, at its pixel size. Glyphs are white
+    (libGDX tints them with the label's colour). Returns (fnt text, page, size, glyph regions).
+    """
+    path = pack / entry["file"]
+    if not path.exists():
+        raise SystemExit(f"Missing in the UI pack: {entry['file']} (fix tools/assets/ui.json)")
+    size = entry.get("size") or native_font_size(path)
+    font = ImageFont.truetype(str(path), size)
+    ascent, descent = font.getmetrics()
+    missing = bytes(font.getmask("", mode="L"))  # what the font draws for a letter it doesn't have
+    glyphs = []
+    for char in FONT_CHARS:
+        mask = font.getmask(char, mode="L")
+        if char != " " and bytes(mask) == missing:
+            continue
+        x0, y0, _, _ = font.getbbox(char)
+        width, height = mask.size
+        image = Image.new("RGBA", (max(width, 1), max(height, 1)), (255, 255, 255, 0))
+        if width and height:
+            image.putalpha(Image.frombytes("L", (width, height), bytes(mask)).point(lambda v: 255 if v >= 128 else 0))
+        glyphs.append({"name": char, "index": 0, "image": image, "char": char, "width": width, "height": height,
+                       "xoffset": x0, "yoffset": y0, "advance": round(font.getlength(char))})
+    page = pack_regions(glyphs, padding=1)
+    name = entry["name"]
+    lines = [f'info face="{name}" size={size} bold=0 italic=0 charset="" unicode=1 stretchH=100 smooth=0 aa=1 '
+             f'padding=0,0,0,0 spacing=1,1',
+             f"common lineHeight={ascent + descent} base={ascent} scaleW={page.width} scaleH={page.height} pages=1 "
+             f"packed=0",
+             f'page id=0 file="{name}.png"',
+             f"chars count={len(glyphs)}"]
+    for g in glyphs:
+        lines.append(f"char id={ord(g['char'])} x={g['x']} y={g['y']} width={g['width']} height={g['height']} "
+                     f"xoffset={g['xoffset']} yoffset={g['yoffset']} xadvance={g['advance']} page=0 chnl=15")
+    note = f"generated by tools/assets/build_assets.py from the Sprout Lands UI pack: {entry['file']}"
+    return "\n".join(lines) + "\n", page, size, glyphs, note
+
+
+def font_sample(glyphs, text, scale=3):
+    """The text drawn with the generated glyphs (what the game will show), for the preview page."""
+    by_char = {g["char"]: g for g in glyphs}
+    height = max(g["yoffset"] + g["height"] for g in glyphs) + 2
+    width = sum(by_char[c]["advance"] for c in text if c in by_char) + 4
+    canvas = Image.new("RGBA", (width, height), (240, 236, 220, 255))
+    x = 2
+    for char in text:
+        g = by_char.get(char)
+        if g is None:
+            continue
+        if g["width"]:
+            ink = Image.new("RGBA", g["image"].size, (60, 40, 30, 255))
+            canvas.paste(ink, (x + g["xoffset"], 1 + g["yoffset"]), g["image"])
+        x += g["advance"]
+    return canvas.resize((width * scale, height * scale), Image.NEAREST)
+
+
+def stretched(piece, split, scale=3):
+    """A nine-patch piece stretched to about twice its size, as the game draws it (borders keep their size)."""
+    left, right, top, bottom = split
+    w, h = piece.size
+    tw, th = w * 2, h * 2
+    out = Image.new("RGBA", (tw, th), (0, 0, 0, 0))
+    xs = [(0, left, 0, left), (left, w - right, left, tw - right), (w - right, w, tw - right, tw)]
+    ys = [(0, top, 0, top), (top, h - bottom, top, th - bottom), (h - bottom, h, th - bottom, th)]
+    for sx0, sx1, dx0, dx1 in xs:
+        for sy0, sy1, dy0, dy1 in ys:
+            if sx1 > sx0 and sy1 > sy0 and dx1 > dx0 and dy1 > dy0:
+                out.paste(piece.crop((sx0, sy0, sx1, sy1)).resize((dx1 - dx0, dy1 - dy0), Image.NEAREST), (dx0, dy0))
+    return out.resize((tw * scale, th * scale), Image.NEAREST)
+
+
+def build_ui(pack):
+    """
+    Cuts every sheet of ui.json (all of them get a preview), packs the pieces listed in the UiImage enum into ui.atlas
+    and makes the fonts listed in the UiFont enum. Returns what the preview page shows.
+    """
+    print("UI")
+    config = json.loads(UI_CONFIG_FILE.read_text(encoding="utf-8"))
+    pieces, animations, known = [], {}, set()
+    for entry in config["images"]:
+        known.update(file for _, file in ui_sources(pack, entry))
+        entry_pieces, entry_animations = cut_ui(pack, entry)
+        pieces += entry_pieces
+        animations.update(entry_animations)
+    by_name = {}
+    for piece in pieces:
+        by_name.setdefault(piece["name"], []).append(piece)
+    for name, group in by_name.items():
+        if len(group) > 1 and name not in animations or len({p["sheet"] for p in group}) > 1:
+            raise SystemExit(f"ui.json: two pieces are called '{name}' (give one of the sheets another 'name')")
+    known.update(font["file"] for font in config["fonts"])
+    for relative in unknown_files(pack, known, config.get("ignore", []), (".png", ".ttf")):
+        warn(f"not in ui.json (add it to 'images', 'fonts' or 'ignore'): {relative}")
+
+    used = java_enum_values(UI_IMAGE_ENUM)
+    for name, constant in used.items():
+        if name not in by_name:
+            raise unknown_name(UI_IMAGE_ENUM, constant, name, by_name, "a piece")
+    packed = [piece for piece in pieces if piece["name"] in used]
+    page = pack_regions(packed)
+    save_png_if_changed(GAME_UI_DIR / (UI_ATLAS + ".png"), page)
+    save_if_changed(GAME_UI_DIR / (UI_ATLAS + ".atlas"), atlas_text(UI_ATLAS + ".png", page, packed))
+    images = {}
+    for name in sorted(used):
+        images[name] = dict(animations.get(name, {"frames": 1}))
+        if by_name[name][0].get("split"):
+            images[name]["split"] = by_name[name][0]["split"]
+
+    fonts_used = java_enum_values(UI_FONT_ENUM)
+    font_names = [font["name"] for font in config["fonts"]]
+    for name, constant in fonts_used.items():
+        if name not in font_names:
+            raise unknown_name(UI_FONT_ENUM, constant, name, font_names, "a font")
+    fonts, samples = {}, {}
+    fonts_dir = GAME_UI_DIR / "fonts"
+    for entry in config["fonts"]:
+        fnt, font_page, size, glyphs, note = build_font(pack, entry)
+        samples[entry["name"]] = (font_sample(glyphs, "The quick brown fox jumps over the lazy dog. 0123456789!?"), size)
+        if entry["name"] in fonts_used:
+            save_if_changed(fonts_dir / (entry["name"] + ".fnt"), fnt)
+            save_png_if_changed(fonts_dir / (entry["name"] + ".png"), font_page)
+            fonts[entry["name"]] = {"file": f"fonts/{entry['name']}.fnt", "size": size, "source": note}
+    for stale in fonts_dir.glob("*") if fonts_dir.exists() else []:
+        if stale.stem not in fonts:
+            stale.unlink()
+    description = {"atlas": UI_ATLAS + ".atlas", "uiJsonSha1": source_hash(UI_CONFIG_FILE), "images": images,
+                   "fonts": dict(sorted(fonts.items()))}
+    save_if_changed(GAME_UI_DIR / "ui.json", json.dumps(description, indent=2) + "\n")
+    print(f"  {len(by_name)} pieces and animations in ui.json, {len(config['fonts'])} fonts")
+    print(f"  packed for the game (UiImage, UiFont): {len(used)} pieces, page {page.width}x{page.height}; "
+          f"fonts: {', '.join(sorted(fonts)) or 'none'}")
+    write_ui_previews(by_name, animations, samples)
+    return {"by_name": by_name, "animations": animations, "used": used, "fonts_used": fonts_used, "samples": samples}
+
+
+def write_ui_previews(by_name, animations, samples, scale=2):
+    """build/assets-preview/ui: every UI piece (nine-patches also stretched), animation and font sample."""
+    folder = PREVIEW_DIR / "ui"
+    if folder.exists():
+        shutil.rmtree(folder)
+    folder.mkdir(parents=True)
+    for name, group in by_name.items():
+        file = folder / name.replace("/", "__")
+        frames = [p["image"] for p in sorted(group, key=lambda p: p["index"])]
+        w, h = frames[0].size
+        if name in animations:
+            gif = [Image.new("RGBA", (w, h), (232, 222, 196, 255)) for _ in frames]
+            for background, frame in zip(gif, frames):
+                background.alpha_composite(frame)
+            gif = [g.resize((w * scale, h * scale), Image.NEAREST).convert("P", palette=Image.ADAPTIVE) for g in gif]
+            gif[0].save(file.with_suffix(".gif"), save_all=True, append_images=gif[1:], loop=0,
+                        duration=int(animations[name]["frameDuration"] * 1000), disposal=2)
+            continue
+        frames[0].resize((w * scale, h * scale), Image.NEAREST).save(file.with_suffix(".png"))
+        if group[0].get("split"):
+            stretched(frames[0], group[0]["split"], scale).save(folder / (file.name + "__stretched.png"))
+    for name, (sample, _) in samples.items():
+        sample.save(folder / f"font__{name}.png")
+
+
+def ui_preview_html(ui):
+    """The UI section of the preview page."""
+    from html import escape
+    by_sheet = {}
+    for name, group in ui["by_name"].items():
+        by_sheet.setdefault(group[0]["sheet"], []).append(name)
+    parts = [f"<h2 id='ui'>UI pack ({len(ui['by_name'])} pieces and animations)</h2>",
+             "<p>Everything in <code>tools/assets/ui.json</code> (the UI pack), by sheet. Only what the game's "
+             "<code>UiImage</code> enum (<code>core/.../resources/UiImage.java</code>) lists is packed: add a line "
+             "with a piece's name, e.g. <code>DIALOG_BOX(\"dialog_box\")</code>, and run the tool. In the game: "
+             "<code>resourcesService.getUiImage(UiImage.X)</code>, <code>getUiNinePatch</code> for nine-patches "
+             "(shown stretched), <code>getUiAnimation</code> for animations. Rename pieces with <code>names</code> in "
+             "ui.json.</p>",
+             "<h3>Fonts</h3><p>Listed in <code>UiFont</code> → <code>resourcesService.getFont(UiFont.X)</code>.</p>"]
+    for name, (_, size) in sorted(ui["samples"].items()):
+        status = f"in the game: <code>UiFont.{ui['fonts_used'][name]}</code>" if name in ui["fonts_used"] else "not in the game"
+        parts.append(f"<div class='card'><img src='ui/font__{name}.png' alt=''><span>{escape(name)} ({size} px) "
+                     f"<small>{status}</small></span></div>")
+    for sheet in sorted(by_sheet):
+        parts.append(f"<h3>{escape(sheet)}</h3><div class='grid'>")
+        for name in sorted(by_sheet[sheet]):
+            file = name.replace("/", "__")
+            group = ui["by_name"][name]
+            image = f"ui/{file}.gif" if name in ui["animations"] else f"ui/{file}.png"
+            extra = f"<img src='ui/{file}__stretched.png' alt=''>" if group[0].get("split") else ""
+            info = (f"<br>{len(group)} frames" if name in ui["animations"] else "") + \
+                   (f"<br>nine-patch {group[0]['split']}" if group[0].get("split") else "")
+            used = f"<br><b>UiImage.{ui['used'][name]}</b>" if name in ui["used"] else ""
+            parts.append(f"<div class='card'><img src='{image}' alt=''>{extra}<span>{escape(name)}{info}{used}</span></div>")
+        parts.append("</div>")
+    return parts
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # pack check
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -938,24 +1305,49 @@ def check_pack_coverage(config, pack):
     known = {e["file"] for e in config["tilesets"]}
     for entry in config["sprites"]:
         known.update(file for _, file in sprite_sources(entry))
-    ignored = config.get("ignore", [])
+    for relative in unknown_files(pack, known, config.get("ignore", []), (".png",)):
+        warn(f"not in pack.json (add it as a tileset, a sprite sheet or to 'ignore'): {relative}")
+
+
+def unknown_files(pack, known, ignored, suffixes):
+    """Files of the pack (with these suffixes) that the config neither uses nor ignores."""
     unknown = []
     for path in sorted(pack.rglob("*")):
-        if path.suffix.lower() != ".png":
+        if path.suffix.lower() not in suffixes:
             continue
         relative = path.relative_to(pack).as_posix()
         if relative in known or any(Path(relative).match(pattern) or relative.startswith(pattern) for pattern in ignored):
             continue
         unknown.append(relative)
-    for relative in unknown:
-        warn(f"not in pack.json (add it as a tileset, a sprite sheet or to 'ignore'): {relative}")
+    return unknown
 
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+def find_ui_pack(given):
+    """The UI pack: given, remembered from the last run, or next to this tool (tools/assets/*UI Pack*)."""
+    usage = 'python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"'
+    if given:
+        pack = Path(given)
+    elif UI_PACK_PATH_FILE.exists():
+        pack = Path(UI_PACK_PATH_FILE.read_text(encoding="utf-8").strip())
+        if not pack.is_dir():
+            sys.exit(f"The UI pack isn't at {pack} any more (remembered from the last run). Give its directory: {usage}")
+    else:
+        found = sorted(path for path in TOOL_DIR.glob("*UI Pack*") if path.is_dir())
+        if not found:
+            sys.exit(f"Where is the Sprout Lands UI pack? Give its directory once (it's remembered): {usage}")
+        pack = found[0]
+    if not pack.is_dir():
+        sys.exit(f"Not a directory: {pack}. Give the UI pack's root directory: {usage}")
+    UI_PACK_PATH_FILE.write_text(str(pack.resolve()) + "\n", encoding="utf-8")
+    return pack
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("pack", nargs="?", help="the pack's root directory (remembered for next time)")
+    parser.add_argument("--ui", help="the UI pack's root directory (remembered for next time)")
     args = parser.parse_args()
 
     config = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
@@ -973,16 +1365,19 @@ def main():
         sys.exit(f"Not a directory: {pack}. Give the pack's root directory: {usage}")
     PACK_PATH_FILE.write_text(str(pack.resolve()) + "\n", encoding="utf-8")
     print(f"Pack: {pack}")
+    ui_pack = find_ui_pack(args.ui)
+    print(f"UI pack: {ui_pack}")
     check_pack_coverage(config, pack)
     tilesets = build_tilesets(config, pack)
     animations, used = build_sprites(config, pack)
+    ui = build_ui(ui_pack)
     create_tiled_project()
     create_starter_map(tilesets, config)
     build_maps(tilesets, pack_available=True)
 
     report = PREVIEW_DIR / "report.txt"
     report.write_text("\n".join(warnings) + "\n" if warnings else "no warnings\n", encoding="utf-8")
-    write_preview_index(animations, used)
+    write_preview_index(animations, used, ui)
     print(f"Done. {len(warnings)} warnings. Open {(PREVIEW_DIR / 'index.html').relative_to(ROOT)} in a browser.")
 
 

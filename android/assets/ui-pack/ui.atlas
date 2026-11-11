@@ -1,0 +1,29 @@
+ui.png
+size:64,64
+filter:Nearest,Nearest
+repeat:none
+continue_indicator
+  bounds:34,2,7,6
+  index:0
+continue_indicator
+  bounds:43,2,7,6
+  index:1
+continue_indicator
+  bounds:52,2,7,6
+  index:2
+continue_indicator
+  bounds:2,32,7,6
+  index:3
+continue_indicator
+  bounds:11,32,7,6
+  index:4
+continue_indicator
+  bounds:20,32,7,6
+  index:5
+continue_indicator
+  bounds:29,32,7,6
+  index:6
+dialog_box
+  bounds:2,2,30,28
+  split:9,6,6,6
+  index:0

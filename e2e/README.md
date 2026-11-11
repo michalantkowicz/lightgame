@@ -45,7 +45,8 @@ test/com/mantkowicz/light/e2e/
 ├── LevelVariant.java   changed copies of a TestMap (extra layers, mirrored tiles, map properties), in e2e/build/test-maps
 ├── headless/           HeadlessGame, NoOpGL, FixedGraphics, ScriptedInput
 ├── scenario/           gameplay tests, written against GameDriver only
-└── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, WallTest, InventoryTest, AssetsUpToDateTest
+└── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, WallTest, InventoryTest, AssetsUpToDateTest,
+                        UiAssetsTest
 ```
 
 Scenario ids are used in `docs/refactoring-plan.md`:

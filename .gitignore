@@ -4,7 +4,9 @@
 /assets-src/tilesets/images/
 # the pack itself, when kept in the suggested place (README.md)
 /tools/assets/Sprout Lands - Sprites - premium pack/
+/tools/assets/Sprout Lands - UI Pack - Premium pack/
 /tools/assets/.pack-path
+/tools/assets/.ui-pack-path
 *.tiled-session
 __pycache__/
 *.pyc

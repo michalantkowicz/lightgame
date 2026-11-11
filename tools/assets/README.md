@@ -1,12 +1,13 @@
 # Asset pipeline
 
-`build_assets.py` turns the **Sprout Lands** pack into Tiled tilesets and game atlases. Run it whenever the pack
+`build_assets.py` turns the **Sprout Lands** packs (sprites and UI) into Tiled tilesets, game atlases and fonts. Run it whenever the pack
 changes, or after editing a level in Tiled.
 
 ```sh
 pip3 install pillow                                   # once
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
-python3 tools/assets/build_assets.py                  # same pack as last time
+python3 tools/assets/build_assets.py                  # same packs as last time
+python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
 ```
 
 The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
@@ -25,8 +26,9 @@ If you forget to run the tool after saving a level or editing `pack.json`, `./gr
 | `assets-src/lightgame.tiled-project` | Tiled project with the maps and tilesets folders | committed |
 | `android/assets/maps/` | Game copies of the levels + `tiles.atlas`: **only the tiles the levels use** | committed |
 | `android/assets/sprites/` | `sprites.atlas` with **only the sheets in the game's `Sprite` enum**, `animations.json` | committed |
+| `android/assets/ui-pack/` | `ui.atlas` with **only the UI pieces in the game's `UiImage` enum**, bitmap fonts of `UiFont`, `ui.json` | committed |
 | `core/.../resources/Action.java` | Enum of the actions named in `pack.json` (`WALK`, `IDLE`, `OPEN`...) | committed |
-| `build/assets-preview/` | `index.html` (open in a browser): every animation of the pack playing, the levels, terrain overlays, warnings | ignored |
+| `build/assets-preview/` | `index.html` (open in a browser): every animation of the pack playing, every UI piece and font, the levels, terrain overlays, warnings | ignored |
 
 Generated files are rewritten only when they change. Don't edit `.tsx` files by hand; change `pack.json` and run the
 tool again.
@@ -87,7 +89,42 @@ do, and `AssetsUpToDateTest` fails.
 missing files, empty named rows and terrains that can't be detected reliably. The same list is in
 `build/assets-preview/report.txt`.
 
+## UI pack
+
+The Sprout Lands UI pack (buttons, dialog boxes, icons, emotes, fonts) is a second pack. The tool finds it in
+`tools/assets/` (a folder with "UI Pack" in its name) or takes it once with `--ui "/path/to/pack"`, and remembers it in
+`tools/assets/.ui-pack-path`. `tools/assets/ui.json` says how its sheets are cut; every image of the pack is either in
+it or ignored on purpose (others are listed as warnings).
+
+- **images**: one entry per sheet. `file` is a path in the pack, or a glob: then every matching file is a piece of its
+  own, named `prefix` + its file name (`backdrops_a1`, `mouse_catpaw_mouse_icon`).
+  - nothing more: the whole image is one piece, named `name` (`dialog_box`);
+  - `"frame": [w, h]`: a grid, pieces `name/000`, `name/001`... row by row (empty cells skipped, numbers kept);
+  - `"pieces": "auto"`: every separate shape is a piece, numbered in reading order. `"gap": n` joins shapes closer
+    than n px (the letters of a word). Shapes that touch come out as one piece: use a grid then;
+  - `"names": {"17": "heart"}` renames pieces (`icons/heart`), so code doesn't depend on numbers;
+  - `"split": [left, right, top, bottom]`: a nine-patch. The borders keep their size, the middle stretches. For every
+    piece of the entry, or `{"piece": [...]}` for some. The preview shows it stretched to twice its size;
+  - `"animation": {"duration": ms, "playMode": "LOOP" or "NORMAL"}` with a `frame` grid: every row is an animation,
+    `name` itself when there's one row, else `name/row_00`... (or name them with `rows`, as in `pack.json`).
+  Pieces are trimmed to their visible pixels; an animation's frames share one box, so they don't jump.
+- **fonts**: TTF fonts turned into libGDX bitmap fonts (`.fnt` + `.png`) at their pixel size: the smallest size with
+  sharp edges (8 or 9 px for the small ones, 18 for the 8x14 one); `size` forces one. Only ASCII: the pack's fonts
+  have nothing else (lower case letters are drawn as capitals). Glyphs are white, so labels can tint them. Scale them
+  by whole numbers to keep them sharp.
+- **ignore**: previews, examples, and sheets that only repeat single files kept as pieces (e.g. `Selectorst.png`).
+
+Only what the game lists is packed: pieces in `core/.../resources/UiImage.java` (`DIALOG_BOX("dialog_box")`) go into
+`android/assets/ui-pack/ui.atlas`, fonts in `UiFont.java` (`PIXEL_8X14("pixel_8x14")`) into `android/assets/ui-pack/fonts/`.
+`android/assets/ui-pack/ui.json` records frames, frame durations, nine-patch borders and fonts for the game, and the SHA-1 of
+`tools/assets/ui.json` (`AssetsUpToDateTest` checks it). In the game: `resourcesService.getUiImage`,
+`getUiNinePatch`, `getUiAnimation`, `getFont(UiFont)`. A name that isn't in ui.json stops the tool with a "did you mean"
+hint; a piece the game lists but wasn't packed stops the game at start.
+
 ## License
 
-Sprout Lands is by Cup Nooble. The pack itself may not be redistributed, so its sheets never go into git (see
-`.gitignore`). The game's packed atlases are allowed, with credit: see `CREDITS.md`.
+Both Sprout Lands packs (sprites, UI) are by Cup Nooble, under the same terms. The packs themselves may not be
+redistributed, so their sheets and TTF fonts never go into git (see `.gitignore`); the preview page stays in `build/`.
+What the game uses is allowed in the repo, with credit and the license terms: the packed atlases and the bitmap fonts
+made from the TTF fonts. Keep it that way: pack only what the game uses (the `Sprite`, `UiImage` and `UiFont` enums),
+never whole sheets for later. See `CREDITS.md`.
