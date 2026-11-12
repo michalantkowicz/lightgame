@@ -208,11 +208,12 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
 Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `ccr-dcc79c9a-n8m2ou`):
 
 - `ui/hud/Hud` on the UI stage, drawn at 4x (`Hud.SCALE`, one step above `UI_SCALE`). Bottom centre: the player's face
-  in a square frame (`Portrait`: the stretched inventory slot, 176x184), the backpack slot on its left showing the
+  in a frame (`Portrait`, 184x184), the backpack slot on its left showing the
   player's first inventory item, the day picture (a sun) on its right, 3 apples under the face. Top right: the settings
   gear (`HoldButton`), 44 px from the corner.
-- The face is the rabbit's own idle animation, cropped to the rabbit (16x18 px of the frame, drawn 8x), until the game
-  has portraits.
+- The face looks like the UI pack's Teemo emote preview: Teemo from the premium emote sheet standing on the bottom bar
+  of the dark wooden backdrop (`backdrops_c1`, a nine-patch stretched to fit one 32x32 emote frame). It is mostly still
+  and every 2.5 s plays a gesture in a fixed order: blink, blink, ear twitch (`TEEMO_STILL`, `TEEMO_BLINK`, `TEEMO_EAR`).
 - The gear works only after a 3 s hold: a ring of 16 dots (the pack's selector dots) lights up clockwise; letting go
   early empties it. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
   close. The settings themselves come in step 4.

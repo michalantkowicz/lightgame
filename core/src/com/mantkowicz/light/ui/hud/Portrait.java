@@ -1,60 +1,76 @@
 package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.mantkowicz.light.resources.UiImage;
-import com.mantkowicz.light.ui.UiStyle;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.UiImage;
 
 /**
- * A character's face in the HUD: an animated picture in a square frame (the pack's inventory slot, stretched). For
- * now the player's own sprite stands in for a portrait (docs/hud-design.md: real portraits come later).
+ * A character's face in the HUD, drawn like the pack's Teemo emote preview: a dark wooden frame with posts at the
+ * corners, the character's bust standing on its bottom edge. The face is mostly still; every few seconds it plays one
+ * of its gestures (blinking, twitching an ear), in a fixed order so tests see the same face every run.
  */
 public class Portrait extends Group {
-    public static final float WIDTH = 176, HEIGHT = 184;
-    private final Animation<TextureRegion> animation;
+    /** The frame's inside, in pack pixels: one emote frame (32x32). */
+    private static final int INSIDE = 32;
+    /** The frame's border in pack pixels (posts and bars), the split of {@link UiImage#PORTRAIT_FRAME}. */
+    private static final int BORDER = 7;
+    public static final float WIDTH = (INSIDE + 2 * BORDER) * Hud.SCALE, HEIGHT = WIDTH;
+    /** Seconds of stillness between two gestures. */
+    static final float STILL_SECONDS = 2.5f;
+
     private final String name;
+    private final Animation<TextureRegion> still;
+    private final Animation<TextureRegion>[] gestures;
     private final Image picture;
-    private final float scale;
-    private final int cropX, cropY, cropWidth, cropHeight;
     private float time;
+    private int gesture = -1, nextGesture;
 
     /**
-     * @param name what the portrait shows, e.g. "rabbit/idle_down" (for tests and descriptions)
-     * @param crop the part of each frame to show, x, y (from the top), width, height in frame pixels: a sprite frame
-     *             is mostly empty around the character
+     * @param name     what the portrait shows, e.g. "teemo" (for tests and descriptions)
+     * @param gestures played one after another, each after {@link #STILL_SECONDS} of the still face
      */
-    public Portrait(ResourcesService resources, Animation<TextureRegion> animation, String name, int[] crop, float scale) {
-        this.animation = animation;
+    @SafeVarargs
+    public Portrait(ResourcesService resources, String name, Animation<TextureRegion> still, Animation<TextureRegion>... gestures) {
         this.name = name;
-        this.scale = scale;
-        this.cropX = crop[0];
-        this.cropY = crop[1];
-        this.cropWidth = crop[2];
-        this.cropHeight = crop[3];
+        this.still = still;
+        this.gestures = gestures;
         setSize(WIDTH, HEIGHT);
-        Image frame = new Image(UiStyle.stretching(resources, UiImage.SLOT));
-        frame.setSize(WIDTH, HEIGHT);
-        addActor(frame);
-        picture = new Image(new TextureRegionDrawable(new TextureRegion(animation.getKeyFrame(0))));
+
+        NinePatch frame = new NinePatch(resources.getUiNinePatch(UiImage.PORTRAIT_FRAME));
+        frame.scale(Hud.SCALE, Hud.SCALE);
+        Image background = new Image(new NinePatchDrawable(frame));
+        background.setSize(WIDTH, HEIGHT);
+        addActor(background);
+
+        TextureRegion first = still.getKeyFrame(0);
+        picture = new Image(new TextureRegionDrawable(first));
+        picture.setSize(first.getRegionWidth() * Hud.SCALE, first.getRegionHeight() * Hud.SCALE);
+        // standing on the frame's bottom bar, in the middle of the inside
+        picture.setPosition(BORDER * Hud.SCALE, BORDER * Hud.SCALE);
         addActor(picture);
-        show(animation.getKeyFrame(0));
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
         time += delta;
-        show(animation.getKeyFrame(time, true));
-    }
-
-    private void show(TextureRegion frame) {
-        ((TextureRegionDrawable) picture.getDrawable()).getRegion().setRegion(frame, cropX, cropY, cropWidth, cropHeight);
-        picture.setSize(cropWidth * scale, cropHeight * scale);
-        picture.setPosition((WIDTH - picture.getWidth()) / 2f, (HEIGHT - picture.getHeight()) / 2f + scale);
+        if (gesture < 0) {
+            if (time >= STILL_SECONDS && gestures.length > 0) {
+                time -= STILL_SECONDS;
+                gesture = nextGesture++ % gestures.length;
+            }
+        } else if (gestures[gesture].isAnimationFinished(time)) {
+            time = 0;
+            gesture = -1;
+        }
+        Animation<TextureRegion> playing = gesture < 0 ? still : gestures[gesture];
+        ((TextureRegionDrawable) picture.getDrawable()).setRegion(playing.getKeyFrame(time, gesture < 0));
     }
 
     public String getPictureName() {

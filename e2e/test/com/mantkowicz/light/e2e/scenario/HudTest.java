@@ -52,7 +52,7 @@ class HudTest {
     @Test
     void theRowSitsInTheBottomCentreAndTheGearTopRight() {
         String hud = GameDriver.start(MAP.write("hud")).describeHud();
-        assertTrue(hud.contains("face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0"), hud); // (800 - 176) / 2 = 312
+        assertTrue(hud.contains("face: teemo at=(308.0,74.0) size=184.0x184.0"), hud);       // (800 - 184) / 2 = 308
         assertTrue(hud.contains("gear: at=(668.0,1140.0) size=88.0x96.0"), hud);                  // 44 px from the top-right corner (room for its ring)
     }
 
@@ -86,7 +86,7 @@ class HudTest {
         game.resize(500, 640); // wider: the UI's world gets wider
         game.frames(1);
         String hud = game.describeHud();
-        assertTrue(hud.contains("face: rabbit/idle_down at=(412.0,74.0)"), hud); // (1000 - 176) / 2: still centred
+        assertTrue(hud.contains("face: teemo at=(408.0,74.0)"), hud);           // (1000 - 184) / 2: still centred
         assertTrue(hud.contains("gear: at=(868.0,1140.0)"), hud);                 // still 44 px from the top-right corner
         assertFalse(game.crashed());
     }

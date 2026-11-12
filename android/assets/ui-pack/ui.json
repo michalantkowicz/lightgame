@@ -1,7 +1,16 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "0449f86de0442284f991bb571e49d9b5f3ca66d7",
+  "uiJsonSha1": "2f3deeb2a6b81f9cf33b1eddd75cd114b71dc3c1",
   "images": {
+    "backdrops_c1": {
+      "frames": 1,
+      "split": [
+        7,
+        7,
+        7,
+        7
+      ]
+    },
     "continue_indicator": {
       "frames": 7,
       "frameDuration": 0.1,
@@ -21,6 +30,21 @@
     },
     "emojis/sun": {
       "frames": 1
+    },
+    "emotes_premium/row_02": {
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_04": {
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_05": {
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
     },
     "icon_buttons/check": {
       "frames": 1

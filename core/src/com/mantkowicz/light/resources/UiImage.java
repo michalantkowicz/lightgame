@@ -24,7 +24,13 @@ public enum UiImage {
     CHECK_BUTTON("icon_buttons/check"),
     /** The dots of the ring that fills while the gear is held: lit and not yet lit. */
     RING_DOT("selector_dot_1"),
-    RING_DOT_EMPTY("selector_dot_6");
+    RING_DOT_EMPTY("selector_dot_6"),
+    /** The face's frame: dark wood with posts at the corners, as in the pack's Teemo emote preview. */
+    PORTRAIT_FRAME("backdrops_c1"),
+    /** The player's face (Teemo from the pack's premium emotes): still, blinking, twitching an ear. */
+    TEEMO_STILL("emotes_premium/row_02"),
+    TEEMO_BLINK("emotes_premium/row_05"),
+    TEEMO_EAR("emotes_premium/row_04");
 
     private final String piece;
 

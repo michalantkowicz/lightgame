@@ -11,10 +11,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.game.GameContext;
-import com.mantkowicz.light.resources.Action;
-import com.mantkowicz.light.resources.Direction;
 import com.mantkowicz.light.resources.ResourcesService;
-import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.UiStyle;
 
@@ -39,11 +36,6 @@ public class Hud extends Group {
     private static final float MARGIN = 16, GAP = 24, APPLE_SIZE = 50;
     /** Room for the gear's ring between the gear and the screen's corner. */
     private static final float GEAR_MARGIN = 44;
-    /**
-     * The rabbit in its idle frames (x, y from the top, width, height in the packed frame): the player's sprite stands
-     * in for a portrait until the game has portraits.
-     */
-    private static final int[] RABBIT_FACE = {13, 7, 16, 18};
 
     private final ResourcesService resources;
     private final Player player;
@@ -73,8 +65,9 @@ public class Hud extends Group {
         });
         addActor(row);
 
-        face = new Portrait(resources, resources.getAnimation(Sprite.RABBIT, Action.IDLE, Direction.DOWN),
-                ResourcesService.animationName(Sprite.RABBIT, Action.IDLE, Direction.DOWN), RABBIT_FACE, 8);
+        face = new Portrait(resources, "teemo", resources.getUiAnimation(UiImage.TEEMO_STILL),
+                resources.getUiAnimation(UiImage.TEEMO_BLINK), resources.getUiAnimation(UiImage.TEEMO_BLINK),
+                resources.getUiAnimation(UiImage.TEEMO_EAR));
         row.addActor(face);
 
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
