@@ -50,6 +50,9 @@ import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
+import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.hud.Portrait;
+import com.mantkowicz.light.ui.hud.SettingsPanel;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.collect.CollectItem;
@@ -169,6 +172,65 @@ public final class GameDriver {
             }
         }
         throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    // ---------------------------------------------------------------------------------------------- the HUD
+
+    /**
+     * What the HUD shows, one line each, positions in UI pixels (800 wide, y up): the face, the backpack, the day
+     * picture, the apples, the gear and how full its ring is, whether the settings window is open.
+     */
+    public String describeHud() {
+        Hud hud = hud();
+        Snapshot snapshot = new Snapshot();
+        Portrait face = hud.getFace();
+        snapshot.line("face: %s %s", face.getPictureName(), uiBox(face));
+        List<String> backpack = new ArrayList<>();
+        for (Item item : hud.getBackpack()) {
+            backpack.add(item == null ? "-" : item.getClass().getSimpleName());
+        }
+        snapshot.line("backpack: %s %s", backpack, uiBox(hud.getRow().getChildren().get(1)));
+        snapshot.line("day: %s", hud.getDayPicture());
+        snapshot.line("apples: %d of %d full", hud.getFullApples(), hud.getApples());
+        snapshot.line("gear: %s ring=%d%%", uiBox(hud.getGear()), Math.round(hud.getGear().getProgress() * 100));
+        snapshot.line("settings: %s", hud.getSettings() == null ? "closed" : "open");
+        return snapshot.toString();
+    }
+
+    /** Presses the settings gear and keeps holding; follow with {@link #seconds} and {@link #release}. */
+    public void pressGear() {
+        movePointer(uiScreenPosition(hud().getGear()));
+        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
+    }
+
+    /** Short tap on the player's face in the HUD. */
+    public void tapFace() {
+        tap(uiScreenPosition(hud().getFace()));
+    }
+
+    /** Taps the check mark of the open settings window. */
+    public void closeSettings() {
+        SettingsPanel settings = hud().getSettings();
+        if (settings == null) {
+            throw new IllegalStateException("The settings window isn't open");
+        }
+        tap(uiScreenPosition(settings.getCloseButton()));
+    }
+
+    private Hud hud() {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof Hud hud) {
+                return hud;
+            }
+        }
+        throw new IllegalStateException("No HUD on screen");
+    }
+
+    /** "at=(x,y) size=WxH" of a UI actor, in UI stage coordinates. */
+    private static String uiBox(Actor actor) {
+        Vector2 corner = actor.localToStageCoordinates(new Vector2());
+        return "at=" + Snapshot.point(corner.x, corner.y) + " size=" + Snapshot.number(actor.getWidth()) + "x"
+                + Snapshot.number(actor.getHeight());
     }
 
     /** Is a collect window open? */

@@ -29,6 +29,7 @@ import com.mantkowicz.light.ui.GameStage;
 import com.mantkowicz.light.ui.MenuStage;
 import com.mantkowicz.light.ui.NotificationStage;
 import com.mantkowicz.light.ui.UiStage;
+import com.mantkowicz.light.ui.hud.Hud;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,7 @@ public class GameScreen extends ScreenAdapter {
         PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
         if (playerCreatedEvent != null) {
             addFeature(new CameraTrackingFeature(context, playerCreatedEvent.getPlayer()));
+            uiStage.addActor(new Hud(context, playerCreatedEvent.getPlayer()));
         }
         addFeature(new MenuFeature(context));
         addFeature(new StageFeature(context));

@@ -17,7 +17,14 @@ public enum UiImage {
     SLOT_CHOSEN("inventory/slot_chosen"),
     SLOT_FREE("inventory/slot_free"),
     QUESTION_BUTTON("icon_buttons/question"),
-    SUN("emojis/sun");
+    SUN("emojis/sun"),
+    // the HUD (docs/hud-design.md)
+    APPLE("emojis/apple"),
+    GEAR_BUTTON("icon_buttons/gear"),
+    CHECK_BUTTON("icon_buttons/check"),
+    /** The dots of the ring that fills while the gear is held: lit and not yet lit. */
+    RING_DOT("selector_dot_1"),
+    RING_DOT_EMPTY("selector_dot_6");
 
     private final String piece;
 

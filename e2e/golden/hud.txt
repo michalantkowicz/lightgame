@@ -1,0 +1,35 @@
+## at the start
+face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0
+backpack: [-] at=(168.0,102.0) size=120.0x128.0
+day: SUN
+apples: 3 of 3 full
+gear: at=(668.0,1140.0) size=88.0x96.0 ring=0%
+settings: closed
+## gear held for 2 s
+face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0
+backpack: [-] at=(168.0,102.0) size=120.0x128.0
+day: SUN
+apples: 3 of 3 full
+gear: at=(668.0,1140.0) size=88.0x96.0 ring=67%
+settings: closed
+## let go: the ring empties, nothing opens
+face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0
+backpack: [-] at=(168.0,102.0) size=120.0x128.0
+day: SUN
+apples: 3 of 3 full
+gear: at=(668.0,1140.0) size=88.0x96.0 ring=0%
+settings: closed
+## gear held for 3 s: the settings open
+face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0
+backpack: [-] at=(168.0,102.0) size=120.0x128.0
+day: SUN
+apples: 3 of 3 full
+gear: at=(668.0,1140.0) size=88.0x96.0 ring=0%
+settings: open
+## check mark: closed
+face: rabbit/idle_down at=(312.0,74.0) size=176.0x184.0
+backpack: [-] at=(168.0,102.0) size=120.0x128.0
+day: SUN
+apples: 3 of 3 full
+gear: at=(668.0,1140.0) size=88.0x96.0 ring=0%
+settings: closed

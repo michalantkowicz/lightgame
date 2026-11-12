@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "6a5820f1b48f5f36e1b60e54cc65441374eb1071",
+  "uiJsonSha1": "0449f86de0442284f991bb571e49d9b5f3ca66d7",
   "images": {
     "continue_indicator": {
       "frames": 7,
@@ -16,14 +16,29 @@
         6
       ]
     },
+    "emojis/apple": {
+      "frames": 1
+    },
     "emojis/sun": {
+      "frames": 1
+    },
+    "icon_buttons/check": {
+      "frames": 1
+    },
+    "icon_buttons/gear": {
       "frames": 1
     },
     "icon_buttons/question": {
       "frames": 1
     },
     "inventory/slot": {
-      "frames": 1
+      "frames": 1,
+      "split": [
+        7,
+        7,
+        7,
+        9
+      ]
     },
     "inventory/slot_chosen": {
       "frames": 1
@@ -51,6 +66,12 @@
         5,
         7
       ]
+    },
+    "selector_dot_1": {
+      "frames": 1
+    },
+    "selector_dot_6": {
+      "frames": 1
     },
     "settings_menu/panel": {
       "frames": 1,

@@ -27,7 +27,7 @@
     {"file": "UI Sprites/Icons/special icons/Small Happines-Sadness icons.png", "name": "moods_small", "pieces": "auto"},
 
     {"file": "UI Sprites/buttons/Icon Buttons/Icon Buttons Spritesheet.png", "name": "icon_buttons", "frame": [32, 32],
-     "names": {"26": "question", "27": "question_down"}},
+     "names": {"24": "gear", "25": "gear_down", "26": "question", "27": "question_down", "54": "check", "55": "check_down"}},
     {"file": "UI Sprites/buttons/round/medium colored round buttons.png", "name": "round_buttons", "pieces": "auto"},
     {"file": "UI Sprites/buttons/round/small colored round buttons.png", "name": "round_buttons_small", "frame": [16, 16]},
     {"file": "UI Sprites/buttons/square/Small Square Buttons.png", "name": "square_buttons_small", "frame": [16, 16]},
@@ -65,11 +65,12 @@
     {"file": "UI Sprites/Other UI sprites/Stamina circle with white outline sprite sheet .png", "name": "stamina_white",
      "frame": [16, 16], "animation": {"duration": 100, "playMode": "NORMAL"}},
 
-    {"file": "emojis/Emoji spritesheet.png", "name": "emojis", "frame": [32, 32], "names": {"312": "sun"}},
+    {"file": "emojis/Emoji spritesheet.png", "name": "emojis", "frame": [32, 32], "names": {"312": "sun", "160": "apple"}},
     {"file": "emojis/tiny emotes.png", "name": "tiny_emotes", "frame": [16, 16]},
     {"file": "emojis/speech_bubble_*.png", "prefix": "", "frame": [64, 64], "animation": {"duration": 80, "playMode": "NORMAL"}},
     {"file": "emojis/emoji style ui/Inventory_Spritesheet.png", "name": "inventory", "pieces": "auto",
-     "names": {"32": "slot", "33": "slot_pressed", "34": "slot_chosen", "39": "slot_free"}},
+     "names": {"32": "slot", "33": "slot_pressed", "34": "slot_chosen", "39": "slot_free"},
+     "split": {"slot": [7, 7, 7, 9]}},
     {"file": "emojis/emoji style ui/Inventory_Blocks_Spritesheet.png", "name": "inventory_blocks", "pieces": "auto"},
     {"file": "emojis/emoji style ui/Inventory_Herat_Spritesheet.png", "name": "inventory_hearts", "pieces": "auto"},
     {"file": "emojis/emoji style ui/Inventory_Light_Herat_Spritesheet.png", "name": "inventory_hearts_light", "pieces": "auto"},

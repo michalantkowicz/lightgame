@@ -203,3 +203,27 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
 - Not used any more, kept for now: the old skin (`skin/`, still loaded), `font.fnt`, `table_background.png`,
   `item_background*.png`, and the unused old `android/assets/ui/` skin.
 
+## 2026‑11‑12, HUD step 1: the bottom row (branch `hud-1-bottom-row`)
+
+Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `ccr-dcc79c9a-n8m2ou`):
+
+- `ui/hud/Hud` on the UI stage, drawn at 4x (`Hud.SCALE`, one step above `UI_SCALE`). Bottom centre: the player's face
+  in a square frame (`Portrait`: the stretched inventory slot, 176x184), the backpack slot on its left showing the
+  player's first inventory item, the day picture (a sun) on its right, 3 apples under the face. Top right: the settings
+  gear (`HoldButton`), 44 px from the corner.
+- The face is the rabbit's own idle animation, cropped to the rabbit (16x18 px of the frame, drawn 8x), until the game
+  has portraits.
+- The gear works only after a 3 s hold: a ring of 16 dots (the pack's selector dots) lights up clockwise; letting go
+  early empties it. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
+  close. The settings themselves come in step 4.
+- Fixed values until the game has them (step 7): the sun, 3 of 3 apples, one backpack slot.
+- Taps on the bottom row stay in the HUD (they don't walk the player to a cell behind it); taps beside it reach the map.
+  The HUD follows the UI camera, so it keeps to the screen's edges after a resize.
+- The old COLLECT button moved up above the face (`ActionButton.BELOW_THE_MIDDLE`, 310 px below the middle instead of
+  400) so the two don't overlap until step 2 moves the action onto the face. Goldens `collect` and `collect-cancel`
+  re-recorded: only COLLECT's position changed (y 220.5 → 310.5).
+- New pack pieces: the slot as a nine-patch, the apple, the gear, the check mark, two selector dots.
+- Tests: `HudTest` (golden `hud`): the row's layout, the backpack after collecting the lighter, the gear's hold (2 s:
+  ring 67 %, nothing opens; let go: empty; 3 s: open; check mark: closed), a tap on the face doesn't walk, layout after
+  a resize.
+

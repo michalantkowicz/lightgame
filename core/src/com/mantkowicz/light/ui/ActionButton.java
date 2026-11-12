@@ -12,13 +12,17 @@ import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
 import java.util.function.BooleanSupplier;
 
 import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
-import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 /**
  * A button at the bottom of the screen that stays while its action is available and fades out when it no longer is
  * (and fades back in if it becomes available again before it is gone).
  */
 public class ActionButton extends GameActor {
+    /**
+     * How far below the screen's middle the button's centre is: just above the HUD's face (docs/hud-design.md moves the
+     * action onto the face in step 2, which removes this button).
+     */
+    private static final float BELOW_THE_MIDDLE = 310;
     private final TextButton button;
 
     public ActionButton(GameContext context, String text, EventListener listener, BooleanSupplier available) {
@@ -31,7 +35,7 @@ public class ActionButton extends GameActor {
 
         setSize(button.getWidth(), button.getHeight());
 
-        Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, new Vector2(0, SCREEN_WIDTH / 2f));
+        Plugin centerActorByCameraPlugin = new CenterActorByCameraPlugin(this, new Vector2(0, BELOW_THE_MIDDLE));
         addPlugin(centerActorByCameraPlugin);
 
         addPlugin(new RemoveWhenUnavailablePlugin(this, available));
