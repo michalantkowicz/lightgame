@@ -53,7 +53,7 @@ class HudTest {
     void theRowSitsInTheBottomCentreAndTheGearTopRight() {
         String hud = GameDriver.start(MAP.write("hud")).describeHud();
         assertTrue(hud.contains("face: teemo at=(308.0,74.0) size=184.0x184.0"), hud);       // (800 - 184) / 2 = 308
-        assertTrue(hud.contains("gear: at=(644.0,1116.0) size=88.0x96.0"), hud);                  // 68 px from the top-right corner (room for its circle)
+        assertTrue(hud.contains("gear: at=(664.0,1136.0) size=88.0x96.0"), hud);                  // 48 px from the top-right corner (room for its circle)
     }
 
     @Test
@@ -62,12 +62,14 @@ class HudTest {
         assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
         game.click(MAP.cell('C'));
         game.seconds(3);
-        game.clickButton("COLLECT");
-        game.clickChestSlot(0);
-        game.clickPlayerSlot(0);
-        game.clickButton("OK");
+        game.clickButton("COLLECT"); // the carrot jumps out of the chest
+        game.seconds(1.5f);
+        game.click(game.itemCell());
+        game.seconds(2);
+        assertTrue(game.describeHud().contains("backpack: [Carrot, -]"), game.describeHud());
+        game.tapBackpackSlot(0); // and out again
         game.frames(2);
-        assertTrue(game.describeHud().contains("backpack: [Lighter, -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
     }
 
     @Test
@@ -198,7 +200,7 @@ class HudTest {
         game.frames(1);
         String hud = game.describeHud();
         assertTrue(hud.contains("face: teemo at=(408.0,74.0)"), hud);           // (1000 - 184) / 2: still centred
-        assertTrue(hud.contains("gear: at=(844.0,1116.0)"), hud);                 // still 68 px from the top-right corner
+        assertTrue(hud.contains("gear: at=(864.0,1136.0)"), hud);                 // still 48 px from the top-right corner
         assertFalse(game.crashed());
     }
 }

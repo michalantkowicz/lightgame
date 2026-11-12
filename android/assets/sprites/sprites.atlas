@@ -158,6 +158,51 @@ cow_brown/walk
 cow_brown/walk
   bounds:664,266,29,28
   index:7
+farm_items/row_01
+  bounds:853,299,16,16
+  index:0
+farm_items/row_02
+  bounds:871,299,16,16
+  index:0
+farm_items/row_03
+  bounds:889,299,16,16
+  index:0
+farm_items/row_04
+  bounds:907,299,16,16
+  index:0
+farm_items/row_05
+  bounds:925,299,16,16
+  index:0
+farm_items/row_06
+  bounds:943,299,16,16
+  index:0
+farm_items/row_07
+  bounds:961,299,16,16
+  index:0
+farm_items/row_08
+  bounds:979,299,16,16
+  index:0
+farm_items/row_09
+  bounds:997,299,16,16
+  index:0
+farm_items/row_10
+  bounds:2,329,16,16
+  index:0
+farm_items/row_11
+  bounds:20,329,16,16
+  index:0
+farm_items/row_12
+  bounds:38,329,16,16
+  index:0
+farm_items/row_13
+  bounds:56,329,16,16
+  index:0
+farm_items/row_14
+  bounds:74,329,16,16
+  index:0
+item_shadow/row_00
+  bounds:92,329,14,4
+  index:0
 rabbit/chop_down
   bounds:574,167,42,31
   index:0

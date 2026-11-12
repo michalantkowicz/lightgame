@@ -209,14 +209,14 @@ Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `
 
 - `ui/hud/Hud` on the UI stage, drawn at 4x (`Hud.SCALE`, one step above `UI_SCALE`). Bottom centre: the player's face
   in a frame (`Portrait`, 184x184), two backpack slots on its left showing the
-  player's first two inventory items, the stamina bar under the face. Top right: the settings gear (`HoldButton`), 68 px from
+  player's first two inventory items, the stamina bar under the face. Top right: the settings gear (`HoldButton`), 48 px from
   the corner. No day picture for now (the sun said nothing); its place right of the face is the round button's.
 - The face looks like the UI pack's Teemo emote preview: Teemo from the premium emote sheet standing on the bottom bar
   of the dark wooden backdrop (`backdrops_c1`, a nine-patch stretched to fit one 32x32 emote frame). It is mostly still
   and every 2.5 s plays a gesture in a fixed order: blink, blink, ear twitch (`TEEMO_STILL`, `TEEMO_BLINK`, `TEEMO_EAR`).
 - The gear works only after a 3 s hold: a circle at its top right (the pack's stamina circle with black outline, 37
   frames following the hold: empty, filling, a green check), a little outside the button so a finger on it doesn't
-  hide it, fills; letting go early empties it. The gear is 68 px from the screen's corner, room for the circle. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
+  hide it, fills; letting go early empties it. The gear is 48 px from the screen's corner, room for the circle. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
   close. The settings themselves come in step 4.
 - Stamina: `Stamina` (0..1) belongs to the player (`Player.getStamina()`): `use(amount)` lowers it (time passing, hard
   work), `fill()` fills it (sleeping), `set(value)`; it stays between 0 and 1. The HUD's `StaminaBar` shows it under
@@ -264,3 +264,29 @@ Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `
   a resize, the action button's place (over the hint), the hint's bubble over the face (shown, fading, gone) and the face cheering meanwhile, reactions (for a while, once,
   replaced).
 
+
+## 2026‑11‑13, the chest throws out a carrot (branch `chest-pops-carrot`)
+
+The collect window is gone (it was too complicated): `CollectWindow`, `CollectItem`, `CollectItemType`,
+`CollectWindowItemState` and the golden `collect-cancel` are deleted.
+
+- The chest holds a `Carrot` (an `Item`, from the sprites pack's farm items: `Sprite.FARM_ITEMS`, row 2). Its button
+  works as before (it appears on the chest's four sides, fades out when the player leaves, opens once the player stands
+  still), but opening it lifts the lid, which stays open, pops 7 small stars (`Sparkles`, the UI pack's small star
+  flying out, growing, shrinking and fading) and throws everything inside out. With nothing left, the button goes.
+- `ItemThrower`: an item flies (`ItemOnGround.flyOnto`: an arc, 0.6 s) onto a random free tile next to where it comes
+  from: walkable, nobody and nothing on it, no other item flying there (all 8 neighbours). With no free tile it stays
+  where it is. The choice uses `MathUtils.random`, which the tests seed.
+- `ItemOnGround`: an item lying on a tile, drawn 6x over the pack's item shadow, bobbing up and down; it doesn't block
+  the tile and clicks go through it, so clicking it walks there. Stepping onto its tile picks it up into the backpack if
+  a slot is free.
+- The backpack is the player's inventory (2 slots, as the HUD shows: `Player.INVENTORY_SIZE`); the HUD's slots show
+  each item's picture (`Item.getPicture()`, the same as on the ground, drawn 4x). Tapping a slot throws its item out
+  from the player onto a free tile next to it (no stars), from where it can be picked up again.
+- New: `Inventory.add`/`take`, `BoardService.getGameActors(tile)`, `Player.throwOut(slot)`, `Hud.getSlots()`.
+  `Collectible.afterCollect()` and `Lighter` are no longer used, kept.
+- Tests: `CollectTest` (S15, golden `collect`) rewritten: open the chest, the carrot lands next to it, walk onto it,
+  throw it out from the backpack, pick it up again; it lands only on a free cell; with no free cell it stays in the
+  chest; an empty slot throws nothing; the button tests as before. `AnimationTest`: the chest opens and stays open.
+  `HudTest`: the backpack shows the carrot, then empties when it is thrown out. `GameDriver`: `itemsOnGround`,
+  `itemCell`, `starsOnScreen`, `tapBackpackSlot`; scene snapshots list items on the ground.

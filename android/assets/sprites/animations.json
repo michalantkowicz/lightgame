@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "61bb90d17b5584444f5f3b5292dd756e0825df42",
+  "packJsonSha1": "8942bffe1a9ee951b7a98cde071f07a6d94b5441",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -21,6 +21,26 @@
       "height": 28,
       "anchorX": 16,
       "anchorY": 11
+    },
+    "farm_items": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "item_shadow": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 4,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "rabbit": {
       "frameWidth": 48,
@@ -92,6 +112,96 @@
       "sheet": "cow_brown",
       "frames": 8,
       "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_01": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_02": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_03": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_04": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_05": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_06": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_07": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_08": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_09": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_10": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_11": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_12": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_13": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "farm_items/row_14": {
+      "sheet": "farm_items",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "item_shadow/row_00": {
+      "sheet": "item_shadow",
+      "frames": 1,
+      "frameDuration": 0.1,
       "playMode": "LOOP"
     },
     "rabbit/chop_down": {

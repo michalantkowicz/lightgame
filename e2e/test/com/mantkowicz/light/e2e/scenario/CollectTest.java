@@ -1,9 +1,9 @@
 package com.mantkowicz.light.e2e.scenario;
 
+import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.Golden;
 import com.mantkowicz.light.e2e.TestMap;
-import com.mantkowicz.light.e2e.Cell;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -13,13 +13,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * S15: the collect flow. Clicking the chest walks next to it (it blocks its cell) and shows a COLLECT button; it
- * opens a window with the chest's and the player's slots; items are moved by clicking a full slot and then a free one;
- * OK saves, CANCEL drops the changes;
- * the chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
- * walking away removes it; a click on the fading button does nothing; COLLECT clicked
- * while walking away stops the player next to the chest and opens the window there. Every COLLECT click opens a fresh window showing the saved inventories.
- * (Was bug B1: the game crashed when the button appeared; B7: a cancelled window was reopened with its unsaved changes.)
+ * S15: collecting. Clicking the chest walks next to it (it blocks its cell) and shows its button; the button opens the
+ * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a random free cell next to
+ * the chest; then the button goes (the chest is empty). Stepping onto the carrot puts it into the backpack (the HUD's
+ * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
+ * be picked up again. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
+ * it is.
+ * <p>
+ * The chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
+ * walking away removes it; a click on the fading button does nothing; clicked while walking away, the player stops next
+ * to the chest and it opens there. (Was bug B1: the game crashed when the button appeared.)
  */
 class CollectTest {
     /** The rabbit starts two cells below the chest: clicking the chest walks one cell up, next to it. */
@@ -32,7 +35,7 @@ class CollectTest {
             "~.....~",
             "~~~~~~~");
 
-    /** Like {@link #MAP}, with grass far below the chest, so there are cells under the COLLECT button at the bottom. */
+    /** Like {@link #MAP}, with grass far below the chest, so there are cells under the button at the bottom. */
     private static final TestMap TALL_MAP = TestMap.of(
             "~~~~~~~",
             "~.....~",
@@ -48,57 +51,93 @@ class CollectTest {
             "~.....~",
             "~~~~~~~");
 
+    /** Next to the chest only {@code a} is free once the player stands below it: the carrot can land nowhere else. */
+    private static final TestMap ONE_FREE_CELL = TestMap.of(
+            "~~~~~~",
+            "~~Ca~~",
+            "~~.~~~",
+            "~~P~~~",
+            "~~~~~~");
+
+    /** Next to the chest only the cell below it is grass: with the player there, nothing is free. */
+    private static final TestMap NO_FREE_CELL = TestMap.of(
+            "~~~~~",
+            "~~C~~",
+            "~~.~~",
+            "~~P~~",
+            "~~~~~");
+
     @Test
-    void collectingTheLighter() {
+    void theChestThrowsOutTheCarrotThePlayerPicksItUpAndThrowsItOutAgain() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
-        game.click(MAP.cell('C'));
+        Cell chest = MAP.cell('C');
+        game.click(chest);
         game.seconds(2);
-        game.snapshot("on chest");
+        game.snapshot("next to the chest");
 
         game.clickButton("COLLECT");
-        game.seconds(1);
-        game.snapshot("window open");
+        game.frames(3);
+        game.note("stars: " + game.starsOnScreen() + ", chest: " + game.chestAnimation() + ", items: " + game.itemsOnGround());
+        game.seconds(1.5f);
+        game.snapshot("the carrot has landed");
         game.note("inventories: " + game.inventories());
-        game.note("debug lines: " + game.uiDebugLinesShown());
+        Cell carrot = game.itemCell();
+        assertTrue(game.neighbours(chest).contains(carrot), "it lands next to the chest");
+        assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the chest is empty: no button");
 
-        game.clickChestSlot(0);
-        game.clickPlayerSlot(0);
-        game.clickButton("OK");
-        game.seconds(1);
-        game.snapshot("after OK");
+        game.click(carrot);
+        game.seconds(2);
+        game.snapshot("walked onto the carrot");
         game.note("inventories: " + game.inventories());
+        assertTrue(game.itemsOnGround().isEmpty(), "picked up");
 
-        game.clickButton("COLLECT");
+        Cell player = game.playerCell();
+        game.tapBackpackSlot(0);
+        game.frames(3);
+        game.note("stars: " + game.starsOnScreen() + ", items: " + game.itemsOnGround());
         game.seconds(1);
-        game.note("reopened window: " + game.collectWindowSlots());
-        game.clickButton("CANCEL");
-        game.seconds(1);
+        game.snapshot("thrown out of the backpack");
+        game.note("inventories: " + game.inventories());
+        assertTrue(game.neighbours(player).contains(game.itemCell()), "it lands next to the player");
+        assertEquals(player, game.playerCell(), "the tap on the slot didn't walk the player");
 
-        game.click(MAP.cell('P'));
-        game.seconds(3);
-        game.snapshot("walked away");
+        game.click(game.itemCell());
+        game.seconds(2);
+        game.snapshot("picked up again");
+        game.note("inventories: " + game.inventories());
         Golden.assertMatches("collect", game.timeline());
+        assertFalse(game.crashed());
     }
 
     @Test
-    void cancelDropsTheChanges() {
-        GameDriver game = GameDriver.start(MAP.write("collect"));
-        game.click(MAP.cell('C'));
+    void theCarrotLandsOnlyOnAFreeCell() {
+        GameDriver game = GameDriver.start(ONE_FREE_CELL.write("collect-one-free"));
+        game.click(ONE_FREE_CELL.cell('C'));
         game.seconds(2);
         game.clickButton("COLLECT");
-        game.seconds(1);
+        game.seconds(1.5f);
+        assertEquals(ONE_FREE_CELL.cell('a'), game.itemCell(), "not on water, not on the player");
+    }
 
-        game.clickChestSlot(0);
-        game.clickPlayerSlot(0);
-        game.clickButton("CANCEL");
-        game.seconds(1);
-        game.snapshot("after CANCEL");
-        game.note("inventories: " + game.inventories());
-
+    @Test
+    void withNoFreeCellTheCarrotStaysInTheChest() {
+        GameDriver game = GameDriver.start(NO_FREE_CELL.write("collect-no-free"));
+        game.click(NO_FREE_CELL.cell('C'));
+        game.seconds(2);
         game.clickButton("COLLECT");
+        game.seconds(1.5f);
+        assertTrue(game.itemsOnGround().isEmpty());
+        assertEquals("player=[-, -] chest=[Carrot, -]", game.inventories());
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "it still holds something: the button stays");
+    }
+
+    @Test
+    void anEmptySlotThrowsNothing() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.tapBackpackSlot(1);
         game.seconds(1);
-        game.note("reopened window: " + game.collectWindowSlots());
-        Golden.assertMatches("collect-cancel", game.timeline());
+        assertTrue(game.itemsOnGround().isEmpty());
+        assertEquals(MAP.cell('P'), game.playerCell(), "nor does it walk the player");
     }
 
     /**
@@ -129,7 +168,7 @@ class CollectTest {
 
     /**
      * Bug: clicking the button while it faded (on the chest's corner cell) went through it to the board below and walked
-     * the player there. The fading button catches the click and does nothing: no window, the walk goes on.
+     * the player there. The fading button catches the click and does nothing: the chest stays shut, the walk goes on.
      */
     @Test
     void clickOnFadingButtonDoesNothing() {
@@ -144,11 +183,10 @@ class CollectTest {
         }
         assertEquals(new Cell(2, 9), game.playerCell(), "on the corner cell, out of reach");
         game.clickButton("COLLECT");
-        assertFalse(game.collectWindowOpen());
-
         game.seconds(2);
         assertEquals(leftOfTheChest, game.playerCell(), "the click didn't walk the player anywhere else");
-        assertFalse(game.collectWindowOpen());
+        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "still shut");
+        assertTrue(game.itemsOnGround().isEmpty());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 
@@ -168,9 +206,9 @@ class CollectTest {
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 
-    /** COLLECT clicked while walking away (still next to the chest) must not open the window with the player leaving. */
+    /** The button clicked while walking away (still next to the chest) opens it only once the player stops next to it. */
     @Test
-    void collectWhileWalkingAwayStopsNextToTheChest() {
+    void openingWhileWalkingAwayStopsNextToTheChest() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
         game.click(MAP.cell('C'));
         game.seconds(2);
@@ -179,12 +217,12 @@ class CollectTest {
         game.click(new Cell(3, 1));
         game.frames(3);
         game.clickButton("COLLECT");
-        assertFalse(game.collectWindowOpen(), "no window while the player is still walking");
+        assertTrue(game.itemsOnGround().isEmpty(), "nothing opens while the player is still walking");
 
         game.seconds(1);
         assertEquals(besideTheChest, game.playerCell());
         assertEquals("IDLE", game.playerStatus());
-        assertTrue(game.collectWindowOpen(), "the window opens once the player stands next to the chest");
-        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "one COLLECT button, never faded");
+        assertEquals("chest/open_front", game.chestAnimation(), "it opens once the player stands next to the chest");
+        assertEquals(1, game.itemsOnGround().size());
     }
 }

@@ -22,7 +22,7 @@
     {"file": "UI Sprites/Icons/white icons.png", "name": "icons_white", "frame": [16, 16]},
     {"file": "UI Sprites/Icons/special icons/Hearts.png", "name": "hearts", "pieces": "auto"},
     {"file": "UI Sprites/Icons/special icons/Hearts in wood.png", "name": "hearts_in_wood", "pieces": "auto"},
-    {"file": "UI Sprites/Icons/special icons/stars.png", "name": "stars", "pieces": "auto"},
+    {"file": "UI Sprites/Icons/special icons/stars.png", "name": "stars", "pieces": "auto", "names": {"6": "small"}},
     {"file": "UI Sprites/Icons/special icons/stars in wood.png", "name": "stars_in_wood", "pieces": "auto"},
     {"file": "UI Sprites/Icons/special icons/coins.png", "name": "coins", "pieces": "auto"},
     {"file": "UI Sprites/Icons/special icons/Medium Happines-Sadness icons.png", "name": "moods_medium", "pieces": "auto"},
