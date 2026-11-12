@@ -1,0 +1,14 @@
+## at the start: full
+stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
+## used 0.35 (hard work): 0.65 left, still happy
+stamina: 10 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
+## used 0.15 more: half left, neutral
+stamina: 7 of 14 segments, face MOOD_NEUTRAL at=(316.0,40.0) size=168.0x24.0
+## used 0.25 more: a quarter left, sad
+stamina: 4 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
+## used 0.2 more: a little left still shows one segment
+stamina: 1 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
+## used more than is left: empty, not below
+stamina: 0 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
+## filled (slept)
+stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0

@@ -11,28 +11,25 @@ import com.mantkowicz.light.resources.UiImage;
 
 /**
  * A button that works only after it is held for {@link #SECONDS}, so small children don't press it by accident (the
- * settings gear). While it is held a ring of dots around it lights up clockwise from the top; letting go early empties
- * it.
+ * settings gear). While it is held a circle at its top right fills (the pack's stamina circle: empty, filling, then a
+ * green check), a little outside the button so a finger on it doesn't hide it; letting go early empties it.
  */
 public class HoldButton extends Group {
     public static final float SECONDS = 3;
     private static final float EMPTYING_SPEED = 3;
     private final TextureRegion icon;
-    private static final int DOTS = 16;
-    private final TextureRegion dot, emptyDot;
-    private final float dotScale, radius;
+    /** The circle's pack pixels per screen pixel, and how far its middle is out from the button's top right corner. */
+    private static final float CIRCLE_SCALE = 3, CIRCLE_OUT = 8;
+    private final TextureRegion[] circle;
     private final Runnable action;
     private boolean held;
     private float progress;
 
     public HoldButton(ResourcesService resources, UiImage icon, float scale, Runnable action) {
         this.icon = resources.getUiImage(icon);
-        this.dot = resources.getUiImage(UiImage.RING_DOT);
-        this.emptyDot = resources.getUiImage(UiImage.RING_DOT_EMPTY);
+        this.circle = resources.getUiAnimation(UiImage.HOLD_CIRCLE).getKeyFrames();
         this.action = action;
         setSize(this.icon.getRegionWidth() * scale, this.icon.getRegionHeight() * scale);
-        dotScale = scale - 1;
-        radius = Math.max(getWidth(), getHeight()) / 2f + dot.getRegionWidth() * dotScale / 2f + 14;
         setTouchable(Touchable.enabled);
         addListener(new InputListener() {
             @Override
@@ -63,7 +60,7 @@ public class HoldButton extends Group {
         }
     }
 
-    /** How full the ring is: 0 (not held) .. 1 (done). */
+    /** How full the circle is: 0 (not held) .. 1 (done). */
     public float getProgress() {
         return progress;
     }
@@ -71,18 +68,13 @@ public class HoldButton extends Group {
     @Override
     public void draw(Batch batch, float parentAlpha) {
         batch.setColor(1, 1, 1, parentAlpha * getColor().a);
-        if (progress > 0) {
-            int lit = Math.round(progress * DOTS);
-            for (int i = 0; i < DOTS; i++) {
-                TextureRegion region = i < lit ? dot : emptyDot;
-                double angle = Math.PI / 2 - 2 * Math.PI * i / DOTS; // clockwise from the top
-                float w = region.getRegionWidth() * dotScale, h = region.getRegionHeight() * dotScale;
-                float cx = getX() + getWidth() / 2f + (float) Math.cos(angle) * radius;
-                float cy = getY() + getHeight() / 2f + (float) Math.sin(angle) * radius;
-                batch.draw(region, Math.round(cx - w / 2f), Math.round(cy - h / 2f), w, h);
-            }
-        }
         batch.draw(icon, getX(), getY(), getWidth(), getHeight());
+        if (progress > 0) {
+            TextureRegion frame = circle[Math.round(progress * (circle.length - 1))];
+            float w = frame.getRegionWidth() * CIRCLE_SCALE, h = frame.getRegionHeight() * CIRCLE_SCALE;
+            float cx = getX() + getWidth() + CIRCLE_OUT, cy = getY() + getHeight() + CIRCLE_OUT;
+            batch.draw(frame, Math.round(cx - w / 2f), Math.round(cy - h / 2f), w, h);
+        }
         super.draw(batch, parentAlpha);
     }
 }

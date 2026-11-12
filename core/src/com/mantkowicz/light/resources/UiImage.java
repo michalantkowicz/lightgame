@@ -25,12 +25,30 @@ public enum UiImage {
     /** The dots of the ring that fills while the gear is held: lit and not yet lit. */
     RING_DOT("selector_dot_1"),
     RING_DOT_EMPTY("selector_dot_6"),
+    /** The circle at the gear's top right that fills while the gear is held (its frames follow the hold). */
+    HOLD_CIRCLE("stamina_black"),
+    /** A segment of the stamina bar: what is left, and what is used. */
+    BAR_FULL("bar/full"),
+    BAR_EMPTY("bar/empty"),
+    /** Left of the stamina bar, by how much is left: more than half, half or less, a quarter or less. */
+    MOOD_HAPPY("tiny_emotes/happy"),
+    MOOD_NEUTRAL("tiny_emotes/neutral"),
+    MOOD_SAD("tiny_emotes/sad"),
     /** The face's frame: dark wood with posts at the corners, as in the pack's Teemo emote preview. */
     PORTRAIT_FRAME("backdrops_c1"),
     /** The player's face (Teemo from the pack's premium emotes): still, blinking, twitching an ear. */
     TEEMO_STILL("emotes_premium/row_02"),
     TEEMO_BLINK("emotes_premium/row_05"),
-    TEEMO_EAR("emotes_premium/row_04");
+    TEEMO_EAR("emotes_premium/row_04"),
+    /** Teemo's reactions (the face's {@code play}): waving its arms with an open mouth. */
+    TEEMO_CHEER("emotes_premium/row_15"),
+    /** The action button beside the face: up, and pressed (lower, its side hidden). */
+    ROUND_BUTTON("round_buttons/brown"),
+    ROUND_BUTTON_DOWN("round_buttons/brown_down"),
+    /** On the round button when there is nothing to do: tapping it gives a hint. */
+    HINT_ICON("icons/question"),
+    /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */
+    DIALOG_BOX_DOWN("dialog_box_down");
 
     private final String piece;
 

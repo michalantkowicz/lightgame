@@ -581,9 +581,13 @@ def build_sprites(config, pack):
             fw, fh = entry["frame"]
             if sheet_name in sheets:
                 raise SystemExit(f"Sheet '{sheet_name}' is defined twice in pack.json")
+            # the frame's point that stands on the tile's middle: the frame's middle unless the sheet draws its
+            # character elsewhere in the frame (e.g. low, the cow)
+            anchor_x, anchor_y = entry.get("anchor", [fw / 2 if fw % 2 else fw // 2, fh / 2 if fh % 2 else fh // 2])
             sheets[sheet_name] = {"frameWidth": fw, "frameHeight": fh,
                                   "trimX": box[0], "trimY": fh - box[3],  # from the bottom-left, like libGDX
-                                  "width": box[2] - box[0], "height": box[3] - box[1]}
+                                  "width": box[2] - box[0], "height": box[3] - box[1],
+                                  "anchorX": anchor_x, "anchorY": fh - anchor_y}
             for row, frames in rows.items():
                 name = f"{sheet_name}/{row}"
                 if name in animations:
@@ -1049,6 +1053,8 @@ def cut_ui(pack, entry):
     pieces, animations = [], {}
     for sheet, file in ui_sources(pack, entry):
         image = load_image(pack, file)
+        if entry.get("rotate"):
+            image = image.rotate(entry["rotate"], expand=True)  # counter-clockwise, before cutting
         if "animation" in entry:
             if "frame" not in entry:
                 raise SystemExit(f"ui.json: {file}: an animation needs a 'frame' grid")
@@ -1070,6 +1076,8 @@ def cut_ui(pack, entry):
             fw, fh = entry["frame"]
             ox, oy = entry.get("offset", [0, 0])
             columns, rows = (image.width - ox) // fw, (image.height - oy) // fh
+            # a few cells of a big sheet: 'columns' and 'rowCount' limit the grid, as for animations
+            columns, rows = min(columns, entry.get("columns", columns)), min(rows, entry.get("rowCount", rows))
             boxes = [(ox + c * fw, oy + r * fh, ox + (c + 1) * fw, oy + (r + 1) * fh)
                      for r in range(rows) for c in range(columns)]
         elif entry.get("pieces") == "auto":

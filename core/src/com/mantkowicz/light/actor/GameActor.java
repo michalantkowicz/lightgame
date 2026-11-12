@@ -73,15 +73,16 @@ public abstract class GameActor extends Group {
 
     /**
      * Shows a frame of a pixel-art sprite sheet, {@code scale} times bigger. The actor itself is only
-     * {@code width x height} (what it occupies on the board, what can be clicked); the picture is centred on it
-     * and may stick out, like a character holding a tool.
+     * {@code width x height} (what it occupies on the board, what can be clicked); the picture is centred on it (the
+     * sheet's anchor, normally the frame's middle, on the actor's middle) and may stick out, like a character holding a
+     * tool.
      */
     protected void createAvatar(TextureRegion frame, SpriteSheet sheet, float scale, float width, float height) {
         avatar = new Image(frame);
         avatar.setSize(frame.getRegionWidth() * scale, frame.getRegionHeight() * scale);
         avatar.setTouchable(Touchable.disabled);
-        avatarRestY = height / 2f + (sheet.trimY() - sheet.frameHeight() / 2f) * scale;
-        avatar.setPosition(width / 2f + (sheet.trimX() - sheet.frameWidth() / 2f) * scale, avatarRestY);
+        avatarRestY = height / 2f + (sheet.trimY() - sheet.anchorY()) * scale;
+        avatar.setPosition(width / 2f + (sheet.trimX() - sheet.anchorX()) * scale, avatarRestY);
         this.addActor(avatar);
         setSize(width, height);
     }

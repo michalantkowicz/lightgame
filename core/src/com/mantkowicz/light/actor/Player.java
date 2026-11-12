@@ -39,6 +39,7 @@ public class Player extends GameBoardActor implements Collecting {
 
     private final GameEventService gameEventService;
     private final Inventory inventory;
+    private final Stamina stamina = new Stamina();
     private final AnimationPlugin animationPlugin;
     private Long lastIdleChange;
 
@@ -104,6 +105,11 @@ public class Player extends GameBoardActor implements Collecting {
      */
     public String getCurrentAnimation() {
         return animationPlugin.getCurrentAnimation();
+    }
+
+    /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
+    public Stamina getStamina() {
+        return stamina;
     }
 
     @Override

@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "2f3deeb2a6b81f9cf33b1eddd75cd114b71dc3c1",
+  "uiJsonSha1": "32933c67db65ce12f9a4dad995817a54b654b1d8",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -10,6 +10,12 @@
         7,
         7
       ]
+    },
+    "bar/empty": {
+      "frames": 1
+    },
+    "bar/full": {
+      "frames": 1
     },
     "continue_indicator": {
       "frames": 7,
@@ -24,6 +30,9 @@
         6,
         6
       ]
+    },
+    "dialog_box_down": {
+      "frames": 1
     },
     "emojis/apple": {
       "frames": 1
@@ -46,6 +55,11 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "emotes_premium/row_15": {
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "icon_buttons/check": {
       "frames": 1
     },
@@ -53,6 +67,9 @@
       "frames": 1
     },
     "icon_buttons/question": {
+      "frames": 1
+    },
+    "icons/question": {
       "frames": 1
     },
     "inventory/slot": {
@@ -91,6 +108,12 @@
         7
       ]
     },
+    "round_buttons/brown": {
+      "frames": 1
+    },
+    "round_buttons/brown_down": {
+      "frames": 1
+    },
     "selector_dot_1": {
       "frames": 1
     },
@@ -105,6 +128,20 @@
         7,
         9
       ]
+    },
+    "stamina_black": {
+      "frames": 37,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "tiny_emotes/happy": {
+      "frames": 1
+    },
+    "tiny_emotes/neutral": {
+      "frames": 1
+    },
+    "tiny_emotes/sad": {
+      "frames": 1
     }
   },
   "fonts": {

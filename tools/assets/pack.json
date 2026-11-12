@@ -9,6 +9,8 @@
     "  ('auto' = row_00, row_01 ...; a list or {row: name} for real names), 'duration' is ms per frame,",
     "  'variants' lists sheets with the same layout (colours), 'rowCount' stops after that many rows (when a sheet",
     "  switches to another grid further down, add a second entry with its own 'offset'). Empty frames are skipped.",
+    "  'anchor': [x, y] (pixels of a frame, from its top left) is the point drawn on the tile's middle, for sheets whose",
+    "  character isn't in the middle of its frame (default: the frame's middle).",
     "ignore: files that are neither (previews, duplicates). Paths are relative to the pack directory.",
     "'door animation sprites.png' is a tileset only, not a sprite sheet: its frames overlap (a 3px pillar + the door",
     "  leaf every 16px), so no grid cuts them right. Animating doors needs frames given as rectangles (not supported yet)."
@@ -152,7 +154,7 @@
                   "egg_hatch_brown": "Animals/Chicken_Egg/Egg_Spritesheet_Brown.png",
                   "egg_hatch_green": "Animals/Chicken_Egg/Egg_Spritesheet_Green.png",
                   "egg_hatch_red": "Animals/Chicken_Egg/Egg_Spritesheet_red.png"}},
-    {"name": "cow", "frame": [32, 32], "duration": 120,
+    {"name": "cow", "frame": [32, 32], "duration": 120, "anchor": [16, 21],
      "rows": ["idle", "walk", "row_02", "row_03", "row_04", "row_05", "row_06", "row_07"],
      "variants": {"cow_brown": "Animals/Cow/Brown cow animations.png",
                   "cow_green": "Animals/Cow/Green cow animation sprites.png",

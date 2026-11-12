@@ -51,7 +51,8 @@ public class PlayerCollectResolver implements CollectResolver {
                 requestWindow(collectible);
             }
         };
-        ActionButton actionButton = new ActionButton(context, "COLLECT", onClick, () -> isInReach(collectible));
+        ActionButton actionButton = new ActionButton(context, "COLLECT", collectible.getActionIcon(), onClick,
+                () -> isInReach(collectible));
         buttons.put(collectible, actionButton);
 
         context.getUiStage().addActor(actionButton);

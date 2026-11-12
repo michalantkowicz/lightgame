@@ -208,23 +208,54 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
 Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `ccr-dcc79c9a-n8m2ou`):
 
 - `ui/hud/Hud` on the UI stage, drawn at 4x (`Hud.SCALE`, one step above `UI_SCALE`). Bottom centre: the player's face
-  in a frame (`Portrait`, 184x184), the backpack slot on its left showing the
-  player's first inventory item, the day picture (a sun) on its right, 3 apples under the face. Top right: the settings
-  gear (`HoldButton`), 44 px from the corner.
+  in a frame (`Portrait`, 184x184), two backpack slots on its left showing the
+  player's first two inventory items, the stamina bar under the face. Top right: the settings gear (`HoldButton`), 68 px from
+  the corner. No day picture for now (the sun said nothing); its place right of the face is the round button's.
 - The face looks like the UI pack's Teemo emote preview: Teemo from the premium emote sheet standing on the bottom bar
   of the dark wooden backdrop (`backdrops_c1`, a nine-patch stretched to fit one 32x32 emote frame). It is mostly still
   and every 2.5 s plays a gesture in a fixed order: blink, blink, ear twitch (`TEEMO_STILL`, `TEEMO_BLINK`, `TEEMO_EAR`).
-- The gear works only after a 3 s hold: a ring of 16 dots (the pack's selector dots) lights up clockwise; letting go
-  early empties it. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
+- The gear works only after a 3 s hold: a circle at its top right (the pack's stamina circle with black outline, 37
+  frames following the hold: empty, filling, a green check), a little outside the button so a finger on it doesn't
+  hide it, fills; letting go early empties it. The gear is 68 px from the screen's corner, room for the circle. It opens `SettingsPanel`: the settings panel on the dimmed screen with its title and a check mark to
   close. The settings themselves come in step 4.
-- Fixed values until the game has them (step 7): the sun, 3 of 3 apples, one backpack slot.
+- Stamina: `Stamina` (0..1) belongs to the player (`Player.getStamina()`): `use(amount)` lowers it (time passing, hard
+  work), `fill()` fills it (sleeping), `set(value)`; it stays between 0 and 1. The HUD's `StaminaBar` shows it under
+  the face as 14 segments from the pack (drawn 2x, 138 px: 3/4 of the face's width), with a tiny
+  face from the pack on its left (`tiny_emotes`, drawn 2x like the segments): happy (green) with more than half left,
+  neutral (yellow) at half or less, sad (red) at a quarter or less; the face and the bar together centred under the face (found only on its all-in-one sheet, cut with the tool's grid limits
+  `columns`/`rowCount`): green for what is left, brown for what is used; any strength left shows at least one green
+  segment. Nothing in the game lowers it yet.
+- 40 px between the face and the pieces beside it, 12 px between the two slots; the slots are 96x104
+  (80% of their first size). The slots and the action button line up with the bottom of the face's frame.
 - Taps on the bottom row stay in the HUD (they don't walk the player to a cell behind it); taps beside it reach the map.
   The HUD follows the UI camera, so it keeps to the screen's edges after a resize.
-- The old COLLECT button moved up above the face (`ActionButton.BELOW_THE_MIDDLE`, 310 px below the middle instead of
-  400) so the two don't overlap until step 2 moves the action onto the face. Goldens `collect` and `collect-cancel`
-  re-recorded: only COLLECT's position changed (y 220.5 → 310.5).
-- New pack pieces: the slot as a nine-patch, the apple, the gear, the check mark, two selector dots.
+- Right of the face there is always a round button (`RoundButton`: the pack's round brown button with a picture and
+  no text; pressed, it sinks and the picture with it). With nothing to do it is the hint: a question mark (the pack's
+  icon), and tapping it makes the face say "play around!" in a `SpeechBubble` over it for 2.5 s, then the bubble
+  fades. The bubble is the pack's dialog box turned 90° (`dialog_box_down`: the tool's new `rotate` option in ui.json)
+  so its pointer is at the bottom, cut in two: the box stretches around the text (a nine-patch from 9 parts, its edges
+  taken from a plain row and column away from the pointer) and the small pointer is drawn on its own at the middle of
+  the box's bottom. Later the hint will say where to go next (and show arrows). While the bubble shows, the face
+  cheers (`TEEMO_CHEER`, the premium emote sheet's row 15).
+- The face can react: `Portrait.play(animation, seconds)` plays a face animation over and over for that long instead of
+  the idle, `Portrait.play(animation)` plays it once; then the face goes back to being still and to its gestures by
+  itself. A new reaction replaces the one playing. `getReaction()` says what plays (null when idle).
+- The action button is no longer a COLLECT text button but a round button over the hint with a picture of what it
+  acts on, no text: `Collectible.getActionIcon()`, for the chest the closed chest as it looks on the map (cropped to its
+  visible 16x14 px, drawn 4x on a button drawn 6x, 108x120). It appears right of the face, its right edge as far from
+  the screen's edge as the slots' left edge (64 px on an 800 px wide screen), its bottom on the face's bottom
+  (`Hud.ACTION_RIGHT`, `Hud.ACTION_Y`); pressed, it sinks (the pack's pressed piece) and the chest with it.
+  This differs from the design (step 2 puts the action on the face). Its name, COLLECT, is only for tests: `GameDriver`
+  finds it by name in `clickButton`, `buttonAlphas` and `buttonOnScreen`, and goldens show it as
+  `action button on ui stage: COLLECT (a picture)` instead of the COLLECT text. Goldens `collect` and `collect-cancel`
+  re-recorded: only that line changed. New golden `hud-hint`.
+- New pack pieces: the slot as a nine-patch, the apple (no longer drawn, kept in `UiImage`), the gear, the check mark, two selector dots (no longer drawn, kept in `UiImage`), the stamina circle, the round brown
+  button and its pressed piece, the question mark icon, the dialog box turned 90°, the bar segments.
+- The cow stands in the middle of its tile: it is drawn low in its 32x32 frame, so its sheet has `"anchor": [16, 21]`
+  in pack.json (the frame's point drawn on the tile's middle; default the frame's middle), passed to the game in
+  animations.json (`SpriteSheet.anchorX/Y`). Test: `AnimationTest.theCowStandsInTheMiddleOfItsTile`.
 - Tests: `HudTest` (golden `hud`): the row's layout, the backpack after collecting the lighter, the gear's hold (2 s:
-  ring 67 %, nothing opens; let go: empty; 3 s: open; check mark: closed), a tap on the face doesn't walk, layout after
-  a resize.
+  67 % held, nothing opens; let go: empty; 3 s: open; check mark: closed), a tap on the face doesn't walk, layout after
+  a resize, the action button's place (over the hint), the hint's bubble over the face (shown, fading, gone) and the face cheering meanwhile, reactions (for a while, once,
+  replaced).
 

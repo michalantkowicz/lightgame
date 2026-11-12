@@ -5,7 +5,7 @@ chest: cell=(3,4)
 camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on ui stage: "COLLECT" at=(283.0,310.5) alpha=1.0 color=5c3b2eff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
+action button on ui stage: COLLECT (a picture) at=(628.0,74.0) alpha=1.0
 inventories: player=[-, -, -] chest=[Lighter, -]
 reopened window: chest=[Lighter, -] player=[-, -, -]

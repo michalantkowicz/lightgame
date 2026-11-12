@@ -1,5 +1,6 @@
 package com.mantkowicz.light.actor;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.Action;
@@ -21,11 +22,14 @@ public class Chest extends SpriteActor implements Collectible {
     private static final int INVENTORY_SIZE = 2;
 
     private final Inventory inventory;
+    private final TextureRegion closed;
 
     public Chest(GameContext context) {
         super(CHEST, context, Sprite.CHEST, OPEN, DESCRIPTION);
         setName("Nice Chest");
         setTouchable(Touchable.disabled);
+        // the closed chest without the empty rows above it in its frame
+        closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7, 16, 14);
 
         List<Item> content = new ArrayList<>();
         content.add(new Lighter(context));
@@ -42,6 +46,14 @@ public class Chest extends SpriteActor implements Collectible {
     @Override
     public boolean isDistant() {
         return true;
+    }
+
+    /**
+     * The closed chest, as the player sees it on the map.
+     */
+    @Override
+    public TextureRegion getActionIcon() {
+        return closed;
     }
 
     /**
