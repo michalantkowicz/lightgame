@@ -81,6 +81,13 @@ class AnimationTest {
     }
 
     @Test
+    void theCowStandsInTheMiddleOfItsTile() {
+        GameDriver game = GameDriver.start(FARM.write("farm"));
+        // the cow is drawn low in its 32x32 frame (its pixels span x 3..30, y 12..30): its body's middle is (16, 21)
+        assertArrayEquals(new float[]{64, 64}, game.cowFramePixel(16, 21), 0.001f, "on the middle of the 128 px tile");
+    }
+
+    @Test
     void theChestOpensWithTheCollectWindowAndShutsAfterIt() {
         GameDriver game = GameDriver.start(FARM.write("farm"));
         Cell chest = FARM.cell('C');

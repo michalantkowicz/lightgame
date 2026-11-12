@@ -1,7 +1,22 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "6a5820f1b48f5f36e1b60e54cc65441374eb1071",
+  "uiJsonSha1": "32933c67db65ce12f9a4dad995817a54b654b1d8",
   "images": {
+    "backdrops_c1": {
+      "frames": 1,
+      "split": [
+        7,
+        7,
+        7,
+        7
+      ]
+    },
+    "bar/empty": {
+      "frames": 1
+    },
+    "bar/full": {
+      "frames": 1
+    },
     "continue_indicator": {
       "frames": 7,
       "frameDuration": 0.1,
@@ -16,14 +31,75 @@
         6
       ]
     },
+    "dialog_box_down": {
+      "frames": 1
+    },
+    "emojis/apple": {
+      "frames": 1
+    },
     "emojis/sun": {
+      "frames": 1
+    },
+    "emotes_premium/row_02": {
+      "frames": 1,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_04": {
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_05": {
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_15": {
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_29": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_41": {
+      "frames": 12,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_42": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_43": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "icon_buttons/check": {
+      "frames": 1
+    },
+    "icon_buttons/gear": {
       "frames": 1
     },
     "icon_buttons/question": {
       "frames": 1
     },
-    "inventory/slot": {
+    "icons/question": {
       "frames": 1
+    },
+    "inventory/slot": {
+      "frames": 1,
+      "split": [
+        7,
+        7,
+        7,
+        9
+      ]
     },
     "inventory/slot_chosen": {
       "frames": 1
@@ -52,6 +128,18 @@
         7
       ]
     },
+    "round_buttons/brown": {
+      "frames": 1
+    },
+    "round_buttons/brown_down": {
+      "frames": 1
+    },
+    "selector_dot_1": {
+      "frames": 1
+    },
+    "selector_dot_6": {
+      "frames": 1
+    },
     "settings_menu/panel": {
       "frames": 1,
       "split": [
@@ -60,6 +148,20 @@
         7,
         9
       ]
+    },
+    "stamina_black": {
+      "frames": 37,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "tiny_emotes/happy": {
+      "frames": 1
+    },
+    "tiny_emotes/neutral": {
+      "frames": 1
+    },
+    "tiny_emotes/sad": {
+      "frames": 1
     }
   },
   "fonts": {

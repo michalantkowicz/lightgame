@@ -33,6 +33,7 @@ import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.actor.SpriteActor;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
@@ -50,6 +51,12 @@ import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
+import com.mantkowicz.light.ui.ActionButton;
+import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.hud.Portrait;
+import com.mantkowicz.light.ui.hud.SettingsPanel;
+import com.mantkowicz.light.ui.hud.SpeechBubble;
+import com.mantkowicz.light.ui.hud.StaminaBar;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.collect.CollectItem;
@@ -163,12 +170,119 @@ public final class GameDriver {
     /** Short click on a UI button (COLLECT, OK, CANCEL, ...) by its text. */
     public void clickButton(String text) {
         for (Actor actor : uiActors()) {
-            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
-                tap(uiScreenPosition(button));
+            if (isButton(actor, text)) {
+                tap(uiScreenPosition(actor));
                 return;
             }
         }
         throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** A button with this text, or the action button (a picture, no text) named so, e.g. "COLLECT". */
+    private static boolean isButton(Actor actor, String text) {
+        return actor instanceof TextButton button && text.contentEquals(button.getText())
+                || actor instanceof ActionButton && text.equals(actor.getName());
+    }
+
+    // ---------------------------------------------------------------------------------------------- the HUD
+
+    /**
+     * What the HUD shows, one line each, positions in UI pixels (800 wide, y up): the face, the backpack, the
+     * stamina bar, the hint button, the bubble over the face, the gear and how full its hold circle is, whether the
+     * settings window is open.
+     */
+    public String describeHud() {
+        Hud hud = hud();
+        Snapshot snapshot = new Snapshot();
+        Portrait face = hud.getFace();
+        snapshot.line("face: %s %s %s%s", face.getPictureName(), uiBox(face), face.getIdle().name(),
+                face.getReaction() == null ? "" : " playing " + face.getReaction());
+        List<String> backpack = new ArrayList<>();
+        for (Item item : hud.getBackpack()) {
+            backpack.add(item == null ? "-" : item.getClass().getSimpleName());
+        }
+        snapshot.line("backpack: %s %s", backpack, uiBox(hud.getRow().getChildren().get(1)));
+        StaminaBar stamina = hud.getStamina();
+        snapshot.line("stamina: %d of %d segments, face %s %s", stamina.getFullSegments(), stamina.getSegments(),
+                stamina.getMood(), uiBox(stamina));
+        snapshot.line("hint: %s", uiBox(hud.getHint()));
+        SpeechBubble bubble = hud.getBubble();
+        snapshot.line("bubble: %s", bubble == null ? "none" : "\"" + bubble.getText() + "\" " + uiBox(bubble)
+                + " alpha=" + Snapshot.number(bubble.getColor().a));
+        snapshot.line("gear: %s held=%d%%", uiBox(hud.getGear()), Math.round(hud.getGear().getProgress() * 100));
+        snapshot.line("settings: %s", hud.getSettings() == null ? "closed" : "open");
+        return snapshot.toString();
+    }
+
+    /** Presses the settings gear and keeps holding; follow with {@link #seconds} and {@link #release}. */
+    public void pressGear() {
+        movePointer(uiScreenPosition(hud().getGear()));
+        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
+    }
+
+    /**
+     * Makes the HUD's face play an animation for a while instead of its idle, as game code does (e.g. cheering while it
+     * says something); null seconds: once.
+     *
+     * @param animation a {@code UiImage} name, e.g. "TEEMO_CHEER"
+     */
+    public void faceReacts(String animation, Float seconds) {
+        if (seconds == null) {
+            hud().getFace().play(UiImage.valueOf(animation));
+        } else {
+            hud().getFace().play(UiImage.valueOf(animation), seconds);
+        }
+    }
+
+    /** What the HUD's face plays instead of its idle ("TEEMO_CHEER"), or "idle". */
+    public String faceReaction() {
+        UiImage reaction = hud().getFace().getReaction();
+        return reaction == null ? "idle" : reaction.name();
+    }
+
+    /** Takes some of the player's stamina away, as time passing or hard work does (0..1, 1 = all of it). */
+    public void useStamina(float amount) {
+        ((Player) actor(Kind.PLAYER)).getStamina().use(amount);
+    }
+
+    /** Fills the player's stamina again, as sleeping does. */
+    public void fillStamina() {
+        ((Player) actor(Kind.PLAYER)).getStamina().fill();
+    }
+
+    /** Short tap on the hint button (the question mark right of the face). */
+    public void tapHint() {
+        tap(uiScreenPosition(hud().getHint()));
+    }
+
+    /** Short tap on the player's face in the HUD. */
+    public void tapFace() {
+        tap(uiScreenPosition(hud().getFace()));
+    }
+
+    /** Taps the check mark of the open settings window. */
+    public void closeSettings() {
+        SettingsPanel settings = hud().getSettings();
+        if (settings == null) {
+            throw new IllegalStateException("The settings window isn't open");
+        }
+        tap(uiScreenPosition(settings.getCloseButton()));
+    }
+
+    private Hud hud() {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof Hud hud) {
+                return hud;
+            }
+        }
+        throw new IllegalStateException("No HUD on screen");
+    }
+
+    /** "at=(x,y) size=WxH" of a UI actor, in UI stage coordinates. */
+    private static String uiBox(Actor actor) {
+        Vector2 corner = actor.localToStageCoordinates(new Vector2());
+        return "at=" + Snapshot.point(corner.x, corner.y) + " size=" + Snapshot.number(actor.getWidth()) + "x"
+                + Snapshot.number(actor.getHeight());
     }
 
     /** Is a collect window open? */
@@ -185,8 +299,8 @@ public final class GameDriver {
     public List<Float> buttonAlphas(String text) {
         List<Float> alphas = new ArrayList<>();
         for (Actor actor : uiActors()) {
-            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
-                alphas.add(effectiveAlpha(button));
+            if (isButton(actor, text)) {
+                alphas.add(effectiveAlpha(actor));
             }
         }
         return alphas;
@@ -423,8 +537,8 @@ public final class GameDriver {
     }
 
     /**
-     * Where the centre of the player's sprite frame (the 48x48 picture before trimming) is, relative to the player's
-     * bottom-left corner. The frame is drawn centred on the player's tile, so this is the tile's centre.
+     * Where the anchor of the player's sprite frame (the middle of the 48x48 picture before trimming, unless pack.json
+     * moves it) is, relative to the player's bottom-left corner. It is drawn on the player's tile's centre.
      */
     public float[] playerFrameCentre() {
         Player player = (Player) actor(Kind.PLAYER);
@@ -433,8 +547,23 @@ public final class GameDriver {
         TextureRegion picture = ((TextureRegionDrawable) player.getAvatar().getDrawable()).getRegion();
         float scale = player.getAvatar().getWidth() / picture.getRegionWidth();
         return new float[]{
-                player.getAvatar().getX() + (sheet.frameWidth() / 2f - sheet.trimX()) * scale,
-                player.getAvatarRestY() + (sheet.frameHeight() / 2f - sheet.trimY()) * scale};
+                player.getAvatar().getX() + (sheet.anchorX() - sheet.trimX()) * scale,
+                player.getAvatarRestY() + (sheet.anchorY() - sheet.trimY()) * scale};
+    }
+
+    /**
+     * Where a pixel of the cow's sprite frame (art pixels from the 32x32 frame's top left) is drawn, relative to the
+     * cow's bottom-left corner (its tile's corner).
+     */
+    public float[] cowFramePixel(int x, int y) {
+        SpriteActor cow = (SpriteActor) actor(Kind.COW);
+        ResourcesService resources = screenField("resourcesService");
+        SpriteSheet sheet = resources.getSpriteSheet(cow.getSprite());
+        TextureRegion picture = ((TextureRegionDrawable) cow.getAvatar().getDrawable()).getRegion();
+        float scale = cow.getAvatar().getWidth() / picture.getRegionWidth();
+        return new float[]{
+                cow.getAvatar().getX() + (x - sheet.trimX()) * scale,
+                cow.getAvatarRestY() + (sheet.frameHeight() - y - sheet.trimY()) * scale};
     }
 
     /**
@@ -639,6 +768,13 @@ public final class GameDriver {
         describeLabels(snapshot, "notification stage", notificationStage());
         describeLabels(snapshot, "menu stage", menuStage());
         describeLabels(snapshot, "ui stage", uiStage());
+        for (Actor actor : uiStage().getActors()) {
+            float alpha = effectiveAlpha(actor);
+            if (actor instanceof ActionButton && alpha > 0.01f) {
+                snapshot.line("action button on ui stage: %s (a picture) at=%s alpha=%s", actor.getName(),
+                        Snapshot.point(actor.getX(), actor.getY()), Snapshot.number(alpha));
+            }
+        }
     }
 
     /** Every label a player can see (effective alpha above zero), in drawing order. */
@@ -857,10 +993,10 @@ public final class GameDriver {
     /** Where a button is on the screen and how big: "x,y wxh" in screen pixels (bottom-left corner, y down). */
     public String buttonOnScreen(String text) {
         for (Actor actor : uiActors()) {
-            if (actor instanceof TextButton button && text.contentEquals(button.getText())) {
-                Vector2 corner = uiStage().stageToScreenCoordinates(button.localToStageCoordinates(new Vector2()));
+            if (isButton(actor, text)) {
+                Vector2 corner = uiStage().stageToScreenCoordinates(actor.localToStageCoordinates(new Vector2()));
                 Vector2 opposite = uiStage().stageToScreenCoordinates(
-                        button.localToStageCoordinates(new Vector2(button.getWidth(), button.getHeight())));
+                        actor.localToStageCoordinates(new Vector2(actor.getWidth(), actor.getHeight())));
                 return Snapshot.number(corner.x) + "," + Snapshot.number(corner.y) + " "
                         + Snapshot.number(opposite.x - corner.x) + "x" + Snapshot.number(corner.y - opposite.y);
             }

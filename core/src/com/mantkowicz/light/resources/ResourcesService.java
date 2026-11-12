@@ -165,7 +165,7 @@ public class ResourcesService {
 
         for (JsonValue sheet = root.get("sheets").child; sheet != null; sheet = sheet.next) {
             spriteSheets.put(sheet.name, new SpriteSheet(sheet.getInt("frameWidth"), sheet.getInt("frameHeight"),
-                    sheet.getInt("trimX"), sheet.getInt("trimY")));
+                    sheet.getInt("trimX"), sheet.getInt("trimY"), sheet.getFloat("anchorX"), sheet.getFloat("anchorY")));
         }
         for (JsonValue animation = root.get("animations").child; animation != null; animation = animation.next) {
             Array<AtlasRegion> frames = atlas.findRegions(animation.name);

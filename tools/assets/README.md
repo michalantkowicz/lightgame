@@ -65,7 +65,9 @@ It describes what's in the pack, so the tool doesn't need to be told again:
   instead (`layoutFrom`). `wang` sets pieces by hand. `animations` makes animated tiles (the water).
 - **sprites**: animation sheets cut into frames. `frame` is the frame size, `offset` where the grid starts, `rows`
   names the rows (`"auto"` gives `row_00`, `row_01`...). `duration` is ms per frame, `playMode` is `LOOP` or `NORMAL`
-  (play once). `variants` lists colours with the same layout. Empty frames are skipped. Name rows `action` or
+  (play once). `variants` lists colours with the same layout. Empty frames are skipped. `anchor: [x, y]` is the
+  frame's pixel (from its top left) drawn on the tile's middle, for sheets that draw their character away from the
+  frame's middle: the cow stands low in its 32x32 frame, so `[16, 21]` (its body's middle). Default: the frame's middle. Name rows `action` or
   `action_direction` (`open`, `walk_left`): every action becomes a constant of the generated `Action` enum.
 - **ignore**: previews and duplicates.
 
@@ -99,12 +101,16 @@ it or ignored on purpose (others are listed as warnings).
 - **images**: one entry per sheet. `file` is a path in the pack, or a glob: then every matching file is a piece of its
   own, named `prefix` + its file name (`backdrops_a1`, `mouse_catpaw_mouse_icon`).
   - nothing more: the whole image is one piece, named `name` (`dialog_box`);
-  - `"frame": [w, h]`: a grid, pieces `name/000`, `name/001`... row by row (empty cells skipped, numbers kept);
+  - `"frame": [w, h]`: a grid, pieces `name/000`, `name/001`... row by row (empty cells skipped, numbers kept).
+    `"offset": [x, y]` is where it starts; `"columns"` and `"rowCount"` limit it to a few cells of a big sheet (the
+    stamina bar's segments, found only on `ALL UI ASSETS on one sheet.png`);
   - `"pieces": "auto"`: every separate shape is a piece, numbered in reading order. `"gap": n` joins shapes closer
     than n px (the letters of a word). Shapes that touch come out as one piece: use a grid then;
   - `"names": {"17": "heart"}` renames pieces (`icons/heart`), so code doesn't depend on numbers;
   - `"split": [left, right, top, bottom]`: a nine-patch. The borders keep their size, the middle stretches. For every
     piece of the entry, or `{"piece": [...]}` for some. The preview shows it stretched to twice its size;
+  - `"rotate": 90` turns the image counter-clockwise (90, 180 or 270) before cutting it, e.g. the dialog box with its
+    pointer at the bottom (`dialog_box_down`);
   - `"animation": {"duration": ms, "playMode": "LOOP" or "NORMAL"}` with a `frame` grid: every row is an animation,
     `name` itself when there's one row, else `name/row_00`... (or name them with `rows`, as in `pack.json`).
   Pieces are trimmed to their visible pixels; an animation's frames share one box, so they don't jump.

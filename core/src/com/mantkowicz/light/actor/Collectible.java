@@ -1,5 +1,6 @@
 package com.mantkowicz.light.actor;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.resources.Thumbnail;
 
@@ -20,6 +21,11 @@ public interface Collectible extends Thumbnail, InventoryOwner {
      * The collect window for this collectible closes, with OK or CANCEL (e.g. a chest shuts its lid).
      */
     void afterCollect();
+
+    /**
+     * The picture on the action button that collects from it, e.g. the closed chest.
+     */
+    TextureRegion getActionIcon();
 
     String getName();
 
