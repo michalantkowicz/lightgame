@@ -240,6 +240,11 @@ Step 1 of the HUD design ("face is the button", `docs/hud-design.md` on branch `
 - The face can react: `Portrait.play(animation, seconds)` plays a face animation over and over for that long instead of
   the idle, `Portrait.play(animation)` plays it once; then the face goes back to being still and to its gestures by
   itself. A new reaction replaces the one playing. `getReaction()` says what plays (null when idle).
+- The face's idle follows the stamina bar's face: `Portrait.Idle` (an intro played once, then a still face for a
+  pause and the next gesture, over and over; no pause: the gestures follow each other), set with `setIdle`. Awake
+  (green): still, blinking, twitching an ear every 2.5 s. Tired (yellow): yawning (row 29) after every second of
+  stillness. Asleep (red): falls asleep once (row 41), then sleeps with a bubble growing and shrinking (rows 42, 43).
+  Reactions still play over any idle.
 - The action button is no longer a COLLECT text button but a round button over the hint with a picture of what it
   acts on, no text: `Collectible.getActionIcon()`, for the chest the closed chest as it looks on the map (cropped to its
   visible 16x14 px, drawn 4x on a button drawn 6x, 108x120). It appears right of the face, its right edge as far from

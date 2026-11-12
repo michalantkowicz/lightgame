@@ -49,6 +49,14 @@ public class Hud extends Group {
             + (BACKPACK_SLOTS - 1) * SLOT_GAP, ACTION_Y = FACE_Y;
     /** What the player says when the hint button is tapped (later: where to go next). */
     static final String HINT = "play around!";
+    /**
+     * The face's idle by the stamina bar's face: awake (green: still, blinking, twitching an ear), tired (yellow:
+     * yawning), asleep (red: falls asleep, then sleeps with a bubble).
+     */
+    static final Portrait.Idle AWAKE = new Portrait.Idle("awake", null, UiImage.TEEMO_STILL, 2.5f,
+            UiImage.TEEMO_BLINK, UiImage.TEEMO_BLINK, UiImage.TEEMO_EAR),
+            TIRED = new Portrait.Idle("tired", null, UiImage.TEEMO_STILL, 1, UiImage.TEEMO_YAWN),
+            ASLEEP = new Portrait.Idle("asleep", UiImage.TEEMO_FALL_ASLEEP, null, 0, UiImage.TEEMO_SLEEP, UiImage.TEEMO_SLEEP_MORE);
     /** Between the face's top and the tip of its bubble's pointer. */
     private static final float BUBBLE_GAP = 6;
     /** Between the gear and the screen's corner: room for the circle at its top right while it is held. */
@@ -83,9 +91,7 @@ public class Hud extends Group {
         });
         addActor(row);
 
-        face = new Portrait(resources, "teemo", resources.getUiAnimation(UiImage.TEEMO_STILL),
-                resources.getUiAnimation(UiImage.TEEMO_BLINK), resources.getUiAnimation(UiImage.TEEMO_BLINK),
-                resources.getUiAnimation(UiImage.TEEMO_EAR));
+        face = new Portrait(resources, "teemo", AWAKE);
         row.addActor(face);
 
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
@@ -129,6 +135,8 @@ public class Hud extends Group {
     public void act(float delta) {
         followCamera();
         showBackpack();
+        UiImage mood = stamina.getMood();
+        face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);
     }
 

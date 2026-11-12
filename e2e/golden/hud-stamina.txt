@@ -1,14 +1,21 @@
 ## at the start: full
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 ## used 0.35 (hard work): 0.65 left, still happy
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 stamina: 10 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 ## used 0.15 more: half left, neutral
+face: teemo at=(308.0,74.0) size=184.0x184.0 tired
 stamina: 7 of 14 segments, face MOOD_NEUTRAL at=(316.0,40.0) size=168.0x24.0
 ## used 0.25 more: a quarter left, sad
+face: teemo at=(308.0,74.0) size=184.0x184.0 asleep
 stamina: 4 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
 ## used 0.2 more: a little left still shows one segment
+face: teemo at=(308.0,74.0) size=184.0x184.0 asleep
 stamina: 1 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
 ## used more than is left: empty, not below
+face: teemo at=(308.0,74.0) size=184.0x184.0 asleep
 stamina: 0 of 14 segments, face MOOD_SAD at=(316.0,40.0) size=168.0x24.0
 ## filled (slept)
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0

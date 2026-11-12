@@ -195,7 +195,7 @@ public final class GameDriver {
         Hud hud = hud();
         Snapshot snapshot = new Snapshot();
         Portrait face = hud.getFace();
-        snapshot.line("face: %s %s%s", face.getPictureName(), uiBox(face),
+        snapshot.line("face: %s %s %s%s", face.getPictureName(), uiBox(face), face.getIdle().name(),
                 face.getReaction() == null ? "" : " playing " + face.getReaction());
         List<String> backpack = new ArrayList<>();
         for (Item item : hud.getBackpack()) {

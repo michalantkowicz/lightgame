@@ -1,5 +1,5 @@
 ## at the start
-face: teemo at=(308.0,74.0) size=184.0x184.0
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 hint: at=(628.0,74.0) size=108.0x120.0
@@ -7,7 +7,7 @@ bubble: none
 gear: at=(644.0,1116.0) size=88.0x96.0 held=0%
 settings: closed
 ## hint tapped: a bubble over the face
-face: teemo at=(308.0,74.0) size=184.0x184.0 playing TEEMO_CHEER
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake playing TEEMO_CHEER
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 hint: at=(628.0,74.0) size=108.0x120.0
@@ -15,7 +15,7 @@ bubble: "play around!" at=(277.0,264.0) size=246.0x69.0 alpha=1.0
 gear: at=(644.0,1116.0) size=88.0x96.0 held=0%
 settings: closed
 ## after 2.6 s: fading
-face: teemo at=(308.0,74.0) size=184.0x184.0
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 hint: at=(628.0,74.0) size=108.0x120.0
@@ -23,7 +23,7 @@ bubble: "play around!" at=(277.0,264.0) size=246.0x69.0 alpha=0.6
 gear: at=(644.0,1116.0) size=88.0x96.0 held=0%
 settings: closed
 ## after 3.1 s: gone
-face: teemo at=(308.0,74.0) size=184.0x184.0
+face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
 hint: at=(628.0,74.0) size=108.0x120.0

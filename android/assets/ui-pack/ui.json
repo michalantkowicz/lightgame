@@ -60,6 +60,26 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "emotes_premium/row_29": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_41": {
+      "frames": 12,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_42": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_43": {
+      "frames": 13,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "icon_buttons/check": {
       "frames": 1
     },

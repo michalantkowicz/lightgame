@@ -176,7 +176,9 @@ class HudTest {
     }
 
     private static String staminaLine(GameDriver game) {
-        return game.describeHud().lines().filter(line -> line.startsWith("stamina:")).findFirst().orElseThrow() + "\n";
+        // the bar, and the face whose idle follows it (awake, tired, asleep)
+        return game.describeHud().lines().filter(line -> line.startsWith("stamina:") || line.startsWith("face:"))
+                .reduce("", (lines, line) -> lines + line + "\n");
     }
 
     @Test

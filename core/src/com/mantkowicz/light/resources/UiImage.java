@@ -42,6 +42,11 @@ public enum UiImage {
     TEEMO_EAR("emotes_premium/row_04"),
     /** Teemo's reactions (the face's {@code play}): waving its arms with an open mouth. */
     TEEMO_CHEER("emotes_premium/row_15"),
+    /** Teemo tired: a yawn; sleeping: falling asleep, then two rows of sleep with a bubble growing and shrinking. */
+    TEEMO_YAWN("emotes_premium/row_29"),
+    TEEMO_FALL_ASLEEP("emotes_premium/row_41"),
+    TEEMO_SLEEP("emotes_premium/row_42"),
+    TEEMO_SLEEP_MORE("emotes_premium/row_43"),
     /** The action button beside the face: up, and pressed (lower, its side hidden). */
     ROUND_BUTTON("round_buttons/brown"),
     ROUND_BUTTON_DOWN("round_buttons/brown_down"),
