@@ -8,7 +8,11 @@ package com.mantkowicz.light.resources;
 public enum Sprite {
     RABBIT("rabbit"),
     COW_BROWN("cow_brown"),
-    CHEST("chest");
+    CHEST("chest"),
+    /** Farm produce lying on the ground, one per row (only the right column: the left one has seed bags). */
+    FARM_ITEMS("farm_items"),
+    /** The shadow under an item lying on the ground. */
+    ITEM_SHADOW("item_shadow");
 
     private final String sheet;
 

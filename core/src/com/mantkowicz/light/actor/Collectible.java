@@ -13,7 +13,7 @@ public interface Collectible extends Thumbnail, InventoryOwner {
     boolean isDistant();
 
     /**
-     * The collect window for this collectible opens (e.g. a chest opens its lid).
+     * It is opened, just before what is inside comes out (e.g. a chest lifts its lid).
      */
     void beforeCollect();
 

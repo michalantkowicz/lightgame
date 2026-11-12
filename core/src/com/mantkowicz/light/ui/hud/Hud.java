@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
@@ -38,7 +39,7 @@ public class Hud extends Group {
     /** GAP: between the face and the pieces beside it; SLOT_GAP: between two backpack slots. */
     private static final float MARGIN = 16, GAP = 40, SLOT_GAP = 12;
     /** A backpack slot (80% of the 120x128 it was at first) and the item drawn in it. */
-    private static final float SLOT_WIDTH = 96, SLOT_HEIGHT = 104, ITEM_SIZE = 68;
+    private static final float SLOT_WIDTH = 96, SLOT_HEIGHT = 104, ITEM_SIZE = 64; // a 16 px item drawn 4x
     /** The face's bottom; the stamina bar is BAR_GAP under it. */
     private static final float FACE_Y = MARGIN + 58, BAR_GAP = 10;
     /**
@@ -60,7 +61,7 @@ public class Hud extends Group {
     /** Between the face's top and the tip of its bubble's pointer. */
     private static final float BUBBLE_GAP = 6;
     /** Between the gear and the screen's corner: room for the circle at its top right while it is held. */
-    private static final float GEAR_MARGIN = 68;
+    private static final float GEAR_MARGIN = 48;
 
     private final ResourcesService resources;
     private final Player player;
@@ -97,11 +98,19 @@ public class Hud extends Group {
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             Image slot = new Image(UiStyle.stretching(resources, UiImage.SLOT));
             slot.setSize(SLOT_WIDTH, SLOT_HEIGHT);
+            int index = i;
+            slot.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    player.throwOut(index); // what is in it jumps out next to the player
+                }
+            });
             row.addActor(slot);
             slots.add(slot);
             Image item = new Image();
             item.setScaling(Scaling.fit);
             item.setSize(ITEM_SIZE, ITEM_SIZE);
+            item.setTouchable(Touchable.disabled); // taps go to the slot under it
             row.addActor(item);
             slotItems.add(item);
             shownItems.add(null);
@@ -197,7 +206,7 @@ public class Hud extends Group {
             Item item = i < items.size() ? items.get(i) : null;
             if (item != shownItems.get(i)) {
                 shownItems.set(i, item);
-                slotItems.get(i).setDrawable(item == null ? null : UiStyle.image(resources, item.getThumbnailType().getImage()));
+                slotItems.get(i).setDrawable(item == null ? null : new TextureRegionDrawable(item.getPicture()));
             }
         }
     }
@@ -249,6 +258,11 @@ public class Hud extends Group {
     /** The open settings window, or null. */
     public SettingsPanel getSettings() {
         return settings != null && settings.getStage() != null ? settings : null;
+    }
+
+    /** The backpack slots, left to right: tapping one throws out what is in it. */
+    public List<Image> getSlots() {
+        return slots;
     }
 
     /** What each backpack slot holds, null for empty. */

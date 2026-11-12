@@ -44,4 +44,3 @@ chest: cell=gone
 camera: at=(701.5,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff

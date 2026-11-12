@@ -182,6 +182,9 @@
     {"name": "tree_fall", "file": "Objects/Tree animations/tree_fall_animation_sprite_sheet.png", "frame": [64, 48],
      "duration": 100, "playMode": "NORMAL", "rows": ["fall"]},
 
+    {"name": "farm_items", "file": "Objects/Items/Farming Plants items.png", "frame": [16, 16], "offset": [16, 0],
+     "columns": 1},
+    {"name": "item_shadow", "file": "Objects/Items/item shadow.png", "frame": [16, 16]},
     {"name": "chest", "file": "Tilesets/Building parts/Chest.png", "frame": [48, 48], "duration": 100,
      "playMode": "NORMAL", "rows": ["open_front", "open_side"]},
     {"name": "gate", "file": "Tilesets/Building parts/Fence gates animation sprites .png", "frame": [32, 16],
