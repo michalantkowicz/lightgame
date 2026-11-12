@@ -5,7 +5,7 @@ chest: cell=gone
 camera: at=(576.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on notification stage: "no path" at=(537.0,436.2) alpha=1.0 color=b22222ff
+text on notification stage: "no path" at=(519.0,437.7) alpha=1.0 color=b22222ff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## after 1 s
 crash: none
@@ -14,7 +14,7 @@ chest: cell=gone
 camera: at=(576.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-text on notification stage: "no path" at=(537.0,446.2) alpha=0.5 color=b22222ff
+text on notification stage: "no path" at=(519.0,447.7) alpha=0.5 color=b22222ff
 text on ui stage: "60" at=(700.0,1160.0) alpha=1.0 color=ffffffff
 ## after 2.1 s
 crash: none

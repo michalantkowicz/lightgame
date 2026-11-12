@@ -29,12 +29,21 @@ public class ResourcesService {
     /** Animations made by tools/assets: names, frame durations and the atlas with the frames. */
     private static final String ANIMATIONS = "sprites/animations.json";
     private static final String RUN_TOOL = "run python3 tools/assets/build_assets.py";
+    /** UI pieces and fonts made by tools/assets from the Sprout Lands UI pack (only what UiImage and UiFont list). */
+    private static final String UI = "ui-pack/ui.json";
+    /** How much bigger than in the pack UI pieces and fonts are drawn: one pack pixel is 3x3 screen pixels. */
+    public static final int UI_SCALE = 3;
+    /** The font of all game text. */
+    private static final UiFont GAME_FONT = UiFont.PIXEL_7X7;
 
     private final Skin skin;
     private final AssetManager assetManager;
     private final Array<TextureAtlas> atlases = new Array<>();
     private final Map<String, Animation<TextureRegion>> animations = new HashMap<>();
     private final Map<String, SpriteSheet> spriteSheets = new HashMap<>();
+    private TextureAtlas uiAtlas;
+    private final Map<UiImage, Animation<TextureRegion>> uiAnimations = new HashMap<>();
+    private final Map<UiFont, String> uiFonts = new HashMap<>();
 
     public ResourcesService() {
         assetManager = new AssetManager();
@@ -58,6 +67,89 @@ public class ResourcesService {
         assetManager.getAll(TextureAtlas.class, atlases);
         skin = new Skin(Gdx.files.internal("skin/skin.json"), assetManager.get("skin/skin.atlas", TextureAtlas.class));
         loadAnimations();
+        loadUi();
+    }
+
+    /**
+     * The UI atlas is kept apart from the others (not searched by getTexture), so its piece names can't clash with them.
+     */
+    private void loadUi() {
+        FileHandle file = Gdx.files.internal(UI);
+        JsonValue root = new JsonReader().parse(file);
+        String atlasName = file.parent().child(root.getString("atlas")).path();
+        assetManager.load(atlasName, TextureAtlas.class);
+        JsonValue fonts = root.get("fonts");
+        for (UiFont font : UiFont.values()) {
+            JsonValue entry = fonts.get(font.getFont());
+            if (entry == null) {
+                throw new IllegalStateException("UiFont." + font + " ('" + font.getFont() + "') isn't in " + UI + ": " + RUN_TOOL);
+            }
+            String fontName = file.parent().child(entry.getString("file")).path();
+            assetManager.load(fontName, BitmapFont.class);
+            uiFonts.put(font, fontName);
+        }
+        assetManager.finishLoading();
+        uiAtlas = assetManager.get(atlasName, TextureAtlas.class);
+        for (UiFont font : UiFont.values()) {
+            BitmapFont bitmapFont = getFont(font);
+            bitmapFont.getData().setScale(UI_SCALE);
+            bitmapFont.setUseIntegerPositions(true);
+        }
+
+        // fail at start, not when a widget first needs its piece
+        JsonValue images = root.get("images");
+        for (UiImage image : UiImage.values()) {
+            JsonValue entry = images.get(image.getPiece());
+            if (entry == null) {
+                throw new IllegalStateException("UiImage." + image + " ('" + image.getPiece() + "') isn't in " + UI + ": " + RUN_TOOL);
+            }
+            Array<AtlasRegion> frames = uiAtlas.findRegions(image.getPiece());
+            if (frames.size != entry.getInt("frames")) {
+                throw new IllegalStateException("UI piece '" + image.getPiece() + "' has " + frames.size + " frames in "
+                        + atlasName + " instead of " + entry.getInt("frames") + ": " + RUN_TOOL);
+            }
+            if (entry.has("frameDuration")) {
+                uiAnimations.put(image, new Animation<TextureRegion>(entry.getFloat("frameDuration"), frames,
+                        Animation.PlayMode.valueOf(entry.getString("playMode"))));
+            }
+        }
+    }
+
+    /**
+     * A UI piece, e.g. an icon; for an animation its first frame.
+     */
+    public TextureRegion getUiImage(UiImage image) {
+        return uiAtlas.findRegion(image.getPiece());
+    }
+
+    /**
+     * A UI piece that stretches without blurring its borders (dialog boxes, panels): it needs a 'split' in
+     * tools/assets/ui.json.
+     */
+    public NinePatch getUiNinePatch(UiImage image) {
+        if (uiAtlas.findRegion(image.getPiece()).findValue("split") == null) {
+            throw new IllegalArgumentException("UiImage." + image + " isn't a nine-patch: give '" + image.getPiece()
+                    + "' a split in tools/assets/ui.json");
+        }
+        return uiAtlas.createPatch(image.getPiece());
+    }
+
+    /**
+     * An animated UI piece (a sheet with 'animation' in tools/assets/ui.json), e.g. the "continue" arrow.
+     */
+    public Animation<TextureRegion> getUiAnimation(UiImage image) {
+        Animation<TextureRegion> animation = uiAnimations.get(image);
+        if (animation == null) {
+            throw new IllegalArgumentException("UiImage." + image + " isn't an animation (see build/assets-preview/index.html#ui)");
+        }
+        return animation;
+    }
+
+    /**
+     * A pixel font of the UI pack, drawn at {@link #UI_SCALE} like the UI pieces.
+     */
+    public BitmapFont getFont(UiFont font) {
+        return assetManager.get(uiFonts.get(font), BitmapFont.class);
     }
 
     private void loadAnimations() {
@@ -183,15 +275,18 @@ public class ResourcesService {
         return new NinePatchDrawable(new NinePatch(assetManager.get(textureName, Texture.class)));
     }
 
+    /**
+     * A thumbnail's picture as it is in the UI pack; draw it at {@link #UI_SCALE} (UiStyle does).
+     */
     public TextureRegion getThumbnail(ThumbnailType thumbnailType) {
-        return getTexture(thumbnailType.getRegionName());
+        return getUiImage(thumbnailType.getImage());
     }
 
     /**
-     * The one game font, loaded once and disposed with the asset manager.
+     * The font of all game text: a pixel font of the UI pack, at UI scale. Loaded once, disposed with the asset manager.
      */
     public BitmapFont getFont() {
-        return assetManager.get(FONT, BitmapFont.class);
+        return getFont(GAME_FONT);
     }
 
     public Skin getSkin() {

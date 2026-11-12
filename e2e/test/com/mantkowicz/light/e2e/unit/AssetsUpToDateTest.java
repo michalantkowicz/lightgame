@@ -3,6 +3,8 @@ package com.mantkowicz.light.e2e.unit;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.mantkowicz.light.resources.Sprite;
+import com.mantkowicz.light.resources.UiFont;
+import com.mantkowicz.light.resources.UiImage;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -25,13 +27,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Fails when a source of the generated assets changed but tools/assets/build_assets.py wasn't run afterwards (e.g. a
  * level saved in Tiled, pack.json edited, a sheet added to the Sprite enum). The tool records the SHA-1 of each source
- * in what it generates: the game copy of a map has it in its header comment, animations.json has the one of pack.json.
+ * in what it generates: the game copy of a map has it in its header comment, animations.json has the one of pack.json,
+ * ui-pack/ui.json the one of tools/assets/ui.json.
  * Needs neither the pack nor Python.
  */
 class AssetsUpToDateTest {
     private static final String RUN_TOOL = "run: python3 tools/assets/build_assets.py";
     private static final Pattern MAP_SHA1 = Pattern.compile("source-sha1: ([0-9a-f]{40})");
     private static final Pattern PACK_JSON_SHA1 = Pattern.compile("\"packJsonSha1\": \"([0-9a-f]{40})\"");
+    private static final Pattern UI_JSON_SHA1 = Pattern.compile("\"uiJsonSha1\": \"([0-9a-f]{40})\"");
 
     private final Path root = Path.of(System.getProperty("repo.root", "../.."));
     private final Path sourceMaps = root.resolve("assets-src/maps");
@@ -80,6 +84,37 @@ class AssetsUpToDateTest {
             listed.add(sprite.getSheet());
         }
         assertEquals(listed, packed, "the sheets in sprites.atlas aren't the ones in the Sprite enum, " + RUN_TOOL);
+    }
+
+    @Test
+    void uiMatchesUiJson() throws IOException {
+        Matcher recorded = UI_JSON_SHA1.matcher(Files.readString(root.resolve("android/assets/ui-pack/ui.json")));
+        String found = recorded.find() ? recorded.group(1) : "nothing";
+        assertEquals(sha1(root.resolve("tools/assets/ui.json")), found,
+                "tools/assets/ui.json changed since the UI was packed, " + RUN_TOOL);
+    }
+
+    @Test
+    void uiMatchesTheUiEnums() throws IOException {
+        JsonValue ui = new JsonReader().parse(Files.readString(root.resolve("android/assets/ui-pack/ui.json")));
+        Set<String> listed = new TreeSet<>();
+        for (UiImage image : UiImage.values()) {
+            listed.add(image.getPiece());
+        }
+        assertEquals(listed, names(ui.get("images")), "the pieces in ui.atlas aren't the ones in the UiImage enum, " + RUN_TOOL);
+        Set<String> fonts = new TreeSet<>();
+        for (UiFont font : UiFont.values()) {
+            fonts.add(font.getFont());
+        }
+        assertEquals(fonts, names(ui.get("fonts")), "the fonts in android/assets/ui-pack/fonts aren't the ones in UiFont, " + RUN_TOOL);
+    }
+
+    private static Set<String> names(JsonValue object) {
+        Set<String> names = new TreeSet<>();
+        for (JsonValue child = object.child; child != null; child = child.next) {
+            names.add(child.name);
+        }
+        return names;
     }
 
     private static List<Path> tmxFiles(Path directory) throws IOException {

@@ -24,7 +24,7 @@ public class ActionButton extends GameActor {
     public ActionButton(GameContext context, String text, EventListener listener, BooleanSupplier available) {
         super(ACTION_BUTTON);
 
-        button = new TextButton(text, context.getResourcesService().getSkin(), "action");
+        button = UiStyle.textButton(context.getResourcesService(), text);
         button.addListener(listener);
 
         addActor(button);

@@ -6,7 +6,6 @@ import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.ThumbnailType;
 
 import static com.mantkowicz.light.actor.GameActorType.LIGHTER;
-import static com.mantkowicz.light.resources.ThumbnailType.DEFAULT;
 
 public class Lighter extends GameBoardActor implements Item, Collectible {
     private static final String LOG_TAG = "Lighter";
@@ -52,6 +51,6 @@ public class Lighter extends GameBoardActor implements Item, Collectible {
 
     @Override
     public ThumbnailType getThumbnailType() {
-        return ThumbnailType.DEFAULT;
+        return ThumbnailType.LIGHT;
     }
 }

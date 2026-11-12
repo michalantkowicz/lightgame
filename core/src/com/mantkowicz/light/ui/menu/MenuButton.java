@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.notification.LabelFactory;
 import com.mantkowicz.light.notification.NotificationStyle;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.ui.UiStyle;
 
 public class MenuButton extends Group {
     private static final float HOVER_SCALE = 1.5f;
@@ -19,7 +20,7 @@ public class MenuButton extends Group {
     private final Interaction interaction;
 
     public MenuButton(ResourcesService resourcesService, Interaction interaction) {
-        Image image = new Image(resourcesService.getThumbnail(interaction.getThumbnailType()));
+        Image image = UiStyle.icon(resourcesService, interaction.getThumbnailType().getImage());
         image.setPosition(-image.getWidth() / 2f, -image.getHeight() / 2f);
         addActor(image);
 

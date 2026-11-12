@@ -1,15 +1,18 @@
 package com.mantkowicz.light.ui.collect;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.resources.UiImage;
+import com.mantkowicz.light.ui.UiStyle;
 
 import static com.mantkowicz.light.ui.collect.CollectWindowItemState.UNCHOSEN;
 
 public class CollectItem extends Button {
+    /** The item's picture inside a slot (the slot's inner square, at UI scale). */
+    private static final float ITEM_SIZE = 60;
     private final Drawable unchosenDownDrawable;
     private final Drawable unchosenUpDrawable;
     private final Drawable chosenUpDrawable;
@@ -31,10 +34,10 @@ public class CollectItem extends Button {
 
         tryAddItemImage(item);
 
-        unchosenUpDrawable = resourcesService.getDrawable("item_background.png");
-        unchosenDownDrawable = resourcesService.getDrawable("item_background_pressed.png");
-        chosenUpDrawable = resourcesService.getDrawable("item_background_chosen.png");
-        ableToPutDrawable = resourcesService.getDrawable("item_background_able_to_put.png");
+        unchosenUpDrawable = UiStyle.image(resourcesService, UiImage.SLOT);
+        unchosenDownDrawable = UiStyle.image(resourcesService, UiImage.SLOT_PRESSED);
+        chosenUpDrawable = UiStyle.image(resourcesService, UiImage.SLOT_CHOSEN);
+        ableToPutDrawable = UiStyle.image(resourcesService, UiImage.SLOT_FREE);
     }
 
     public CollectWindowItemState getState() {
@@ -60,8 +63,8 @@ public class CollectItem extends Button {
     private static ButtonStyle getButtonStyle(ResourcesService resourcesService) {
         ButtonStyle buttonStyle = new ButtonStyle();
 
-        buttonStyle.up = resourcesService.getDrawable("item_background.png");
-        buttonStyle.down = resourcesService.getDrawable("item_background_pressed.png");
+        buttonStyle.up = UiStyle.image(resourcesService, UiImage.SLOT);
+        buttonStyle.down = UiStyle.image(resourcesService, UiImage.SLOT_PRESSED);
 
         return buttonStyle;
     }
@@ -87,9 +90,8 @@ public class CollectItem extends Button {
 
     private void tryAddItemImage(Item item) {
         if (item != null) {
-            TextureRegion thumbnail = resourcesService.getThumbnail(item.getThumbnailType());
-            itemImage = new Image(thumbnail);
-            add(itemImage);
+            itemImage = UiStyle.icon(resourcesService, item.getThumbnailType().getImage());
+            add(itemImage).size(ITEM_SIZE);
         } else {
             itemImage = null;
         }

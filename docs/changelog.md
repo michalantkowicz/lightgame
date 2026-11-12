@@ -158,3 +158,48 @@ The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md
   side cells for chests.
   `CollectTest.collectWhileWalkingAwayStopsNextToTheChest` clicks COLLECT just after starting to walk away: no window during the
   walk, then the player stands next to the chest with the window open. The goldens are unchanged.
+
+## 2026‑11‑11, UI pack in the asset tool (branch `ui-pack`)
+
+- `build_assets.py` reads a second pack, the Sprout Lands UI pack (found in `tools/assets/*UI Pack*` or given once with
+  `--ui`, remembered in `.ui-pack-path`), described in `tools/assets/ui.json`: sheets cut as a whole, as a grid, or
+  into separate shapes (`"pieces": "auto"`, flood fill + joining overlapping boxes, reading order), optional piece
+  names, nine-patch borders (`split`, written into the atlas, so `atlas.createPatch` works) and row animations. All 200
+  files of the pack are either described or ignored on purpose (0 warnings).
+- Like sprites, only what the game lists is packed: `UiImage` (pieces) → `android/assets/ui-pack/ui.atlas`, `UiFont` → bitmap
+  fonts in `android/assets/ui-pack/fonts/`. The TTF fonts are rendered with Pillow at their pixel size (smallest size with
+  no grey edges), ASCII only (the fonts have nothing else); the generated glyphs match Pillow's own drawing of the TTF
+  pixel for pixel. TTF isn't loaded directly because the web build can't read it without extra libraries.
+- `ResourcesService`: `getUiImage`, `getUiNinePatch`, `getUiAnimation`, `getFont(UiFont)`; the UI atlas is kept apart
+  from `getTexture`'s atlases so piece names can't clash. Listed pieces and fonts are checked at start.
+- To start with, the enums list `DIALOG_BOX`, `CONTINUE_INDICATOR` (an animation) and `PIXEL_8X14`, so every path is
+  exercised; no screen uses them yet.
+- Preview page: a UI section with every piece by sheet (nine-patches also stretched, animations playing) and a sample
+  of every font.
+- Tests: `UiAssetsTest` (everything listed loads; a nine-patch, an animation, a font measure as expected),
+  `AssetsUpToDateTest` checks `ui.json`'s SHA-1 and that the packed pieces and fonts are the enums' ones.
+- License: `CREDITS.md` names both packs and where their parts are, with the terms (the same for both packs).
+- Known limits: shapes that touch come out as one piece with `"pieces": "auto"` (e.g. three small hearts in
+  `inventory`), so such sheets may need a grid later; the dialog boxes' splits keep the tail on the left in the
+  stretching middle, so a tall box stretches the tail too.
+
+## 2026‑11‑12, the UI drawn with the UI pack (branch `ui-pack`)
+
+- All UI comes from the Sprout Lands UI pack, drawn at `ResourcesService.UI_SCALE` = 3 (one pack pixel is 3x3 screen
+  pixels, the font's too), built by `ui/UiStyle`:
+  - COLLECT, OK, CANCEL: the blank wide button (`play_button/blank`, pressed `blank_down`), a nine-patch, 220x81 at
+    least, dark brown text (`UiStyle.TEXT`);
+  - the collect window: the blank settings panel (`settings_menu/panel`, nine-patch) on the same dimmed screen; slots
+    are the inventory's octagons: light (empty or holding), darker when pressed, dark when chosen, the square one
+    where the chosen item can go;
+  - the description bubble: `dialog_box` (nine-patch) with dark text, up to 420 px wide;
+  - pictures (`ThumbnailType` now names a `UiImage`): the radial menu's describe button is the "?" icon button, the
+    lighter is the sun emoji (the pack has no lighter);
+  - all text (buttons, notifications, descriptions, FPS) uses the pack's 7x7 pixel font (`getFont()`), capitals only.
+- `ui.json` names the pieces used (`names`) and gives the panel and button their nine-patch borders.
+- Goldens re-recorded (approved look change): only texts' positions and colours changed (COLLECT/OK/CANCEL brown and
+  moved with the new button sizes, menu "button" labels and "no path" moved with the new font, descriptions brown).
+  Walking, collecting, inventories and menu behaviour are the same.
+- Not used any more, kept for now: the old skin (`skin/`, still loaded), `font.fnt`, `table_background.png`,
+  `item_background*.png`, and the unused old `android/assets/ui/` skin.
+
