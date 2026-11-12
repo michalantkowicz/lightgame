@@ -59,8 +59,8 @@ Scenario ids are used in `docs/refactoring-plan.md`:
 | S8–S11 | Radial menu: dog description, cancel, short tap, player description | `MenuTest` | `menu-*` |
 | S12, S13 | Q/W fade shader; torch flicker | `ShaderAndLightTest` | `fade-shader`, `torch-flicker` |
 | S14 | Resize | `ResizeTest` | `resize` |
-| S15 | The collect flow: walk onto the chest, COLLECT, move the lighter to the player, OK; CANCEL drops changes; walking away removes the button | `CollectTest` | `collect`, `collect-cancel` |
-| — | Animations: the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile; the cow's idle animation; the chest's lid opening and shutting with the collect window | `AnimationTest` | — |
+| S15 | Collecting: the chest's button opens it (stays open, stars), the carrot jumps out onto a free cell next to it; walking onto it puts it into the backpack; tapping its slot throws it out next to the player; no free cell: it stays; the button's reach and fading | `CollectTest` | `collect` |
+| — | Animations: the rabbit's walk per direction, no flicker on diagonals, frame centred on its tile; the cow's idle animation; the chest's lid opening and staying open | `AnimationTest` | — |
 | — | HUD bottom row (face, backpack showing what the player carries, stamina bar (lowered, filled), the round button right of the face: the hint, whose bubble says "play around!" over the face, or the action next to a chest) and the settings gear that opens only after a 3 s hold; taps on the row don't walk; stays on the screen's edges after a resize | `HudTest` | `hud`, `hud-hint`, `hud-stamina` |
 | — | Every shipped map (android/assets): loads, the rabbit starts on a free cell, every chest can be reached; the game starts on level1 | `ShippedMapsTest` | — |
 | — | Camera zoom: the world gets bigger or smaller, clicks still hit the right cell, buttons keep their place and size | `CameraZoomTest` | — |

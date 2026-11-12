@@ -35,12 +35,14 @@ public class Player extends GameBoardActor implements Collecting {
     /** How high the rabbit hops (px) and how long one hop takes: two hops per tile. */
     private static final float HOP_HEIGHT = 10f;
     private static final float HOP_DURATION = SECONDS_PER_TILE / 2;
-    private static final int INVENTORY_SIZE = 3;
+    /** As many as the HUD's backpack slots. */
+    private static final int INVENTORY_SIZE = 2;
 
     private final GameEventService gameEventService;
     private final Inventory inventory;
     private final Stamina stamina = new Stamina();
     private final AnimationPlugin animationPlugin;
+    private final PlayerCollectResolver collectResolver;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
@@ -63,7 +65,7 @@ public class Player extends GameBoardActor implements Collecting {
             addPlugin(playerNotificationPlugin);
         }
 
-        PlayerCollectResolver collectResolver = new PlayerCollectResolver(this, context);
+        collectResolver = new PlayerCollectResolver(this, context);
         CollectPlugin collectPlugin = new CollectPlugin(collectResolver, context);
         addPlugin(collectPlugin);
 
@@ -110,6 +112,11 @@ public class Player extends GameBoardActor implements Collecting {
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
     public Stamina getStamina() {
         return stamina;
+    }
+
+    /** Throws the item in a backpack slot out onto a free tile next to the player (nothing happens without one). */
+    public void throwOut(int slot) {
+        collectResolver.throwOut(slot);
     }
 
     @Override

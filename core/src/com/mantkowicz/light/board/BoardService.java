@@ -96,6 +96,11 @@ public class BoardService {
         return false;
     }
 
+    /** The actors on a tile right now (the player, a dog, items lying there...), as a copy. */
+    public List<GameActor> getGameActors(Tile tile) {
+        return new ArrayList<>(gameActorsByTile.getGameActors(tile));
+    }
+
     public void unregisterGameActor(Tile tile, GameActor gameActor) {
         gameActorsByTile.removeGameActor(tile, gameActor);
     }

@@ -27,7 +27,7 @@ public final class Debug {
         DARKNESS_EXCLAMATION
     }
 
-    private static final Set<Tool> enabledTools = EnumSet.of(Tool.FPS_LABEL);
+    private static final Set<Tool> enabledTools = EnumSet.noneOf(Tool.class);
     private static final Set<Class<?>> outlinedClasses = new HashSet<>();
 
     private Debug() {

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Sprite animations. The rabbit is animated by direction: it walks right with "walk_right" and when it stops it turns
  * back to the default "idle_down"; a diagonal walk keeps one direction. The cow chews in its place ("idle"); the chest's
- * lid opens with the collect window and shuts after it.
+ * lid opens when it is opened and stays open.
  */
 class AnimationTest {
     /** Targets around the rabbit: e(ast), w(est), n(orth), s(outh), r = north-east, q = north-west. */
@@ -88,7 +88,7 @@ class AnimationTest {
     }
 
     @Test
-    void theChestOpensWithTheCollectWindowAndShutsAfterIt() {
+    void theChestOpensAndStaysOpen() {
         GameDriver game = GameDriver.start(FARM.write("farm"));
         Cell chest = FARM.cell('C');
         assertEquals(chest, game.cellOf(GameDriver.Kind.CHEST));
@@ -101,11 +101,10 @@ class AnimationTest {
 
         game.clickButton("COLLECT");
         game.seconds(1);
-        assertEquals("chest/open_front", game.chestAnimation(), "the lid opens with the window");
+        assertEquals("chest/open_front", game.chestAnimation(), "the lid opens");
 
-        game.clickButton("CANCEL");
-        game.seconds(1);
-        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "and shuts when it closes");
+        game.seconds(3);
+        assertEquals("chest/open_front", game.chestAnimation(), "and stays open");
         assertFalse(game.crashed());
     }
 

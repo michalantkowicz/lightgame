@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -24,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Chest;
@@ -32,6 +34,7 @@ import com.mantkowicz.light.actor.Dog;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
+import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.actor.SpriteActor;
 import com.mantkowicz.light.board.Board;
@@ -59,9 +62,6 @@ import com.mantkowicz.light.ui.hud.SpeechBubble;
 import com.mantkowicz.light.ui.hud.StaminaBar;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
-import com.mantkowicz.light.ui.collect.CollectItem;
-import com.mantkowicz.light.ui.collect.CollectItemType;
-import com.mantkowicz.light.ui.collect.CollectWindow;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -79,6 +79,7 @@ public final class GameDriver {
     /** Geometry of every map: a square grid of 128 px cells. */
     private static final float CELL_SIZE = 128;
     private static final int START_FRAMES = 30;
+    private static final long RANDOM_SEED = 7;
     private static final int FRAMES_PER_SECOND = 60;
 
     public enum Kind {PLAYER, DOG, CHEST, COW}
@@ -118,6 +119,7 @@ public final class GameDriver {
     }
 
     private static GameDriver start(String mapName, float cameraZoom) {
+        MathUtils.random.setSeed(RANDOM_SEED); // the game's random choices (where a thrown item lands) repeat every run
         GameDriver driver = new GameDriver(mapName, cameraZoom);
         driver.frames(START_FRAMES);
         return driver;
@@ -285,16 +287,6 @@ public final class GameDriver {
                 + Snapshot.number(actor.getHeight());
     }
 
-    /** Is a collect window open? */
-    public boolean collectWindowOpen() {
-        for (Actor actor : uiActors()) {
-            if (actor instanceof CollectWindow) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /** The effective alpha of every UI button with this text, e.g. [1.0] for one fully shown COLLECT button. */
     public List<Float> buttonAlphas(String text) {
         List<Float> alphas = new ArrayList<>();
@@ -304,15 +296,6 @@ public final class GameDriver {
             }
         }
         return alphas;
-    }
-
-    /** Short click on a slot of the collect window: the chest's row or the player's row. */
-    public void clickChestSlot(int index) {
-        tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTIBLE_ITEM).get(index)));
-    }
-
-    public void clickPlayerSlot(int index) {
-        tap(uiScreenPosition(collectSlots(CollectItemType.COLLECTING_ITEM).get(index)));
     }
 
     /** Puts a wall tile on a cell, as if the map had one there (the map has no walls; WallTile only builds its physics body). */
@@ -415,6 +398,46 @@ public final class GameDriver {
         return "player=" + describe(player.getInventory()) + " chest=" + describe(chest.getInventory());
     }
 
+    /** Items lying on the ground, e.g. ["Carrot cell=(3,5)"], or "flying" while thrown; in the order they were thrown. */
+    public List<String> itemsOnGround() {
+        List<String> items = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying) {
+                items.add(lying.getItem().getClass().getSimpleName() + (lying.isLanded() ? " cell=" + cellOf(lying.getTile()) : " flying"));
+            }
+        }
+        return items;
+    }
+
+    /** Where the first item lying on the ground is (it must have landed). */
+    public Cell itemCell() {
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying && lying.isLanded()) {
+                return cellOf(lying.getTile());
+            }
+        }
+        throw new IllegalStateException("No item lying on the ground");
+    }
+
+    /** How many stars (popping out of an opened chest) are on screen. */
+    public int starsOnScreen() {
+        int stars = 0;
+        TextureRegion star = ((ResourcesService) screenField("resourcesService")).getUiImage(UiImage.SPARKLE);
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof Image image && image.getDrawable() instanceof TextureRegionDrawable drawable
+                    && drawable.getRegion().getTexture() == star.getTexture()
+                    && drawable.getRegion().getRegionX() == star.getRegionX() && drawable.getRegion().getRegionY() == star.getRegionY()) {
+                stars++;
+            }
+        }
+        return stars;
+    }
+
+    /** Short tap on a backpack slot of the HUD (0 = the left one). */
+    public void tapBackpackSlot(int slot) {
+        tap(uiScreenPosition(hud().getSlots().get(slot)));
+    }
+
     /** Does any actor on the UI stage draw scene2d debug lines? */
     public boolean uiDebugLinesShown() {
         for (Actor actor : uiActors()) {
@@ -423,19 +446,6 @@ public final class GameDriver {
             }
         }
         return false;
-    }
-
-    /** What the open collect window shows, slot by slot ("-" is an empty slot). */
-    public String collectWindowSlots() {
-        return "chest=" + describeSlots(CollectItemType.COLLECTIBLE_ITEM) + " player=" + describeSlots(CollectItemType.COLLECTING_ITEM);
-    }
-
-    private String describeSlots(CollectItemType type) {
-        List<String> slots = new ArrayList<>();
-        for (CollectItem slot : collectSlots(type)) {
-            slots.add(slot.getItem() == null ? "-" : slot.getItem().getClass().getSimpleName());
-        }
-        return slots.toString();
     }
 
     private static String describe(Inventory inventory) {
@@ -750,6 +760,9 @@ public final class GameDriver {
             snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
         }
         snapshot.line("chest: cell=%s", chestCell());
+        for (String item : itemsOnGround()) {
+            snapshot.line("item on ground: %s", item);
+        }
         OrthographicCamera camera = (OrthographicCamera) gameStage().getCamera();
         snapshot.line("camera: at=%s zoom=%s view=%sx%s", cameraPosition(), Snapshot.number(camera.zoom),
                 Snapshot.number(camera.viewportWidth), Snapshot.number(camera.viewportHeight));
@@ -968,19 +981,6 @@ public final class GameDriver {
                 collectActors(child, actors);
             }
         }
-    }
-
-    private List<CollectItem> collectSlots(CollectItemType type) {
-        List<CollectItem> slots = new ArrayList<>();
-        for (Actor actor : uiActors()) {
-            if (actor instanceof CollectItem item && item.getCollectItemType() == type) {
-                slots.add(item);
-            }
-        }
-        if (slots.isEmpty()) {
-            throw new IllegalStateException("The collect window is not open");
-        }
-        return slots;
     }
 
     /** How many screen pixels wide a cell is drawn right now. */

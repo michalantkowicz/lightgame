@@ -27,6 +27,8 @@ public enum UiImage {
     RING_DOT_EMPTY("selector_dot_6"),
     /** The circle at the gear's top right that fills while the gear is held (its frames follow the hold). */
     HOLD_CIRCLE("stamina_black"),
+    /** The stars that pop out of a chest when it opens. */
+    SPARKLE("stars/small"),
     /** A segment of the stamina bar: what is left, and what is used. */
     BAR_FULL("bar/full"),
     BAR_EMPTY("bar/empty"),

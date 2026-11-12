@@ -13,8 +13,8 @@ import java.util.List;
 import static com.mantkowicz.light.actor.GameActorType.CHEST;
 
 /**
- * The Sprout Lands chest, holding a lighter. It blocks its tile, so the player uses it from a neighbouring tile: walking
- * next to it shows the COLLECT button. The lid opens when the collect window opens and shuts when it closes.
+ * The Sprout Lands chest, holding a carrot. It blocks its tile, so the player uses it from a neighbouring tile: walking
+ * next to it shows its button. Opening it lifts the lid, which stays open, and what is inside jumps out.
  */
 public class Chest extends SpriteActor implements Collectible {
     private static final Action OPEN = Action.OPEN_FRONT;
@@ -32,7 +32,7 @@ public class Chest extends SpriteActor implements Collectible {
         closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7, 16, 14);
 
         List<Item> content = new ArrayList<>();
-        content.add(new Lighter(context));
+        content.add(new Carrot(context.getResourcesService()));
         inventory = new Inventory(INVENTORY_SIZE, new ArrayList<Item>());
         inventory.setItemsAndCompleteWithNulls(content);
 
@@ -57,7 +57,7 @@ public class Chest extends SpriteActor implements Collectible {
     }
 
     /**
-     * The collect window opens: the lid opens.
+     * It is opened: the lid opens (and stays open).
      */
     @Override
     public void beforeCollect() {

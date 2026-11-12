@@ -24,6 +24,23 @@ public class Inventory {
         return items;
     }
 
+    /** Puts the item into the first free slot; false (nothing changes) when every slot is full. */
+    public boolean add(Item item) {
+        int free = items.indexOf(null);
+        if (free < 0) {
+            return false;
+        }
+        items.set(free, item);
+        return true;
+    }
+
+    /** Takes the item out of a slot, which becomes free; null if it was free already. */
+    public Item take(int slot) {
+        Item item = items.get(slot);
+        items.set(slot, null);
+        return item;
+    }
+
     public Inventory setItemsAndCompleteWithNulls(List<Item> inputItems) {
         if (inputItems == null) {
             throw new IllegalArgumentException("Items must not be null");

@@ -45,6 +45,11 @@ public class Lighter extends GameBoardActor implements Item, Collectible {
     }
 
     @Override
+    public TextureRegion getPicture() {
+        return thumbnail;
+    }
+
+    @Override
     public TextureRegion getActionIcon() {
         return thumbnail;
     }
