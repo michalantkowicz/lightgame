@@ -97,3 +97,13 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
     are used by hand or automatically, and the presentation (item in the paws with auto-pickup, or the backpack window).
     Builds on "Interactable objects" above: using an item automatically is an action that runs without a button when the
     player is in reach.
+- **UI pictures drawn on the game stage** (2026‑11‑13). The stars popping out of an opened chest (`Sparkles`, PR #33)
+  are game stage actors, but their picture (`UiImage.SPARKLE`) comes from the UI atlas: the star exists only in the UI
+  pack, and `sprites.atlas` is built from the sprites pack only. Each switch between atlas textures while drawing makes
+  `SpriteBatch` send what it collected (one more draw call). For the stars that is at most 2 more draw calls per frame
+  for under a second, nothing to notice; it would matter if many map objects each drew a UI picture next to their
+  sprite (e.g. an icon over each of 50 animals: ~100 draw calls instead of a few), on weak phones and in the browser.
+  First check how often it happens: count draw calls per frame (libGDX `GLProfiler`, or `SpriteBatch.renderCalls`) on
+  a busy map and see which UI pictures the game stage draws. If it matters, either draw those pictures together (one
+  switch each way) or let the tool copy chosen UI pack pieces into `sprites.atlas` (e.g. a list in `pack.json`) and load
+  them as sprites; that would also keep `UiImage` for the UI only.
