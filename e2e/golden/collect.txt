@@ -5,7 +5,7 @@ chest: cell=(3,4)
 camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
-action button on ui stage: COLLECT (a picture) at=(628.0,74.0) alpha=1.0
+action button on ui stage: COLLECT (a picture) at=(355.0,976.0) alpha=1.0
 stars: 7, chest: chest/open_front, items: [Carrot flying]
 ## the carrot has landed
 crash: none

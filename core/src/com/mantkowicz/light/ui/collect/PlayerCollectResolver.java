@@ -21,7 +21,7 @@ import static com.mantkowicz.light.actor.Status.IDLE;
 
 /**
  * How the player gets things. Next to a collectible that still holds something (a chest: on a tile it is used from)
- * its button appears; it stays while the player is within reach and fades out once the player leaves. Coming back
+ * its button appears over it (the open chest); it stays while the player is within reach and fades out once the player leaves. Coming back
  * before it is gone brings the same button back, so walking around a chest (past its corner cells) never shows two
  * buttons.
  * <p>
@@ -67,7 +67,7 @@ public class PlayerCollectResolver implements CollectResolver {
             }
         };
         ActionButton actionButton = new ActionButton(context, "COLLECT", collectible.getActionIcon(), onClick,
-                () -> isInReach(collectible) && holdsSomething(collectible));
+                () -> isInReach(collectible) && holdsSomething(collectible), collectible.getActor());
         buttons.put(collectible, actionButton);
 
         context.getUiStage().addActor(actionButton);

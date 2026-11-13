@@ -70,15 +70,16 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   *Update after the cow (branch `cow-state-machine`):* the cow was that first object, and it went the other way to stay
   small: `CreatureFeature` (for any `actor.Creature`) is a second resolver beside `PlayerCollectResolver` (they
   share only the tile rule, `Tile.getUsedFromNeighbours()`, since branch `chest-and-reach`). It is inside every PMD
-  limit but the heaviest class in `feature` (69 statements, complexity 27, its `run` at 8 of the allowed 10, coupled to 12 classes: fifth highest in the game), so
-  the next kind of action there would break the build. What the shared resolver must also cover:
+  limit but the heaviest class in `feature` (80 statements, complexity 31, coupled to 12 classes: fifth highest in the
+  game; its `run` reached the limit of 10 when the buttons moved over the creature, branch `action-button-over`, and
+  had to be split), so the next kind of action there would break the build. What the shared resolver must also cover:
   - *A creature as a kind of `Interactable` whose offer changes with its state:* a paw to stroke it, the item it wishes
-    for when the player carries one, or nothing (walking, eating). So an interactable answers "what do you offer this
+    for (tapped without one, the button shakes), or nothing (walking, eating). So an interactable answers "what do you offer this
     player right now" (picture and action, or none) instead of having one fixed picture.
   - *Rules that belong to the object, not the resolver:* whether an item fulfils a wish (today `CreatureFeature`
     compares item classes; should be e.g. `creature.accepts(item)`).
-  - *Two things in reach at once:* a chest and a cow next to the player each put a button on the same place today. One
-    resolver shows one button and needs a rule for which (e.g. the one the player walked to last, or wishes first).
+  - *Two things in reach at once:* each button sits over its own object since branch `action-button-over`, so a chest
+    and a cow next to the player show one button each; the resolver must keep one button per object, not one in all.
   - *Who owns the hint:* `CreatureFeature` resets what the question mark says every frame, so nothing else can set a
     hint. The resolver (or the HUD) should take hints from whatever is in reach and fall back to the default.
   Worth doing before the second creature or the first field or tree.

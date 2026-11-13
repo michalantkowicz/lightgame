@@ -1,6 +1,8 @@
 package com.mantkowicz.light.character;
 
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.Carrot;
 import com.mantkowicz.light.actor.Collectible;
@@ -26,7 +28,7 @@ public class Chest extends SpriteActor implements Collectible {
     private static final int INVENTORY_SIZE = 2;
 
     private final Inventory inventory;
-    private final TextureRegion closed;
+    private final TextureRegion closed, open;
 
     public Chest(GameContext context) {
         super(CHEST, context, Sprite.CHEST, OPEN, DESCRIPTION);
@@ -35,6 +37,9 @@ public class Chest extends SpriteActor implements Collectible {
         // the closed chest without the empty rows above it in its frame
         closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7,
                 16, 14);
+        // the open chest (the lid up) without the empty column and row around it
+        Animation<TextureRegion> opening = context.getResourcesService().getAnimation(Sprite.CHEST, OPEN);
+        open = new TextureRegion(opening.getKeyFrame(opening.getAnimationDuration(), false), 1, 1, 16, 20);
 
         List<Item> content = new ArrayList<>();
         content.add(new Carrot(context.getResourcesService()));
@@ -54,11 +59,21 @@ public class Chest extends SpriteActor implements Collectible {
     }
 
     /**
-     * The closed chest, as the player sees it on the map.
+     * The open chest: what the button does.
      */
     @Override
     public TextureRegion getActionIcon() {
+        return open;
+    }
+
+    /** The closed chest, as the player sees it on the map (was the action button's picture). */
+    public TextureRegion getClosedIcon() {
         return closed;
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
     }
 
     /**

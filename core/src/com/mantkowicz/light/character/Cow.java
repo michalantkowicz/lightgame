@@ -3,6 +3,7 @@ package com.mantkowicz.light.character;
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.msg.MessageManager;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.Carrot;
 import com.mantkowicz.light.actor.Creature;
@@ -42,6 +43,8 @@ public class Cow extends SpriteActor implements Creature {
     /** What it wishes for when hungry. */
     private final Item favouriteFood;
     private PictureBubble wishBubble;
+    /** False while the action button with its wish is over it: the bubble is hidden. */
+    private boolean wishShown = true;
     /** Seconds left of what {@link #stayFor} set, and since the start or its last carrot. */
     private float timeLeft, sinceFed;
 
@@ -126,6 +129,20 @@ public class Cow extends SpriteActor implements Creature {
     void showWish() {
         wishBubble = new PictureBubble(resources, "carrot", favouriteFood.getPicture());
         wishBubble.showOver(this);
+        wishBubble.setVisible(wishShown);
+    }
+
+    @Override
+    public void setWishShown(boolean shown) {
+        wishShown = shown;
+        if (wishBubble != null) {
+            wishBubble.setVisible(shown);
+        }
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
     }
 
     void hideWish() {

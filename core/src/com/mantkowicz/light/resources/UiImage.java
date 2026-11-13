@@ -49,9 +49,12 @@ public enum UiImage {
     TEEMO_FALL_ASLEEP("emotes_premium/row_41"),
     TEEMO_SLEEP("emotes_premium/row_42"),
     TEEMO_SLEEP_MORE("emotes_premium/row_43"),
-    /** The action button beside the face: up, and pressed (lower, its side hidden). */
+    /** The hint button beside the face: up, and pressed (lower, its side hidden). */
     ROUND_BUTTON("round_buttons/brown"),
     ROUND_BUTTON_DOWN("round_buttons/brown_down"),
+    /** The action buttons over things on the map: up, and pressed. */
+    ACTION_BUTTON_DARK_BROWN("round_buttons/dark_brown"),
+    ACTION_BUTTON_DARK_BROWN_DOWN("round_buttons/dark_brown_down"),
     /** On the round button when there is nothing to do: tapping it gives a hint. */
     HINT_ICON("icons/question"),
     /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */

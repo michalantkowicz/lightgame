@@ -20,16 +20,16 @@ import java.util.function.BooleanSupplier;
 
 /**
  * What the player does with a creature (a cow) the player stands next to (on a tile it is used from:
- * {@link Tile#getUsedFromNeighbours()}), on the HUD's round button:
+ * {@link Tile#getUsedFromNeighbours()}), on an action button over the creature:
  * <ul>
- * <li>the creature wishes for something the player carries: the button shows that item; tapping it takes the item out
- * of the backpack (its slot shakes) and gives it to the creature;</li>
- * <li>it wishes for something the player doesn't carry: the hint button (the question mark) stays, and tapping it says
- * "find" with the item's picture;</li>
+ * <li>the creature wishes for something: the button shows that item instead of the bubble with the wish. Tapping it
+ * takes the item out of the backpack (its slot shakes) and gives it to the creature; when the player doesn't carry
+ * one, the button shakes and the HUD's hint button (the question mark) says "find" with the item's picture;</li>
  * <li>it wishes for nothing and can be stroked: the button shows a hand; tapping it strokes the creature, and a heart
  * floats up over the player.</li>
  * </ul>
- * The buttons fade out when what they do is no longer possible (the player walks away, the creature walks or eats).
+ * The buttons fade out when what they do is no longer possible (the player walks away, the creature walks or eats);
+ * once the button with the wish is gone, the bubble is back.
  */
 public class CreatureFeature implements Feature {
     /** What the hint says next to a creature wishing for something the player doesn't carry; the item's picture follows. */
@@ -42,6 +42,8 @@ public class CreatureFeature implements Feature {
     private final Hud hud;
     private final TextureRegion hand, heart;
     private ActionButton strokeButton, giveButton;
+    /** The creature the give button is over (its bubble hidden meanwhile), or null. */
+    private Creature givingTo;
 
     public CreatureFeature(GameContext context, Player player, Hud hud) {
         this.context = context;
@@ -60,17 +62,28 @@ public class CreatureFeature implements Feature {
         } else {
             hud.resetHint();
         }
-        if (canGive() && !isShown(giveButton)) {
-            giveButton = addButton("GIVE", wish.getPicture(), this::give, this::canGive);
-        }
+        updateGiveButton(creature);
         if (canStroke() && !isShown(strokeButton)) {
-            strokeButton = addButton("STROKE", hand, this::stroke, this::canStroke);
+            strokeButton = addButton("STROKE", hand, this::stroke, this::canStroke, creature);
+        }
+    }
+
+    /** The button with the wish takes the bubble's place over the creature; once it is gone, the bubble is back. */
+    private void updateGiveButton(Creature creature) {
+        if (!isShown(giveButton) && givingTo != null) {
+            givingTo.setWishShown(true);
+            givingTo = null;
+        }
+        if (canGive() && !isShown(giveButton)) {
+            giveButton = addButton("GIVE", creature.getWish().getPicture(), this::give, this::canGive, creature);
+            givingTo = creature;
+            creature.setWishShown(false);
         }
     }
 
     private boolean canGive() {
         Creature creature = creatureNextToPlayer();
-        return creature != null && creature.getWish() != null && slotWith(creature.getWish()) >= 0;
+        return creature != null && creature.getWish() != null;
     }
 
     private void give() {
@@ -79,6 +92,10 @@ public class CreatureFeature implements Feature {
         }
         Creature creature = creatureNextToPlayer();
         int slot = slotWith(creature.getWish());
+        if (slot < 0) {
+            giveButton.shake(); // nothing to give: the hint says what to find
+            return;
+        }
         Item item = player.getInventory().take(slot);
         context.getGameEventService().post(new BackpackItemEjectedEvent(slot)); // the HUD shakes its slot
         creature.give(item);
@@ -131,13 +148,14 @@ public class CreatureFeature implements Feature {
         return button != null && button.isOnStage();
     }
 
-    private ActionButton addButton(String name, TextureRegion picture, Runnable onClick, BooleanSupplier available) {
+    private ActionButton addButton(String name, TextureRegion picture, Runnable onClick, BooleanSupplier available,
+            Creature over) {
         ActionButton button = new ActionButton(context, name, picture, new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 onClick.run();
             }
-        }, available);
+        }, available, over.getActor());
         context.getUiStage().addActor(button);
         return button;
     }

@@ -12,8 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The HUD's bottom row and the settings gear (docs/hud-design.md, step 1): the face in the bottom centre, the two backpack
- * slots on its left showing what the player carries, the stamina bar under the face, the action button on its right when
- * there is something to do, the gear at the top right. The gear opens the settings only after a 3-second hold; letting go earlier empties its circle. Taps on
+ * slots on its left showing what the player carries, the stamina bar under the face, the hint button on its right (what
+ * there is to do is on buttons over the things on the map), the gear at the top right. The gear opens the settings only after a 3-second hold; letting go earlier empties its circle. Taps on
  * the bottom row don't walk the player.
  */
 class HudTest {
@@ -73,17 +73,17 @@ class HudTest {
     }
 
     @Test
-    void theActionButtonAppearsRightOfTheFace() {
+    void theActionButtonAppearsOverTheChest() {
         GameDriver game = GameDriver.start(MAP.write("hud"));
         assertFalse(game.snapshot("start").contains("action button"), "nothing to do yet");
         game.click(MAP.cell('C'));
         game.seconds(3);
         String next = game.snapshot("next to the chest");
-        // its right edge 64 px from the screen's edge, like the slots' left edge (800 - 64 - 108 = 628), its bottom on
-        // the face's bottom
-        assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(628.0,74.0) alpha=1.0"), next);
+        // the chest's cell (3,4) is 384..512 x 512..640 on the map, the camera's middle (448,320) is the screen's (400,640):
+        // centred over the chest (400 - 90 / 2 = 355), 16 px over its top (640 + 16 - 320 + 640 = 976)
+        assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(355.0,976.0) alpha=1.0"), next);
         assertTrue(game.describeHud().contains("hint: at=(628.0,74.0) size=108.0x120.0"),
-                "the action button covers the hint");
+                "the hint stays right of the face");
     }
 
     @Test

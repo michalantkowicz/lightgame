@@ -2,6 +2,7 @@ package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.ThumbnailType;
 
@@ -52,6 +53,11 @@ public class Lighter extends GameBoardActor implements Item, Collectible {
     @Override
     public TextureRegion getActionIcon() {
         return thumbnail;
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
     }
 
     @Override
