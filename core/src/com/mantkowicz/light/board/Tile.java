@@ -172,7 +172,8 @@ public abstract class Tile {
         List<Tile> tiles = new ArrayList<>();
         float centerY = getCenter().y;
         for (Tile side : getSideNeighbours()) {
-            if (side.getCenter().y < centerY + 0.5f) {
+            boolean above = side.getCenter().y > centerY + 0.5f;
+            if (!above) {
                 tiles.add(side);
             }
         }
