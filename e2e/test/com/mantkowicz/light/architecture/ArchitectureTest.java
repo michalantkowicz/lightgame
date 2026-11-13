@@ -1,11 +1,12 @@
 package com.mantkowicz.light.architecture;
 
-import com.tngtech.archunit.core.domain.Dependency;
+import com.tngtech.archunit.ArchConfiguration;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaPackage;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.library.metrics.ArchitectureMetrics;
 import com.tngtech.archunit.library.metrics.ComponentDependencyMetrics;
 import com.tngtech.archunit.library.metrics.LakosMetrics;
@@ -16,80 +17,120 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
-import static org.junit.jupiter.api.Assertions.fail;
+import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
+import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
 
 /**
- * Keeps the game code from getting more tangled (docs/code-quality-plan.md, phase 2). The game's packages depend on
- * each other only as listed in {@code e2e/architecture/package-dependencies.txt}: a new dependency fails here and must
- * either go or be added to the list on purpose, where the pull request shows it; a listed one that is gone fails too,
- * so the list only ever shrinks by itself. {@code -Darchitecture.update=true} rewrites the list from the code.
+ * The game code's intended architecture (docs/code-quality-plan.md): layers that only use the layers below them, no
+ * two packages of one layer using each other, and a few conventions.
  * <p>
- * Dependencies are read from the compiled classes, so a class that uses only constants of another (copied in by the
+ * Layers, from the bottom: <b>leaves</b> (util, debug, resources, stage: use nothing of the game), the <b>world</b>
+ * (board, actor, light, event), <b>behaviour</b> (map, plugin, notification), the <b>UI</b> (ui and its subpackages),
+ * the <b>application</b> (feature, game).
+ * <p>
+ * The code doesn't follow all of it yet: the layer and same-layer rules are <i>frozen</i>. The violations the code had
+ * when the rules came are listed in {@code e2e/architecture/frozen/} (one class-to-class dependency each) and pass; any
+ * other one fails. A refactoring that removes listed violations makes the test delete them from the files, and CI
+ * fails until that change is committed, so the list only shrinks. {@code -Darchitecture.update=true} records the
+ * current violations instead (only for a deliberate exception, visible in the pull request).
+ * <p>
+ * Dependencies are read from the compiled classes, so a class using only constants of another (copied in by the
  * compiler) doesn't count.
  */
 class ArchitectureTest {
     private static final String GAME = "com.mantkowicz.light";
     private static final Path ROOT = Path.of(System.getProperty("repo.root", "../..")).toAbsolutePath().normalize();
-    private static final Path ALLOWED = ROOT.resolve("e2e/architecture/package-dependencies.txt");
+    private static final Path FROZEN = ROOT.resolve("e2e/architecture/frozen");
     private static final Path METRICS = ROOT.resolve("e2e/build/reports/architecture/metrics.md");
-    /** Packages that depend on no other game package: everything may use them, they use nothing of the game. */
-    private static final List<String> LEAVES = List.of("debug", "resources", "stage", "util");
 
     private static JavaClasses game;
 
     @BeforeAll
     static void importGame() {
+        boolean update = Boolean.getBoolean("architecture.update");
+        ArchConfiguration configuration = ArchConfiguration.get();
+        configuration.setProperty("freeze.store.default.path", FROZEN.toString());
+        configuration.setProperty("freeze.store.default.allowStoreCreation", String.valueOf(update));
+        configuration.setProperty("freeze.store.default.allowStoreUpdate", "true"); // removes fixed violations
+        configuration.setProperty("freeze.refreeze", String.valueOf(update)); // adds violations only on purpose
         game = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages(GAME);
     }
 
     @Test
-    void packagesDependOnEachOtherOnlyAsListed() throws IOException {
-        Map<String, String> found = packageDependencies();
-        if (Boolean.getBoolean("architecture.update")) {
-            write(found.keySet());
-            return;
-        }
-        Set<String> allowed = read();
-        List<String> problems = new ArrayList<>();
-        for (Map.Entry<String, String> dependency : found.entrySet()) {
-            if (!allowed.contains(dependency.getKey())) {
-                problems.add("new dependency " + dependency.getKey() + " (e.g. " + dependency.getValue()
-                        + "): remove it, or add the line to the list if it is meant");
-            }
-        }
-        for (String line : allowed) {
-            if (!found.containsKey(line)) {
-                problems.add("no longer a dependency: " + line + " (nice): delete the line from the list");
-            }
-        }
-        if (!problems.isEmpty()) {
-            fail("Package dependencies differ from " + ROOT.relativize(ALLOWED) + ":\n  "
-                    + String.join("\n  ", problems)
-                    + "\n(-Darchitecture.update=true rewrites the list from the code)");
-        }
+    void layersUseOnlyTheLayersBelowThem() {
+        ArchRule layers = layeredArchitecture().consideringOnlyDependenciesInLayers()
+                .layer("Leaves").definedBy(packages("util", "debug", "resources", "stage"))
+                .layer("World").definedBy(packages("board", "actor", "light", "event"))
+                .layer("Behaviour").definedBy(packages("map", "plugin", "notification"))
+                .layer("UI").definedBy(packages("ui"))
+                .layer("Application").definedBy(packages("feature", "game"))
+                .whereLayer("Application").mayNotBeAccessedByAnyLayer()
+                .whereLayer("UI").mayOnlyBeAccessedByLayers("Application")
+                .whereLayer("Behaviour").mayOnlyBeAccessedByLayers("UI", "Application")
+                .whereLayer("World").mayOnlyBeAccessedByLayers("Behaviour", "UI", "Application")
+                .as("Layers use only the layers below them (leaves, world, behaviour, UI, application)");
+        freeze(layers).check(game);
+    }
+
+    /** The layer rule allows two packages of one layer to use each other; these pairs must not (no cycles). */
+    @Test
+    void theBoardDoesNotKnowActors() {
+        freeze(noClasses().that().resideInAPackage(GAME + ".board..")
+                .should().dependOnClassesThat().resideInAPackage(GAME + ".actor..")
+                .as("The board does not know actors (actors stand on the board)")).check(game);
     }
 
     @Test
-    void leafPackagesUseNoOtherGamePackage() {
-        for (String leaf : LEAVES) {
-            noClasses().that().resideInAPackage(GAME + "." + leaf + "..")
-                    .should().dependOnClassesThat(resideInAPackage(GAME + "..")
-                            .and(not(resideInAPackage(GAME + "." + leaf + ".."))))
-                    .because(leaf + " is a leaf: the rest of the game uses it, it uses nothing of the game")
-                    .check(game);
-        }
+    void theEventBusUsesNothingOfTheGame() {
+        freeze(noClasses().that().resideInAPackage(GAME + ".event..")
+                .should()
+                .dependOnClassesThat(resideInAPackage(GAME + "..").and(not(resideInAPackage(GAME + ".event.."))))
+                .as("The event bus uses nothing of the game (events belong with the code they are about)"))
+                .check(game);
+    }
+
+    @Test
+    void basicUiDoesNotKnowItsSubpackages() {
+        freeze(noClasses().that().resideInAPackage(GAME + ".ui")
+                .should().dependOnClassesThat().resideInAnyPackage(GAME + ".ui.menu..", GAME + ".ui.hud..",
+                        GAME + ".ui.collect..")
+                .as("The basic UI (stages, widgets, style) does not know the menu, the HUD or collecting"))
+                .check(game);
+    }
+
+    @Test
+    void featuresDoNotKnowTheGameScreen() {
+        freeze(noClasses().that().resideInAPackage(GAME + ".feature..")
+                .should().dependOnClassesThat().resideInAPackage(GAME + ".game..")
+                .as("Features do not know the game package (it creates them)")).check(game);
+    }
+
+    @Test
+    void namesSayWhatClassesAre() {
+        classes().that().haveSimpleNameEndingWith("Event").should().beAssignableTo(GAME + ".event.GameEvent")
+                .check(game);
+        classes().that().haveSimpleNameEndingWith("Plugin").should().beAssignableTo(GAME + ".plugin.Plugin")
+                .check(game);
+        classes().that().haveSimpleNameEndingWith("Feature").should().beAssignableTo(GAME + ".feature.Feature")
+                .check(game);
+    }
+
+    /** The browser build (GWT) has no reflection, no threads' concurrency tools and no String.format. */
+    @Test
+    void theGameRunsInTheBrowser() {
+        noClasses().should().dependOnClassesThat().resideInAnyPackage("java.lang.reflect..", "java.util.concurrent..")
+                .orShould().callMethod(String.class, "format", String.class, Object[].class)
+                .because("the HTML5 build (GWT) can't run them")
+                .check(game);
     }
 
     /** The rule of e2e/README.md: scenario tests speak to the game only through GameDriver. */
@@ -114,9 +155,9 @@ class ArchitectureTest {
         ComponentDependencyMetrics martin = ArchitectureMetrics.componentDependencyMetrics(components);
         StringBuilder report = new StringBuilder("### Architecture metrics\n\n");
         report.append(String.format(Locale.ROOT,
-                "%d package dependencies. Lakos over %d packages: RACD %.3f (share of the packages one depends on, directly"
-                        + " or not), NCCD %.2f (about 1: a balanced tree; more: more tangled).%n%n",
-                packageDependencies().size(), packages.size(), lakos.getRelativeAverageComponentDependency(),
+                "Lakos over %d packages: RACD %.3f (share of the packages one depends on, directly or not), NCCD %.2f"
+                        + " (about 1: a balanced tree; more: more tangled).%n%n",
+                packages.size(), lakos.getRelativeAverageComponentDependency(),
                 lakos.getNormalizedCumulativeComponentDependency()));
         report.append("| Package | Uses (Ce) | Used by (Ca) | Instability | Abstractness |\n|---|---|---|---|---|\n");
         Set<String> names = new TreeSet<>();
@@ -131,43 +172,12 @@ class ArchitectureTest {
         Files.writeString(METRICS, report);
     }
 
-    /** "from -> to" (package names under com.mantkowicz.light) with one example "Class -> Class" each. */
-    private static Map<String, String> packageDependencies() {
-        Map<String, String> dependencies = new TreeMap<>();
-        for (JavaClass origin : game) {
-            for (Dependency dependency : origin.getDirectDependenciesFromSelf()) {
-                JavaClass target = dependency.getTargetClass();
-                String from = origin.getPackageName(), to = target.getPackageName();
-                if (to.startsWith(GAME + ".") && !from.equals(to)) {
-                    dependencies.putIfAbsent(relative(from) + " -> " + relative(to),
-                            origin.getSimpleName() + " -> " + target.getSimpleName());
-                }
-            }
+    /** "com.mantkowicz.light.board..", ... for package names under the game's root package. */
+    private static String[] packages(String... names) {
+        String[] patterns = new String[names.length];
+        for (int i = 0; i < names.length; i++) {
+            patterns[i] = GAME + "." + names[i] + "..";
         }
-        return dependencies;
-    }
-
-    private static String relative(String packageName) {
-        return packageName.substring(GAME.length() + 1);
-    }
-
-    private static Set<String> read() throws IOException {
-        Set<String> lines = new TreeSet<>();
-        for (String line : Files.readAllLines(ALLOWED)) {
-            if (!line.isBlank() && !line.startsWith("#")) {
-                lines.add(line.trim());
-            }
-        }
-        return lines;
-    }
-
-    private static void write(Set<String> dependencies) throws IOException {
-        List<String> lines = new ArrayList<>(List.of(
-                "# Which game packages (under com.mantkowicz.light) may use which: ArchitectureTest fails on any other.",
-                "# A new line here is a new tangle: add one only on purpose. Remove lines when a refactoring makes them",
-                "# untrue (the test says so). -Darchitecture.update=true rewrites this file from the code.",
-                ""));
-        lines.addAll(dependencies);
-        Files.write(ALLOWED, lines);
+        return patterns;
     }
 }

@@ -47,6 +47,14 @@ jobs:
           chmod +x gradlew
           ./gradlew build --no-daemon
 
+      # ArchitectureTest deletes fixed violations from its frozen baseline: commit that, so the list only shrinks.
+      - name: Architecture baseline is committed
+        run: |
+          git diff --exit-code -- e2e/architecture/frozen || {
+            echo "::error::Architecture violations were fixed: run ./gradlew e2e:test and commit e2e/architecture/frozen"
+            exit 1
+          }
+
       - name: Compile HTML5 version (GWT)
         run: ./gradlew html:dist --no-daemon
 
