@@ -8,7 +8,7 @@ actor -> event
 actor -> game
 actor -> plugin
 actor -> resources
-actor -> ui
+actor -> stage
 actor -> ui.collect
 actor -> ui.menu
 board -> actor
@@ -26,6 +26,7 @@ feature -> event
 feature -> game
 feature -> notification
 feature -> resources
+feature -> stage
 feature -> ui
 feature -> ui.menu
 game -> board
@@ -56,6 +57,7 @@ plugin -> ui
 plugin -> ui.collect
 ui -> notification
 ui -> resources
+ui -> stage
 ui -> ui.menu
 ui.collect -> actor
 ui.collect -> board
@@ -75,4 +77,5 @@ ui.menu -> event
 ui.menu -> game
 ui.menu -> notification
 ui.menu -> resources
+ui.menu -> stage
 ui.menu -> ui

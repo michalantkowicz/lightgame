@@ -356,3 +356,13 @@ Phase 4, step 1 of [code-quality-plan.md](code-quality-plan.md).
   (stages, `RoundButton`, `UiStyle`) no longer depends on `actor`, `game` or `plugin`; instead `ui.collect` uses
   `ui.hud` (the resolver shows the button) and `ui.hud` uses `plugin` (the button fades with
   `RemoveWhenUnavailablePlugin`). `package-dependencies.txt`: 75 → 74.
+
+## 2026‑11‑13, StageType in a leaf package (branch `quality-4b-stage-type`)
+
+Phase 4, step 2 of [code-quality-plan.md](code-quality-plan.md).
+
+- `StageType` moved from `ui` to the new package `com.mantkowicz.light.stage`, which uses nothing of the game (a
+  leaf, checked by `ArchitectureTest` like `debug`, `resources`, `util`). `actor` no longer depends on `ui`; `actor`,
+  `feature`, `ui` and `ui.menu` depend on `stage` instead, which can never be part of a cycle.
+  `package-dependencies.txt`: 74 → 77 lines, but one fewer link inside the cycle (13 packages are still in it, mostly
+  through `GameContext`).

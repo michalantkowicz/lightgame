@@ -6,8 +6,8 @@ import com.mantkowicz.light.actor.GameActorDefinition;
 import com.mantkowicz.light.event.AddToStageEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.stage.StageType;
 import com.mantkowicz.light.ui.AbstractStage;
-import com.mantkowicz.light.ui.StageType;
 
 import java.util.HashMap;
 import java.util.Map;

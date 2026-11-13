@@ -1,6 +1,6 @@
 package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.ui.StageType;
+import com.mantkowicz.light.stage.StageType;
 
 public interface GameActorDefinition<T extends GameActor> {
     T getActor();

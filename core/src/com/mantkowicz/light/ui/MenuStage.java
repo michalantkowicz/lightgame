@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mantkowicz.light.stage.StageType;
 import com.mantkowicz.light.ui.menu.MenuButton;
 
-import static com.mantkowicz.light.ui.StageType.MENU_STAGE;
+import static com.mantkowicz.light.stage.StageType.MENU_STAGE;
 
 public class MenuStage extends AbstractStage {
     public MenuStage(Viewport viewport) {

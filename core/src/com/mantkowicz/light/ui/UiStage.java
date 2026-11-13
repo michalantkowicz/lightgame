@@ -1,8 +1,9 @@
 package com.mantkowicz.light.ui;
 
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mantkowicz.light.stage.StageType;
 
-import static com.mantkowicz.light.ui.StageType.UI_STAGE;
+import static com.mantkowicz.light.stage.StageType.UI_STAGE;
 
 /**
  * Buttons and windows of the game UI (the COLLECT button, the collect window). Drawn on top of everything and gets input first.
