@@ -33,13 +33,6 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   drawn layer can block (an invisible one still works for invisible barriers). The loader reads the properties instead of
   names; the tool warns about leftovers (a layer named `collision` without the class, unknown properties). Needs:
   migrating `level1`, `PackedMapTest` (its `LevelVariant` layers), the READMEs.
-- **Animated objects placed from Tiled maps** (2026‑11‑08). Today sprite sheets reach the game only through the `Sprite`
-  enum and actors written in Java (the rabbit). For animals or objects placed in a level: a map object in the `objects`
-  layer with an `objectClass` (e.g. `ANIMAL`) and a `sprite` property holding a `Sprite` constant (e.g. `COW_BROWN`); the
-  loader checks it with `Sprite.valueOf` and creates the actor. The tool already reads every map, so it can also check
-  that each `sprite` value is in the enum (or pack those sheets too), and it can write the list of sheet names into
-  `assets-src/lightgame.tiled-project` as a custom enum property type, so Tiled shows a dropdown instead of free text.
-  Design it together with the first map-placed animal.
 - **Door animation** (2026‑11‑08). `Tilesets/Building parts/door animation sprites.png` is only a tileset: its frames
   overlap (a 3px pillar plus the door leaf every 16px; the wide door the same with 48px), so no frame grid cuts them right
   (see the note in `tools/assets/pack.json`). To animate doors, `pack.json` needs frames given as rectangles
@@ -58,25 +51,25 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   map, a `SpriteActor` subclass with its `TileObjectType` line. Update the READMEs (step 2 of "Adding an animated
   sprite" in README.md, "Sprites in the game" in tools/assets/README.md, whose note that animals still use `row_NN` is
   already out of date) and the `_help` notes in `pack.json`.
-- **Interactable objects: one reach rule for chests, fields, trees** (2026‑11‑10). After PR #29 a chest is used only from
-  its four side cells (`Tile.getSideNeighbours()`, because the characters face only up, down, left and right), but the
-  code using that rule knows only `Collectible`: `BoardService.checkCollisions` (shows the button), `BoardMovementPlugin.walkTarget`
-  with `BoardService.isUsedFromNeighbour` (walks next to it) and `PlayerCollectResolver.isInReach` (keeps or fades the
-  button), and the button always says COLLECT and opens the collect window. A field to harvest or a tree to chop would
-  have to pretend to be a `Collectible`. Suggested fix: an `Interactable` interface (its tile or tiles; its reach: from
-  the sides like a chest or a tree, or standing on it like a crop cell; the button text: COLLECT, HARVEST, CHOP; and the
-  action), `Collectible` becoming one kind of it. One reach check in `BoardService` (e.g. `isInReach(interactable, tile)`)
-  used by all three places, so they can't drift apart. `PlayerCollectResolver` becomes a general action resolver: one
-  button per object, fading out and back in as now, the action left to the object. Open questions: does the player
-  harvest standing on the field or next to it, and is a patch one object per crop cell (simplest, each ripens on its own)
-  or one object over several cells (reach = side cells of any of them, which also fits a big tree)? Pairs well with
-  "Animated objects placed from Tiled maps": fields and trees would be placed in Tiled the same way. Do it with the first
-  object that isn't a chest; prove it with one harvestable field cell.
+- **Interactable objects: one reach rule for chests, fields, trees** (2026‑11‑10, updated 2026‑11‑13). A chest is used
+  only from its four side cells (`Tile.getSideNeighbours()`, because the characters face only up, down, left and right),
+  but the code using that rule knows only `Collectible`: `CollectibleFinder.entered` (shows the button),
+  `BoardMovementPlugin.walkTarget` with `BoardService.isUsedFromNeighbour` (walks next to it) and
+  `PlayerCollectResolver.isInReach` (keeps or fades the button), and opening means "throw out what is inside". A field
+  to harvest or a tree to chop would have to pretend to be a `Collectible`. Suggested fix: an `Interactable` interface
+  (its tile or tiles; its reach: from the sides like a chest or a tree, or standing on it like a crop cell; its picture on
+  the round button; the action), `Collectible` becoming one kind of it. One reach check (e.g. `isInReach(interactable,
+  tile)`) used by all three places, so they can't drift apart; `PlayerCollectResolver` becomes a general action
+  resolver: one button per object, fading out and back in as now, the action left to the object. Related: picking items
+  up is player-only today (`PlayerCollectResolver.pickUp`); a generic per-actor pick-up plugin would let animals collect
+  too (a character adding a plugin fits the architecture). Open questions: does the player harvest standing on the field
+  or next to it, and is a patch one object per crop cell or one object over several cells? Do it with the first object
+  that isn't a chest.
 - **Game modes by age: a simple backpack for the youngest** (2026‑11‑10). **Needs more discussion before any
   implementation: how the backpack should look and behave (for each mode) isn't decided yet.** The game should suit kids
-  from about 3 years old up, with easier mechanics for the youngest. Today `Player` has a fixed `Inventory(3)` and every
-  chest goes through the COLLECT button and the collect window (moving items slot by slot), which is too much for a
-  3-year-old. Notes so far:
+  from about 3 years old up, with easier mechanics for the youngest. Today the player has 2 backpack slots (shown in the HUD); a chest's button
+  throws its contents out, items are picked up by walking onto them and thrown out by tapping their slot, and a full
+  backpack makes room by throwing out its first slot's item (PR #35). Notes so far, from before that:
   - *Older kids:* a proper backpack, e.g. 8 slots, items of one type stacked in a slot, using and dropping items, maybe
     simple crafting. Refusing a pickup when full is fine at this age, with a hint like "drop something to make room".
   - *Youngest (around 3):* they can't read or plan ahead, and drags between slots are too fiddly, so everything is
