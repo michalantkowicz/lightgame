@@ -64,7 +64,8 @@ It describes what's in the pack, so the tool doesn't need to be told again:
   transparency. Sheets that draw outlines into their inner corners borrow the layout of a clean cut-out sheet
   instead (`layoutFrom`). `wang` sets pieces by hand. `animations` makes animated tiles (the water).
 - **sprites**: animation sheets cut into frames. `frame` is the frame size, `offset` where the grid starts, `rows`
-  names the rows (`"auto"` gives `row_00`, `row_01`...). `duration` is ms per frame, `playMode` is `LOOP` or `NORMAL`
+  names the rows: `"auto"` gives `row_00`, `row_01`...; a list names them in order (an empty name skips a row); a
+  dict such as `{"0": "idle"}` packs only the rows it names. `duration` is ms per frame, `playMode` is `LOOP` or `NORMAL`
   (play once). `variants` lists colours with the same layout. Empty frames are skipped. `anchor: [x, y]` is the
   frame's pixel (from its top left) drawn on the tile's middle, for sheets that draw their character away from the
   frame's middle: the cow stands low in its 32x32 frame, so `[16, 21]` (its body's middle). Default: the frame's middle. Name rows `action` or
@@ -132,5 +133,5 @@ hint; a piece the game lists but wasn't packed stops the game at start.
 Both Sprout Lands packs (sprites, UI) are by Cup Nooble, under the same terms. The packs themselves may not be
 redistributed, so their sheets and TTF fonts never go into git (see `.gitignore`); the preview page stays in `build/`.
 What the game uses is allowed in the repo, with credit and the license terms: the packed atlases and the bitmap fonts
-made from the TTF fonts. Keep it that way: pack only what the game uses (the `Sprite`, `UiImage` and `UiFont` enums),
-never whole sheets for later. See `CREDITS.md`.
+made from the TTF fonts. Keep it that way: pack only the sheets, pieces and fonts the game uses (the `Sprite`, `UiImage` and
+`UiFont` enums; a sheet in `Sprite` is packed with all its rows), never sheets for later. See `CREDITS.md`.

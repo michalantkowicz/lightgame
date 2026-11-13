@@ -60,7 +60,7 @@ redistributing them). A tool turns it into what the game and Tiled need, and onl
    ```
 3. Start the game. To check the graphics, open `build/assets-preview/index.html`: every animation, every UI piece and
    font, the levels, warnings.
-4. Commit your changes together with what the tool changed (in `assets-src/`, `android/assets/`, `Action.java`).
+4. When you commit, include what the tool changed (in `assets-src/`, `android/assets/`, `Action.java`).
 
 Run the tool after any change to a level, to `tools/assets/pack.json` or `tools/assets/ui.json`, to the packs, or to
 the lists of what the game uses (`Sprite`, `UiImage`, `UiFont` in `core/src/com/mantkowicz/light/resources/`: only

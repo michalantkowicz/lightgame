@@ -510,3 +510,8 @@ Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](
 - `README.md`: a "Building and checks" section (the commands, what `./gradlew build` checks, CI).
 - `CLAUDE.md`: short notes for agents (how to work here, commands, architecture, gotchas), read by Claude Code at the
   start of every session in the repository.
+- Tried out on four small tasks by fresh agents (a PMD exception removed, a new HUD reaction, a changed hint text, a new
+  animal). All four were done correctly; their questions led to clearer notes: work on a branch but commit only when
+  asked, the changelog date, keeping docs that quote changed things up to date, events that carry nothing staying in
+  `event`, when to take screenshots, where test results are, and in `tools/assets/README.md` how `rows` names rows and
+  that a sheet in `Sprite` is packed whole.

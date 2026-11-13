@@ -19,7 +19,7 @@ What `./gradlew build` checks besides the tests, and why. All of it runs in CI (
   god classes, plus three cheap correctness rules. Nothing about unused members: the project keeps them on purpose.
 - Known exceptions, marked `@SuppressWarnings("PMD.<Rule>")` with a `// baseline (docs/code-quality-plan.md)` comment:
   `TmxTiledMapLoader` (size, coupling, imports), `ResourcesService` and its `loadUi`, `Tile`, `GameContext`'s
-  constructor, `GameScreen`, `Hud`, `Portrait.act`. Remove one when its code is refactored; never add one to new code.
+  constructor, `GameScreen`, `Hud`, `Portrait.act`. Remove one (and its name here) when its code is refactored; never add one to new code.
 - The report is `core/build/reports/pmd/main.html` (CI attaches it when a run fails).
 
 ## Architecture: ArchUnit
