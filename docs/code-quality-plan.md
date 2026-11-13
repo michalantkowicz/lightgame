@@ -140,8 +140,9 @@ In the e2e module, package `com.mantkowicz.light.architecture` (it already depen
 2. **Leaves stay leaves.** `resources`, `debug`, `util` depend on no other game package.
 3. **Scenario tests use `GameDriver` only** (the rule in `e2e/README.md`, today true): classes in `e2e.scenario` don't
    depend on game classes.
-4. **Metrics in the log.** The test prints the Lakos numbers (RACD, NCCD) and Martin's instability per package, to
-   watch the trend in CI logs; no gate on them (the dependency list already catches every new link).
+4. **Metrics to watch.** The test writes the Lakos numbers (RACD, NCCD) and Martin's coupling and instability per
+   package to `e2e/build/reports/architecture/metrics.md`, which CI adds to the run's summary page; no gate on them
+   (the dependency list already catches every new link).
 
 ### Phase 3: PMD complexity gate
 

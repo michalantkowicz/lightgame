@@ -10,6 +10,7 @@ The game itself is not changed for testing.
 ./gradlew e2e:test                          # all tests, headless, about a second
 ./gradlew e2e:test -Dgolden.update=true     # re-record golden files (see the rules below)
 ./gradlew e2e:test e2e:jacocoTestReport     # coverage: e2e/build/reports/jacoco/test/html
+./gradlew e2e:test --tests '*ArchitectureTest*' -Darchitecture.update=true   # rewrite the allowed package dependencies
 ```
 
 On a mismatch the test fails with a diff and writes what it saw to `build/golden-actual/<name>.txt`.
@@ -36,6 +37,11 @@ and uploads those files when it fails. The golden files are recorded on macOS an
 ## Layout
 
 ```
+test/com/mantkowicz/light/architecture/
+└── ArchitectureTest.java  the game's packages depend on each other only as listed in architecture/package-dependencies.txt;
+                           debug, resources, util use no other game package; scenario tests use only GameDriver;
+                           writes build/reports/architecture/metrics.md (docs/code-quality-plan.md)
+
 test/com/mantkowicz/light/e2e/
 ├── GameDriver.java     actions (start, click, press, drag, pressKey, resize, stop) and observations (snapshot)
 ├── Cell.java           (col,row) address of a tile; the stable way to point at the map

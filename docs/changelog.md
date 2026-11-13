@@ -317,3 +317,18 @@ Phase 1 of [code-quality-plan.md](code-quality-plan.md).
 - `./gradlew spotlessApply` formats; `./gradlew build` runs `spotlessCheck`, so CI (the required `test` check) fails on
   unformatted code with "Run './gradlew spotlessApply' to fix these violations".
 - One formatting-only commit (50 files, +287/−193 lines), listed in `.git-blame-ignore-revs`.
+
+## 2026‑11‑13, architecture tests (branch `quality-2-archunit`)
+
+Phase 2 of [code-quality-plan.md](code-quality-plan.md).
+
+- `ArchitectureTest` (e2e module, ArchUnit 1.5.1, reads the compiled game classes):
+  - the game's packages depend on each other only as listed in `e2e/architecture/package-dependencies.txt` (today's
+    75 dependencies). A new one fails with the classes that make it; a listed one that is gone fails too, asking to
+    delete the line, so the list only shrinks by itself. `-Darchitecture.update=true` rewrites the list.
+  - `debug`, `resources`, `util` use no other game package.
+  - scenario tests use no game class, only `GameDriver` (the rule of e2e/README.md, now enforced).
+  - writes `e2e/build/reports/architecture/metrics.md` (Lakos RACD 0.787, NCCD 3.24; Martin's coupling and
+    instability per package); CI adds it to the run's summary page. Not a gate.
+- Each check was seen failing on a planted violation (a `resources` class using an actor, a stale line in the list,
+  a scenario test using a game class).
