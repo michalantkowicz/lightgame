@@ -379,3 +379,13 @@ Phase 4, step 3 of [code-quality-plan.md](code-quality-plan.md).
   package using lower ones). `package-dependencies.txt`: 77 → 78 lines.
 - Collecting now runs after the stages each frame (features run there) instead of inside the player's update: a full
   backpack's slot starts shaking one frame (16 ms) later; `CollectTest` waits that frame. No golden changed.
+
+## 2026‑11‑13, the board reports "no path", a feature shows it (branch `quality-4d-no-path-event`)
+
+Phase 4, step 4 of [code-quality-plan.md](code-quality-plan.md).
+
+- `BoardClickListener` posts a `NoPathEvent` for a clicked tile nobody can walk to; the new `NoPathFeature` shows the
+  "no path" text over it (same text, style and animation as before). `board` no longer depends on `notification` or
+  `ui`; `feature` depends on `board` instead. `package-dependencies.txt`: 78 → 77 lines.
+- The text now appears one frame (16 ms) later (features run after the stages each frame): golden `no-path`
+  re-recorded, its only change being the text 0.2 px lower at the same moments (it has risen one frame less).

@@ -23,6 +23,7 @@ import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
+import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.StageFeature;
 import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.resources.PhraseService;
@@ -117,6 +118,7 @@ public class GameScreen extends ScreenAdapter {
             uiStage.addActor(new Hud(context, player, collecting::throwOut));
         }
         addFeature(new MenuFeature(context));
+        addFeature(new NoPathFeature(context));
         addFeature(new StageFeature(context));
         if (Debug.isOn(FPS_LABEL)) {
             addFeature(new FPSFeature(context, new Vector2(300, 520)));

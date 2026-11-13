@@ -14,12 +14,11 @@ board -> actor
 board -> event
 board -> game
 board -> map
-board -> notification
 board -> resources
-board -> ui
 event -> actor
 event -> board
 feature -> actor
+feature -> board
 feature -> debug
 feature -> event
 feature -> game
