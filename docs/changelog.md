@@ -516,6 +516,63 @@ Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](
   `event`, when to take screenshots, where test results are, and in `tools/assets/README.md` how `rows` names rows and
   that a sheet in `Sprite` is packed whole.
 
+## 2026‑11‑13, the cow lives: a state machine (branch `cow-state-machine`)
+
+The cow gets a life, written as a gdx-ai state machine that other creatures (and later people) can copy.
+
+- **`CowState`** (`character`) is a plain gdx-ai `State<Cow>` enum, run by a `DefaultStateMachine` in `Cow`: every state
+  says what the cow does on entering it, when it goes on to which state, and how it answers the player. No framework
+  on top and no config files: to change the behaviour, edit the enum (its comment draws the transitions). `Cow` only
+  has the helpers the states call (`stayFor`, `isTimeUp`, `isHungry`, `showWish`...). The player's actions reach the
+  states as gdx-ai messages (`MessageManager`, delivered at once).
+- **What it does:** stands (3–6 s), then walks one step onto a free tile next to it (twice as likely) or lies down;
+  lying, it rests, may fall asleep, gets up again. 20 s after the start or its last carrot it gets hungry (which also
+  gets it up): standing, it
+  shows a bubble with a carrot (`PictureBubble`, the pack's grey speech bubble) and waits until it gets one; then it
+  eats, and shows a heart. The bubble is drawn in front of everyone on the map (below the HUD).
+- **The round button** (`CreatureFeature`, for any `actor.Creature`): next to the cow (its four sides) it shows a hand
+  (the pack's paw) and strokes it (a heart over the cow, a small one floats up over the player) when the cow stands,
+  rests or sleeps; while the cow wishes for a carrot the player carries, it shows the carrot and gives it (the slot
+  shakes). Without a carrot the hint button stays, and says "find" with the carrot's picture (`SpeechBubble` can end
+  with a picture, `Hud.setHint`).
+- **Walking:** `SpriteActor.walkToFreeNeighbour` (a random free side tile; the picture is mirrored while going left,
+  and back to its default when it arrives). Sprite actors block their tile, so tiles are now blocked and freed during
+  the game: `BoardService.setAccessible` (the path finder's graph is rebuilt). The tile the cow goes to is blocked at
+  once, the one it leaves is freed on arrival. If the player was on its way to that tile, it steps back to the middle
+  of the tile it is on (`BoardMovementPlugin`); it never shares a tile with the cow. A cow stepping next to a full
+  chest doesn't get the chest's button (`PlayerCollectResolver` checks the player's reach).
+- **Tapping the cow** walks the player next to it, like a chest (`WalkNextToOnTapListener`; a hold still opens its
+  description).
+- Fixed on the way: `Board.draw` used whatever colour the batch was left with by the last actor of the frame before,
+  so a picture fading out on top of the game stage (a happy face that floated up over a fed cow, since removed: it didn't look good) dimmed the whole map to black. The
+  board now sets its own colour.
+- **Assets:** the cow sheet's rows are named (`settle`: lies down and gets up, `rest`, `sleep`, `eat`, `love`; `row_05`
+  is still unused), `SpriteActor.playOnce` plays a row or a part of it once. New UI pieces: `PICTURE_BUBBLE`, `HEART`,
+  `HAND_ICON`.
+- **Debug:** `Debug.Tool.STATE_LABELS` writes each creature's state under it (`StateLabelPlugin`, for anything with a
+  state).
+- Tests: `CowTest` (stroking, wishing and feeding, every state with its animation, the walk, the player stepping back,
+  the debug label). No golden changed.
+- Known limits, kept simple on purpose: an item thrown onto a tile the cow walks to at the same moment lands under the
+  cow (it can be picked up once the cow moves on); next to a chest and a cow at once, their buttons share one place;
+  with two creatures next to the player the button is for the first one found.
+
+## 2026‑11‑13, chest items near the player, used from three sides (branch `chest-and-reach`)
+
+- What jumps out of a chest lands on the free tile next to the chest that is **closest to the player** (a random one of
+  those as close), not on a random free one, so a small player doesn't have to walk around the chest to pick it up.
+  `ItemThrower.throwOut` got a `near` point; items thrown out of the backpack (tapping a slot, making room) still land on
+  a random free tile next to the player.
+- A chest and a creature (the cow) are used only from the tile **left of, right of or below** them, no longer from the
+  one above: the action button is going to move over the chest or creature, and there it would cover the player. One
+  rule, `Tile.getUsedFromNeighbours()`, for all of it: showing a chest's button (`CollectibleFinder`), keeping it
+  (`PlayerCollectResolver.isInReach`), walking next to a tapped chest or cow (`BoardMovementPlugin.walkTarget`) and the
+  cow's stroke/give button (`CreatureFeature`). The cow still steps in all four directions (`getSideNeighbours()`).
+- Golden `collect.txt` re-recorded (the carrot lands at (4,3), beside the player, instead of (2,5) behind the chest).
+- Tests: `CollectTest` checks the carrot lands next to the player; `CollectTest.noButtonAboveTheChest`,
+  `CowTest.noButtonAboveTheCow`; the chest checks in `AnimationTest` and `ShippedMapsTest` use the new rule
+  (`GameDriver.usedFromNeighbours`).
+
 ## 2026‑11‑13, idea: one round-button resolver, updated after the cow (branch `idea-one-action-resolver`)
 
 - `docs/ideas.md`, "Interactable objects": the cow (branch `cow-state-machine`) got its own resolver,

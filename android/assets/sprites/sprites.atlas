@@ -32,6 +32,18 @@ chest/open_side
 chest/open_side
   bounds:833,299,18,21
   index:4
+cow_brown/eat
+  bounds:343,299,29,28
+  index:0
+cow_brown/eat
+  bounds:374,299,29,28
+  index:1
+cow_brown/eat
+  bounds:405,299,29,28
+  index:2
+cow_brown/eat
+  bounds:436,299,29,28
+  index:3
 cow_brown/idle
   bounds:354,266,29,28
   index:0
@@ -41,48 +53,33 @@ cow_brown/idle
 cow_brown/idle
   bounds:416,266,29,28
   index:2
-cow_brown/row_02
-  bounds:695,266,29,28
+cow_brown/love
+  bounds:467,299,29,28
   index:0
-cow_brown/row_02
-  bounds:726,266,29,28
+cow_brown/love
+  bounds:498,299,29,28
   index:1
-cow_brown/row_02
-  bounds:757,266,29,28
+cow_brown/love
+  bounds:529,299,29,28
   index:2
-cow_brown/row_02
-  bounds:788,266,29,28
+cow_brown/love
+  bounds:560,299,29,28
   index:3
-cow_brown/row_02
-  bounds:819,266,29,28
+cow_brown/love
+  bounds:591,299,29,28
   index:4
-cow_brown/row_02
-  bounds:850,266,29,28
+cow_brown/love
+  bounds:622,299,29,28
   index:5
-cow_brown/row_02
-  bounds:881,266,29,28
-  index:6
-cow_brown/row_03
+cow_brown/rest
   bounds:912,266,29,28
   index:0
-cow_brown/row_03
+cow_brown/rest
   bounds:943,266,29,28
   index:1
-cow_brown/row_03
+cow_brown/rest
   bounds:974,266,29,28
   index:2
-cow_brown/row_04
-  bounds:2,299,29,28
-  index:0
-cow_brown/row_04
-  bounds:33,299,29,28
-  index:1
-cow_brown/row_04
-  bounds:64,299,29,28
-  index:2
-cow_brown/row_04
-  bounds:95,299,29,28
-  index:3
 cow_brown/row_05
   bounds:126,299,29,28
   index:0
@@ -104,36 +101,39 @@ cow_brown/row_05
 cow_brown/row_05
   bounds:312,299,29,28
   index:6
-cow_brown/row_06
-  bounds:343,299,29,28
+cow_brown/settle
+  bounds:695,266,29,28
   index:0
-cow_brown/row_06
-  bounds:374,299,29,28
+cow_brown/settle
+  bounds:726,266,29,28
   index:1
-cow_brown/row_06
-  bounds:405,299,29,28
+cow_brown/settle
+  bounds:757,266,29,28
   index:2
-cow_brown/row_06
-  bounds:436,299,29,28
+cow_brown/settle
+  bounds:788,266,29,28
   index:3
-cow_brown/row_07
-  bounds:467,299,29,28
-  index:0
-cow_brown/row_07
-  bounds:498,299,29,28
-  index:1
-cow_brown/row_07
-  bounds:529,299,29,28
-  index:2
-cow_brown/row_07
-  bounds:560,299,29,28
-  index:3
-cow_brown/row_07
-  bounds:591,299,29,28
+cow_brown/settle
+  bounds:819,266,29,28
   index:4
-cow_brown/row_07
-  bounds:622,299,29,28
+cow_brown/settle
+  bounds:850,266,29,28
   index:5
+cow_brown/settle
+  bounds:881,266,29,28
+  index:6
+cow_brown/sleep
+  bounds:2,299,29,28
+  index:0
+cow_brown/sleep
+  bounds:33,299,29,28
+  index:1
+cow_brown/sleep
+  bounds:64,299,29,28
+  index:2
+cow_brown/sleep
+  bounds:95,299,29,28
+  index:3
 cow_brown/walk
   bounds:447,266,29,28
   index:0

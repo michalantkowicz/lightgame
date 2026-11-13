@@ -148,8 +148,8 @@ public abstract class Tile {
 
     /**
      * The neighbours sharing a side with this tile (up, down, left, right), without the diagonal ones. Walking uses all
-     * {@link #getNeighbours()}; actions (collecting from a chest) only reach these, because the characters face only these
-     * four directions.
+     * {@link #getNeighbours()}; a creature steps only onto these, because the characters face only these four
+     * directions.
      */
     public List<Tile> getSideNeighbours() {
         List<Tile> sides = new ArrayList<>();
@@ -161,6 +161,23 @@ public abstract class Tile {
             }
         }
         return sides;
+    }
+
+    /**
+     * The tiles something on this tile (a chest, a creature) is used from: the neighbours left of it, right of it and
+     * below it. Not the diagonal ones, because the characters face only up, down, left and right, and not the one above,
+     * where the action button drawn over the thing would cover the player.
+     */
+    public List<Tile> getUsedFromNeighbours() {
+        List<Tile> tiles = new ArrayList<>();
+        float centerY = getCenter().y;
+        for (Tile side : getSideNeighbours()) {
+            boolean above = side.getCenter().y > centerY + 0.5f;
+            if (!above) {
+                tiles.add(side);
+            }
+        }
+        return tiles;
     }
 
     public void addNeighbour(Tile neighbour) {

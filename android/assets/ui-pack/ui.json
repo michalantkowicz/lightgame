@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "a1c5bec021cde802f1581102f0dc7b71dfa08597",
+  "uiJsonSha1": "52a545c8d055232001def09ae6aa33cc375026c6",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -35,6 +35,9 @@
       "frames": 1
     },
     "emojis/apple": {
+      "frames": 1
+    },
+    "emojis/heart": {
       "frames": 1
     },
     "emojis/sun": {
@@ -110,6 +113,9 @@
     "inventory/slot_pressed": {
       "frames": 1
     },
+    "mouse_catpaw_mouse_icon": {
+      "frames": 1
+    },
     "play_button/blank": {
       "frames": 1,
       "split": [
@@ -148,6 +154,11 @@
         7,
         9
       ]
+    },
+    "speech_bubble_grey/row_01": {
+      "frames": 7,
+      "frameDuration": 0.08,
+      "playMode": "NORMAL"
     },
     "stamina_black": {
       "frames": 37,

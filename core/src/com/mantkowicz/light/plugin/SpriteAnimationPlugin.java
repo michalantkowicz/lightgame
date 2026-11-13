@@ -44,6 +44,24 @@ public class SpriteAnimationPlugin implements Plugin {
     }
 
     /**
+     * Plays some frames of the animation once, from {@code first} to {@code last} (counted from 0), and stops on the
+     * last one: a whole row with {@code (0, frames - 1)}, or a part of a row that shows two things (the cow's row that
+     * lies down and gets up again).
+     */
+    public void playOnce(String name, Animation<TextureRegion> animation, int first, int last) {
+        Array<TextureRegion> frames = new Array<>();
+        for (int i = first; i <= last; i++) {
+            frames.add(animation.getKeyFrames()[i]);
+        }
+        play(name, new Animation<>(animation.getFrameDuration(), frames, Animation.PlayMode.NORMAL));
+    }
+
+    /** The current animation has shown its last frame (a looping one: for the first time). */
+    public boolean isFinished() {
+        return animation == null || animation.isAnimationFinished(stateTime);
+    }
+
+    /**
      * Jumps to the end of the current animation (e.g. a chest that starts closed shows its closed frame at once).
      */
     public void finish() {

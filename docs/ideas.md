@@ -53,12 +53,13 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   already out of date) and the `_help` notes in `pack.json`.
 - **Interactable objects: one reach rule and one round-button resolver for chests, creatures, fields, trees**
   (2026‑11‑10, updated 2026‑11‑13 twice). A chest is used
-  only from its four side cells (`Tile.getSideNeighbours()`, because the characters face only up, down, left and right),
+  only from its left, its right and below it (`Tile.getUsedFromNeighbours()`: not diagonally, because the characters
+  face only up, down, left and right, and not from above, where its button would cover the player),
   but the code using that rule knows only `Collectible`: `CollectibleFinder.entered` (shows the button),
   `BoardMovementPlugin.walkTarget` with `BoardService.isUsedFromNeighbour` (walks next to it) and
   `PlayerCollectResolver.isInReach` (keeps or fades the button), and opening means "throw out what is inside". A field
   to harvest or a tree to chop would have to pretend to be a `Collectible`. Suggested fix: an `Interactable` interface
-  (its tile or tiles; its reach: from the sides like a chest or a tree, or standing on it like a crop cell; its picture on
+  (its tile or tiles; its reach: from beside and below like a chest or a tree, or standing on it like a crop cell; its picture on
   the round button; the action), `Collectible` becoming one kind of it. One reach check (e.g. `isInReach(interactable,
   tile)`) used by all three places, so they can't drift apart; `PlayerCollectResolver` becomes a general action
   resolver: one button per object, fading out and back in as now, the action left to the object. Related: picking items
@@ -67,9 +68,9 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   or next to it, and is a patch one object per crop cell or one object over several cells? Do it with the first object
   that isn't a chest.
   *Update after the cow (branch `cow-state-machine`):* the cow was that first object, and it went the other way to stay
-  small: `CreatureFeature` (for any `actor.Creature`) is a second resolver beside `PlayerCollectResolver`, with a
-  fourth copy of the "four side cells" rule. It is inside every PMD limit but the heaviest class in `feature` (67
-  statements, complexity 26, its `run` at 8 of the allowed 10, coupled to 12 classes: fifth highest in the game), so
+  small: `CreatureFeature` (for any `actor.Creature`) is a second resolver beside `PlayerCollectResolver` (they
+  share only the tile rule, `Tile.getUsedFromNeighbours()`, since branch `chest-and-reach`). It is inside every PMD
+  limit but the heaviest class in `feature` (69 statements, complexity 27, its `run` at 8 of the allowed 10, coupled to 12 classes: fifth highest in the game), so
   the next kind of action there would break the build. What the shared resolver must also cover:
   - *A creature as a kind of `Interactable` whose offer changes with its state:* a paw to stroke it, the item it wishes
     for when the player carries one, or nothing (walking, eating). So an interactable answers "what do you offer this

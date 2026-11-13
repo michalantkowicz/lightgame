@@ -1,8 +1,8 @@
 package com.mantkowicz.light.event;
 
 /**
- * An item jumped out of the backpack by itself (the backpack was full when the player stepped onto another item): the
- * HUD shakes the slot it came from.
+ * An item left the backpack without its slot being tapped (the backpack was full when the player stepped onto another
+ * item, or the item was given to a cow): the HUD shakes the slot it came from.
  */
 public class BackpackItemEjectedEvent extends GameEvent {
     private final int slot;

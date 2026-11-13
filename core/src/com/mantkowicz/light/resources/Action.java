@@ -8,13 +8,18 @@ package com.mantkowicz.light.resources;
  */
 public enum Action {
     CHOP("chop"),
+    EAT("eat"),
     FALL("fall"),
     IDLE("idle"),
+    LOVE("love"),
     OPEN("open"),
     OPEN_FRONT("open_front"),
     OPEN_HORIZONTAL("open_horizontal"),
     OPEN_SIDE("open_side"),
+    REST("rest"),
     RUN("run"),
+    SETTLE("settle"),
+    SLEEP("sleep"),
     TILL("till"),
     WALK("walk"),
     WATER("water");

@@ -55,7 +55,13 @@ public enum UiImage {
     /** On the round button when there is nothing to do: tapping it gives a hint. */
     HINT_ICON("icons/question"),
     /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */
-    DIALOG_BOX_DOWN("dialog_box_down");
+    DIALOG_BOX_DOWN("dialog_box_down"),
+    /** A small bubble popping up over a character on the map, with a picture put inside it (what a cow wishes for). */
+    PICTURE_BUBBLE("speech_bubble_grey/row_01"),
+    /** Floats up over the player after stroking an animal. */
+    HEART("emojis/heart"),
+    /** On the round button next to an animal that can be stroked: a paw (the pack has no hand). */
+    HAND_ICON("mouse_catpaw_mouse_icon");
 
     private final String piece;
 

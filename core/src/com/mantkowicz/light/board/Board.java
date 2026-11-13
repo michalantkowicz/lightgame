@@ -39,6 +39,8 @@ public class Board extends Actor {
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        // its own colour: the batch still has the last actor's of the frame before (a picture fading out would dim the map)
+        batch.setColor(1, 1, 1, parentAlpha);
         for (Tile tile : tiles) {
             tile.draw(batch, parentAlpha);
         }

@@ -20,7 +20,7 @@ import java.util.Map;
 import static com.mantkowicz.light.actor.Status.IDLE;
 
 /**
- * How the player gets things. Next to a collectible that still holds something (a chest: on one of its four sides)
+ * How the player gets things. Next to a collectible that still holds something (a chest: on a tile it is used from)
  * its button appears; it stays while the player is within reach and fades out once the player leaves. Coming back
  * before it is gone brings the same button back, so walking around a chest (past its corner cells) never shows two
  * buttons.
@@ -55,8 +55,8 @@ public class PlayerCollectResolver implements CollectResolver {
     @Override
     public void resolveCollect(Collectible collectible) {
         ActionButton shown = buttons.get(collectible);
-        if (shown != null && shown.isOnStage() || !holdsSomething(collectible)) {
-            return;
+        if (shown != null && shown.isOnStage() || !holdsSomething(collectible) || !isInReach(collectible)) {
+            return; // not in reach: something else stepped next to it (a wandering cow)
         }
 
         ClickListener onClick = new ClickListener() {
@@ -116,7 +116,7 @@ public class PlayerCollectResolver implements CollectResolver {
         Inventory inside = collectible.getInventory();
         for (int slot = 0; slot < inside.getItems().size(); slot++) {
             Item item = inside.getItems().get(slot);
-            if (item != null && thrower.throwOut(item, tile, tile.getCenter())) {
+            if (item != null && thrower.throwOut(item, tile, tile.getCenter(), player.getCenter())) {
                 inside.take(slot);
             }
         }
@@ -162,6 +162,6 @@ public class PlayerCollectResolver implements CollectResolver {
         Tile playerTile = player.getTile();
         Tile collectibleTile = collectible.getTile();
         return playerTile == collectibleTile
-                || (collectible.isDistant() && collectibleTile.getSideNeighbours().contains(playerTile));
+                || (collectible.isDistant() && collectibleTile.getUsedFromNeighbours().contains(playerTile));
     }
 }
