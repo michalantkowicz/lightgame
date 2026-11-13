@@ -290,3 +290,17 @@ The collect window is gone (it was too complicated): `CollectWindow`, `CollectIt
   chest; an empty slot throws nothing; the button tests as before. `AnimationTest`: the chest opens and stays open.
   `HudTest`: the backpack shows the carrot, then empties when it is thrown out. `GameDriver`: `itemsOnGround`,
   `itemCell`, `starsOnScreen`, `tapBackpackSlot`; scene snapshots list items on the ground.
+
+## 2026‑11‑13, a full backpack makes room (branch `full-backpack-swaps`)
+
+- Stepping onto an item with the backpack full: the item in its first slot jumps out onto a free tile next to the
+  player (as when the slot is tapped) and the slot shakes up and down in the HUD (8 px, 0.24 s: the resolver posts a
+  `BackpackItemEjectedEvent`, the HUD polls it). A second later (`MAKING_ROOM_SECONDS`), if the player still stands
+  there, the new item goes into that slot. The pause makes it clear which item goes and which comes (with the same
+  carrots everywhere, swapping at once looked like the player threw away the one stepped on). Only the first slot
+  empties by itself, nothing moves between slots; the second is emptied by tapping it. With no free tile around
+  nothing changes; the item stays where it lies. `CollectResolver.update` gets the frame's delta for the pause.
+- `Inventory.isFull()`.
+- Test: `CollectTest.aFullBackpackThrowsOutItsFirstItemToTakeTheNewOne` (a dead-end map: which carrot goes where and
+  when, the first slot shakes and settles back); `GameDriver`: `putCarrotIntoBackpack`, `backpackItems`,
+  `itemsOnGroundThemselves`, `backpackSlotShaking`.

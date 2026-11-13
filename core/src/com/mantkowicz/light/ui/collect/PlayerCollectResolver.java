@@ -9,6 +9,7 @@ import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.TileTouchedEvent;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.ui.ActionButton;
@@ -30,16 +31,20 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * does nothing. Opening it (a chest lifts its lid and stays open) pops stars and throws everything inside out onto
  * free tiles around it; then the button goes, nothing is left.
  * <p>
- * Items lying on the ground are picked up when the player steps onto their tile (if the backpack has a free slot), and
- * the player throws an item from the backpack out onto a free tile next to itself.
+ * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
+ * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
  */
 public class PlayerCollectResolver implements CollectResolver {
     private final GameContext context;
     private final Player player;
     private final ItemThrower thrower;
     private final Map<Collectible, ActionButton> buttons = new HashMap<>();
+    /** After making room in a full backpack, nothing is picked up for this long: the old item clearly leaves first. */
+    static final float MAKING_ROOM_SECONDS = 1;
     /** Clicked during a walk: open it once the player stands still in reach. */
     private Collectible openOnArrival;
+    /** Seconds left until something can be picked up again (after making room). */
+    private float pickUpPause;
 
     public PlayerCollectResolver(Player player, GameContext context) {
         this.player = player;
@@ -69,7 +74,7 @@ public class PlayerCollectResolver implements CollectResolver {
     }
 
     @Override
-    public void update() {
+    public void update(float delta) {
         if (openOnArrival != null && IDLE.equals(player.getStatus())) {
             Collectible collectible = openOnArrival;
             openOnArrival = null;
@@ -77,7 +82,10 @@ public class PlayerCollectResolver implements CollectResolver {
                 open(collectible);
             }
         }
-        pickUp();
+        pickUpPause = Math.max(0, pickUpPause - delta);
+        if (pickUpPause == 0) {
+            pickUp();
+        }
     }
 
     /** Throws the item in a backpack slot out onto a free tile next to the player (nothing happens without one). */
@@ -114,16 +122,34 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
-    /** Picks up what has landed on the player's tile, while the backpack has room. */
+    /**
+     * Picks up what has landed on the player's tile. With the backpack full, the item in its first slot jumps out onto a
+     * free tile next to the player to make room and the new one goes into that slot a moment later ({@link
+     * #MAKING_ROOM_SECONDS}, if the player still stands there), so it is clear which goes and which comes; the other
+     * slots stay as they are (the player empties them by tapping them). With no free tile around, nothing changes and
+     * the item stays where it lies.
+     */
     private void pickUp() {
         Tile tile = player.getTile();
         if (tile == null) {
             return;
         }
+        Inventory backpack = player.getInventory();
         for (GameActor actor : context.getBoardService().getGameActors(tile)) {
-            if (actor instanceof ItemOnGround lying && lying.isLanded() && player.getInventory().add(lying.getItem())) {
-                lying.remove();
+            if (!(actor instanceof ItemOnGround lying) || !lying.isLanded()) {
+                continue;
             }
+            if (backpack.isFull()) {
+                if (!thrower.throwOut(backpack.getItems().get(0), tile, player.getCenter())) {
+                    continue;
+                }
+                backpack.take(0);
+                context.getGameEventService().post(new BackpackItemEjectedEvent(0)); // the HUD shakes its slot
+                pickUpPause = MAKING_ROOM_SECONDS; // the new one comes in after it
+                return;
+            }
+            backpack.add(lying.getItem());
+            lying.remove();
         }
     }
 
