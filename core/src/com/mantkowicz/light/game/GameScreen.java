@@ -17,6 +17,7 @@ import com.mantkowicz.light.actor.PlayerCreatedEvent;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileContent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
@@ -27,6 +28,7 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.StageFeature;
+import com.mantkowicz.light.map.Maps;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.resources.PhraseService;
@@ -91,7 +93,7 @@ public class GameScreen extends ScreenAdapter {
         multiplexer.addProcessor(gameStage);
         Gdx.input.setInputProcessor(multiplexer);
 
-        TileSet tileSet = Board.loadTileSet(resourcesService, mapName);
+        TileSet tileSet = Maps.loadTileSet(resourcesService, mapName);
         rayHandler = prepareLights(tileSet.getProperties().getAmbientLight());
 
         List<Tile> tiles = tileSet.getTiles();
@@ -102,8 +104,10 @@ public class GameScreen extends ScreenAdapter {
         board = new Board(boardService, gameEventService, tiles);
 
         for (Tile tile : tiles) {
-            for (TileObject object : tile.getTileObjects()) {
-                object.prepare(tile, context); // characters, lights... come to life
+            for (TileContent content : tile.getTileObjects()) {
+                if (content instanceof TileObject object) {
+                    object.prepare(tile, context); // characters, lights... come to life
+                }
             }
             tile.prepare(world);
         }

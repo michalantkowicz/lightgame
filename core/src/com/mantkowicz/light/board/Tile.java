@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.resources.ResourcesService;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public abstract class Tile {
 
     private boolean marked = false;
 
-    protected List<TileObject> objects = new ArrayList<>();
+    protected List<TileContent> objects = new ArrayList<>();
     private TextureRegion backgroundTexture;
     /** Map tiles drawn instead of the background, bottom layer first (maps made of several tile layers). */
     private List<TileGraphic> layers;
@@ -103,7 +102,7 @@ public abstract class Tile {
     }
 
     /** What the map put on this tile (furniture, characters, lights...), in the order it was added. */
-    public List<TileObject> getTileObjects() {
+    public List<TileContent> getTileObjects() {
         return objects;
     }
 
@@ -221,7 +220,7 @@ public abstract class Tile {
         }
     }
 
-    public void addTileObject(TileObject object) {
+    public void addTileObject(TileContent object) {
         objects.add(object);
     }
 
@@ -264,7 +263,7 @@ public abstract class Tile {
      * Draws the tile's objects (furniture). The board calls it after every background is drawn, so neighbours never cover them.
      */
     public void drawObjects(Batch batch) {
-        for (TileObject object : objects) {
+        for (TileContent object : objects) {
             object.draw(this, batch);
         }
     }

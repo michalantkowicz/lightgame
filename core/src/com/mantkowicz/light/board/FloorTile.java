@@ -1,6 +1,5 @@
 package com.mantkowicz.light.board;
 
-import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.resources.ResourcesService;
 
 public class FloorTile extends AccessibleTile {
@@ -20,7 +19,7 @@ public class FloorTile extends AccessibleTile {
      * A floor tile is blocked when any of its objects blocks.
      */
     @Override
-    public void addTileObject(TileObject object) {
+    public void addTileObject(TileContent object) {
         super.addTileObject(object);
         if (!object.isAccessible()) {
             accessible = false;
