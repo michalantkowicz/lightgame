@@ -48,7 +48,9 @@ class InventoryTest {
 
     /** Any item will do; a proxy keeps this test independent of the Item interface's methods. */
     private static Item anItem() {
-        return (Item) Proxy.newProxyInstance(Item.class.getClassLoader(), new Class<?>[]{Item.class}, (proxy, method, args) ->
-                method.getName().equals("equals") ? proxy == args[0] : method.getName().equals("hashCode") ? System.identityHashCode(proxy) : null);
+        return (Item) Proxy.newProxyInstance(Item.class.getClassLoader(), new Class<?>[]{Item.class},
+                (proxy, method, args) -> method.getName().equals("equals")
+                        ? proxy == args[0]
+                        : method.getName().equals("hashCode") ? System.identityHashCode(proxy) : null);
     }
 }

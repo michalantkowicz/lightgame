@@ -33,8 +33,7 @@ public class RemoveWhenUnavailablePlugin implements Plugin {
             actor.clearActions();
             actor.addAction(Actions.sequence(
                     Actions.fadeOut(DURATION, Interpolation.sineOut),
-                    Actions.removeActor()
-            ));
+                    Actions.removeActor()));
         } else if (leaving && isAvailable) {
             leaving = false;
             actor.clearActions();

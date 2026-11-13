@@ -11,25 +11,27 @@ public class TileObjectFactory {
             return new TileSpriteActor(objectType, objectType.getSpriteActor());
         }
         switch (objectType) {
-            case SPRITE:
+            case SPRITE :
                 assertMandatoryProperties(objectProperties, TEXTURE_NAME);
                 return new TileSprite(objectProperties);
-            case LIGHT:
+            case LIGHT :
                 assertMandatoryProperties(objectProperties, LIGHT_TYPE);
                 return new TileLight(objectProperties);
-            case PLAYER:
+            case PLAYER :
                 return new TilePlayer();
-            case DOG:
+            case DOG :
                 return new TileDog();
-            default:
-                throw new IllegalArgumentException("There is no tile implementation for this tile object type: " + objectType.name());
+            default :
+                throw new IllegalArgumentException(
+                        "There is no tile implementation for this tile object type: " + objectType.name());
         }
     }
 
     private static void assertMandatoryProperties(MapProperties properites, TileObjectAttribute... attributes) {
         for (TileObjectAttribute attribute : attributes) {
             if (!doesContainNotNullProperty(properites, attribute.getValue())) {
-                throw new IllegalStateException("Tile object does not contain mandatory property " + attribute.getValue());
+                throw new IllegalStateException(
+                        "Tile object does not contain mandatory property " + attribute.getValue());
             }
         }
     }

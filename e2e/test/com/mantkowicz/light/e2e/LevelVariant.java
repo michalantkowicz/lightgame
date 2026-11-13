@@ -22,7 +22,8 @@ import java.util.Map;
  */
 public final class LevelVariant {
     /** Tiled's flags in the high bits of a gid: mirrored left-right, mirrored top-bottom, mirrored on the diagonal. */
-    public static final long FLIP_HORIZONTALLY = 0x80000000L, FLIP_VERTICALLY = 0x40000000L, FLIP_DIAGONALLY = 0x20000000L;
+    public static final long FLIP_HORIZONTALLY = 0x80000000L, FLIP_VERTICALLY = 0x40000000L,
+            FLIP_DIAGONALLY = 0x20000000L;
 
     private static final Path ROOT = Path.of(System.getProperty("repo.root", "../..")).toAbsolutePath().normalize();
     private static final Path OUTPUT = ROOT.resolve("e2e/build/test-maps");

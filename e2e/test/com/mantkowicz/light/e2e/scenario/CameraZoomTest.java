@@ -29,7 +29,8 @@ class CameraZoomTest {
     @Test
     void zoomingInMakesTheWorldBiggerButNotTheButtons() {
         GameDriver normal = GameDriver.start(MAP.write("zoom"));
-        assertEquals(2 * normal.cellSizeOnScreen(START), GameDriver.startZoomed(MAP.write("zoom"), 0.5f).cellSizeOnScreen(START), 0.01f,
+        assertEquals(2 * normal.cellSizeOnScreen(START),
+                GameDriver.startZoomed(MAP.write("zoom"), 0.5f).cellSizeOnScreen(START), 0.01f,
                 "cells twice as big");
 
         GameDriver close = GameDriver.startZoomed(MAP.write("zoom"), 0.75f); // close enough, and the chest is still on screen
@@ -41,7 +42,8 @@ class CameraZoomTest {
             assertEquals(NEXT_TO_CHEST, game.playerCell(), "clicks hit the right cell at any zoom");
             assertFalse(game.crashed());
         }
-        assertEquals(normal.buttonOnScreen("COLLECT"), close.buttonOnScreen("COLLECT"), "the button doesn't move or grow");
+        assertEquals(normal.buttonOnScreen("COLLECT"), close.buttonOnScreen("COLLECT"),
+                "the button doesn't move or grow");
     }
 
     @Test

@@ -50,9 +50,11 @@ public class RoundButton extends Group {
     private void showPressed(boolean isPressed) {
         TextureRegionDrawable drawable = isPressed ? down : up;
         background.setDrawable(drawable);
-        background.setSize(drawable.getRegion().getRegionWidth() * SCALE, drawable.getRegion().getRegionHeight() * SCALE);
+        background.setSize(drawable.getRegion().getRegionWidth() * SCALE,
+                drawable.getRegion().getRegionHeight() * SCALE);
         float top = background.getHeight() - (up.getRegion().getRegionHeight() - SIDE) * SCALE;
         float faceMiddle = top + (getHeight() - SIDE * SCALE) / 2f;
-        icon.setPosition(Math.round((getWidth() - icon.getWidth()) / 2f), Math.round(faceMiddle - icon.getHeight() / 2f));
+        icon.setPosition(Math.round((getWidth() - icon.getWidth()) / 2f),
+                Math.round(faceMiddle - icon.getHeight() / 2f));
     }
 }

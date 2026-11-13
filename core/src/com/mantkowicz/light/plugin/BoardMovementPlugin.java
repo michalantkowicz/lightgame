@@ -103,8 +103,7 @@ public class BoardMovementPlugin implements Plugin {
         player.setStatus(MOVEMENT);
         player.addAction(Actions.sequence(
                 new FollowPathAction(positions, secondsPerTile * length / tileSize),
-                Actions.run(this::arrive)
-        ));
+                Actions.run(this::arrive)));
     }
 
     /**

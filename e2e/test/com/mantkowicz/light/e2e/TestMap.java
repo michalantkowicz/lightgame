@@ -115,13 +115,16 @@ public final class TestMap {
         }
         StringBuilder tmx = new StringBuilder();
         tmx.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        tmx.append(String.format("<map version=\"1.10\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"%d\" "
-                + "height=\"%d\" tilewidth=\"%d\" tileheight=\"%d\" infinite=\"0\">\n", width, height, TILE, TILE));
+        tmx.append(String.format(
+                "<map version=\"1.10\" orientation=\"orthogonal\" renderorder=\"right-down\" width=\"%d\" "
+                        + "height=\"%d\" tilewidth=\"%d\" tileheight=\"%d\" infinite=\"0\">\n",
+                width, height, TILE, TILE));
         tmx.append(" <properties>\n");
         tmx.append(String.format("  <property name=\"atlas\" value=\"%s\"/>\n",
                 OUTPUT.relativize(ATLAS).toString().replace('\\', '/')));
         tmx.append(" </properties>\n");
-        tmx.append(" <tileset firstgid=\"1\" name=\"water\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"4\" columns=\"4\">\n");
+        tmx.append(
+                " <tileset firstgid=\"1\" name=\"water\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"4\" columns=\"4\">\n");
         tmx.append("  <image source=\"water.png\" width=\"64\" height=\"16\"/>\n");
         tmx.append("  <tile id=\"0\"><animation>");
         for (int frame = 0; frame < 4; frame++) {
@@ -129,7 +132,8 @@ public final class TestMap {
         }
         tmx.append("</animation></tile>\n");
         tmx.append(" </tileset>\n");
-        tmx.append(" <tileset firstgid=\"5\" name=\"grass_tiles_v2\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"77\" columns=\"11\">\n");
+        tmx.append(
+                " <tileset firstgid=\"5\" name=\"grass_tiles_v2\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"77\" columns=\"11\">\n");
         tmx.append("  <image source=\"grass_tiles_v2.png\" width=\"176\" height=\"112\"/>\n");
         tmx.append(" </tileset>\n");
         layer(tmx, 1, "ground", c -> c == ' ' ? 0 : c == '~' ? WATER : GRASS);
@@ -152,7 +156,8 @@ public final class TestMap {
     }
 
     private void layer(StringBuilder tmx, int id, String name, Gid gid) {
-        tmx.append(String.format(" <layer id=\"%d\" name=\"%s\" width=\"%d\" height=\"%d\">\n", id, name, width, height));
+        tmx.append(
+                String.format(" <layer id=\"%d\" name=\"%s\" width=\"%d\" height=\"%d\">\n", id, name, width, height));
         tmx.append("  <data encoding=\"csv\">\n");
         List<String> rows = new ArrayList<>();
         for (String line : lines) {
@@ -176,7 +181,8 @@ public final class TestMap {
                     tmx.append(String.format("  <object id=\"%d\" x=\"%d\" y=\"%d\" width=\"8\" height=\"8\">\n", id++,
                             col * TILE + 4, line * TILE + 4));
                     tmx.append("   <ellipse/>\n   <properties>\n");
-                    tmx.append(String.format("    <property name=\"objectClass\" value=\"%s\"/>\n", object.objectClass()));
+                    tmx.append(
+                            String.format("    <property name=\"objectClass\" value=\"%s\"/>\n", object.objectClass()));
                     object.properties().forEach((name, value) -> tmx.append(
                             String.format("    <property name=\"%s\" value=\"%s\"/>\n", name, value)));
                     tmx.append("   </properties>\n  </object>\n");

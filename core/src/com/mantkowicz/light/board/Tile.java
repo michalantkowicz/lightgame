@@ -198,16 +198,16 @@ public abstract class Tile {
 
     private Vector2 getTilePointPosition(TilePoint tilePoint) {
         switch (tilePoint) {
-            case RIGHT_TOP_CORNER:
+            case RIGHT_TOP_CORNER :
                 return new Vector2(x + width, y + height);
-            case RIGHT_BOTTOM_CORNER:
+            case RIGHT_BOTTOM_CORNER :
                 return new Vector2(x + width, y);
-            case LEFT_BOTTOM_CORNER:
+            case LEFT_BOTTOM_CORNER :
                 return new Vector2(x, y);
-            case LEFT_TOP_CORNER:
+            case LEFT_TOP_CORNER :
                 return new Vector2(x, y + height);
-            case CENTER:
-            default:
+            case CENTER :
+            default :
                 return getCenter();
         }
     }

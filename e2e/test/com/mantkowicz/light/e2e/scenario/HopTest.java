@@ -45,9 +45,11 @@ class HopTest {
 
         assertTrue(!afterStop.isEmpty(), "the walk ended");
         for (int i = 1; i < afterStop.size(); i++) {
-            assertTrue(afterStop.get(i) <= afterStop.get(i - 1), "no hop after stopping: " + afterStop.subList(0, Math.min(15, afterStop.size())));
+            assertTrue(afterStop.get(i) <= afterStop.get(i - 1),
+                    "no hop after stopping: " + afterStop.subList(0, Math.min(15, afterStop.size())));
         }
-        assertEquals(0f, afterStop.get(Math.min(12, afterStop.size() - 1)), "landed within half a hop: " + afterStop.subList(0, Math.min(15, afterStop.size())));
+        assertEquals(0f, afterStop.get(Math.min(12, afterStop.size() - 1)),
+                "landed within half a hop: " + afterStop.subList(0, Math.min(15, afterStop.size())));
 
         assertEquals(EAST, game.playerCell());
         assertEquals(0f, game.playerHopHeight(), "after the walk the rabbit rests on the ground");

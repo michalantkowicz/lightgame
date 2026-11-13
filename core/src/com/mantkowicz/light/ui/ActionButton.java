@@ -20,7 +20,8 @@ import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
  * the picture.
  */
 public class ActionButton extends GameActor {
-    public ActionButton(GameContext context, String name, TextureRegion picture, EventListener listener, BooleanSupplier available) {
+    public ActionButton(GameContext context, String name, TextureRegion picture, EventListener listener,
+            BooleanSupplier available) {
         super(ACTION_BUTTON);
         setName(name);
         RoundButton button = new RoundButton(context.getResourcesService(), picture);

@@ -12,7 +12,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
  * @param offsetY  the layer's offset in world units (up is positive)
  */
 public record TileGraphic(TiledMapTile tile, boolean flipHorizontally, boolean flipVertically, int rotation,
-                          float opacity, float offsetX, float offsetY) {
+        float opacity, float offsetX, float offsetY) {
 
     /**
      * The tile as it is: not mirrored, not rotated, opaque, no offset.

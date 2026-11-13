@@ -157,7 +157,8 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         float tileHeight = first.getTileHeight();
         if (tileWidth != WorldScale.PIXEL_ART_TILE_SIZE || tileHeight != WorldScale.PIXEL_ART_TILE_SIZE) {
             throw new IllegalArgumentException(fileName + " has " + (int) tileWidth + "x" + (int) tileHeight
-                    + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE + " px");
+                    + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE
+                    + " px");
         }
         float scale = WorldScale.TILE_SIZE / tileWidth;
         Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight);
@@ -171,9 +172,10 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                     TiledMapTileLayer.Cell cell = layer.getCell(x, y);
                     if (cell != null && cell.getTile() != null) {
                         // Tiled measures offsets downwards, the game upwards
-                        cellLayers.add(new TileGraphic(cell.getTile(), cell.getFlipHorizontally(), cell.getFlipVertically(),
-                                cell.getRotation(), layer.getOpacity(), layer.getRenderOffsetX() * scale,
-                                -layer.getRenderOffsetY() * scale));
+                        cellLayers.add(
+                                new TileGraphic(cell.getTile(), cell.getFlipHorizontally(), cell.getFlipVertically(),
+                                        cell.getRotation(), layer.getOpacity(), layer.getRenderOffsetX() * scale,
+                                        -layer.getRenderOffsetY() * scale));
                     }
                 }
                 boolean wall = hasCell(walls, x, y);
@@ -181,7 +183,8 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 if (cellLayers.isEmpty() && !wall && !blocked) {
                     continue;
                 }
-                Tile tile = TileFactory.createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
+                Tile tile = TileFactory
+                        .createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
                 tile.setAttributes(new MapProperties());
                 tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
                 tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
@@ -204,8 +207,10 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
             try {
                 tilesetProperties.setAmbientLight(Float.valueOf(value));
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
-                        + "(dark) to 1 (daylight), not '" + value + "'", e);
+                throw new IllegalArgumentException(
+                        fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
+                                + "(dark) to 1 (daylight), not '" + value + "'",
+                        e);
             }
         }
 
@@ -242,7 +247,8 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     /**
      * Each object goes to the cell whose centre is nearest to the object's centre. A later object on the same cell replaces an earlier one.
      */
-    private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth, float tileHeight) {
+    private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth,
+            float tileHeight) {
         Map<GridPoint2, TileObject> objects = new HashMap<>();
         MapLayer objectLayer = getObjectLayer(tiledMap);
         if (objectLayer == null) {
@@ -267,8 +273,10 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                 }
 
                 MapProperties objectProperties = object.getProperties();
-                TileObjectType objectType = TileObjectType.valueOf(objectProperties.get(OBJECT_CLASS.getValue(), String.class));
-                objects.put(new GridPoint2(objectX, objectY), TileObjectFactory.createTileObject(objectType, objectProperties));
+                TileObjectType objectType = TileObjectType
+                        .valueOf(objectProperties.get(OBJECT_CLASS.getValue(), String.class));
+                objects.put(new GridPoint2(objectX, objectY),
+                        TileObjectFactory.createTileObject(objectType, objectProperties));
             }
         }
         return objects;

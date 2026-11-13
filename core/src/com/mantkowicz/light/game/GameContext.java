@@ -35,16 +35,16 @@ public class GameContext {
     private final BoardService boardService;
 
     public GameContext(ResourcesService resourcesService,
-                       GameEventService gameEventService,
-                       PhraseService phraseService,
-                       World world,
-                       RayHandler rayHandler,
-                       OrthographicCamera camera,
-                       GameStage gameStage,
-                       NotificationStage notificationStage,
-                       MenuStage menuStage,
-                       UiStage uiStage,
-                       BoardService boardService) {
+            GameEventService gameEventService,
+            PhraseService phraseService,
+            World world,
+            RayHandler rayHandler,
+            OrthographicCamera camera,
+            GameStage gameStage,
+            NotificationStage notificationStage,
+            MenuStage menuStage,
+            UiStage uiStage,
+            BoardService boardService) {
         this.resourcesService = resourcesService;
         this.gameEventService = gameEventService;
         this.phraseService = phraseService;

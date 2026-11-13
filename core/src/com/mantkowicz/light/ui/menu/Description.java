@@ -18,7 +18,8 @@ public class Description extends GameActor {
     protected Description(DescriptionDefinition definition) {
         super(DESCRIPTION);
 
-        label = LabelFactory.createLabel(definition.getFont(), ON_PANEL, definition.getBackground(), definition.getDescription());
+        label = LabelFactory.createLabel(definition.getFont(), ON_PANEL, definition.getBackground(),
+                definition.getDescription());
         if (label.getWidth() > DESCRIPTION_MAX_WIDTH) {
             label.setWrap(true);
             label.setWidth(DESCRIPTION_MAX_WIDTH);
