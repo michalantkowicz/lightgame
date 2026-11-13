@@ -164,8 +164,9 @@ public abstract class Tile {
     }
 
     /**
-     * The tiles something on this tile (a chest, a creature) is used from: the side neighbours left, right and below it.
-     * Not the one above: the action button drawn over the thing would cover the player standing there.
+     * The tiles something on this tile (a chest, a creature) is used from: the neighbours left of it, right of it and
+     * below it. Not the diagonal ones, because the characters face only up, down, left and right, and not the one above,
+     * where the action button drawn over the thing would cover the player.
      */
     public List<Tile> getUsedFromNeighbours() {
         List<Tile> tiles = new ArrayList<>();

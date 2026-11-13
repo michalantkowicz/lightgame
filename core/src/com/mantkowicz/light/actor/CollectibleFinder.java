@@ -8,7 +8,8 @@ import com.mantkowicz.light.event.GameEventService;
 
 /**
  * When something steps onto a tile, finds what can be collected there: collectibles on that tile, and the ones used
- * from a neighbour (a chest) left of it, right of it or below it. Each one found is a {@link CollectEvent}.
+ * from a neighbour (a chest) when this tile is one it is used from ({@link Tile#getUsedFromNeighbours()}). Each one
+ * found is a {@link CollectEvent}.
  */
 public class CollectibleFinder implements OccupantListener {
     private final BoardService boardService;
@@ -27,7 +28,7 @@ public class CollectibleFinder implements OccupantListener {
             }
         }
         for (Tile neighbour : tile.getSideNeighbours()) {
-            if (neighbour.getUsedFromNeighbours().contains(tile)) { // not when standing above it
+            if (neighbour.getUsedFromNeighbours().contains(tile)) {
                 findUsedFromNeighbour(occupant, neighbour);
             }
         }

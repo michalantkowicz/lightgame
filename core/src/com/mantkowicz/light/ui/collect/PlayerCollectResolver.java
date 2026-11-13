@@ -20,7 +20,7 @@ import java.util.Map;
 import static com.mantkowicz.light.actor.Status.IDLE;
 
 /**
- * How the player gets things. Next to a collectible that still holds something (a chest: left of it, right of it or below it)
+ * How the player gets things. Next to a collectible that still holds something (a chest: on a tile it is used from)
  * its button appears; it stays while the player is within reach and fades out once the player leaves. Coming back
  * before it is gone brings the same button back, so walking around a chest (past its corner cells) never shows two
  * buttons.

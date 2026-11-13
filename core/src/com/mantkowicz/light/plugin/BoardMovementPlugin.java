@@ -55,8 +55,8 @@ public class BoardMovementPlugin implements Plugin {
     }
 
     /**
-     * The clicked tile, or for something used from a neighbouring tile (a chest) the free tile it is used from (left,
-     * right or below it: {@link Tile#getUsedFromNeighbours()}) with the shortest walk (where the player stands if it's already there).
+     * The clicked tile, or for something used from a neighbouring tile (a chest) the free tile it is used from
+     * ({@link Tile#getUsedFromNeighbours()}) with the shortest walk (where the player stands if it's already there).
      */
     private Tile walkTarget(Tile clicked, Tile current) {
         if (clicked.isAccessible() || !boardService.isUsedFromNeighbour(clicked)) {
