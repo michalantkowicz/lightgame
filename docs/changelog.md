@@ -515,3 +515,10 @@ Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](
   asked, the changelog date, keeping docs that quote changed things up to date, events that carry nothing staying in
   `event`, when to take screenshots, where test results are, and in `tools/assets/README.md` how `rows` names rows and
   that a sheet in `Sprite` is packed whole.
+
+## 2026‑11‑13, idea: one round-button resolver, updated after the cow (branch `idea-one-action-resolver`)
+
+- `docs/ideas.md`, "Interactable objects": the cow (branch `cow-state-machine`) got its own resolver,
+  `CreatureFeature`, beside the chest's. The entry now says what a shared resolver has to cover because of it (offers
+  that change with a creature's state, wish rules in the creature, two things in reach at once, who owns the hint) and
+  why it is worth doing (the PMD numbers of `CreatureFeature`). Docs only.
