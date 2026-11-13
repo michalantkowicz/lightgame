@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="4">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="6">
  <properties>
-  <property name="ambientLight" type="float" value="1" />
+  <property name="ambientLight" type="float" value="1"/>
  </properties>
- <tileset firstgid="1" source="../tilesets/water.tsx" />
- <tileset firstgid="5" source="../tilesets/grass_tiles_v2.tsx" />
+ <tileset firstgid="1" source="../tilesets/water.tsx"/>
+ <tileset firstgid="5" source="../tilesets/grass_tiles_v2.tsx"/>
  <layer id="1" name="water" width="24" height="16">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -67,22 +67,34 @@
  </layer>
  <objectgroup id="4" name="objects">
   <object id="1" name="PLAYER" x="100" y="164" width="8" height="8">
-   <ellipse />
    <properties>
-    <property name="objectClass" value="PLAYER" />
+    <property name="objectClass" value="PLAYER"/>
    </properties>
+   <ellipse/>
   </object>
   <object id="2" name="COW" x="68" y="100" width="8" height="8">
-   <ellipse />
    <properties>
-    <property name="objectClass" value="COW" />
+    <property name="objectClass" value="COW"/>
    </properties>
+   <ellipse/>
   </object>
   <object id="3" name="CHEST" x="132" y="100" width="8" height="8">
-   <ellipse />
    <properties>
-    <property name="objectClass" value="CHEST" />
+    <property name="objectClass" value="CHEST"/>
    </properties>
+   <ellipse/>
+  </object>
+  <object id="4" name="CHEST" x="148.56" y="148.56" width="8" height="8">
+   <properties>
+    <property name="objectClass" value="CHEST"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="5" name="CHEST" x="196" y="196.683" width="8" height="8">
+   <properties>
+    <property name="objectClass" value="CHEST"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
 </map>

@@ -34,6 +34,11 @@ public class Inventory {
         return true;
     }
 
+    /** No slot is free. */
+    public boolean isFull() {
+        return !items.contains(null);
+    }
+
     /** Takes the item out of a slot, which becomes free; null if it was free already. */
     public Item take(int slot) {
         Item item = items.get(slot);

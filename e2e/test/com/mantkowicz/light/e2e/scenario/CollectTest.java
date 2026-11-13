@@ -6,6 +6,7 @@ import com.mantkowicz.light.e2e.Golden;
 import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,7 +18,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a random free cell next to
  * the chest; then the button goes (the chest is empty). Stepping onto the carrot puts it into the backpack (the HUD's
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
- * be picked up again. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
+ * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
+ * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
  * it is.
  * <p>
  * The chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
@@ -129,6 +131,55 @@ class CollectTest {
         assertTrue(game.itemsOnGround().isEmpty());
         assertEquals("player=[-, -] chest=[Carrot, -]", game.inventories());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "it still holds something: the button stays");
+    }
+
+    /** A dead end: from {@code P} the only free cell is {@code a}, and from {@code a} only {@code P}. */
+    private static final TestMap DEAD_END = TestMap.of(
+            "~~~~~",
+            "~~a~~",
+            "~~P~~",
+            "~~~~~");
+
+    @Test
+    void aFullBackpackThrowsOutItsFirstItemToTakeTheNewOne() {
+        GameDriver game = GameDriver.start(DEAD_END.write("collect-dead-end"));
+        game.putCarrotIntoBackpack();
+        game.putCarrotIntoBackpack();
+        List<Object> carrots = game.backpackItems(); // [first, second]
+        game.tapBackpackSlot(0); // the first one jumps onto a
+        game.seconds(1);
+        assertEquals(DEAD_END.cell('a'), game.itemCell());
+        game.putCarrotIntoBackpack(); // a third one fills the free slot: the backpack is full again
+        List<Object> full = game.backpackItems(); // [third, second]
+
+        String hud = game.describeHud();
+        game.click(DEAD_END.cell('a'));
+        for (int frame = 0; frame < 120 && game.backpackItems().equals(full); frame++) {
+            game.frames(1);
+        }
+        assertTrue(game.backpackSlotShaking(0), "the slot its oldest item jumped out of shakes");
+        assertFalse(game.backpackSlotShaking(1));
+        assertEquals(Arrays.asList(null, carrots.get(1)), game.backpackItems(),
+                "first the one in the first slot (the third) goes out; the second stays where it is");
+        assertEquals(List.of(carrots.get(0), full.get(0)), game.itemsOnGroundThemselves(), "the first still lies on a");
+        game.seconds(0.9f);
+        assertEquals(Arrays.asList(null, carrots.get(1)), game.backpackItems(), "still waiting");
+        game.seconds(0.2f);
+        assertEquals(Arrays.asList(carrots.get(0), carrots.get(1)), game.backpackItems(),
+                "a second later it comes into the first slot");
+        game.seconds(1);
+        assertFalse(game.backpackSlotShaking(0));
+        assertEquals(slotPlace(hud), slotPlace(game.describeHud()), "and is back in its place");
+        assertEquals(DEAD_END.cell('a'), game.playerCell());
+        assertEquals(List.of(full.get(0)), game.itemsOnGroundThemselves(), "the third one lies on the ground now");
+        assertEquals(DEAD_END.cell('P'), game.itemCell(), "on the only free cell next to the player");
+        assertFalse(game.crashed());
+    }
+
+    /** Where the HUD's first backpack slot is: "at=(x,y) size=WxH" from its line. */
+    private static String slotPlace(String hud) {
+        String line = hud.lines().filter(l -> l.startsWith("backpack:")).findFirst().orElseThrow();
+        return line.substring(line.indexOf("at="));
     }
 
     @Test

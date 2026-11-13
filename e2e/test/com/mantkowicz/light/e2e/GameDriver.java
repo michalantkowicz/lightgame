@@ -28,6 +28,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.mantkowicz.light.actor.Carrot;
 import com.mantkowicz.light.actor.Chest;
 import com.mantkowicz.light.actor.Cow;
 import com.mantkowicz.light.actor.Dog;
@@ -409,6 +410,30 @@ public final class GameDriver {
         return items;
     }
 
+    /** Puts a new carrot into the player's backpack (its first free slot), as if picked up somewhere. */
+    public void putCarrotIntoBackpack() {
+        ResourcesService resources = screenField("resourcesService");
+        if (!((Player) actor(Kind.PLAYER)).getInventory().add(new Carrot(resources))) {
+            throw new IllegalStateException("The backpack is full");
+        }
+    }
+
+    /** The backpack's items themselves (null for a free slot), to tell which one went where. */
+    public List<Object> backpackItems() {
+        return new ArrayList<>(((Player) actor(Kind.PLAYER)).getInventory().getItems());
+    }
+
+    /** The items lying on the ground (or flying) themselves, in the order they were thrown. */
+    public List<Object> itemsOnGroundThemselves() {
+        List<Object> items = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying) {
+                items.add(lying.getItem());
+            }
+        }
+        return items;
+    }
+
     /** Where the first item lying on the ground is (it must have landed). */
     public Cell itemCell() {
         for (Actor actor : gameStage().getActors()) {
@@ -431,6 +456,11 @@ public final class GameDriver {
             }
         }
         return stars;
+    }
+
+    /** Is a backpack slot of the HUD shaking (its item jumped out by itself)? */
+    public boolean backpackSlotShaking(int slot) {
+        return hud().getSlots().get(slot).hasActions();
     }
 
     /** Short tap on a backpack slot of the HUD (0 = the left one). */

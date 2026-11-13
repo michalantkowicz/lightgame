@@ -1,6 +1,10 @@
 package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.event.BackpackItemEjectedEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -60,10 +64,13 @@ public class Hud extends Group {
             ASLEEP = new Portrait.Idle("asleep", UiImage.TEEMO_FALL_ASLEEP, null, 0, UiImage.TEEMO_SLEEP, UiImage.TEEMO_SLEEP_MORE);
     /** Between the face's top and the tip of its bubble's pointer. */
     private static final float BUBBLE_GAP = 6;
+    /** How far a shaken slot moves up and down, and how long the first move takes (the whole shake is 6 times that). */
+    private static final float SHAKE = 8, SHAKE_SECONDS = 0.04f;
     /** Between the gear and the screen's corner: room for the circle at its top right while it is held. */
     private static final float GEAR_MARGIN = 48;
 
     private final ResourcesService resources;
+    private final GameEventService events;
     private final Player player;
     private final Group row = new Group();
     private final Portrait face;
@@ -79,6 +86,7 @@ public class Hud extends Group {
 
     public Hud(GameContext context, Player player) {
         this.resources = context.getResourcesService();
+        this.events = context.getGameEventService();
         this.player = player;
         setTouchable(Touchable.childrenOnly);
 
@@ -144,6 +152,10 @@ public class Hud extends Group {
     public void act(float delta) {
         followCamera();
         showBackpack();
+        for (BackpackItemEjectedEvent ejected = events.poll(BackpackItemEjectedEvent.class); ejected != null;
+             ejected = events.poll(BackpackItemEjectedEvent.class)) {
+            shake(ejected.getSlot());
+        }
         UiImage mood = stamina.getMood();
         face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);
@@ -196,6 +208,18 @@ public class Hud extends Group {
         if (settings != null) {
             settings.remove();
             openSettings();
+        }
+    }
+
+    /** A quick shake up and down of a backpack slot and what is in it: its item jumped out by itself. */
+    private void shake(int slot) {
+        for (Image piece : List.of(slots.get(slot), slotItems.get(slot))) {
+            piece.clearActions();
+            piece.addAction(Actions.sequence(
+                    Actions.moveBy(0, SHAKE, SHAKE_SECONDS, Interpolation.sine),
+                    Actions.moveBy(0, -2 * SHAKE, 2 * SHAKE_SECONDS, Interpolation.sine),
+                    Actions.moveBy(0, 2 * SHAKE, 2 * SHAKE_SECONDS, Interpolation.sine),
+                    Actions.moveBy(0, -SHAKE, SHAKE_SECONDS, Interpolation.sine)));
         }
     }
 
