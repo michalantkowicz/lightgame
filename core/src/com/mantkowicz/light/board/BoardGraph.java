@@ -15,7 +15,8 @@ import java.util.Map;
  * The board as a gdx-ai graph over the square grid's 8 neighbours. Every step costs 1, a diagonal one too, so a path's cost is its
  * number of steps. A diagonal step is only allowed when both tiles it squeezes between are accessible, so paths never cut the corner
  * of furniture or walls. Nothing leaves an inaccessible tile.
- * Connections are built once, because tile accessibility is fixed when the map is loaded.
+ * Connections are built once: when a tile gets blocked or freed during the game (a wandering cow),
+ * {@link BoardService#setAccessible} builds a new graph.
  */
 public class BoardGraph implements IndexedGraph<Tile> {
     private final Map<Tile, Integer> indices = new HashMap<>();

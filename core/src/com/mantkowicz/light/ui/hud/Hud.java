@@ -1,6 +1,7 @@
 package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -87,6 +88,9 @@ public class Hud extends Group {
     private final HoldButton gear;
     private final RoundButton hint;
     private SpeechBubble bubble;
+    /** What the face says when the hint button is tapped, and the picture after it (or null). */
+    private String hintText = HINT;
+    private TextureRegion hintPicture;
     private SettingsPanel settings;
     private float laidOutWidth, laidOutHeight;
 
@@ -252,10 +256,25 @@ public class Hud extends Group {
         if (bubble != null) {
             bubble.remove();
         }
-        bubble = new SpeechBubble(resources, HINT);
+        bubble = new SpeechBubble(resources, hintText, hintPicture);
         addActor(bubble);
         placeBubble();
         face.play(UiImage.TEEMO_CHEER, SpeechBubble.SECONDS); // cheering while it says it
+    }
+
+    /**
+     * What the hint button says from now on, e.g. "find" and a carrot next to a cow wishing for one.
+     *
+     * @param picture shown after the text, or null
+     */
+    public void setHint(String text, TextureRegion picture) {
+        hintText = text;
+        hintPicture = picture;
+    }
+
+    /** Back to the hint for when there is nothing to do ("play around!"). */
+    public void resetHint() {
+        setHint(HINT, null);
     }
 
     /** The bubble's pointer just over the middle of the face's top. */
@@ -284,6 +303,11 @@ public class Hud extends Group {
     /** The round button right of the face when there is nothing to do (the action button covers it otherwise). */
     public RoundButton getHint() {
         return hint;
+    }
+
+    /** The picture after the text the hint button says now ("find" and a carrot), or null. */
+    public TextureRegion getHintPicture() {
+        return hintPicture;
     }
 
     /** The bubble over the face, or null. */

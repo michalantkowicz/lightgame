@@ -26,6 +26,14 @@ public class FloorTile extends AccessibleTile {
         }
     }
 
+    /**
+     * For what blocks a tile and moves (a wandering cow): the tile it leaves becomes walkable, the one it steps onto
+     * blocked. Use {@link BoardService#setAccessible}, which also tells the path finder.
+     */
+    void setAccessible(boolean accessible) {
+        this.accessible = accessible;
+    }
+
     @Override
     public boolean isAccessible() {
         return accessible;

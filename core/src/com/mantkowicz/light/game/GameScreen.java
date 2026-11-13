@@ -23,6 +23,7 @@ import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.feature.CameraTrackingFeature;
 import com.mantkowicz.light.feature.CollectFeature;
+import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
@@ -127,7 +128,9 @@ public class GameScreen extends ScreenAdapter {
             addFeature(new CameraTrackingFeature(context, player));
             CollectFeature collecting = new CollectFeature(context, player);
             addFeature(collecting);
-            uiStage.addActor(new Hud(context, player, collecting::throwOut));
+            Hud hud = new Hud(context, player, collecting::throwOut);
+            uiStage.addActor(hud);
+            addFeature(new CreatureFeature(context, player, hud));
         }
         addFeature(new MenuFeature(context, menuStage));
         addFeature(new NoPathFeature(context));

@@ -14,8 +14,8 @@ public class BoardService {
     private final List<Tile> tiles;
     private final GameActorsByTile gameActorsByTile;
     private final GameEventService gameEventService;
-    private final BoardGraph boardGraph;
-    private final IndexedAStarPathFinder<Tile> pathFinder;
+    private BoardGraph boardGraph;
+    private IndexedAStarPathFinder<Tile> pathFinder;
     private OccupantListener occupantListener;
 
     public BoardService(GameEventService gameEventService, List<Tile> tiles) {
@@ -60,6 +60,19 @@ public class BoardService {
             }
         }
         return true;
+    }
+
+    /**
+     * Blocks or frees a floor tile while the game runs, for what blocks a tile and moves (a wandering cow blocks the
+     * tile it steps onto and frees the one it left). Paths found from now on know about it.
+     */
+    public void setAccessible(Tile tile, boolean accessible) {
+        if (!(tile instanceof FloorTile floor)) {
+            throw new IllegalArgumentException("Only a floor tile can be blocked or freed");
+        }
+        floor.setAccessible(accessible);
+        boardGraph = new BoardGraph(tiles); // its connections are built from what is accessible
+        pathFinder = new IndexedAStarPathFinder<>(boardGraph);
     }
 
     /** Who is told when something steps onto a tile (the game screen sets it before anything is on the board). */

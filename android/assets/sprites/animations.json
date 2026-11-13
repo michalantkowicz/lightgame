@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "8942bffe1a9ee951b7a98cde071f07a6d94b5441",
+  "packJsonSha1": "5ed0697303dfe0cb7a187925f28f140ef881eadb",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -66,27 +66,27 @@
       "frameDuration": 0.1,
       "playMode": "NORMAL"
     },
+    "cow_brown/eat": {
+      "sheet": "cow_brown",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "cow_brown/idle": {
       "sheet": "cow_brown",
       "frames": 3,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
-    "cow_brown/row_02": {
+    "cow_brown/love": {
       "sheet": "cow_brown",
-      "frames": 7,
+      "frames": 6,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
-    "cow_brown/row_03": {
+    "cow_brown/rest": {
       "sheet": "cow_brown",
       "frames": 3,
-      "frameDuration": 0.12,
-      "playMode": "LOOP"
-    },
-    "cow_brown/row_04": {
-      "sheet": "cow_brown",
-      "frames": 4,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
@@ -96,15 +96,15 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
-    "cow_brown/row_06": {
+    "cow_brown/settle": {
       "sheet": "cow_brown",
-      "frames": 4,
+      "frames": 7,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
-    "cow_brown/row_07": {
+    "cow_brown/sleep": {
       "sheet": "cow_brown",
-      "frames": 6,
+      "frames": 4,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },

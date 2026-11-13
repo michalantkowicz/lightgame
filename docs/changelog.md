@@ -515,3 +515,39 @@ Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](
   asked, the changelog date, keeping docs that quote changed things up to date, events that carry nothing staying in
   `event`, when to take screenshots, where test results are, and in `tools/assets/README.md` how `rows` names rows and
   that a sheet in `Sprite` is packed whole.
+
+## 2026‑11‑13, the cow lives: a state machine (branch `cow-state-machine`)
+
+The cow gets a life, written as a gdx-ai state machine that other creatures (and later people) can copy.
+
+- **`CowState`** (`character`) is a plain gdx-ai `State<Cow>` enum, run by a `DefaultStateMachine` in `Cow`: every state
+  says what the cow does on entering it, when it goes on to which state, and how it answers the player. No framework
+  on top and no config files: to change the behaviour, edit the enum (its comment draws the transitions). `Cow` only
+  has the helpers the states call (`stayFor`, `isTimeUp`, `isHungry`, `showWish`...). The player's actions reach the
+  states as gdx-ai messages (`MessageManager`, delivered at once).
+- **What it does:** stands (3–6 s), then walks one step onto a free tile next to it (twice as likely) or lies down;
+  lying, it rests, may fall asleep, gets up again. 20 s after the start or its last carrot it gets hungry (which also
+  gets it up): standing, it
+  shows a bubble with a carrot (`PictureBubble`, the pack's grey speech bubble) and waits until it gets one; then it
+  eats, and a heart and the pack's green happy face (`FloatingPicture`) show over it.
+- **The round button** (`CreatureFeature`, for any `actor.Creature`): next to the cow (its four sides) it shows a hand
+  (the pack's paw) and strokes it (a heart over the cow, a small one floats up over the player) when the cow stands,
+  rests or sleeps; while the cow wishes for a carrot the player carries, it shows the carrot and gives it (the slot
+  shakes). Without a carrot the hint button stays, and says "find" with the carrot's picture (`SpeechBubble` can end
+  with a picture, `Hud.setHint`).
+- **Walking:** `SpriteActor.walkToFreeNeighbour` (a random free side tile; the picture is mirrored while going left,
+  and back to its default when it arrives). Sprite actors block their tile, so tiles are now blocked and freed during
+  the game: `BoardService.setAccessible` (the path finder's graph is rebuilt). The tile the cow goes to is blocked at
+  once, the one it leaves is freed on arrival. If the player was on its way to that tile, it steps back to the middle
+  of the tile it is on (`BoardMovementPlugin`); it never shares a tile with the cow. A cow stepping next to a full
+  chest doesn't get the chest's button (`PlayerCollectResolver` checks the player's reach).
+- **Assets:** the cow sheet's rows are named (`settle`: lies down and gets up, `rest`, `sleep`, `eat`, `love`; `row_05`
+  is still unused), `SpriteActor.playOnce` plays a row or a part of it once. New UI pieces: `PICTURE_BUBBLE`, `HEART`,
+  `HAND_ICON`.
+- **Debug:** `Debug.Tool.STATE_LABELS` writes each creature's state under it (`StateLabelPlugin`, for anything with a
+  state).
+- Tests: `CowTest` (stroking, wishing and feeding, every state with its animation, the walk, the player stepping back,
+  the debug label). No golden changed.
+- Known limits, kept simple on purpose: an item thrown onto a tile the cow walks to at the same moment lands under the
+  cow (it can be picked up once the cow moves on); next to a chest and a cow at once, their buttons share one place;
+  with two creatures next to the player the button is for the first one found.
