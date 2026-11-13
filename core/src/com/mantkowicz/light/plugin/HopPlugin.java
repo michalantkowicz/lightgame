@@ -3,6 +3,7 @@ package com.mantkowicz.light.plugin;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Plugin;
 
 import static com.mantkowicz.light.actor.Status.MOVEMENT;
 

@@ -3,8 +3,9 @@ package com.mantkowicz.light.plugin;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
-import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.PlayerMoveEvent;
+import com.mantkowicz.light.actor.Plugin;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileTouchedEvent;
@@ -29,13 +30,14 @@ public class BoardMovementPlugin implements Plugin {
     /** How far (in tiles) a straight line keeps away from blocked or missing tiles. */
     private static final float CLEARANCE = 0.25f;
 
-    private final Player player;
+    /** Whoever is walked (the player). */
+    private final GameBoardActor player;
     private final GameEventService gameEventService;
     private final BoardService boardService;
     private final float secondsPerTile;
     private Tile tileToEnter;
 
-    public BoardMovementPlugin(Player player, GameContext context, float secondsPerTile) {
+    public BoardMovementPlugin(GameBoardActor player, GameContext context, float secondsPerTile) {
         this.player = player;
         this.gameEventService = context.getGameEventService();
         this.boardService = context.getBoardService();

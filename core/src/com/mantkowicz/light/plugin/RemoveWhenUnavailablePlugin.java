@@ -3,6 +3,7 @@ package com.mantkowicz.light.plugin;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Plugin;
 
 import java.util.function.BooleanSupplier;
 

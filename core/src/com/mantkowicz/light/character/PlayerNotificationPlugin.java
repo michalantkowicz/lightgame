@@ -1,10 +1,10 @@
-package com.mantkowicz.light.plugin;
+package com.mantkowicz.light.character;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.actor.Plugin;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.notification.EnlargeAndFadeOutAnimation;
 import com.mantkowicz.light.notification.Notification;

@@ -6,6 +6,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Plugin;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Direction;
 import com.mantkowicz.light.resources.ResourcesService;

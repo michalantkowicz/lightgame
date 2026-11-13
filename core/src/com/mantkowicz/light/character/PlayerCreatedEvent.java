@@ -1,4 +1,4 @@
-package com.mantkowicz.light.actor;
+package com.mantkowicz.light.character;
 
 import com.mantkowicz.light.event.GameEvent;
 

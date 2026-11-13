@@ -1,16 +1,23 @@
-package com.mantkowicz.light.actor;
+package com.mantkowicz.light.character;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mantkowicz.light.actor.Collecting;
+import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Inventory;
+import com.mantkowicz.light.actor.Item;
+import com.mantkowicz.light.actor.LookAtMeOnClickListener;
+import com.mantkowicz.light.actor.PlayerMoveEvent;
+import com.mantkowicz.light.actor.Stamina;
+import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.plugin.AnimationPlugin;
 import com.mantkowicz.light.plugin.BoardMovementPlugin;
 import com.mantkowicz.light.plugin.HopPlugin;
-import com.mantkowicz.light.plugin.PlayerNotificationPlugin;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Direction;
 import com.mantkowicz.light.resources.ResourcesService;

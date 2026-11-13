@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.debug.Debug;
-import com.mantkowicz.light.plugin.Plugin;
 import com.mantkowicz.light.resources.SpriteSheet;
 
 import java.util.ArrayList;

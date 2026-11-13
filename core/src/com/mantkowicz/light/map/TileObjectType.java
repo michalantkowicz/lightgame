@@ -1,8 +1,8 @@
 package com.mantkowicz.light.map;
 
-import com.mantkowicz.light.actor.Chest;
-import com.mantkowicz.light.actor.Cow;
-import com.mantkowicz.light.actor.SpriteActor;
+import com.mantkowicz.light.character.Chest;
+import com.mantkowicz.light.character.Cow;
+import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
 
 import java.util.function.Function;

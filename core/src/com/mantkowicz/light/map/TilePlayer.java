@@ -1,7 +1,7 @@
 package com.mantkowicz.light.map;
 
-import com.mantkowicz.light.actor.Player;
-import com.mantkowicz.light.actor.PlayerCreatedEvent;
+import com.mantkowicz.light.character.Player;
+import com.mantkowicz.light.character.PlayerCreatedEvent;
 import com.mantkowicz.light.context.GameContext;
 
 import static com.mantkowicz.light.map.TileObjectType.PLAYER;
