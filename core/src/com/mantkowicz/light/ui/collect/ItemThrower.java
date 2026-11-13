@@ -6,7 +6,7 @@ import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 
 import java.util.ArrayList;
 import java.util.HashSet;

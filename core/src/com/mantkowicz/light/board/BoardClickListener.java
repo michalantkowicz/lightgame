@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.NoPathEvent;
 import com.mantkowicz.light.event.TileTouchedEvent;
-import com.mantkowicz.light.game.GameContext;
 
 public class BoardClickListener extends ClickListener {
     private final Board board;
@@ -14,10 +13,10 @@ public class BoardClickListener extends ClickListener {
     private final GameEventService gameEventService;
     private final Vector2 point = new Vector2();
 
-    public BoardClickListener(GameContext context, Board board) {
+    public BoardClickListener(BoardService boardService, GameEventService gameEventService, Board board) {
         this.board = board;
-        boardService = context.getBoardService();
-        gameEventService = context.getGameEventService();
+        this.boardService = boardService;
+        this.gameEventService = gameEventService;
     }
 
     @Override

@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 
 import static com.mantkowicz.light.map.TileObjectAttribute.TEXTURE_NAME;
 import static com.mantkowicz.light.map.TileObjectAttribute.TEXTURE_OFFSET;

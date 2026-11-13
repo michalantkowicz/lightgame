@@ -2,7 +2,7 @@ package com.mantkowicz.light.map;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 
 public abstract class TileObject {
     private final TileObjectType objectType;

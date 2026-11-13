@@ -44,7 +44,6 @@ import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
@@ -309,7 +308,7 @@ public final class GameDriver {
         World world = screenField("world");
         WallTile wall = new WallTile(resources);
         wall.setPosition(cell.col() * CELL_SIZE, cell.row() * CELL_SIZE);
-        wall.prepare(new GameContext(resources, null, null, world, null, null, null, null, null, null, null));
+        wall.prepare(world);
         frames(1);
     }
 

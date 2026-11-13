@@ -2,7 +2,7 @@ package com.mantkowicz.light.board;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.map.TiledMapLoader;
 import com.mantkowicz.light.map.TmxTileMapLoaderProperties;
@@ -17,10 +17,10 @@ import static java.lang.Math.min;
 public class Board extends Actor {
     private final List<Tile> tiles;
 
-    public Board(GameContext context, List<Tile> tiles) {
+    public Board(BoardService boardService, GameEventService gameEventService, List<Tile> tiles) {
         this.tiles = tiles;
         setupPositionAndSize(tiles);
-        addListener(new BoardClickListener(context, this));
+        addListener(new BoardClickListener(boardService, gameEventService, this));
     }
 
     private void setupPositionAndSize(List<Tile> tiles) {

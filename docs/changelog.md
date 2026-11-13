@@ -416,3 +416,18 @@ froze the existing state.
   new CI step (`Architecture baseline is committed`) fails until that is committed. Seen working both ways: a planted
   `board → ui` dependency failed; recorded on purpose and removed again, the baseline shrank back by itself.
 - `e2e/architecture/package-dependencies.txt` is gone.
+
+## 2026‑11‑13, GameContext out of the application layer (branch `arch-1-context`)
+
+Step 1 of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- `GameContext` moved from `game` to the new package `context`, in the world layer (`ArchitectureTest`). It hands out
+  the stages as plain libGDX `Stage`s and the stage map as `Map<StageType, Stage>`, so it knows nothing of the UI.
+  `MenuFeature` gets the `MenuStage` from `GameScreen` (it uses the button under the pointer); finding and removing
+  notifications of a type is `notification.Notifications` (`NotificationStage` keeps its methods, now calling it).
+- The board doesn't use the context any more (a new, unfrozen rule): `Board` and `BoardClickListener` take the
+  board service and the event service, `Tile.prepare` takes the physics world, and `GameScreen` prepares the map
+  objects on each tile itself (same order as before: a tile's objects, then its own physics).
+- Baseline: 183 → 78 recorded dependencies (all "uses game.GameContext" gone, "features know game" emptied). 8 kept
+  ones were re-recorded only because their wording names the moved class; one is new, `Tile.getTileObjects()`
+  returning map objects, part of the board-uses-map tangle that step 4 removes. No golden changed.

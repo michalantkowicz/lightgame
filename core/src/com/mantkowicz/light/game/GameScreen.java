@@ -15,6 +15,7 @@ import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.PlayerCreatedEvent;
@@ -25,6 +26,7 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.StageFeature;
+import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.resources.PhraseService;
 import com.mantkowicz.light.resources.ResourcesService;
@@ -94,10 +96,13 @@ public class GameScreen extends ScreenAdapter {
         List<Tile> tiles = tileSet.getTiles();
         BoardService boardService = new BoardService(gameEventService, tiles);
         GameContext context = createContext(boardService);
-        board = new Board(context, tiles);
+        board = new Board(boardService, gameEventService, tiles);
 
         for (Tile tile : tiles) {
-            tile.prepare(context);
+            for (TileObject object : tile.getTileObjects()) {
+                object.prepare(tile, context); // characters, lights... come to life
+            }
+            tile.prepare(world);
         }
 
         gameStage.getRoot().addActorAt(0, board); // drawn below everything else
@@ -117,7 +122,7 @@ public class GameScreen extends ScreenAdapter {
             addFeature(collecting);
             uiStage.addActor(new Hud(context, player, collecting::throwOut));
         }
-        addFeature(new MenuFeature(context));
+        addFeature(new MenuFeature(context, menuStage));
         addFeature(new NoPathFeature(context));
         addFeature(new StageFeature(context));
         if (Debug.isOn(FPS_LABEL)) {

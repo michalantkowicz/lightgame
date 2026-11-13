@@ -3,11 +3,10 @@ package com.mantkowicz.light.feature;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.GameActorDefinition;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.AddToStageEvent;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.stage.StageType;
-import com.mantkowicz.light.ui.AbstractStage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +18,7 @@ public class StageFeature implements Feature {
     public StageFeature(GameContext context) {
         this.eventService = context.getGameEventService();
 
-        for (AbstractStage stage : context.getStages()) {
-            stageMap.put(stage.getStageType(), stage);
-        }
+        stageMap.putAll(context.getStages());
     }
 
     @Override

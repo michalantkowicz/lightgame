@@ -33,7 +33,7 @@ import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
  * two packages of one layer using each other, and a few conventions.
  * <p>
  * Layers, from the bottom: <b>leaves</b> (util, debug, resources, stage: use nothing of the game), the <b>world</b>
- * (board, actor, light, event), <b>behaviour</b> (map, plugin, notification), the <b>UI</b> (ui and its subpackages),
+ * (board, actor, light, event, context: what the game objects get from the game screen), <b>behaviour</b> (map, plugin, notification), the <b>UI</b> (ui and its subpackages),
  * the <b>application</b> (feature, game).
  * <p>
  * The code doesn't follow all of it yet: the layer and same-layer rules are <i>frozen</i>. The violations the code had
@@ -69,7 +69,7 @@ class ArchitectureTest {
     void layersUseOnlyTheLayersBelowThem() {
         ArchRule layers = layeredArchitecture().consideringOnlyDependenciesInLayers()
                 .layer("Leaves").definedBy(packages("util", "debug", "resources", "stage"))
-                .layer("World").definedBy(packages("board", "actor", "light", "event"))
+                .layer("World").definedBy(packages("board", "actor", "light", "event", "context"))
                 .layer("Behaviour").definedBy(packages("map", "plugin", "notification"))
                 .layer("UI").definedBy(packages("ui"))
                 .layer("Application").definedBy(packages("feature", "game"))
@@ -87,6 +87,15 @@ class ArchitectureTest {
         freeze(noClasses().that().resideInAPackage(GAME + ".board..")
                 .should().dependOnClassesThat().resideInAPackage(GAME + ".actor..")
                 .as("The board does not know actors (actors stand on the board)")).check(game);
+    }
+
+    /** The context holds the board's service, so the board must not use the context (no cycle). */
+    @Test
+    void theBoardDoesNotUseTheContext() {
+        noClasses().that().resideInAPackage(GAME + ".board..")
+                .should().dependOnClassesThat().resideInAPackage(GAME + ".context..")
+                .because("the context holds the board's service: the board takes what it needs directly")
+                .check(game);
     }
 
     @Test

@@ -2,7 +2,7 @@ package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.ThumbnailType;
 
 import static com.mantkowicz.light.actor.GameActorType.LIGHTER;

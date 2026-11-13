@@ -6,10 +6,10 @@ import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.event.TileTouchedEvent;
-import com.mantkowicz.light.game.GameContext;
 
 import java.util.ArrayList;
 import java.util.List;

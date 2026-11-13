@@ -3,10 +3,10 @@ package com.mantkowicz.light.feature;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.actor.CameraActor;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.LookAtMeEvent;
-import com.mantkowicz.light.game.GameContext;
 
 import static com.mantkowicz.light.debug.Debug.Tool.CAMERA_TRACKING_BOX;
 
