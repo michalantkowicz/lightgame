@@ -441,3 +441,18 @@ Step 2 of emptying the architecture baseline ([code-quality-plan.md](code-qualit
   they are about: `TileTouchedEvent`, `NoPathEvent` to `board`; `PlayerMoveEvent`, `PlayerCreatedEvent`,
   `MenuOpenEvent`, `LookAtMeEvent`, `AddToStageEvent` to `actor`. Only packages and imports changed.
 - Baseline: 78 → 57 recorded dependencies (the event bus rule's 21 for these seven). No golden changed.
+
+## 2026‑11‑13, the board doesn't know actors (branch `arch-3-board-occupants`)
+
+Step 3 of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- `BoardService` keeps track of `TileOccupant`s (new, in `board`: something standing on a tile, which may be used
+  from a neighbour) instead of game actors: `registerOccupant`, `unregisterOccupant`, `getOccupants`,
+  `isUsedFromNeighbour`. `GameBoardActor` is a `TileOccupant`; `Collectible` answers "used from a neighbour" with
+  `isDistant()`.
+- Finding what can be collected when something steps onto a tile moved out of the board into
+  `actor.CollectibleFinder`, which `BoardService` tells through `OccupantListener` (set by `GameScreen` before anything
+  is on the board, so it runs at the same moment as before). `CollectEvent` moved to `actor`.
+- Baseline: 57 → 40 recorded dependencies. "The board does not know actors", "the event bus uses nothing of the game"
+  and "features do not know the game package" have no violations left: they are plain rules now, their baseline
+  files are gone. No golden changed.

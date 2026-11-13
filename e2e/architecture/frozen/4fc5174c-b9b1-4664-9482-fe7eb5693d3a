@@ -1,3 +1,0 @@
-Constructor <com.mantkowicz.light.event.CollectEvent.<init>(com.mantkowicz.light.actor.Collectible)> has parameter of type <com.mantkowicz.light.actor.Collectible> in (CollectEvent.java:0)
-Field <com.mantkowicz.light.event.CollectEvent.collectible> has type <com.mantkowicz.light.actor.Collectible> in (CollectEvent.java:0)
-Method <com.mantkowicz.light.event.CollectEvent.getCollectible()> has return type <com.mantkowicz.light.actor.Collectible> in (CollectEvent.java:0)

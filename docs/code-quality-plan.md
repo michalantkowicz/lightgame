@@ -219,7 +219,8 @@ What empties the baseline (the estimate behind it: about 6 pull requests, 70–9
 Done, one pull request each: the plan (#36), Spotless and the reformat (#37), architecture tests (#38), PMD (#39),
 phase 4 steps 1–5 (#40–#44) and the architecture rules of phase 5 (#45). Where things stand after them:
 
-- Architecture: 183 known violations frozen (phase 5); 78 after step 1 (`GameContext` in `context`), 57 after step 2 (events with what they are about). Before phase 5 replaced the list: 77 package dependencies (75
+- Architecture: 183 known violations frozen (phase 5); 78 after step 1 (`GameContext` in `context`), 57 after step 2 (events with what they are about), 40 after step 3 (the board without actors; three of the five
+  frozen rules are plain rules now). Before phase 5 replaced the list: 77 package dependencies (75
   at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
   `actor → ui`, `actor → ui.collect`, `board → notification`, `board → ui`; new, all from a higher package to a lower
   one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,

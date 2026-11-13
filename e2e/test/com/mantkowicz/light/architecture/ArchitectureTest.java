@@ -84,9 +84,9 @@ class ArchitectureTest {
     /** The layer rule allows two packages of one layer to use each other; these pairs must not (no cycles). */
     @Test
     void theBoardDoesNotKnowActors() {
-        freeze(noClasses().that().resideInAPackage(GAME + ".board..")
+        noClasses().that().resideInAPackage(GAME + ".board..")
                 .should().dependOnClassesThat().resideInAPackage(GAME + ".actor..")
-                .as("The board does not know actors (actors stand on the board)")).check(game);
+                .as("The board does not know actors (actors stand on the board)").check(game);
     }
 
     /** The context holds the board's service, so the board must not use the context (no cycle). */
@@ -100,10 +100,10 @@ class ArchitectureTest {
 
     @Test
     void theEventBusUsesNothingOfTheGame() {
-        freeze(noClasses().that().resideInAPackage(GAME + ".event..")
+        noClasses().that().resideInAPackage(GAME + ".event..")
                 .should()
                 .dependOnClassesThat(resideInAPackage(GAME + "..").and(not(resideInAPackage(GAME + ".event.."))))
-                .as("The event bus uses nothing of the game (events belong with the code they are about)"))
+                .as("The event bus uses nothing of the game (events belong with the code they are about)")
                 .check(game);
     }
 
@@ -118,9 +118,9 @@ class ArchitectureTest {
 
     @Test
     void featuresDoNotKnowTheGameScreen() {
-        freeze(noClasses().that().resideInAPackage(GAME + ".feature..")
+        noClasses().that().resideInAPackage(GAME + ".feature..")
                 .should().dependOnClassesThat().resideInAPackage(GAME + ".game..")
-                .as("Features do not know the game package (it creates them)")).check(game);
+                .as("Features do not know the game package (it creates them)").check(game);
     }
 
     @Test
