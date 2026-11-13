@@ -332,3 +332,18 @@ Phase 2 of [code-quality-plan.md](code-quality-plan.md).
     instability per package); CI adds it to the run's summary page. Not a gate.
 - Each check was seen failing on a planted violation (a `resources` class using an actor, a stale line in the list,
   a scenario test using a game class).
+
+## 2026‑11‑13, PMD complexity limits (branch `quality-3-pmd`)
+
+Phase 3 of [code-quality-plan.md](code-quality-plan.md).
+
+- `core` runs PMD 7.29.0 with `config/pmd.xml`: cognitive complexity 15, cyclomatic 10 per method (80 per class),
+  NPath 200, at most 10 parameters, NCSS 60 per method and 300 per class, coupling between objects 20, 30 imports,
+  no god classes; plus `ClassWithOnlyPrivateConstructorsShouldBeFinal`, `UseCollectionIsEmpty`,
+  `UnnecessaryConstructor`. `./gradlew build` fails on a finding (`core:pmdMain`, report in
+  `core/build/reports/pmd/`, attached by CI when a run fails).
+- The 16 findings the code had are marked `@SuppressWarnings("PMD.<Rule>")` with a "baseline" comment in 10 places
+  (`TmxTiledMapLoader` and its `loadPackedMap`, `createObjects`; `ResourcesService` and its `loadUi`; `Tile`;
+  `GameContext`'s constructor; `GameScreen`; `Hud`; `Portrait.act`), so new code meets the limits from now on.
+- Fixed instead: `BlockedTile`'s empty constructor (the compiler's is the same), `Board` uses `isEmpty()`.
+- Seen failing on a planted method (cognitive complexity 31).

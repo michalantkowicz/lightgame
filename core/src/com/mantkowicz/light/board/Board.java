@@ -24,7 +24,7 @@ public class Board extends Actor {
     }
 
     private void setupPositionAndSize(List<Tile> tiles) {
-        if (tiles.size() > 0) {
+        if (!tiles.isEmpty()) {
             float minX = tiles.get(0).getX();
             float maxX = tiles.get(0).getX();
             float minY = tiles.get(0).getY();

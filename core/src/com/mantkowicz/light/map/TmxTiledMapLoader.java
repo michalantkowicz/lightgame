@@ -44,6 +44,8 @@ import static com.mantkowicz.light.util.Tuple.of;
  * </ul>
  * Both have an 'objects' layer with the player, chests, lights and furniture.
  */
+// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+@SuppressWarnings({"PMD.GodClass", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports"})
 public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderProperties> {
     static final String COLLISION_LAYER = "collision";
     static final String WALLS_LAYER = "walls";
@@ -133,6 +135,9 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         return assetManager.get(fileName, TiledMap.class);
     }
 
+    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+
+    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     private TileSet loadPackedMap(TiledMap tiledMap, String fileName) {
         List<TiledMapTileLayer> drawn = new ArrayList<>();
         TiledMapTileLayer collision = null;
@@ -247,6 +252,8 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     /**
      * Each object goes to the cell whose centre is nearest to the object's centre. A later object on the same cell replaces an earlier one.
      */
+    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+    @SuppressWarnings("PMD.CognitiveComplexity")
     private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth,
             float tileHeight) {
         Map<GridPoint2, TileObject> objects = new HashMap<>();

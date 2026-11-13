@@ -22,6 +22,9 @@ import static com.mantkowicz.light.board.TilePoint.LEFT_TOP_CORNER;
 import static com.mantkowicz.light.board.TilePoint.RIGHT_BOTTOM_CORNER;
 import static com.mantkowicz.light.board.TilePoint.RIGHT_TOP_CORNER;
 
+// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+
+@SuppressWarnings("PMD.GodClass")
 public abstract class Tile {
     private static final int NOTIFICATION_OFFSET = 5;
 

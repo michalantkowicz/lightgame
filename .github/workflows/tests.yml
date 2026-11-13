@@ -64,6 +64,7 @@ jobs:
           name: test-reports
           path: |
             **/build/reports/tests/
+            **/build/reports/pmd/
             **/build/golden-actual/
           retention-days: 7
           if-no-files-found: ignore

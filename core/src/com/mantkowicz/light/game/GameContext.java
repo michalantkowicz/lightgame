@@ -34,6 +34,9 @@ public class GameContext {
     private final UiStage uiStage;
     private final BoardService boardService;
 
+    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public GameContext(ResourcesService resourcesService,
             GameEventService gameEventService,
             PhraseService phraseService,
