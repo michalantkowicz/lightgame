@@ -456,3 +456,12 @@ Step 3 of emptying the architecture baseline ([code-quality-plan.md](code-qualit
 - Baseline: 57 → 40 recorded dependencies. "The board does not know actors", "the event bus uses nothing of the game"
   and "features do not know the game package" have no violations left: they are plain rules now, their baseline
   files are gone. No golden changed.
+
+## 2026‑11‑13, the board doesn't know the map (branch `arch-4-board-without-map`)
+
+Step 4 of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- Loading a map moved from `Board` (`loadTileSet`, `loadTiles`) to `map.Maps`; `GameScreen` calls it.
+- Tiles hold `TileContent`s (new, in `board`: whether it blocks the tile, what it draws on it) instead of the map's
+  `TileObject`s; `TileObject` implements it. `GameScreen` prepares the contents that are map objects.
+- Baseline: 40 → 28 recorded dependencies (all of the board's uses of the map). No golden changed.
