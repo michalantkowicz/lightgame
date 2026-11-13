@@ -66,14 +66,17 @@ class AssetsUpToDateTest {
     @Test
     void spritesMatchPackJson() throws IOException {
         Path packJson = root.resolve("tools/assets/pack.json");
-        Matcher recorded = PACK_JSON_SHA1.matcher(Files.readString(root.resolve("android/assets/sprites/animations.json")));
+        Matcher recorded = PACK_JSON_SHA1
+                .matcher(Files.readString(root.resolve("android/assets/sprites/animations.json")));
         String found = recorded.find() ? recorded.group(1) : "nothing";
-        assertEquals(sha1(packJson), found, "tools/assets/pack.json changed since the sprites were packed, " + RUN_TOOL);
+        assertEquals(sha1(packJson), found,
+                "tools/assets/pack.json changed since the sprites were packed, " + RUN_TOOL);
     }
 
     @Test
     void spritesMatchTheSpriteEnum() throws IOException {
-        JsonValue sheets = new JsonReader().parse(Files.readString(root.resolve("android/assets/sprites/animations.json")))
+        JsonValue sheets = new JsonReader()
+                .parse(Files.readString(root.resolve("android/assets/sprites/animations.json")))
                 .get("sheets");
         Set<String> packed = new TreeSet<>();
         for (JsonValue sheet = sheets.child; sheet != null; sheet = sheet.next) {
@@ -101,12 +104,14 @@ class AssetsUpToDateTest {
         for (UiImage image : UiImage.values()) {
             listed.add(image.getPiece());
         }
-        assertEquals(listed, names(ui.get("images")), "the pieces in ui.atlas aren't the ones in the UiImage enum, " + RUN_TOOL);
+        assertEquals(listed, names(ui.get("images")),
+                "the pieces in ui.atlas aren't the ones in the UiImage enum, " + RUN_TOOL);
         Set<String> fonts = new TreeSet<>();
         for (UiFont font : UiFont.values()) {
             fonts.add(font.getFont());
         }
-        assertEquals(fonts, names(ui.get("fonts")), "the fonts in android/assets/ui-pack/fonts aren't the ones in UiFont, " + RUN_TOOL);
+        assertEquals(fonts, names(ui.get("fonts")),
+                "the fonts in android/assets/ui-pack/fonts aren't the ones in UiFont, " + RUN_TOOL);
     }
 
     private static Set<String> names(JsonValue object) {

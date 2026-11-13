@@ -117,7 +117,9 @@ One branch and one pull request per phase, each from `origin/master`, each leavi
   ```
 - `config/eclipse-formatter.xml`: the profile used for the measurement: spaces, size 4, `lineSplit` 120,
   `continuation_indentation` 2, `join_wrapped_lines` false, comment formatting off, `use_on_off_tags` true (so
-  `// @formatter:off` / `on` can protect a hand-aligned table). All other settings are Eclipse's defaults.
+  `// @formatter:off` / `on` can protect a hand-aligned table), `alignment_for_enum_constants` 48 (constants that
+  don't fit on one line go one per line; Eclipse's default joined `UiImage`'s constants into long lines). All other
+  settings are Eclipse's defaults. With that setting the reformat is 50 files, +287/−193 lines.
 - Two commits: the setup, then the reformat alone (`./gradlew spotlessApply`), and a `.git-blame-ignore-revs` file
   listing the reformat commit, so GitHub's blame skips it.
 - `spotlessCheck` runs as part of `./gradlew build` (Spotless adds it to `check`), so CI needs no change. Fixing a

@@ -12,7 +12,10 @@ import java.util.function.Function;
  * line here, e.g. {@code SHEEP(Sheep::new)}, and nothing else outside its class.
  */
 public enum TileObjectType {
-    SPRITE, LIGHT, PLAYER, DOG,
+    SPRITE,
+    LIGHT,
+    PLAYER,
+    DOG,
     // sprite actors
     CHEST(Chest::new),
     COW(Cow::new);

@@ -48,7 +48,8 @@ public class SpeechBubble extends Group {
         NinePatch patch = new NinePatch(
                 part(box, 0, 0, LEFT, TOP), part(box, PLAIN_X, 0, 1, TOP), part(box, right, 0, RIGHT, TOP),
                 part(box, 0, PLAIN_Y, LEFT, 1), part(box, PLAIN_X, PLAIN_Y, 1, 1), part(box, right, PLAIN_Y, RIGHT, 1),
-                part(box, 0, bottom, LEFT, BOTTOM), part(box, PLAIN_X, bottom, 1, BOTTOM), part(box, right, bottom, RIGHT, BOTTOM));
+                part(box, 0, bottom, LEFT, BOTTOM), part(box, PLAIN_X, bottom, 1, BOTTOM),
+                part(box, right, bottom, RIGHT, BOTTOM));
         patch.scale(UI_SCALE, UI_SCALE);
 
         label = new Label(text, new Label.LabelStyle(resources.getFont(), UiStyle.TEXT));
@@ -60,11 +61,13 @@ public class SpeechBubble extends Group {
         body.setBounds(0, below, width, height);
         addActor(body);
         Image pointer = new Image(part(box, POINTER_X, POINTER_Y, POINTER_WIDTH, POINTER_HEIGHT));
-        pointer.setBounds(snap((width - POINTER_WIDTH * UI_SCALE) / 2f), 0, POINTER_WIDTH * UI_SCALE, POINTER_HEIGHT * UI_SCALE);
+        pointer.setBounds(snap((width - POINTER_WIDTH * UI_SCALE) / 2f), 0, POINTER_WIDTH * UI_SCALE,
+                POINTER_HEIGHT * UI_SCALE);
         addActor(pointer);
         // the text in the middle of the box's face (its right border is wider: the box's side)
         float face = width - (RIGHT - LEFT) * UI_SCALE;
-        label.setPosition(Math.round((face - label.getPrefWidth()) / 2f), below + Math.round((height - label.getPrefHeight()) / 2f));
+        label.setPosition(Math.round((face - label.getPrefWidth()) / 2f),
+                below + Math.round((height - label.getPrefHeight()) / 2f));
         addActor(label);
         setSize(width, below + height);
 

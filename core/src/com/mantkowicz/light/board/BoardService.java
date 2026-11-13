@@ -77,7 +77,8 @@ public class BoardService {
         }
         for (Tile neighbour : tile.getSideNeighbours()) {
             for (GameActor tileActor : gameActorsByTile.getGameActors(neighbour)) {
-                if (!tileActor.equals(gameActor) && tileActor instanceof Collectible && ((Collectible) tileActor).isDistant()) {
+                if (!tileActor.equals(gameActor) && tileActor instanceof Collectible
+                        && ((Collectible) tileActor).isDistant()) {
                     gameEventService.post(new CollectEvent((Collectible) tileActor));
                 }
             }

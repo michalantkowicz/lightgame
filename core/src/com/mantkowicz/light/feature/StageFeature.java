@@ -35,7 +35,8 @@ public class StageFeature implements Feature {
                 GameActor actor = builder.getActor();
                 stageMap.get(targetStageType).addActor(actor);
             } else {
-                throw new IllegalArgumentException("There is no stage registered for the stage type: [" + targetStageType + "]");
+                throw new IllegalArgumentException(
+                        "There is no stage registered for the stage type: [" + targetStageType + "]");
             }
         }
     }

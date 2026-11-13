@@ -13,8 +13,8 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
@@ -23,9 +23,9 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Carrot;
@@ -45,24 +45,24 @@ import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
-import com.mantkowicz.light.map.TileSpriteActor;
+import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
-import com.mantkowicz.light.game.Main;
+import com.mantkowicz.light.map.TileSpriteActor;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
+import com.mantkowicz.light.resources.UiFont;
+import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
 import com.mantkowicz.light.ui.hud.SettingsPanel;
 import com.mantkowicz.light.ui.hud.SpeechBubble;
 import com.mantkowicz.light.ui.hud.StaminaBar;
-import com.mantkowicz.light.resources.UiFont;
-import com.mantkowicz.light.resources.UiImage;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -83,7 +83,9 @@ public final class GameDriver {
     private static final long RANDOM_SEED = 7;
     private static final int FRAMES_PER_SECOND = 60;
 
-    public enum Kind {PLAYER, DOG, CHEST, COW}
+    public enum Kind {
+        PLAYER, DOG, CHEST, COW
+    }
 
     private final HeadlessGame game;
     private final StringBuilder timeline = new StringBuilder();
@@ -210,8 +212,10 @@ public final class GameDriver {
                 stamina.getMood(), uiBox(stamina));
         snapshot.line("hint: %s", uiBox(hud.getHint()));
         SpeechBubble bubble = hud.getBubble();
-        snapshot.line("bubble: %s", bubble == null ? "none" : "\"" + bubble.getText() + "\" " + uiBox(bubble)
-                + " alpha=" + Snapshot.number(bubble.getColor().a));
+        snapshot.line("bubble: %s", bubble == null
+                ? "none"
+                : "\"" + bubble.getText() + "\" " + uiBox(bubble)
+                        + " alpha=" + Snapshot.number(bubble.getColor().a));
         snapshot.line("gear: %s held=%d%%", uiBox(hud.getGear()), Math.round(hud.getGear().getProgress() * 100));
         snapshot.line("settings: %s", hud.getSettings() == null ? "closed" : "open");
         return snapshot.toString();
@@ -313,7 +317,8 @@ public final class GameDriver {
     public boolean lightReaches(Cell from, Cell to) {
         Vector2 source = cellCenter(from);
         Vector2 target = cellCenter(to);
-        PointLight light = new PointLight(screenField("rayHandler"), 128, Color.WHITE, source.dst(target) * 2, source.x, source.y);
+        PointLight light = new PointLight(screenField("rayHandler"), 128, Color.WHITE, source.dst(target) * 2, source.x,
+                source.y);
         try {
             light.update();
             return light.contains(target.x, target.y);
@@ -404,7 +409,8 @@ public final class GameDriver {
         List<String> items = new ArrayList<>();
         for (Actor actor : gameStage().getActors()) {
             if (actor instanceof ItemOnGround lying) {
-                items.add(lying.getItem().getClass().getSimpleName() + (lying.isLanded() ? " cell=" + cellOf(lying.getTile()) : " flying"));
+                items.add(lying.getItem().getClass().getSimpleName()
+                        + (lying.isLanded() ? " cell=" + cellOf(lying.getTile()) : " flying"));
             }
         }
         return items;
@@ -451,7 +457,8 @@ public final class GameDriver {
         for (Actor actor : gameStage().getActors()) {
             if (actor instanceof Image image && image.getDrawable() instanceof TextureRegionDrawable drawable
                     && drawable.getRegion().getTexture() == star.getTexture()
-                    && drawable.getRegion().getRegionX() == star.getRegionX() && drawable.getRegion().getRegionY() == star.getRegionY()) {
+                    && drawable.getRegion().getRegionX() == star.getRegionX()
+                    && drawable.getRegion().getRegionY() == star.getRegionY()) {
                 stars++;
             }
         }
@@ -502,7 +509,7 @@ public final class GameDriver {
 
             @Override
             public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
-                             float height, float scaleX, float scaleY, float rotation) {
+                    float height, float scaleX, float scaleY, float rotation) {
                 draw(region, x, y);
             }
         };
@@ -529,12 +536,13 @@ public final class GameDriver {
 
             @Override
             public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
-                             float height, float scaleX, float scaleY, float rotation) {
+                    float height, float scaleX, float scaleY, float rotation) {
                 record(region, originX - width / 2f, originY - height / 2f, scaleX, scaleY, rotation);
             }
 
-            private void record(TextureRegion region, float originOffsetX, float originOffsetY, float scaleX, float scaleY,
-                                float rotation) {
+            private void record(TextureRegion region, float originOffsetX, float originOffsetY, float scaleX,
+                    float scaleY,
+                    float rotation) {
                 if (originOffsetX != 0 || originOffsetY != 0) {
                     throw new IllegalStateException("map tiles should turn around their centre");
                 }
@@ -617,10 +625,12 @@ public final class GameDriver {
         List<String> lines = new ArrayList<>();
         for (UiImage image : UiImage.values()) {
             TextureRegion region = resources.getUiImage(image);
-            StringBuilder line = new StringBuilder(image + " " + region.getRegionWidth() + "x" + region.getRegionHeight());
+            StringBuilder line = new StringBuilder(
+                    image + " " + region.getRegionWidth() + "x" + region.getRegionHeight());
             try {
                 NinePatch patch = resources.getUiNinePatch(image);
-                line.append(", nine-patch, borders ").append((int) (patch.getLeftWidth() + patch.getRightWidth())).append("x")
+                line.append(", nine-patch, borders ").append((int) (patch.getLeftWidth() + patch.getRightWidth()))
+                        .append("x")
                         .append((int) (patch.getTopHeight() + patch.getBottomHeight()));
             } catch (IllegalArgumentException notANinePatch) {
                 // a plain piece
@@ -785,7 +795,8 @@ public final class GameDriver {
 
     private void describeScene(Snapshot snapshot) {
         Player player = (Player) actor(Kind.PLAYER);
-        snapshot.line("player: cell=%s at=%s status=%s", cellOf(player.getTile()), playerPosition(), player.getStatus());
+        snapshot.line("player: cell=%s at=%s status=%s", cellOf(player.getTile()), playerPosition(),
+                player.getStatus());
         if (has(Kind.DOG)) {
             snapshot.line("dog: cell=%s", cellOf(Kind.DOG));
         }
@@ -903,11 +914,16 @@ public final class GameDriver {
     }
 
     private static String kindOf(TileObject object) {
-        if (object instanceof TileSprite) return "SPRITE";
-        if (object instanceof TileDog) return "DOG";
-        if (object instanceof TileSpriteActor) return object.getObjectType().name();
-        if (object instanceof TilePlayer) return "PLAYER";
-        if (object instanceof TileLight) return "LIGHT";
+        if (object instanceof TileSprite)
+            return "SPRITE";
+        if (object instanceof TileDog)
+            return "DOG";
+        if (object instanceof TileSpriteActor)
+            return object.getObjectType().name();
+        if (object instanceof TilePlayer)
+            return "PLAYER";
+        if (object instanceof TileLight)
+            return "LIGHT";
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 
@@ -927,7 +943,7 @@ public final class GameDriver {
 
                 @Override
                 public void draw(TextureRegion region, float x, float y, float originX, float originY, float width,
-                                 float height, float scaleX, float scaleY, float rotation) {
+                        float height, float scaleX, float scaleY, float rotation) {
                     layers.add(regionName(region));
                 }
             };
@@ -1015,8 +1031,10 @@ public final class GameDriver {
 
     /** How many screen pixels wide a cell is drawn right now. */
     public float cellSizeOnScreen(Cell cell) {
-        Vector2 left = gameStage().stageToScreenCoordinates(new Vector2(cell.col() * CELL_SIZE, cell.row() * CELL_SIZE));
-        Vector2 right = gameStage().stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
+        Vector2 left = gameStage()
+                .stageToScreenCoordinates(new Vector2(cell.col() * CELL_SIZE, cell.row() * CELL_SIZE));
+        Vector2 right = gameStage()
+                .stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
         return right.x - left.x;
     }
 
@@ -1035,7 +1053,8 @@ public final class GameDriver {
     }
 
     private Vector2 uiScreenPosition(Actor actor) {
-        return screenPosition(uiStage(), actor.localToStageCoordinates(new Vector2(actor.getWidth() / 2f, actor.getHeight() / 2f)), true);
+        return screenPosition(uiStage(),
+                actor.localToStageCoordinates(new Vector2(actor.getWidth() / 2f, actor.getHeight() / 2f)), true);
     }
 
     private Stage notificationStage() {
@@ -1074,7 +1093,8 @@ public final class GameDriver {
 
     private Vector2 screenPosition(Stage stage, Vector2 stagePosition, boolean mustBeVisible) {
         Vector2 screen = stage.stageToScreenCoordinates(stagePosition.cpy());
-        boolean visible = screen.x >= 0 && screen.y >= 0 && screen.x < game.screenWidth() && screen.y < game.screenHeight();
+        boolean visible = screen.x >= 0 && screen.y >= 0 && screen.x < game.screenWidth()
+                && screen.y < game.screenHeight();
         if (!visible) {
             if (mustBeVisible) {
                 throw new IllegalStateException("Target " + Snapshot.point(stagePosition) + " is not on screen");
@@ -1096,7 +1116,9 @@ public final class GameDriver {
             field.setAccessible(true);
             return (T) field.get(owner);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Game internals changed: update GameDriver (" + declaringClass.getSimpleName() + "." + name + ")", e);
+            throw new IllegalStateException(
+                    "Game internals changed: update GameDriver (" + declaringClass.getSimpleName() + "." + name + ")",
+                    e);
         }
     }
 }

@@ -79,7 +79,8 @@ class CollectTest {
 
         game.clickButton("COLLECT");
         game.frames(3);
-        game.note("stars: " + game.starsOnScreen() + ", chest: " + game.chestAnimation() + ", items: " + game.itemsOnGround());
+        game.note("stars: " + game.starsOnScreen() + ", chest: " + game.chestAnimation() + ", items: "
+                + game.itemsOnGround());
         game.seconds(1.5f);
         game.snapshot("the carrot has landed");
         game.note("inventories: " + game.inventories());
@@ -253,7 +254,8 @@ class CollectTest {
 
         game.click(MAP.cell('C'));
         game.seconds(2);
-        assertTrue(game.sideNeighbours(MAP.cell('C')).contains(game.playerCell()), "clicking the chest walks to its side");
+        assertTrue(game.sideNeighbours(MAP.cell('C')).contains(game.playerCell()),
+                "clicking the chest walks to its side");
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 

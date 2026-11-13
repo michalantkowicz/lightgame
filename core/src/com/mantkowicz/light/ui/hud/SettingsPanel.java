@@ -30,7 +30,8 @@ public class SettingsPanel extends Group {
         addActor(dim);
 
         Table content = new Table();
-        content.add(new Label("SETTINGS", new Label.LabelStyle(resources.getFont(), UiStyle.TEXT))).expandY().top().padTop(40).row();
+        content.add(new Label("SETTINGS", new Label.LabelStyle(resources.getFont(), UiStyle.TEXT))).expandY().top()
+                .padTop(40).row();
         close = new ImageButton(UiStyle.image(resources, UiImage.CHECK_BUTTON));
         close.addListener(new ClickListener() {
             @Override
