@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
@@ -18,6 +19,7 @@ import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.PlayerCreatedEvent;
 import com.mantkowicz.light.feature.CameraTrackingFeature;
+import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.MenuFeature;
@@ -108,8 +110,11 @@ public class GameScreen extends ScreenAdapter {
     private void createFeatures(GameContext context) {
         PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
         if (playerCreatedEvent != null) {
-            addFeature(new CameraTrackingFeature(context, playerCreatedEvent.getPlayer()));
-            uiStage.addActor(new Hud(context, playerCreatedEvent.getPlayer()));
+            Player player = playerCreatedEvent.getPlayer();
+            addFeature(new CameraTrackingFeature(context, player));
+            CollectFeature collecting = new CollectFeature(context, player);
+            addFeature(collecting);
+            uiStage.addActor(new Hud(context, player, collecting::throwOut));
         }
         addFeature(new MenuFeature(context));
         addFeature(new StageFeature(context));

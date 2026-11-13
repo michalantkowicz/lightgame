@@ -9,7 +9,6 @@ actor -> game
 actor -> plugin
 actor -> resources
 actor -> stage
-actor -> ui.collect
 actor -> ui.menu
 board -> actor
 board -> event
@@ -25,9 +24,11 @@ feature -> debug
 feature -> event
 feature -> game
 feature -> notification
+feature -> plugin
 feature -> resources
 feature -> stage
 feature -> ui
+feature -> ui.collect
 feature -> ui.menu
 game -> board
 game -> debug

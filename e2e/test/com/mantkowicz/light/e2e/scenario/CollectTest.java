@@ -158,6 +158,7 @@ class CollectTest {
         for (int frame = 0; frame < 120 && game.backpackItems().equals(full); frame++) {
             game.frames(1);
         }
+        game.frames(1); // the HUD notices it in its next frame
         assertTrue(game.backpackSlotShaking(0), "the slot its oldest item jumped out of shakes");
         assertFalse(game.backpackSlotShaking(1));
         assertEquals(Arrays.asList(null, carrots.get(1)), game.backpackItems(),

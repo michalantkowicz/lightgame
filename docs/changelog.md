@@ -366,3 +366,16 @@ Phase 4, step 2 of [code-quality-plan.md](code-quality-plan.md).
   `feature`, `ui` and `ui.menu` depend on `stage` instead, which can never be part of a cycle.
   `package-dependencies.txt`: 74 → 77 lines, but one fewer link inside the cycle (13 packages are still in it, mostly
   through `GameContext`).
+
+## 2026‑11‑13, collecting is a feature, not part of the player (branch `quality-4c-collect-feature`)
+
+Phase 4, step 3 of [code-quality-plan.md](code-quality-plan.md).
+
+- `CollectFeature` (feature package, created in `GameScreen` once the player exists) owns the `PlayerCollectResolver`
+  and runs the `CollectPlugin` every frame; `Player` no longer creates them and no longer has `throwOut`. The HUD
+  gets a plain `IntConsumer` that throws out a slot's item (`CollectFeature::throwOut`), so it knows nothing about
+  collecting either.
+- `actor` no longer depends on `ui.collect`; `feature` depends on `plugin` and `ui.collect` instead (a top-level
+  package using lower ones). `package-dependencies.txt`: 77 → 78 lines.
+- Collecting now runs after the stages each frame (features run there) instead of inside the player's update: a full
+  backpack's slot starts shaking one frame (16 ms) later; `CollectTest` waits that frame. No golden changed.

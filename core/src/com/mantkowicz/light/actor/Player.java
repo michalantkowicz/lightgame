@@ -10,14 +10,12 @@ import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.AnimationPlugin;
 import com.mantkowicz.light.plugin.BoardMovementPlugin;
-import com.mantkowicz.light.plugin.CollectPlugin;
 import com.mantkowicz.light.plugin.HopPlugin;
 import com.mantkowicz.light.plugin.PlayerNotificationPlugin;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Direction;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
-import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 
 import java.util.ArrayList;
 
@@ -42,7 +40,6 @@ public class Player extends GameBoardActor implements Collecting {
     private final Inventory inventory;
     private final Stamina stamina = new Stamina();
     private final AnimationPlugin animationPlugin;
-    private final PlayerCollectResolver collectResolver;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
@@ -64,10 +61,6 @@ public class Player extends GameBoardActor implements Collecting {
         if (Debug.isOn(DARKNESS_EXCLAMATION)) {
             addPlugin(playerNotificationPlugin);
         }
-
-        collectResolver = new PlayerCollectResolver(this, context);
-        CollectPlugin collectPlugin = new CollectPlugin(collectResolver, context);
-        addPlugin(collectPlugin);
 
         addListener(new LookAtMeOnClickListener(this, gameEventService));
         setTouchable(Touchable.enabled);
@@ -112,11 +105,6 @@ public class Player extends GameBoardActor implements Collecting {
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
     public Stamina getStamina() {
         return stamina;
-    }
-
-    /** Throws the item in a backpack slot out onto a free tile next to the player (nothing happens without one). */
-    public void throwOut(int slot) {
-        collectResolver.throwOut(slot);
     }
 
     @Override

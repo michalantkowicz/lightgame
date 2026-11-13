@@ -24,6 +24,7 @@ import com.mantkowicz.light.ui.UiStyle;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
 
 /**
  * The HUD ("face is the button", docs/hud-design.md). Bottom centre: the player's face in a frame, two backpack
@@ -75,6 +76,8 @@ public class Hud extends Group {
     private final ResourcesService resources;
     private final GameEventService events;
     private final Player player;
+    /** Throws the item in a backpack slot out next to the player. */
+    private final IntConsumer throwOut;
     private final Group row = new Group();
     private final Portrait face;
     private final List<Image> slots = new ArrayList<>();
@@ -87,7 +90,12 @@ public class Hud extends Group {
     private SettingsPanel settings;
     private float laidOutWidth, laidOutHeight;
 
-    public Hud(GameContext context, Player player) {
+    /**
+     * @param throwOut throws the item in a backpack slot (0 = the left one) out next to the player, when its slot is
+     *                 tapped
+     */
+    public Hud(GameContext context, Player player, IntConsumer throwOut) {
+        this.throwOut = throwOut;
         this.resources = context.getResourcesService();
         this.events = context.getGameEventService();
         this.player = player;
@@ -113,7 +121,7 @@ public class Hud extends Group {
             slot.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    player.throwOut(index); // what is in it jumps out next to the player
+                    throwOut.accept(index); // what is in it jumps out next to the player
                 }
             });
             row.addActor(slot);
