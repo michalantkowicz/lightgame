@@ -1,4 +1,4 @@
-package com.mantkowicz.light.ui.menu;
+package com.mantkowicz.light.actor;
 
 import java.util.List;
 

@@ -2,7 +2,7 @@ package com.mantkowicz.light.feature;
 
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.plugin.CollectPlugin;
+import com.mantkowicz.light.ui.collect.CollectPlugin;
 import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 
 /**

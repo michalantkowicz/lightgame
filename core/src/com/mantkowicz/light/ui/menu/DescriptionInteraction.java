@@ -2,6 +2,7 @@ package com.mantkowicz.light.ui.menu;
 
 import com.mantkowicz.light.actor.AddToStageEvent;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Interaction;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ThumbnailType;

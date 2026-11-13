@@ -5,14 +5,15 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Interaction;
 import com.mantkowicz.light.actor.MenuOpenEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.MenuCloseEvent;
 import com.mantkowicz.light.resources.ResourcesService;
-import com.mantkowicz.light.ui.MenuStage;
-import com.mantkowicz.light.ui.menu.Interaction;
+import com.mantkowicz.light.ui.menu.DescriptionInteraction;
 import com.mantkowicz.light.ui.menu.MenuButton;
+import com.mantkowicz.light.ui.menu.MenuStage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,9 +33,11 @@ public class MenuFeature implements Feature {
     private final MenuStage stage;
     private final GameEventService gameEventService;
     private final ResourcesService resourcesService;
+    private final GameContext context;
 
     /** @param stage the menu stage (the game screen's: it has the button under the pointer) */
     public MenuFeature(GameContext context, MenuStage stage) {
+        this.context = context;
         this.stage = stage;
         this.gameEventService = context.getGameEventService();
         this.resourcesService = context.getResourcesService();
@@ -58,7 +61,10 @@ public class MenuFeature implements Feature {
 
     private List<MenuButton> createMenuButtons(GameBoardActor actor) {
         List<MenuButton> buttons = new ArrayList<>();
-        List<Interaction> interactions = actor.getInteractions();
+        // every actor can be described: that button comes first, then what the actor itself offers
+        List<Interaction> interactions = new ArrayList<>();
+        interactions.add(new DescriptionInteraction(actor, context, actor.getDescription()));
+        interactions.addAll(actor.getInteractions());
 
         for (int i = 0; i < interactions.size(); i++) {
             MenuButton button = createButton(actor, i, interactions);

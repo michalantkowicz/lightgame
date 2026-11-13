@@ -220,7 +220,8 @@ Done, one pull request each: the plan (#36), Spotless and the reformat (#37), ar
 phase 4 steps 1–5 (#40–#44) and the architecture rules of phase 5 (#45). Where things stand after them:
 
 - Architecture: 183 known violations frozen (phase 5); 78 after step 1 (`GameContext` in `context`), 57 after step 2 (events with what they are about), 40 after step 3 (the board without actors; three of the five
-  frozen rules are plain rules now), 28 after step 4 (the board without the map), 13 after step 5 (characters above plugins). Before phase 5 replaced the list: 77 package dependencies (75
+  frozen rules are plain rules now), 28 after step 4 (the board without the map), 13 after step 5 (characters above plugins), 0 after step 6: every rule holds outright, the baseline is gone, and
+  a plain "packages have no cycles" rule is added. Lakos: RACD 0.787 → 0.375, NCCD 3.24 → 1.78. Before phase 5 replaced the list: 77 package dependencies (75
   at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
   `actor → ui`, `actor → ui.collect`, `board → notification`, `board → ui`; new, all from a higher package to a lower
   one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,
@@ -229,6 +230,8 @@ phase 4 steps 1–5 (#40–#44) and the architecture rules of phase 5 (#45). Whe
 - PMD baseline: 12 findings in 8 places (16 in 10 at the start): `TmxTiledMapLoader` (class: size, coupling,
   imports), `ResourcesService` and its `loadUi`, `Tile`, `GameContext`'s constructor, `GameScreen`, `Hud`,
   `Portrait.act`.
-- Not done: step 6, splitting `GameContext` (the hub of the cycle). It touches most classes; worth its own plan when
+- Done since: the architecture steps 1–6 of phase 5 (`GameContext` in its own package, events with what they are
+  about, the board without actors and without the map, characters above plugins, the small ones). Not done: splitting
+  `GameContext` into what each part needs (no longer part of a cycle, only big). It touches most classes; worth its own plan when
   wanted. Smaller next candidates: `TmxTiledMapLoader` into a loader per map kind, `Portrait.act` into idle and
   reaction steps.

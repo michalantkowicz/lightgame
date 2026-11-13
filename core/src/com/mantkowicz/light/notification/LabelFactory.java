@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.mantkowicz.light.ui.UiStyle;
+import com.mantkowicz.light.resources.Palette;
 
 public class LabelFactory {
     public static Label createLabel(BitmapFont font, NotificationStyle notificationStyle, String text) {
@@ -29,7 +29,7 @@ public class LabelFactory {
                 labelStyle.fontColor = Color.FIREBRICK;
                 break;
             case ON_PANEL :
-                labelStyle.fontColor = UiStyle.TEXT;
+                labelStyle.fontColor = Palette.TEXT;
                 break;
             default :
                 throw new IllegalArgumentException(

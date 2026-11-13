@@ -479,3 +479,18 @@ Step 5 of emptying the architecture baseline ([code-quality-plan.md](code-qualit
   a `GameBoardActor` and stays in `actor`.
 - New plain rules: plugins don't know characters, characters don't know the map.
 - Baseline: 28 → 13 recorded dependencies (all of the actors' uses of plugins). No golden changed.
+
+## 2026‑11‑13, the architecture rules hold without exceptions (branch `arch-6-small-ones`)
+
+Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- `CollectPlugin` moved to `ui.collect` (only the collect feature uses it), `MenuStage` to `ui.menu`, the interfaces
+  `Interaction` and `Interactive` to `actor`. Actors no longer build the menu's description button: `MenuFeature`
+  adds it in front of the actor's own interactions when the menu opens (the same buttons in the same order).
+- The UI pack's text colour is `resources.Palette.TEXT`; `UiStyle.TEXT` and the notification labels use it.
+- Baseline: 13 → 0. Every rule now holds outright: the frozen baseline (`e2e/architecture/frozen/`), the
+  `-Darchitecture.update` switch and the CI step checking the baseline are gone. With no cycles left, ArchUnit's own
+  "packages have no cycles" rule is added (it couldn't be used before: today's code hit its 100-cycle report limit);
+  seen failing on a planted `board → light` dependency.
+- Lakos over the game's 16 packages: RACD 0.375 (was 0.787 over 13 at the start), NCCD 1.78 (was 3.24). No golden
+  changed.

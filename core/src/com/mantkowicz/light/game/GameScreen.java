@@ -34,10 +34,10 @@ import com.mantkowicz.light.map.TileSet;
 import com.mantkowicz.light.resources.PhraseService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.GameStage;
-import com.mantkowicz.light.ui.MenuStage;
 import com.mantkowicz.light.ui.NotificationStage;
 import com.mantkowicz.light.ui.UiStage;
 import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.menu.MenuStage;
 
 import java.util.ArrayList;
 import java.util.List;
