@@ -1,6 +1,5 @@
 package com.mantkowicz.light.architecture;
 
-import com.tngtech.archunit.ArchConfiguration;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaPackage;
@@ -26,7 +25,7 @@ import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPac
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
-import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 /**
  * The game code's intended architecture (docs/code-quality-plan.md): layers that only use the layers below them, no
@@ -37,11 +36,7 @@ import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
  * notification), the <b>characters</b> (character: the player, the dog, the cow, the chest...; map: creates them), the
  * <b>UI</b> (ui and its subpackages), the <b>application</b> (feature, game).
  * <p>
- * The code doesn't follow all of it yet: the layer and same-layer rules are <i>frozen</i>. The violations the code had
- * when the rules came are listed in {@code e2e/architecture/frozen/} (one class-to-class dependency each) and pass; any
- * other one fails. A refactoring that removes listed violations makes the test delete them from the files, and CI
- * fails until that change is committed, so the list only shrinks. {@code -Darchitecture.update=true} records the
- * current violations instead (only for a deliberate exception, visible in the pull request).
+ * The code follows all of it: any violation fails the build.
  * <p>
  * Dependencies are read from the compiled classes, so a class using only constants of another (copied in by the
  * compiler) doesn't count.
@@ -49,19 +44,12 @@ import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
 class ArchitectureTest {
     private static final String GAME = "com.mantkowicz.light";
     private static final Path ROOT = Path.of(System.getProperty("repo.root", "../..")).toAbsolutePath().normalize();
-    private static final Path FROZEN = ROOT.resolve("e2e/architecture/frozen");
     private static final Path METRICS = ROOT.resolve("e2e/build/reports/architecture/metrics.md");
 
     private static JavaClasses game;
 
     @BeforeAll
     static void importGame() {
-        boolean update = Boolean.getBoolean("architecture.update");
-        ArchConfiguration configuration = ArchConfiguration.get();
-        configuration.setProperty("freeze.store.default.path", FROZEN.toString());
-        configuration.setProperty("freeze.store.default.allowStoreCreation", String.valueOf(update));
-        configuration.setProperty("freeze.store.default.allowStoreUpdate", "true"); // removes fixed violations
-        configuration.setProperty("freeze.refreeze", String.valueOf(update)); // adds violations only on purpose
         game = new ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
                 .importPackages(GAME);
     }
@@ -81,7 +69,14 @@ class ArchitectureTest {
                 .whereLayer("Behaviour").mayOnlyBeAccessedByLayers("Characters", "UI", "Application")
                 .whereLayer("World").mayOnlyBeAccessedByLayers("Behaviour", "Characters", "UI", "Application")
                 .as("Layers use only the layers below them (leaves, world, behaviour, UI, application)");
-        freeze(layers).check(game);
+        layers.check(game);
+    }
+
+    /** No package reaches itself through others (with subpackages such as ui.hud counted on their own). */
+    @Test
+    void packagesHaveNoCycles() {
+        slices().matching(GAME + ".(**)").should().beFreeOfCycles()
+                .as("Packages have no cycles").check(game);
     }
 
     /** The layer rule allows two packages of one layer to use each other; these pairs must not (no cycles). */
@@ -126,10 +121,10 @@ class ArchitectureTest {
 
     @Test
     void basicUiDoesNotKnowItsSubpackages() {
-        freeze(noClasses().that().resideInAPackage(GAME + ".ui")
+        noClasses().that().resideInAPackage(GAME + ".ui")
                 .should().dependOnClassesThat().resideInAnyPackage(GAME + ".ui.menu..", GAME + ".ui.hud..",
                         GAME + ".ui.collect..")
-                .as("The basic UI (stages, widgets, style) does not know the menu, the HUD or collecting"))
+                .as("The basic UI (stages, widgets, style) does not know the menu, the HUD or collecting")
                 .check(game);
     }
 

@@ -5,9 +5,6 @@ import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.ui.menu.DescriptionInteraction;
-import com.mantkowicz.light.ui.menu.Interaction;
-import com.mantkowicz.light.ui.menu.Interactive;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +12,7 @@ import java.util.List;
 import static com.mantkowicz.light.board.TilePoint.CENTER;
 
 public abstract class GameBoardActor extends GameActor implements Interactive, TileOccupant {
+    /** What can be done with it in the radial menu besides reading its description (the menu adds that one). */
     private final List<Interaction> interactions = new ArrayList<>();
     private final BoardService boardService;
     private final String description;
@@ -25,7 +23,6 @@ public abstract class GameBoardActor extends GameActor implements Interactive, T
         this.description = description;
         this.boardService = context.getBoardService();
 
-        interactions.add(new DescriptionInteraction(this, context, description));
         addListener(new OpenMenuOnHoldListener(this, context.getGameEventService()));
     }
 

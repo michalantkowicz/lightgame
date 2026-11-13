@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
+import com.mantkowicz.light.resources.Palette;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
 
@@ -21,7 +22,7 @@ import static com.mantkowicz.light.resources.ResourcesService.UI_SCALE;
  */
 public final class UiStyle {
     /** The dark brown of the pack's outlines, for text on panels and buttons. */
-    public static final Color TEXT = new Color(0x5c3b2eff);
+    public static final Color TEXT = Palette.TEXT;
     private static final float BUTTON_WIDTH = 220, BUTTON_HEIGHT = 81;
 
     private UiStyle() {

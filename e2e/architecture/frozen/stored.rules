@@ -1,4 +1,0 @@
-#
-#Fri Nov 13 10:44:37 CET 2026
-Layers\ use\ only\ the\ layers\ below\ them\ (leaves,\ world,\ behaviour,\ UI,\ application)=101bf814-3385-4f30-9930-7ca4df013ab4
-The\ basic\ UI\ (stages,\ widgets,\ style)\ does\ not\ know\ the\ menu,\ the\ HUD\ or\ collecting=d2114ac4-a7ec-4955-b9f7-c479e093c5c3
