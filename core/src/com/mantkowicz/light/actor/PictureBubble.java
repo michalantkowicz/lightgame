@@ -17,7 +17,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 /**
  * A small bubble with a picture in it over a character on the map: what it wishes for (a carrot over the cow).
  * Pictures, not words: the players can't read. It pops up (the pack's bubble
- * animation), then shows the picture; it is its character's child, so it follows it around.
+ * animation), then shows the picture. It follows its character around and is drawn over everyone else on the map
+ * (someone standing behind the character doesn't cover it); the HUD is on its own stage, above it.
  */
 public class PictureBubble extends Group {
     /** Screen pixels per pack pixel: the bubble, and the biggest a picture in it gets (it is scaled by whole numbers). */
@@ -32,6 +33,7 @@ public class PictureBubble extends Group {
     private final Animation<TextureRegion> pop;
     private final TextureRegionDrawable bubble;
     private final String name;
+    private Group character;
     private float time;
 
     /**
@@ -60,13 +62,26 @@ public class PictureBubble extends Group {
 
     /** Shows it over the character until it is removed ({@link #remove()}). */
     public void showOver(Group character) {
-        setPosition(Math.round((character.getWidth() - getWidth()) / 2f), character.getHeight() + GAP);
-        character.addActor(this);
+        this.character = character;
+        character.getParent().addActor(this);
+        follow();
+    }
+
+    /** Over its character, and in front of everything else on the map (whoever was added since). */
+    private void follow() {
+        setPosition(Math.round(character.getX() + (character.getWidth() - getWidth()) / 2f),
+                character.getY() + character.getHeight() + GAP);
+        toFront();
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
+        if (character.getStage() == null) {
+            remove(); // its character is gone
+            return;
+        }
+        follow();
         time += delta;
         bubble.setRegion(pop.getKeyFrame(time));
     }

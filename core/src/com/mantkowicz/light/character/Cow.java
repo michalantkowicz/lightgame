@@ -10,6 +10,7 @@ import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.PictureBubble;
 import com.mantkowicz.light.actor.Status;
+import com.mantkowicz.light.actor.WalkNextToOnTapListener;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.StateLabelPlugin;
@@ -23,8 +24,8 @@ import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
 
 /**
  * A brown cow. What it does (stands, walks a step, lies down, sleeps, wishes for a carrot, eats, enjoys a stroke) and
- * when is all in {@link CowState}, a gdx-ai state machine; this class only has what the states use. Holding it shows
- * its description.
+ * when is all in {@link CowState}, a gdx-ai state machine; this class only has what the states use. Tapping it walks
+ * the player next to it; holding it shows its description.
  */
 public class Cow extends SpriteActor implements Creature {
     /** What the player tells the cow (gdx-ai messages, answered in {@link CowState}). */
@@ -49,6 +50,7 @@ public class Cow extends SpriteActor implements Creature {
         resources = context.getResourcesService();
         favouriteFood = new Carrot(resources);
         setTouchable(Touchable.enabled);
+        addListener(new WalkNextToOnTapListener(this, context.getGameEventService()));
 
         stateMachine.changeState(CowState.STANDING);
         addPlugin(delta -> {
@@ -65,7 +67,13 @@ public class Cow extends SpriteActor implements Creature {
         return stateMachine.getCurrentState();
     }
 
-    // what the player does with it (the round button)
+    // what the player does with it (a tap on it, the round button)
+
+    /** Tapping it walks the player next to it, like a chest. */
+    @Override
+    public boolean isUsedFromNeighbour() {
+        return true;
+    }
 
     @Override
     public Item getWish() {
@@ -125,7 +133,7 @@ public class Cow extends SpriteActor implements Creature {
         wishBubble = null;
     }
 
-    /** A small face (the pack's tiny emotes) floats up over it and fades. */
+    /** A small face (the pack's tiny emotes) floats up over it and fades. Not used right now: no state calls it. */
     void showEmote(UiImage face) {
         new FloatingPicture(face.name(), resources.getUiImage(face), EMOTE_SCALE).showOver(this, EMOTE_GAP);
     }

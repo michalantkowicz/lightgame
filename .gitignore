@@ -144,3 +144,4 @@ Thumbs.db
 
 ## Claude Code agent worktrees
 /.claude/worktrees/
+/docs/functional/

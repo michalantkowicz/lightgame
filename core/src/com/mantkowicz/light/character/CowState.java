@@ -4,7 +4,6 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.MathUtils;
 import com.mantkowicz.light.resources.Action;
-import com.mantkowicz.light.resources.UiImage;
 
 /**
  * Everything the cow does, as a gdx-ai state machine: each constant is a state, saying what the cow does when it gets
@@ -170,12 +169,11 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** After eating: a heart over its head and a happy face floating up. */
+    /** After eating: a heart over its head. */
     HAPPY {
         @Override
         public void enter(Cow cow) {
             cow.playOnce(Action.LOVE);
-            cow.showEmote(UiImage.MOOD_HAPPY);
         }
 
         @Override

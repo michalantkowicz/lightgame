@@ -705,9 +705,14 @@ public final class GameDriver {
         return bubbleOver(actor(Kind.COW));
     }
 
-    private static String bubbleOver(Group character) {
-        for (Actor child : character.getChildren()) {
-            if (child instanceof PictureBubble bubble) {
+    /** The picture bubbles on the map are drawn in front of every other actor (only the cow has one). */
+    private String bubbleOver(Group character) {
+        Array<Actor> actors = gameStage().getActors();
+        for (Actor actor : actors) {
+            if (actor instanceof PictureBubble bubble) {
+                if (actor != actors.peek()) {
+                    throw new IllegalStateException("The bubble isn't in front of everything on the map");
+                }
                 return bubble.getPictureName();
             }
         }

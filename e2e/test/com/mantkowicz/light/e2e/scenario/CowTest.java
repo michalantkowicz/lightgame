@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * The cow's life (its state machine): it stands, lies down, rests, sleeps, gets up, walks a step onto a free cell next
+ * Tapping the cow walks the rabbit next to it. The cow's life (its state machine): it stands, lies down, rests, sleeps, gets up, walks a step onto a free cell next
  * to it (looking where it goes), and from time to time wishes for a carrot (a bubble over it). Next to it, the round
  * button strokes it (a hand; a heart over the cow and a small one floating up over the player) or, when it wishes for a carrot the player
  * carries, gives it (the carrot's picture; its slot shakes, the cow eats and is happy). Without a carrot the hint says
@@ -42,6 +42,12 @@ class CowTest {
             "~~~~~~~",
             "~P.baM~",
             "~~~~~~~");
+
+    /** The rabbit is three cells from the cow, whose only free cell is {@code a}. */
+    private static final TestMap ROW = TestMap.of(
+            "~~~~~~",
+            "~P.aM~",
+            "~~~~~~");
 
     /** Which animation shows which state. */
     private static final Map<String, String> ANIMATIONS = Map.of(
@@ -77,6 +83,18 @@ class CowTest {
     }
 
     @Test
+    void tappingTheCowWalksNextToIt() {
+        GameDriver game = GameDriver.start(ROW.write("cow-row"));
+        game.click(GameDriver.Kind.COW);
+        game.seconds(1.5f);
+        assertEquals(ROW.cell('a'), game.playerCell(), "like a chest: the rabbit stops on the cell next to it");
+        assertEquals("IDLE", game.playerStatus());
+        assertEquals(ROW.cell('M'), game.cellOf(GameDriver.Kind.COW));
+        assertEquals(List.of(1f), game.buttonAlphas("STROKE"), "and can stroke it");
+        assertFalse(game.crashed());
+    }
+
+    @Test
     void theCowWishesForACarrotGetsItAndIsHappy() {
         GameDriver game = GameDriver.start(PEN.write("cow-pen"));
         assertEquals("none", game.cowWish());
@@ -104,7 +122,7 @@ class CowTest {
 
         waitFor(game, "HAPPY", 3);
         assertEquals("cow_brown/love", game.cowAnimation());
-        assertEquals(List.of("MOOD_HAPPY"), game.floatingPictures(), "a happy face floats up over it");
+        assertEquals(List.of(), game.floatingPictures(), "the heart over its head is all it shows");
         waitFor(game, "STANDING", 2);
         game.seconds(2);
         assertEquals(List.of(), game.floatingPictures());

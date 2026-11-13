@@ -529,7 +529,7 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   lying, it rests, may fall asleep, gets up again. 20 s after the start or its last carrot it gets hungry (which also
   gets it up): standing, it
   shows a bubble with a carrot (`PictureBubble`, the pack's grey speech bubble) and waits until it gets one; then it
-  eats, and a heart and the pack's green happy face (`FloatingPicture`) show over it.
+  eats, and shows a heart. The bubble is drawn in front of everyone on the map (below the HUD).
 - **The round button** (`CreatureFeature`, for any `actor.Creature`): next to the cow (its four sides) it shows a hand
   (the pack's paw) and strokes it (a heart over the cow, a small one floats up over the player) when the cow stands,
   rests or sleeps; while the cow wishes for a carrot the player carries, it shows the carrot and gives it (the slot
@@ -541,6 +541,11 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   once, the one it leaves is freed on arrival. If the player was on its way to that tile, it steps back to the middle
   of the tile it is on (`BoardMovementPlugin`); it never shares a tile with the cow. A cow stepping next to a full
   chest doesn't get the chest's button (`PlayerCollectResolver` checks the player's reach).
+- **Tapping the cow** walks the player next to it, like a chest (`WalkNextToOnTapListener`; a hold still opens its
+  description).
+- Fixed on the way: `Board.draw` used whatever colour the batch was left with by the last actor of the frame before,
+  so a picture fading out on top of the game stage (a happy face that floated up over a fed cow, since removed: it didn't look good) dimmed the whole map to black. The
+  board now sets its own colour.
 - **Assets:** the cow sheet's rows are named (`settle`: lies down and gets up, `rest`, `sleep`, `eat`, `love`; `row_05`
   is still unused), `SpriteActor.playOnce` plays a row or a part of it once. New UI pieces: `PICTURE_BUBBLE`, `HEART`,
   `HAND_ICON`.

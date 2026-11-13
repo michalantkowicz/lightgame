@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
- * A small picture that floats up over a character on the map and fades away: what it feels right now (a happy face
- * over a fed cow, a heart over the player stroking it). It is drawn over everything on the map, where the character
+ * A small picture that floats up over a character on the map and fades away: what it feels right now (a heart
+ * over the player stroking a cow). It is drawn over everything on the map, where the character
  * stood when it appeared.
  */
 public class FloatingPicture extends Image {
