@@ -3,12 +3,12 @@ package com.mantkowicz.light.ui.collect;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mantkowicz.light.actor.Collectible;
-import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.board.TileTouchedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.BackpackItemEjectedEvent;
@@ -135,7 +135,7 @@ public class PlayerCollectResolver implements CollectResolver {
             return;
         }
         Inventory backpack = player.getInventory();
-        for (GameActor actor : context.getBoardService().getGameActors(tile)) {
+        for (TileOccupant actor : context.getBoardService().getOccupants(tile)) {
             if (!(actor instanceof ItemOnGround lying) || !lying.isLanded()) {
                 continue;
             }

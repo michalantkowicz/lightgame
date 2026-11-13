@@ -3,6 +3,7 @@ package com.mantkowicz.light.actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.ui.menu.DescriptionInteraction;
 import com.mantkowicz.light.ui.menu.Interaction;
@@ -13,7 +14,7 @@ import java.util.List;
 
 import static com.mantkowicz.light.board.TilePoint.CENTER;
 
-public abstract class GameBoardActor extends GameActor implements Interactive {
+public abstract class GameBoardActor extends GameActor implements Interactive, TileOccupant {
     private final List<Interaction> interactions = new ArrayList<>();
     private final BoardService boardService;
     private final String description;
@@ -56,18 +57,18 @@ public abstract class GameBoardActor extends GameActor implements Interactive {
      */
     public void enterTile(Tile tile) {
         if (this.tile != null) {
-            boardService.unregisterGameActor(this.tile, this);
+            boardService.unregisterOccupant(this.tile, this);
         }
 
         this.tile = tile;
 
-        boardService.registerGameActor(tile, this);
+        boardService.registerOccupant(tile, this);
     }
 
     @Override
     public boolean remove() {
         if (this.tile != null) {
-            boardService.unregisterGameActor(this.tile, this);
+            boardService.unregisterOccupant(this.tile, this);
         }
         return super.remove();
     }

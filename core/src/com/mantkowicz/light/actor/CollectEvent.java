@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.actor.Collectible;
+import com.mantkowicz.light.event.GameEvent;
 
 public class CollectEvent extends GameEvent {
     private final Collectible collectible;

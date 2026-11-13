@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mantkowicz.light.actor.CollectibleFinder;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.actor.PlayerCreatedEvent;
 import com.mantkowicz.light.board.Board;
@@ -95,6 +96,8 @@ public class GameScreen extends ScreenAdapter {
 
         List<Tile> tiles = tileSet.getTiles();
         BoardService boardService = new BoardService(gameEventService, tiles);
+        // before anything is on the board: what steps onto a tile finds the collectibles there
+        boardService.setOccupantListener(new CollectibleFinder(boardService, gameEventService));
         GameContext context = createContext(boardService);
         board = new Board(boardService, gameEventService, tiles);
 

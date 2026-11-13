@@ -3,9 +3,6 @@ package com.mantkowicz.light.board;
 import com.badlogic.gdx.ai.pfa.DefaultGraphPath;
 import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
-import com.mantkowicz.light.actor.Collectible;
-import com.mantkowicz.light.actor.GameActor;
-import com.mantkowicz.light.event.CollectEvent;
 import com.mantkowicz.light.event.GameEventService;
 
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ public class BoardService {
     private final GameEventService gameEventService;
     private final BoardGraph boardGraph;
     private final IndexedAStarPathFinder<Tile> pathFinder;
+    private OccupantListener occupantListener;
 
     public BoardService(GameEventService gameEventService, List<Tile> tiles) {
         this.gameEventService = gameEventService;
@@ -64,24 +62,16 @@ public class BoardService {
         return true;
     }
 
-    public void registerGameActor(Tile tile, GameActor gameActor) {
-        gameActorsByTile.putGameActor(tile, gameActor);
-        checkCollisions(tile, gameActor);
+    /** Who is told when something steps onto a tile (the game screen sets it before anything is on the board). */
+    public void setOccupantListener(OccupantListener occupantListener) {
+        this.occupantListener = occupantListener;
     }
 
-    private void checkCollisions(Tile tile, GameActor gameActor) {
-        for (GameActor tileActor : gameActorsByTile.getGameActors(tile)) {
-            if (!tileActor.equals(gameActor) && tileActor instanceof Collectible) {
-                gameEventService.post(new CollectEvent((Collectible) tileActor));
-            }
-        }
-        for (Tile neighbour : tile.getSideNeighbours()) {
-            for (GameActor tileActor : gameActorsByTile.getGameActors(neighbour)) {
-                if (!tileActor.equals(gameActor) && tileActor instanceof Collectible
-                        && ((Collectible) tileActor).isDistant()) {
-                    gameEventService.post(new CollectEvent((Collectible) tileActor));
-                }
-            }
+    /** Puts something on a tile and tells the listener. */
+    public void registerOccupant(Tile tile, TileOccupant occupant) {
+        gameActorsByTile.putGameActor(tile, occupant);
+        if (occupantListener != null) {
+            occupantListener.entered(occupant, tile);
         }
     }
 
@@ -89,21 +79,21 @@ public class BoardService {
      * Whether the tile holds something used from a side neighbour (a chest): clicking it means "walk next to it".
      */
     public boolean isUsedFromNeighbour(Tile tile) {
-        for (GameActor actor : gameActorsByTile.getGameActors(tile)) {
-            if (actor instanceof Collectible && ((Collectible) actor).isDistant()) {
+        for (TileOccupant occupant : gameActorsByTile.getGameActors(tile)) {
+            if (occupant.isUsedFromNeighbour()) {
                 return true;
             }
         }
         return false;
     }
 
-    /** The actors on a tile right now (the player, a dog, items lying there...), as a copy. */
-    public List<GameActor> getGameActors(Tile tile) {
+    /** What is on a tile right now (the player, a dog, items lying there...), as a copy. */
+    public List<TileOccupant> getOccupants(Tile tile) {
         return new ArrayList<>(gameActorsByTile.getGameActors(tile));
     }
 
-    public void unregisterGameActor(Tile tile, GameActor gameActor) {
-        gameActorsByTile.removeGameActor(tile, gameActor);
+    public void unregisterOccupant(Tile tile, TileOccupant occupant) {
+        gameActorsByTile.removeGameActor(tile, occupant);
     }
 
     /**

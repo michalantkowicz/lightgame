@@ -52,6 +52,6 @@ public class ItemThrower {
     }
 
     private boolean isFree(Tile tile) {
-        return tile.isAccessible() && boardService.getGameActors(tile).isEmpty() && !landing.contains(tile);
+        return tile.isAccessible() && boardService.getOccupants(tile).isEmpty() && !landing.contains(tile);
     }
 }
