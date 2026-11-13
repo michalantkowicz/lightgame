@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.event.GameEvent;
 
 public class PlayerCreatedEvent extends GameEvent {
     private final Player player;

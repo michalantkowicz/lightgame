@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.event.GameEvent;
 
 public class MenuOpenEvent extends GameEvent {
     private final GameBoardActor actor;

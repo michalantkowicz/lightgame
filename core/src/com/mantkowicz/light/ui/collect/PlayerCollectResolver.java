@@ -9,9 +9,9 @@ import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Player;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileTouchedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.BackpackItemEjectedEvent;
-import com.mantkowicz.light.event.TileTouchedEvent;
 import com.mantkowicz.light.ui.hud.ActionButton;
 
 import java.util.HashMap;

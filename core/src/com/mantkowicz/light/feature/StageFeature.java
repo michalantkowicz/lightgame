@@ -1,10 +1,10 @@
 package com.mantkowicz.light.feature;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.mantkowicz.light.actor.AddToStageEvent;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.GameActorDefinition;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.event.AddToStageEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.stage.StageType;
 

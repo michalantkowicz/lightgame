@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.actor.GameActorDefinition;
+import com.mantkowicz.light.event.GameEvent;
 
 public class AddToStageEvent extends GameEvent {
     private final GameActorDefinition definition;

@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.MenuCloseEvent;
-import com.mantkowicz.light.event.MenuOpenEvent;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
