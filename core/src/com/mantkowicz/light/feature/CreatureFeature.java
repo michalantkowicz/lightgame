@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 
 /**
- * What the player does with a creature (a cow) standing on one of the four tiles next to it, on the HUD's round
- * button:
+ * What the player does with a creature (a cow) the player stands next to (on a tile it is used from:
+ * {@link Tile#getUsedFromNeighbours()}), on the HUD's round button:
  * <ul>
  * <li>the creature wishes for something the player carries: the button shows that item; tapping it takes the item out
  * of the backpack (its slot shakes) and gives it to the creature;</li>
@@ -97,13 +97,16 @@ public class CreatureFeature implements Feature {
         new FloatingPicture("heart", heart, HEART_SCALE).showOver(player, HEART_GAP);
     }
 
-    /** The creature on one of the four tiles next to the player's (the first found), or null. */
+    /** The creature used from the player's tile (the first found), or null. */
     private Creature creatureNextToPlayer() {
         Tile tile = player.getTile();
         if (tile == null) {
             return null;
         }
         for (Tile neighbour : tile.getSideNeighbours()) {
+            if (!neighbour.getUsedFromNeighbours().contains(tile)) {
+                continue;
+            }
             for (TileOccupant occupant : context.getBoardService().getOccupants(neighbour)) {
                 if (occupant instanceof Creature creature) {
                     return creature;

@@ -857,6 +857,15 @@ public final class GameDriver {
         return cells;
     }
 
+    /** The cells a chest or a creature on this one is used from ({@link Tile#getUsedFromNeighbours()}). */
+    public List<Cell> usedFromNeighbours(Cell cell) {
+        List<Cell> cells = new ArrayList<>();
+        for (Tile tile : tile(cell).getUsedFromNeighbours()) {
+            cells.add(cellOf(tile));
+        }
+        return cells;
+    }
+
     public List<Cell> cells() {
         return new ArrayList<>(tilesByCell().keySet());
     }

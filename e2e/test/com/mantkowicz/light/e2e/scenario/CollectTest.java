@@ -15,14 +15,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * S15: collecting. Clicking the chest walks next to it (it blocks its cell) and shows its button; the button opens the
- * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a random free cell next to
- * the chest; then the button goes (the chest is empty). Stepping onto the carrot puts it into the backpack (the HUD's
+ * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a free cell next to
+ * the chest, one of those closest to the player; then the button goes (the chest is empty). Stepping onto the carrot puts it into the backpack (the HUD's
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
  * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
  * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
  * it is.
  * <p>
- * The chest is used from its four sides only (no button diagonally next to it); walking around it keeps one button,
+ * The chest is used only from its left, its right and below it (no button diagonally next to it or above it, where the
+ * button would cover the player); walking around it keeps one button,
  * walking away removes it; a click on the fading button does nothing; clicked while walking away, the player stops next
  * to the chest and it opens there. (Was bug B1: the game crashed when the button appeared.)
  */
@@ -86,6 +87,7 @@ class CollectTest {
         game.note("inventories: " + game.inventories());
         Cell carrot = game.itemCell();
         assertTrue(game.neighbours(chest).contains(carrot), "it lands next to the chest");
+        assertTrue(game.neighbours(game.playerCell()).contains(carrot), "close to the player");
         assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the chest is empty: no button");
 
         game.click(carrot);
@@ -243,7 +245,7 @@ class CollectTest {
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
     }
 
-    /** A chest is used only from its four sides: diagonally next to it there is no button. */
+    /** A chest is used only from its left, its right and below it: diagonally next to it there is no button. */
     @Test
     void noButtonDiagonallyNextToTheChest() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
@@ -255,9 +257,27 @@ class CollectTest {
 
         game.click(MAP.cell('C'));
         game.seconds(2);
-        assertTrue(game.sideNeighbours(MAP.cell('C')).contains(game.playerCell()),
+        assertTrue(game.usedFromNeighbours(MAP.cell('C')).contains(game.playerCell()),
                 "clicking the chest walks to its side");
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
+    }
+
+    /** Above the chest there is no button: the button over the chest would cover the player. */
+    @Test
+    void noButtonAboveTheChest() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        Cell chest = MAP.cell('C');
+        Cell aboveTheChest = new Cell(chest.col(), chest.row() + 1);
+        game.click(aboveTheChest);
+        game.seconds(3);
+        assertEquals(aboveTheChest, game.playerCell());
+        assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "no button above the chest");
+
+        game.click(chest);
+        game.seconds(2);
+        assertTrue(game.usedFromNeighbours(chest).contains(game.playerCell()), "clicking the chest walks beside it");
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
+        assertFalse(game.crashed());
     }
 
     /** The button clicked while walking away (still next to the chest) opens it only once the player stops next to it. */

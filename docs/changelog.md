@@ -556,3 +556,19 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
 - Known limits, kept simple on purpose: an item thrown onto a tile the cow walks to at the same moment lands under the
   cow (it can be picked up once the cow moves on); next to a chest and a cow at once, their buttons share one place;
   with two creatures next to the player the button is for the first one found.
+
+## 2026‑11‑13, chest items near the player, used from three sides (branch `chest-and-reach`)
+
+- What jumps out of a chest lands on the free tile next to the chest that is **closest to the player** (a random one of
+  those as close), not on a random free one, so a small player doesn't have to walk around the chest to pick it up.
+  `ItemThrower.throwOut` got a `near` point; items thrown out of the backpack (tapping a slot, making room) still land on
+  a random free tile next to the player.
+- A chest and a creature (the cow) are used only from the tile **left of, right of or below** them, no longer from the
+  one above: the action button is going to move over the chest or creature, and there it would cover the player. One
+  rule, `Tile.getUsedFromNeighbours()`, for all of it: showing a chest's button (`CollectibleFinder`), keeping it
+  (`PlayerCollectResolver.isInReach`), walking next to a tapped chest or cow (`BoardMovementPlugin.walkTarget`) and the
+  cow's stroke/give button (`CreatureFeature`). The cow still steps in all four directions (`getSideNeighbours()`).
+- Golden `collect.txt` re-recorded (the carrot lands at (4,3), beside the player, instead of (2,5) behind the chest).
+- Tests: `CollectTest` checks the carrot lands next to the player; `CollectTest.noButtonAboveTheChest`,
+  `CowTest.noButtonAboveTheCow`; the chest checks in `AnimationTest` and `ShippedMapsTest` use the new rule
+  (`GameDriver.usedFromNeighbours`).
