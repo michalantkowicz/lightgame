@@ -37,9 +37,9 @@ and uploads those files when it fails. The golden files are recorded on macOS an
 
 ```
 test/com/mantkowicz/light/architecture/
-└── ArchitectureTest.java  layers (leaves, world, behaviour, UI, application) use only the layers below; no two packages
-                           of a layer use each other; naming; nothing the browser can't run; scenario tests use only
-                           GameDriver; writes build/reports/architecture/metrics.md (docs/code-quality-plan.md)
+└── ArchitectureTest.java  layers (leaves, world, behaviour, characters, UI, application) use only the layers below; no
+                           package cycles; naming; nothing the browser can't run; scenario tests use only GameDriver;
+                           writes build/reports/architecture/metrics.md (docs/code-quality-plan.md)
 
 test/com/mantkowicz/light/e2e/
 ├── GameDriver.java     actions (start, click, press, drag, pressKey, resize, stop) and observations (snapshot)
@@ -54,7 +54,7 @@ test/com/mantkowicz/light/e2e/
                         UiAssetsTest
 ```
 
-Scenario ids are used in `docs/refactoring-plan.md`:
+Scenario ids (S1…) date from the first refactoring; older changelog entries use them, so keep them stable:
 
 | Id | Behaviour | Test class | Golden |
 |----|-----------|------------|--------|

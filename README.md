@@ -2,11 +2,34 @@
 
 A libGDX game (desktop, Android, HTML). Run it with `./gradlew desktop:run`.
 
+## Building and checks
+
+```sh
+./gradlew build html:dist   # what CI runs: compile, format check, PMD, all tests, the HTML5 (GWT) build
+./gradlew spotlessApply     # format the code (the build fails on unformatted code)
+./gradlew e2e:test          # the headless gameplay tests and the architecture tests only
+./gradlew html:serve        # the HTML5 version at http://localhost:8080
+```
+
+`./gradlew build` checks more than the tests (details and reasons in
+[docs/code-quality-plan.md](docs/code-quality-plan.md)):
+
+- **Format** (Spotless): the Eclipse profile in `config/eclipse-formatter.xml`. Fix with `./gradlew spotlessApply`.
+- **Complexity** (PMD, `config/pmd.xml`): limits per method and class; the report is `core/build/reports/pmd/main.html`.
+- **Architecture** (ArchUnit, `e2e/.../architecture/ArchitectureTest.java`): the packages' layers, no package cycles, naming
+  conventions, nothing the HTML5 build can't run.
+- **Behaviour** (`e2e/`): the real game played headlessly against golden files; see [e2e/README.md](e2e/README.md).
+
+CI (`.github/workflows/tests.yml`) runs `./gradlew build` and `html:dist` on every pull request to `master`; a pull
+request can be merged only when it passes. Android needs an Android SDK and isn't built by CI.
+
 ## Docs
 
 - [docs/changelog.md](docs/changelog.md): what each feature branch changed, and why.
 - [docs/ideas.md](docs/ideas.md): possible improvements, not planned yet.
-- [docs/refactoring-plan.md](docs/refactoring-plan.md): the finished refactoring (analysis, decisions, the phases).
+- [docs/code-quality-plan.md](docs/code-quality-plan.md): the build's checks (format, complexity, architecture) and why.
+- [docs/hud-design.md](docs/hud-design.md): the HUD as built, and what is planned for it.
+- [CLAUDE.md](CLAUDE.md): short notes for AI agents (and anyone new): how to work here, the architecture in brief.
 - [e2e/README.md](e2e/README.md): the headless regression tests; [tools/assets/README.md](tools/assets/README.md): the
   asset tool.
 
@@ -37,7 +60,7 @@ redistributing them). A tool turns it into what the game and Tiled need, and onl
    ```
 3. Start the game. To check the graphics, open `build/assets-preview/index.html`: every animation, every UI piece and
    font, the levels, warnings.
-4. Commit your changes together with what the tool changed (in `assets-src/`, `android/assets/`, `Action.java`).
+4. When you commit, include what the tool changed (in `assets-src/`, `android/assets/`, `Action.java`).
 
 Run the tool after any change to a level, to `tools/assets/pack.json` or `tools/assets/ui.json`, to the packs, or to
 the lists of what the game uses (`Sprite`, `UiImage`, `UiFont` in `core/src/com/mantkowicz/light/resources/`: only

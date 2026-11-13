@@ -2,7 +2,7 @@
 
 What each feature branch changed and what was found on the way, newest last. Add an entry per branch: date, branch,
 what changed, and anything a later reader should know (decisions, trade-offs, what the tests cover).
-The refactoring that came before is in [refactoring-plan.md](refactoring-plan.md) (§8 has its journal).
+The first refactoring came before this file; its plan (`docs/refactoring-plan.md`, with its journal) is in git history.
 
 ## 2026‑11‑07, square tiles (branch `square-tiles`)
 
@@ -320,6 +320,8 @@ Phase 1 of [code-quality-plan.md](code-quality-plan.md).
 
 ## 2026‑11‑13, architecture tests (branch `quality-2-archunit`)
 
+Replaced the same day by real rules (`quality-5-layers` below); the dependency list described here is gone.
+
 Phase 2 of [code-quality-plan.md](code-quality-plan.md).
 
 - `ArchitectureTest` (e2e module, ArchUnit 1.5.1, reads the compiled game classes):
@@ -494,3 +496,22 @@ Step 6, the last, of emptying the architecture baseline ([code-quality-plan.md](
   seen failing on a planted `board → light` dependency.
 - Lakos over the game's 16 packages: RACD 0.375 (was 0.787 over 13 at the start), NCCD 1.78 (was 3.24). No golden
   changed.
+
+## 2026‑11‑13, docs cleaned up, notes for agents (branch `docs-cleanup`)
+
+- `docs/refactoring-plan.md` removed (the first refactoring is long finished and the game it described has changed; it
+  stays in git history). `docs/code-quality-plan.md` rewritten from a plan with its history into a short description of
+  what the build checks and why (the steps stay in this file).
+- `docs/ideas.md`: "Animated objects placed from Tiled maps" removed (done another way: one `objectClass` and class per
+  object, e.g. `COW(Cow::new)`; the Tiled dropdown was dropped in PR #28); "Interactable objects" and "Game modes by age"
+  updated to today's code (no collect window, the chest throws out its items, 2 backpack slots).
+- `docs/hud-design.md` brought into master (it was only on branch `ccr-dcc79c9a-n8m2ou`, while the code pointed to it)
+  and rewritten: what is built (with what changed from the first design) and what is planned.
+- `README.md`: a "Building and checks" section (the commands, what `./gradlew build` checks, CI).
+- `CLAUDE.md`: short notes for agents (how to work here, commands, architecture, gotchas), read by Claude Code at the
+  start of every session in the repository.
+- Tried out on four small tasks by fresh agents (a PMD exception removed, a new HUD reaction, a changed hint text, a new
+  animal). All four were done correctly; their questions led to clearer notes: work on a branch but commit only when
+  asked, the changelog date, keeping docs that quote changed things up to date, events that carry nothing staying in
+  `event`, when to take screenshots, where test results are, and in `tools/assets/README.md` how `rows` names rows and
+  that a sheet in `Sprite` is packed whole.
