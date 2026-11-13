@@ -23,6 +23,8 @@ public final class Debug {
         FPS_LABEL,
         /** Debug lines of the collect window's table. */
         COLLECT_WINDOW_LINES,
+        /** Over every creature with a state machine (the cow): the state it is in, e.g. "STANDING". */
+        STATE_LABELS,
         /** Switched-off feature: the player exclaims after standing in the dark for 2 seconds. */
         DARKNESS_EXCLAMATION
     }

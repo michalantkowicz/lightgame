@@ -24,7 +24,8 @@ import static com.mantkowicz.light.actor.Status.MOVEMENT;
  * from where the player is.
  * <p>
  * The board still sees the walk tile by tile: when the player's centre crosses into a tile, a {@link PlayerMoveEvent} says it
- * left its tile, and in the next frame it enters the new one (collisions, collecting).
+ * left its tile, and in the next frame it enters the new one (collisions, collecting). If that tile got blocked while
+ * the player was on the way (a cow wandered onto it), the player steps back to the middle of the tile it is on.
  */
 public class BoardMovementPlugin implements Plugin {
     /** How far (in tiles) a straight line keeps away from blocked or missing tiles. */
@@ -142,15 +143,35 @@ public class BoardMovementPlugin implements Plugin {
     }
 
     private void arrive() {
-        enterPendingTile();
-        player.setStatus(IDLE);
+        if (enterPendingTile()) {
+            player.setStatus(IDLE);
+        }
     }
 
-    private void enterPendingTile() {
-        if (tileToEnter != null) {
-            player.enterTile(tileToEnter);
-            tileToEnter = null;
+    /**
+     * @return false when the tile got blocked meanwhile: the player doesn't enter it and walks back instead
+     */
+    private boolean enterPendingTile() {
+        Tile tile = tileToEnter;
+        tileToEnter = null;
+        if (tile == null) {
+            return true;
         }
+        if (!tile.isAccessible()) {
+            stepBack();
+            return false;
+        }
+        player.enterTile(tile);
+        return true;
+    }
+
+    /** Drops the walk and goes back to the middle of the tile the player is on. */
+    private void stepBack() {
+        Vector2 back = toPosition(player.getTile().getCenter());
+        player.clearActions();
+        player.addAction(Actions.sequence(
+                Actions.moveTo(back.x, back.y, secondsPerTile / 2),
+                Actions.run(this::arrive)));
     }
 
     /** The tile under the player's centre (the board may not have been told about it yet). */

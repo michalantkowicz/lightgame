@@ -18,7 +18,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 import static com.mantkowicz.light.resources.ResourcesService.UI_SCALE;
 
 /**
- * A short line of text in a box with a small pointer at the middle of its bottom, e.g. over the HUD's face. It goes
+ * A short line of text, with or without a picture after it ("find" and a carrot), in a box with a small pointer at the
+ * middle of its bottom, e.g. over the HUD's face. It goes
  * away by itself after a few seconds; its parent places it (the pointer's tip is its bottom middle).
  * <p>
  * Drawn from the pack's dialog box turned so its pointer is at the bottom ({@link UiImage#DIALOG_BOX_DOWN}): the box
@@ -37,10 +38,19 @@ public class SpeechBubble extends Group {
             PLAIN_Y = 10, POINTER_X = 9, POINTER_Y = 23, POINTER_WIDTH = 12, POINTER_HEIGHT = 7;
     /** Between the text and the box's outer edge, in pack pixels. */
     private static final int PAD_X = 7, PAD_Y = 6;
+    /** Between the text and the picture after it, in pack pixels. */
+    private static final int PICTURE_GAP = 3;
 
     private final Label label;
 
     public SpeechBubble(ResourcesService resources, String text) {
+        this(resources, text, null);
+    }
+
+    /**
+     * @param picture shown after the text at the UI's scale (a 16 px item is 48 px), or null for text only
+     */
+    public SpeechBubble(ResourcesService resources, String text, TextureRegion picture) {
         setTouchable(Touchable.disabled);
 
         TextureRegion box = resources.getUiImage(UiImage.DIALOG_BOX_DOWN);
@@ -53,8 +63,11 @@ public class SpeechBubble extends Group {
         patch.scale(UI_SCALE, UI_SCALE);
 
         label = new Label(text, new Label.LabelStyle(resources.getFont(), UiStyle.TEXT));
-        float width = snap(label.getPrefWidth() + (PAD_X + PAD_X + RIGHT - LEFT) * UI_SCALE);
-        float height = snap(label.getPrefHeight() + 2 * PAD_Y * UI_SCALE);
+        float pictureWidth = picture == null ? 0 : (PICTURE_GAP + picture.getRegionWidth()) * UI_SCALE;
+        float pictureHeight = picture == null ? 0 : picture.getRegionHeight() * UI_SCALE;
+        float contentWidth = label.getPrefWidth() + pictureWidth;
+        float width = snap(contentWidth + (PAD_X + PAD_X + RIGHT - LEFT) * UI_SCALE);
+        float height = snap(Math.max(label.getPrefHeight(), pictureHeight) + 2 * PAD_Y * UI_SCALE);
         float below = (POINTER_Y + POINTER_HEIGHT - BOX_HEIGHT) * UI_SCALE; // how far the pointer reaches under the box
 
         Image body = new Image(new NinePatchDrawable(patch));
@@ -66,9 +79,16 @@ public class SpeechBubble extends Group {
         addActor(pointer);
         // the text in the middle of the box's face (its right border is wider: the box's side)
         float face = width - (RIGHT - LEFT) * UI_SCALE;
-        label.setPosition(Math.round((face - label.getPrefWidth()) / 2f),
+        label.setPosition(Math.round((face - contentWidth) / 2f),
                 below + Math.round((height - label.getPrefHeight()) / 2f));
         addActor(label);
+        if (picture != null) {
+            Image shown = new Image(picture);
+            shown.setBounds(label.getX() + contentWidth - picture.getRegionWidth() * UI_SCALE,
+                    below + Math.round((height - pictureHeight) / 2f), picture.getRegionWidth() * UI_SCALE,
+                    pictureHeight);
+            addActor(shown);
+        }
         setSize(width, below + height);
 
         addAction(sequence(delay(SECONDS), fadeOut(FADE_SECONDS), Actions.removeActor()));

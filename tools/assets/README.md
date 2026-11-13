@@ -72,7 +72,7 @@ It describes what's in the pack, so the tool doesn't need to be told again:
   `action_direction` (`open`, `walk_left`): every action becomes a constant of the generated `Action` enum.
 - **ignore**: previews and duplicates.
 
-The rabbit's rows have real names. Animals and objects use `row_NN` for now: check the preview page and name rows in
+The rabbit's rows and most of the cow's have real names. The other animals and objects use `row_NN` for now: check the preview page and name rows in
 `pack.json` when you need them.
 
 ## Sprites in the game

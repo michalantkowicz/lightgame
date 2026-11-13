@@ -55,8 +55,8 @@ public class PlayerCollectResolver implements CollectResolver {
     @Override
     public void resolveCollect(Collectible collectible) {
         ActionButton shown = buttons.get(collectible);
-        if (shown != null && shown.isOnStage() || !holdsSomething(collectible)) {
-            return;
+        if (shown != null && shown.isOnStage() || !holdsSomething(collectible) || !isInReach(collectible)) {
+            return; // not in reach: something else stepped next to it (a wandering cow)
         }
 
         ClickListener onClick = new ClickListener() {

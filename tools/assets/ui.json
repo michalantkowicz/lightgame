@@ -73,7 +73,7 @@
     {"file": "UI Sprites/ALL UI ASSETS on one sheet.png", "name": "bar", "frame": [16, 16], "offset": [144, 240],
      "columns": 2, "rowCount": 2, "names": {"0": "empty", "1": "full", "2": "full_pink"}},
 
-    {"file": "emojis/Emoji spritesheet.png", "name": "emojis", "frame": [32, 32], "names": {"312": "sun", "160": "apple"}},
+    {"file": "emojis/Emoji spritesheet.png", "name": "emojis", "frame": [32, 32], "names": {"312": "sun", "160": "apple", "92": "heart"}},
     {"file": "emojis/tiny emotes.png", "name": "tiny_emotes", "frame": [16, 16],
      "names": {"1": "happy", "2": "neutral", "4": "sad"}},
     {"file": "emojis/speech_bubble_*.png", "prefix": "", "frame": [64, 64], "animation": {"duration": 80, "playMode": "NORMAL"}},

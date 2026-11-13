@@ -29,10 +29,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.Carrot;
+import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
+import com.mantkowicz.light.actor.PictureBubble;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
@@ -42,6 +44,7 @@ import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Dog;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
+import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.Main;
@@ -679,6 +682,76 @@ public final class GameDriver {
     /** The cow's animation right now, e.g. "cow_brown/idle". */
     public String cowAnimation() {
         return ((Cow) actor(Kind.COW)).getCurrentAnimation();
+    }
+
+    /** What the cow is doing (its state machine's state), e.g. "STANDING", "WALKING", "WISHING". */
+    public String cowState() {
+        return ((Cow) actor(Kind.COW)).getState().name();
+    }
+
+    /** Is the cow's picture mirrored (it is drawn looking right; walking left it looks left)? */
+    public boolean cowLooksLeft() {
+        return ((Cow) actor(Kind.COW)).isMirrored();
+    }
+
+    /** Where the cow is drawn (bottom-left corner). */
+    public float[] cowXY() {
+        Actor cow = actor(Kind.COW);
+        return new float[]{cow.getX(), cow.getY()};
+    }
+
+    /** What the bubble over the cow shows (what it wishes for), e.g. "carrot", or "none". */
+    public String cowWish() {
+        return bubbleOver(actor(Kind.COW));
+    }
+
+    /** The picture bubbles on the map are drawn in front of every other actor (only the cow has one). */
+    private String bubbleOver(Group character) {
+        Array<Actor> actors = gameStage().getActors();
+        for (Actor actor : actors) {
+            if (actor instanceof PictureBubble bubble) {
+                if (actor != actors.peek()) {
+                    throw new IllegalStateException("The bubble isn't in front of everything on the map");
+                }
+                return bubble.getPictureName();
+            }
+        }
+        return "none";
+    }
+
+    /** The small pictures floating up on the map right now, e.g. ["heart"] over the player after stroking the cow. */
+    public List<String> floatingPictures() {
+        List<String> pictures = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof FloatingPicture) {
+                pictures.add(actor.getName());
+            }
+        }
+        return pictures;
+    }
+
+    /** The debug label under the cow (Debug.Tool.STATE_LABELS), or "none". */
+    public String cowStateLabel() {
+        for (Actor child : actor(Kind.COW).getChildren()) {
+            if (child instanceof Label label) {
+                return label.getText().toString();
+            }
+        }
+        return "none";
+    }
+
+    /** Switches the debug tool that writes each creature's state under it on or off, for games started from now on. */
+    public static void showStateLabels(boolean show) {
+        if (show) {
+            Debug.switchOn(Debug.Tool.STATE_LABELS);
+        } else {
+            Debug.switchOff(Debug.Tool.STATE_LABELS);
+        }
+    }
+
+    /** Does the hint button's bubble show a picture after its text right now ("find" and a carrot)? */
+    public boolean hintShowsPicture() {
+        return hud().getBubble() != null && hud().getHintPicture() != null;
     }
 
     /** The chest's animation right now: "chest/open_front" while opening or open, "... (backwards)" closing or closed. */
