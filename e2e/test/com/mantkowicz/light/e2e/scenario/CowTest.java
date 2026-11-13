@@ -31,6 +31,14 @@ class CowTest {
             "~~.~~",
             "~~~~~");
 
+    /** The rabbit stands above the cow, which has no free cell to walk to. */
+    private static final TestMap ON_TOP = TestMap.of(
+            "~~~~~",
+            "~~.~~",
+            "~~P~~",
+            "~~M~~",
+            "~~~~~");
+
     /** The cow's only free cell is {@code a}, next to a full chest; the rabbit is far away. */
     private static final TestMap PATH = TestMap.of(
             "~~~~~~~~~",
@@ -79,6 +87,16 @@ class CowTest {
         game.seconds(1);
         assertEquals(List.of(1f), game.buttonAlphas("STROKE"), "it can be stroked again: the button is back");
         assertEquals(List.of(), game.floatingPictures(), "the heart is gone");
+        assertFalse(game.crashed());
+    }
+
+    /** Above the cow there is no button: the button over the cow would cover the player. */
+    @Test
+    void noButtonAboveTheCow() {
+        GameDriver game = GameDriver.start(ON_TOP.write("cow-on-top"));
+        game.seconds(1);
+        assertEquals(ON_TOP.cell('P'), game.playerCell());
+        assertEquals(List.of(), game.buttonAlphas("STROKE"), "standing above the cow: no hand");
         assertFalse(game.crashed());
     }
 

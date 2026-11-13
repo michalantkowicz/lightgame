@@ -46,7 +46,7 @@ class ShippedMapsTest {
                 continue;
             }
             Cell chest = entry.getKey();
-            boolean reachable = game.sideNeighbours(chest).stream()
+            boolean reachable = game.usedFromNeighbours(chest).stream()
                     .anyMatch(
                             cell -> cell.equals(start) || game.isAccessible(cell) && !game.path(start, cell).isEmpty());
             assertTrue(reachable, map + ": the rabbit can't get next to the chest on " + chest);

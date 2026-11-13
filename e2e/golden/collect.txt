@@ -11,34 +11,34 @@ stars: 7, chest: chest/open_front, items: [Carrot flying]
 crash: none
 player: cell=(3,3) at=(384.0,384.0) status=IDLE
 chest: cell=(3,4)
-item on ground: Carrot cell=(2,5)
+item on ground: Carrot cell=(4,3)
 camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
 inventories: player=[-, -] chest=[-, -]
 ## walked onto the carrot
 crash: none
-player: cell=(2,5) at=(256.0,640.0) status=IDLE
+player: cell=(4,3) at=(512.0,384.0) status=IDLE
 chest: cell=(3,4)
-camera: at=(355.1,579.1) zoom=1.0 view=800.0x1280.0
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
 inventories: player=[Carrot, -] chest=[-, -]
 stars: 0, items: [Carrot flying]
 ## thrown out of the backpack
 crash: none
-player: cell=(2,5) at=(256.0,640.0) status=IDLE
+player: cell=(4,3) at=(512.0,384.0) status=IDLE
 chest: cell=(3,4)
-item on ground: Carrot cell=(1,5)
-camera: at=(355.1,579.1) zoom=1.0 view=800.0x1280.0
+item on ground: Carrot cell=(4,4)
+camera: at=(448.0,320.0) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
 inventories: player=[-, -] chest=[-, -]
 ## picked up again
 crash: none
-player: cell=(1,5) at=(128.0,640.0) status=IDLE
+player: cell=(4,4) at=(512.0,512.0) status=IDLE
 chest: cell=(3,4)
-camera: at=(355.1,579.1) zoom=1.0 view=800.0x1280.0
+camera: at=(515.2,452.4) zoom=1.0 view=800.0x1280.0
 game stage shaded: false
 menu buttons: 0
 inventories: player=[Carrot, -] chest=[-, -]
