@@ -2,7 +2,7 @@ package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.ThumbnailType;

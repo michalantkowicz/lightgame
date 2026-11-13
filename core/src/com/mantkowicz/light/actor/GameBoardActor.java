@@ -3,7 +3,7 @@ package com.mantkowicz.light.actor;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.ui.menu.DescriptionInteraction;
 import com.mantkowicz.light.ui.menu.Interaction;
 import com.mantkowicz.light.ui.menu.Interactive;

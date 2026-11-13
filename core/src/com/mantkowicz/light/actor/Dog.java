@@ -1,7 +1,7 @@
 package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 
 import static com.mantkowicz.light.actor.GameActorType.DOG;
 

@@ -2,7 +2,7 @@ package com.mantkowicz.light.map;
 
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 
 /**
  * A map object that spawns an actor on its tile: creates the actor, puts it on the tile and adds it to the game stage.

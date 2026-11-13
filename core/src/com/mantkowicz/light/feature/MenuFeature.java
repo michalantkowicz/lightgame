@@ -5,10 +5,10 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.DelayAction;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.event.MenuCloseEvent;
 import com.mantkowicz.light.event.MenuOpenEvent;
-import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.MenuStage;
 import com.mantkowicz.light.ui.menu.Interaction;
@@ -33,8 +33,9 @@ public class MenuFeature implements Feature {
     private final GameEventService gameEventService;
     private final ResourcesService resourcesService;
 
-    public MenuFeature(GameContext context) {
-        this.stage = context.getMenuStage();
+    /** @param stage the menu stage (the game screen's: it has the button under the pointer) */
+    public MenuFeature(GameContext context, MenuStage stage) {
+        this.stage = stage;
         this.gameEventService = context.getGameEventService();
         this.resourcesService = context.getResourcesService();
     }

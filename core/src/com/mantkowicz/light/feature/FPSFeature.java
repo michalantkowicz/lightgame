@@ -3,7 +3,7 @@ package com.mantkowicz.light.feature;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.notification.NotificationStyle;
 
 import static com.badlogic.gdx.Gdx.graphics;

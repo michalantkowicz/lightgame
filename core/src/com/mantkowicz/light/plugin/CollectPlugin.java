@@ -1,9 +1,9 @@
 package com.mantkowicz.light.plugin;
 
 import com.mantkowicz.light.actor.Collectible;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.CollectEvent;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.ui.collect.CollectResolver;
 
 public class CollectPlugin implements Plugin {

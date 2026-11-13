@@ -8,9 +8,9 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
-import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.resources.ResourcesService;
 
@@ -95,10 +95,16 @@ public abstract class Tile {
         setSize(size, size);
     }
 
-    public void prepare(GameContext context) {
-        for (TileObject object : objects) {
-            object.prepare(this, context);
-        }
+    /**
+     * Adds what the tile itself needs in the physics world (nothing for most tiles; a wall's body). The objects on it
+     * are prepared by the game screen ({@link #getTileObjects()}).
+     */
+    public void prepare(World world) {
+    }
+
+    /** What the map put on this tile (furniture, characters, lights...), in the order it was added. */
+    public List<TileObject> getTileObjects() {
+        return objects;
     }
 
     protected Vector2[] getPolygonVertices() {

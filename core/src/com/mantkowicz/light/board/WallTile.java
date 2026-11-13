@@ -3,7 +3,7 @@ package com.mantkowicz.light.board;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.ChainShape;
-import com.mantkowicz.light.game.GameContext;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mantkowicz.light.resources.ResourcesService;
 
 /**
@@ -21,11 +21,11 @@ public class WallTile extends NoPathTile {
     }
 
     @Override
-    public void prepare(GameContext context) {
-        super.prepare(context);
+    public void prepare(World world) {
+        super.prepare(world);
 
         // the body stays at the world origin and the shape uses the tile's stage coordinates (the world uses stage units)
-        Body wallBody = context.getWorld().createBody(new BodyDef());
+        Body wallBody = world.createBody(new BodyDef());
 
         ChainShape square = new ChainShape();
         square.createLoop(this.getPolygonVertices());

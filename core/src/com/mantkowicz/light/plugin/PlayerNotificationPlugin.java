@@ -3,13 +3,14 @@ package com.mantkowicz.light.plugin;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mantkowicz.light.actor.Player;
-import com.mantkowicz.light.game.GameContext;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.notification.EnlargeAndFadeOutAnimation;
 import com.mantkowicz.light.notification.Notification;
 import com.mantkowicz.light.notification.NotificationBuilder;
+import com.mantkowicz.light.notification.Notifications;
 import com.mantkowicz.light.resources.PhraseService;
-import com.mantkowicz.light.ui.NotificationStage;
 
 import static com.mantkowicz.light.notification.NotificationType.PLAYER_NOTIFICATION;
 import static com.mantkowicz.light.resources.PhraseGroup.DARKNESS_EXCLAMATION;
@@ -19,7 +20,7 @@ public class PlayerNotificationPlugin implements Plugin {
 
     private final Player player;
     private final RayHandler rayHandler;
-    private final NotificationStage notificationStage;
+    private final Stage notificationStage;
     private final PhraseService phraseService;
     private final BitmapFont font;
 
@@ -38,14 +39,14 @@ public class PlayerNotificationPlugin implements Plugin {
             notificationStage.addActor(shadowNotification);
             shadowNotification.toFront();
         } else if (player.getIdleLength() < MILLIS_TO_EXCLAIM_AT_SHADOW) {
-            notificationStage.removeAllNotificationsOfType(PLAYER_NOTIFICATION);
+            Notifications.removeAll(notificationStage, PLAYER_NOTIFICATION);
         }
     }
 
     private boolean shouldPlayerExclaimAtShadow() {
         return isPlayerAtShadow()
                 && player.getIdleLength() >= MILLIS_TO_EXCLAIM_AT_SHADOW
-                && !notificationStage.doesContainNotification(PLAYER_NOTIFICATION);
+                && !Notifications.contains(notificationStage, PLAYER_NOTIFICATION);
     }
 
     /**
