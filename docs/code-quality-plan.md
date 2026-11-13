@@ -155,7 +155,7 @@ In the e2e module, package `com.mantkowicz.light.architecture` (it already depen
   or one fix away: `ClassWithOnlyPrivateConstructorsShouldBeFinal` (clean), `UseCollectionIsEmpty` and
   `UnnecessaryConstructor` (one finding each, fixed in this phase). Nothing about unused members (the project keeps
   them on purpose). Measured with exactly these rules and limits: 18 findings, the 16 in the table above plus those two.
-- The baseline: the 16 findings in the table above get `@SuppressWarnings("PMD.<Rule>")` (on 8 classes or methods)
+- The baseline: the 16 findings in the table above get `@SuppressWarnings("PMD.<Rule>")` (in 10 places)
   with a `// baseline, see docs/code-quality-plan.md` comment, so new code is held to the limits from day one.
   Phase 4 removes them.
 - `pmdMain` is part of `check`, so CI runs it in `./gradlew build`. CI uploads `**/build/reports/pmd/` with the test

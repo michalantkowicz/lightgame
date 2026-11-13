@@ -24,6 +24,9 @@ import java.util.Map;
 
 import static com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 
+// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+
+@SuppressWarnings({"PMD.GodClass", "PMD.CouplingBetweenObjects"})
 public class ResourcesService {
     private static final String FONT = "font.fnt";
     /** Animations made by tools/assets: names, frame durations and the atlas with the frames. */
@@ -74,6 +77,8 @@ public class ResourcesService {
     /**
      * The UI atlas is kept apart from the others (not searched by getTexture), so its piece names can't clash with them.
      */
+    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     private void loadUi() {
         FileHandle file = Gdx.files.internal(UI);
         JsonValue root = new JsonReader().parse(file);

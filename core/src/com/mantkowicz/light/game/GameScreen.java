@@ -38,6 +38,9 @@ import static com.mantkowicz.light.debug.Debug.Tool.FPS_LABEL;
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
+// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+
+@SuppressWarnings({"PMD.ExcessiveImports", "PMD.CouplingBetweenObjects"})
 public class GameScreen extends ScreenAdapter {
     private static final float DEFAULT_AMBIENT_LIGHT = 0.02f;
 

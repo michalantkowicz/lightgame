@@ -5,6 +5,4 @@ package com.mantkowicz.light.board;
  * the physics world. It only exists on maps made with tools/assets, so it has no picture of its own: the map draws it.
  */
 public class BlockedTile extends NoPathTile {
-    public BlockedTile() {
-    }
 }

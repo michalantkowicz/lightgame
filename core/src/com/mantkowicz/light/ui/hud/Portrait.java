@@ -112,6 +112,8 @@ public class Portrait extends Group {
     }
 
     @Override
+    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+    @SuppressWarnings("PMD.CyclomaticComplexity")
     public void act(float delta) {
         super.act(delta);
         if (reaction != null) {

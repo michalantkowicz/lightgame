@@ -35,6 +35,8 @@ import java.util.List;
  * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
  * for now.
  */
+// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 public class Hud extends Group {
     /** HUD pieces are drawn one step bigger than the rest of the UI ({@link ResourcesService#UI_SCALE}). */
     public static final int SCALE = 4;
