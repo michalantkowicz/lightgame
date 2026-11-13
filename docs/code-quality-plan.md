@@ -190,9 +190,9 @@ also for admins), so such a pull request can't be merged. No change to the GitHu
 Done, one pull request each: the plan (#36), Spotless and the reformat (#37), architecture tests (#38), PMD (#39),
 and phase 4 steps 1–5 (#40–#44). Where things stand after them:
 
-- Package dependencies: 77 lines (75 at the start). Gone: `ui → actor`, `ui → game`, `ui → plugin`, `actor → ui`,
-  `actor → ui.collect`, `board → notification`, `board → ui`, `ui.collect → ui`; new, all from a higher package to a
-  lower one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,
+- Package dependencies: 77 lines (75 at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
+  `actor → ui`, `actor → ui.collect`, `board → notification`, `board → ui`; new, all from a higher package to a lower
+  one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,
   `feature → board` and four into the new leaf `stage`. The 13 packages are still one cycle: what holds it together
   now is mainly `GameContext` (imported by 9 packages) and `event`'s events carrying actors.
 - PMD baseline: 12 findings in 8 places (16 in 10 at the start): `TmxTiledMapLoader` (class: size, coupling,
