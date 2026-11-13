@@ -8,6 +8,7 @@ import com.mantkowicz.light.actor.Carrot;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
+import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Sprite;
@@ -29,6 +30,9 @@ public class Chest extends SpriteActor implements Collectible {
 
     private final Inventory inventory;
     private final TextureRegion closed, open;
+    private boolean isOpen;
+    /** How high it is drawn, as of the end of its last opening or closing (it doesn't change while the lid moves). */
+    private float topY;
 
     public Chest(GameContext context) {
         super(CHEST, context, Sprite.CHEST, OPEN, DESCRIPTION);
@@ -59,16 +63,44 @@ public class Chest extends SpriteActor implements Collectible {
     }
 
     /**
-     * The open chest: what the button does.
+     * What the button does: the open chest while it is closed, the closed chest while it is open.
      */
     @Override
     public TextureRegion getActionIcon() {
-        return open;
+        return isOpen ? closed : open;
     }
 
-    /** The closed chest, as the player sees it on the map (was the action button's picture). */
+    /** The closed chest, as the player sees it on the map: the button's picture while the chest is open. */
     public TextureRegion getClosedIcon() {
         return closed;
+    }
+
+    /** It opens and closes as often as the player likes; what was inside comes out only once. */
+    @Override
+    public boolean canBeClosed() {
+        return true;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return isOpen;
+    }
+
+    @Override
+    public boolean isBusy() {
+        return !isAnimationFinished();
+    }
+
+    /**
+     * Its tile's top while it is closed; open, the top of its lid, which sticks out above the tile (the picture's top
+     * row is empty). While the lid moves, where it was before.
+     */
+    @Override
+    public float getTopY() {
+        if (!isBusy()) {
+            topY = isOpen ? getAvatar().getY() + getAvatar().getHeight() - WorldScale.PIXEL_SCALE : getHeight();
+        }
+        return topY;
     }
 
     @Override
@@ -81,14 +113,16 @@ public class Chest extends SpriteActor implements Collectible {
      */
     @Override
     public void beforeCollect() {
+        isOpen = true;
         playAnimation(OPEN);
     }
 
     /**
-     * The collect window closes: the lid shuts.
+     * It is closed: the lid shuts.
      */
     @Override
     public void afterCollect() {
+        isOpen = false;
         playBackwards(OPEN);
     }
 

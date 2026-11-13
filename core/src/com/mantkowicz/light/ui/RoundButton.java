@@ -20,7 +20,7 @@ public class RoundButton extends Group {
     private static final int SIDE = 3;
 
     private final TextureRegionDrawable up, down;
-    private final int scale;
+    private final int scale, iconScale;
     private final Image background = new Image(), icon;
     private final ClickListener pressed = new ClickListener();
 
@@ -37,6 +37,7 @@ public class RoundButton extends Group {
     public RoundButton(ResourcesService resources, TextureRegion picture, UiImage upImage, UiImage downImage,
             int scale, int iconScale) {
         this.scale = scale;
+        this.iconScale = iconScale;
         up = new TextureRegionDrawable(resources.getUiImage(upImage));
         down = new TextureRegionDrawable(resources.getUiImage(downImage));
         setSize(up.getRegion().getRegionWidth() * scale, up.getRegion().getRegionHeight() * scale);
@@ -51,6 +52,22 @@ public class RoundButton extends Group {
         background.setTouchable(Touchable.disabled);
         icon.setTouchable(Touchable.disabled);
         addListener(pressed);
+    }
+
+    /** The picture on it now. */
+    public TextureRegion getPicture() {
+        return ((TextureRegionDrawable) icon.getDrawable()).getRegion();
+    }
+
+    /** Another picture on it (nothing happens if it is the same one). */
+    public void setPicture(TextureRegion picture) {
+        TextureRegionDrawable now = (TextureRegionDrawable) icon.getDrawable();
+        if (now.getRegion() == picture) {
+            return;
+        }
+        icon.setDrawable(new TextureRegionDrawable(picture));
+        icon.setSize(picture.getRegionWidth() * iconScale, picture.getRegionHeight() * iconScale);
+        showPressed(pressed.isVisualPressed());
     }
 
     @Override

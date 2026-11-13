@@ -29,7 +29,9 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * the collectible, so the player stops on (or steps back to) the nearest cell in reach, and it opens on arrival. While
  * the button fades (out of reach) it still catches clicks, so they don't walk the player to the board under it, but
  * does nothing. Opening it (a chest lifts its lid and stays open) pops stars and throws everything inside out onto
- * free tiles around it; then the button goes, nothing is left.
+ * free tiles around it. A chest then keeps its button, showing the closed chest: it closes the lid, and the next tap
+ * opens it again (with nothing left inside: no stars, nothing comes out). Something that can't be closed loses its
+ * button once it is empty.
  * <p>
  * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
  * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
@@ -41,8 +43,8 @@ public class PlayerCollectResolver implements CollectResolver {
     private final Map<Collectible, ActionButton> buttons = new HashMap<>();
     /** After making room in a full backpack, nothing is picked up for this long: the old item clearly leaves first. */
     static final float MAKING_ROOM_SECONDS = 1;
-    /** Clicked during a walk: open it once the player stands still in reach. */
-    private Collectible openOnArrival;
+    /** Clicked during a walk: open or close it once the player stands still in reach. */
+    private Collectible useOnArrival;
     /** Seconds left until something can be picked up again (after making room). */
     private float pickUpPause;
 
@@ -55,7 +57,7 @@ public class PlayerCollectResolver implements CollectResolver {
     @Override
     public void resolveCollect(Collectible collectible) {
         ActionButton shown = buttons.get(collectible);
-        if (shown != null && shown.isOnStage() || !holdsSomething(collectible) || !isInReach(collectible)) {
+        if (shown != null && shown.isOnStage() || !isUsable(collectible) || !isInReach(collectible)) {
             return; // not in reach: something else stepped next to it (a wandering cow)
         }
 
@@ -63,11 +65,12 @@ public class PlayerCollectResolver implements CollectResolver {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 super.clicked(event, x, y);
-                requestOpening(collectible);
+                requestUse(collectible);
             }
         };
         ActionButton actionButton = new ActionButton(context, "COLLECT", collectible.getActionIcon(), onClick,
-                () -> isInReach(collectible) && holdsSomething(collectible), collectible.getActor());
+                () -> isReady(collectible), collectible.getActor());
+        actionButton.setTopY(collectible::getTopY);
         buttons.put(collectible, actionButton);
 
         context.getUiStage().addActor(actionButton);
@@ -75,12 +78,15 @@ public class PlayerCollectResolver implements CollectResolver {
 
     @Override
     public void update(float delta) {
-        if (openOnArrival != null && IDLE.equals(player.getStatus())) {
-            Collectible collectible = openOnArrival;
-            openOnArrival = null;
+        if (useOnArrival != null && IDLE.equals(player.getStatus())) {
+            Collectible collectible = useOnArrival;
+            useOnArrival = null;
             if (isInReach(collectible)) {
-                open(collectible);
+                use(collectible);
             }
+        }
+        for (Map.Entry<Collectible, ActionButton> entry : buttons.entrySet()) {
+            showReady(entry.getKey(), entry.getValue());
         }
         pickUpPause = Math.max(0, pickUpPause - delta);
         if (pickUpPause == 0) {
@@ -97,21 +103,47 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
-    private void requestOpening(Collectible collectible) {
-        if (!isInReach(collectible) || !holdsSomething(collectible)) {
-            return; // a fading button (the player is out of reach, or it's empty) catches the click but does nothing
+    /**
+     * Once a chest's lid has stopped, its button shows what it does now (open or close), fading back in if it faded
+     * out meanwhile (or coming back if it was gone).
+     */
+    private void showReady(Collectible collectible, ActionButton button) {
+        if (collectible.isBusy()) {
+            return;
+        }
+        button.setPicture(collectible.getActionIcon());
+        if (!button.isOnStage()) {
+            resolveCollect(collectible);
+        }
+    }
+
+    private void requestUse(Collectible collectible) {
+        if (!isReady(collectible)) {
+            return; // a fading button (out of reach, empty, the lid moving) catches the click but does nothing
         }
         if (IDLE.equals(player.getStatus())) {
-            open(collectible);
+            use(collectible);
         } else {
-            openOnArrival = collectible;
+            useOnArrival = collectible;
             context.getGameEventService().post(new TileTouchedEvent(collectible.getTile()));
+        }
+    }
+
+    /** Closes it when it is open (a chest shuts its lid), opens it otherwise. */
+    private void use(Collectible collectible) {
+        if (collectible.isOpen()) {
+            collectible.afterCollect();
+        } else {
+            open(collectible);
         }
     }
 
     private void open(Collectible collectible) {
         collectible.beforeCollect(); // a chest lifts its lid (and keeps it open)
         Tile tile = collectible.getTile();
+        if (!holdsSomething(collectible)) {
+            return; // opened again, empty: nothing comes out, no stars
+        }
         Sparkles.burst(context.getGameStage(), context.getResourcesService(), tile.getCenter());
         Inventory inside = collectible.getInventory();
         for (int slot = 0; slot < inside.getItems().size(); slot++) {
@@ -151,6 +183,16 @@ public class PlayerCollectResolver implements CollectResolver {
             backpack.add(lying.getItem());
             lying.remove();
         }
+    }
+
+    /** The player can use it now: in reach, something to do with it, not opening or closing. */
+    private boolean isReady(Collectible collectible) {
+        return isInReach(collectible) && isUsable(collectible) && !collectible.isBusy();
+    }
+
+    /** It holds something, or it can be closed and opened again (a chest, even empty). */
+    private static boolean isUsable(Collectible collectible) {
+        return holdsSomething(collectible) || collectible.canBeClosed();
     }
 
     private static boolean holdsSomething(Collectible collectible) {

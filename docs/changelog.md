@@ -598,6 +598,14 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   `ActionButton.setPlace`. The cow keeps its **hand while it wishes** for a carrot: hand left, carrot right. A stroke
   while wishing (`CowState.WISHING` can be stroked now) shows the heart and goes back to wishing (via STANDING, still
   hungry), so the carrot button fades for the heart and comes back.
+- **Closing a chest:** once open, the chest keeps its button, now showing the closed chest; tapping it shuts the lid,
+  and the button shows the open chest again. Opened again, nothing comes out (it doesn't refill) and there are no
+  stars. `Collectible.canBeClosed`/`isOpen` (the chest says yes; the button no longer goes when it is empty) and
+  `getActionIcon` follows the state; `ActionButton.setPicture` changes the picture. While the lid moves
+  (`Collectible.isBusy`, 0.5 s) the button is unavailable, so it fades a little (its fade-out takes 0.75 s) and comes back
+  with the new picture, like the cow's hand during a stroke. Open, the button sits over the lid, which sticks out above
+  the tile (`Collectible.getTopY`, `ActionButton.setTopY`: 32 px higher). Golden `collect.txt`: the chest's button now
+  stays in the two snapshots next to the emptied open chest, over its lid. Test: `CollectTest.theOpenChestClosesAndOpensAgainEmpty`.
 - Tapping the carrot without one also makes the face say "find" with the carrot (`Hud.showHint`, as the hint button
   does), not only shakes the button.
 - `CreatureFeature.run` reached PMD's complexity limit and was split (`updateGiveButton`).

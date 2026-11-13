@@ -17,6 +17,7 @@ import com.mantkowicz.light.ui.RoundButton;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
 
@@ -42,6 +43,8 @@ public class ActionButton extends GameActor {
     private final RoundButton button;
     /** Its place in the row over its thing: lower is further left. */
     private int place;
+    /** How high over its thing's bottom the thing is drawn; null: its height. */
+    private DoubleSupplier topY;
 
     /**
      * @param over what it acts on, on the game stage: the button is drawn over it
@@ -71,7 +74,8 @@ public class ActionButton extends GameActor {
 
     /** Over the top of what it acts on, wherever the camera shows it: in its place in the row of buttons there. */
     private void followTarget() {
-        Vector2 top = over.localToStageCoordinates(new Vector2(over.getWidth() / 2f, over.getHeight()));
+        float height = topY == null ? over.getHeight() : (float) topY.getAsDouble();
+        Vector2 top = over.localToStageCoordinates(new Vector2(over.getWidth() / 2f, height));
         getStage().screenToStageCoordinates(gameStage.stageToScreenCoordinates(top));
         List<ActionButton> row = rowOverTheSameThing();
         float step = getWidth() + ROW_GAP;
@@ -91,9 +95,27 @@ public class ActionButton extends GameActor {
         return row;
     }
 
+    /**
+     * How high over its thing's bottom the thing is drawn, if not its height (a picture sticking out above its tile,
+     * e.g. an open chest's lid): the button goes over that.
+     */
+    public void setTopY(DoubleSupplier topY) {
+        this.topY = topY;
+    }
+
     /** Its place in the row of buttons over the same thing: lower is further left (0 by default). */
     public void setPlace(int place) {
         this.place = place;
+    }
+
+    /** The picture on it now: what it does. */
+    public TextureRegion getPicture() {
+        return button.getPicture();
+    }
+
+    /** Shows another picture: what the button does now (e.g. close the chest it opened). */
+    public void setPicture(TextureRegion picture) {
+        button.setPicture(picture);
     }
 
     /** A quick shake sideways: tapped, but there is nothing it can do (e.g. nothing to give yet). */

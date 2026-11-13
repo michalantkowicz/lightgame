@@ -31,9 +31,33 @@ public interface Collectible extends Thumbnail, InventoryOwner, TileOccupant {
     void afterCollect();
 
     /**
-     * The picture on the action button that collects from it, e.g. the open chest.
+     * The picture on its action button, for what the button does now: e.g. the open chest (opens it), or the closed
+     * chest once it is open (closes it).
      */
     TextureRegion getActionIcon();
+
+    /**
+     * After opening it can be closed again and opened again, also empty (a chest): its button stays while the player
+     * is next to it. Otherwise the button goes once nothing is left inside.
+     */
+    default boolean canBeClosed() {
+        return false;
+    }
+
+    /** It is open now (a chest with its lid up): its button closes it. */
+    default boolean isOpen() {
+        return false;
+    }
+
+    /** It is opening or closing right now (a chest's lid moves): its button waits, faded a little. */
+    default boolean isBusy() {
+        return false;
+    }
+
+    /** How high over its actor's bottom it is drawn: its action button goes over that (e.g. over an open lid). */
+    default float getTopY() {
+        return getActor().getHeight();
+    }
 
     /** What is drawn for it on the map: its action button sits over it. */
     Actor getActor();

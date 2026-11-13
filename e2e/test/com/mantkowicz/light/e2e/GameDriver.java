@@ -472,6 +472,17 @@ public final class GameDriver {
         return hud().getSlots().get(slot).hasActions();
     }
 
+    /** What the chest's button does now, by its picture: "open" (the open chest) or "close" (the closed chest). */
+    public String chestButton() {
+        Chest chest = (Chest) actor(Kind.CHEST);
+        for (Actor actor : uiActors()) {
+            if (actor instanceof ActionButton button && "COLLECT".equals(button.getName())) {
+                return button.getPicture() == chest.getClosedIcon() ? "close" : "open";
+            }
+        }
+        throw new IllegalStateException("No chest button on screen");
+    }
+
     /** Is the action button with this name shaking (tapped when there was nothing it could do)? */
     public boolean actionButtonShaking(String name) {
         for (Actor actor : uiActors()) {
