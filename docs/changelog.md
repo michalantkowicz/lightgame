@@ -431,3 +431,13 @@ Step 1 of emptying the architecture baseline ([code-quality-plan.md](code-qualit
 - Baseline: 183 → 78 recorded dependencies (all "uses game.GameContext" gone, "features know game" emptied). 8 kept
   ones were re-recorded only because their wording names the moved class; one is new, `Tile.getTileObjects()`
   returning map objects, part of the board-uses-map tangle that step 4 removes. No golden changed.
+
+## 2026‑11‑13, events live with what they are about (branch `arch-2-events`)
+
+Step 2 of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- The event bus (`event`: `GameEvent`, `GameEventService`) keeps only the events that carry nothing of the game
+  (`MenuCloseEvent`, `BackpackItemEjectedEvent`) and `CollectEvent` (moves in step 3). The others moved next to what
+  they are about: `TileTouchedEvent`, `NoPathEvent` to `board`; `PlayerMoveEvent`, `PlayerCreatedEvent`,
+  `MenuOpenEvent`, `LookAtMeEvent`, `AddToStageEvent` to `actor`. Only packages and imports changed.
+- Baseline: 78 → 57 recorded dependencies (the event bus rule's 21 for these seven). No golden changed.

@@ -4,12 +4,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
 import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.actor.PlayerMoveEvent;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileTouchedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.event.PlayerMoveEvent;
-import com.mantkowicz.light.event.TileTouchedEvent;
 
 import java.util.ArrayList;
 import java.util.List;

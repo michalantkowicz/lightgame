@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.actor;
 
-import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.event.GameEvent;
 
 /**
  * Lives for one loop: everything interested in "the player started moving" checks it in that loop.

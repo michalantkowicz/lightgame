@@ -7,7 +7,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.event.PlayerMoveEvent;
 import com.mantkowicz.light.plugin.AnimationPlugin;
 import com.mantkowicz.light.plugin.BoardMovementPlugin;
 import com.mantkowicz.light.plugin.HopPlugin;

@@ -1,6 +1,6 @@
-package com.mantkowicz.light.event;
+package com.mantkowicz.light.board;
 
-import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.event.GameEvent;
 
 public class TileTouchedEvent extends GameEvent {
     private final Tile tile;

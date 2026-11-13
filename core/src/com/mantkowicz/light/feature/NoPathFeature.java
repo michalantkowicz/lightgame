@@ -2,9 +2,9 @@ package com.mantkowicz.light.feature;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.mantkowicz.light.board.NoPathEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.event.NoPathEvent;
 import com.mantkowicz.light.notification.MoveUpperAndFadeOutAnimation;
 import com.mantkowicz.light.notification.Notification;
 import com.mantkowicz.light.notification.NotificationBuilder;
