@@ -71,7 +71,8 @@ public class BoardService {
             throw new IllegalArgumentException("Only a floor tile can be blocked or freed");
         }
         floor.setAccessible(accessible);
-        boardGraph = new BoardGraph(tiles); // its connections are built from what is accessible
+        // the whole graph again: simple, and cheap for small maps (see BoardGraph for the numbers and the alternative)
+        boardGraph = new BoardGraph(tiles);
         pathFinder = new IndexedAStarPathFinder<>(boardGraph);
     }
 

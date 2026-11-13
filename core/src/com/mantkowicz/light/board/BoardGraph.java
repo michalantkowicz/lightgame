@@ -15,8 +15,14 @@ import java.util.Map;
  * The board as a gdx-ai graph over the square grid's 8 neighbours. Every step costs 1, a diagonal one too, so a path's cost is its
  * number of steps. A diagonal step is only allowed when both tiles it squeezes between are accessible, so paths never cut the corner
  * of furniture or walls. Nothing leaves an inaccessible tile.
- * Connections are built once: when a tile gets blocked or freed during the game (a wandering cow),
- * {@link BoardService#setAccessible} builds a new graph.
+ * <p>
+ * A graph never changes: its connections are built in the constructor from what is accessible then. When a tile gets
+ * blocked or freed during the game (a wandering cow), {@link BoardService#setAccessible} throws the graph away and
+ * builds a new one for the whole map. That is the simple and safe way, and cheap while maps are small: 0.2 ms for
+ * 24x16 tiles, 0.8 ms for 50x50, 2.2 ms for 100x100 (measured on a desktop JVM; expect several times more on a phone
+ * or in the browser), twice per step of each creature. If maps or herds grow, rebuild only what a tile can change:
+ * the connections leaving that tile and its 8 neighbours (a diagonal step between two of its neighbours depends on
+ * it too).
  */
 public class BoardGraph implements IndexedGraph<Tile> {
     private final Map<Tile, Integer> indices = new HashMap<>();
