@@ -135,94 +135,124 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         return assetManager.get(fileName, TiledMap.class);
     }
 
-    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
-
-    @SuppressWarnings({"PMD.CognitiveComplexity", "PMD.CyclomaticComplexity", "PMD.NPathComplexity"})
     private TileSet loadPackedMap(TiledMap tiledMap, String fileName) {
-        List<TiledMapTileLayer> drawn = new ArrayList<>();
-        TiledMapTileLayer collision = null;
-        TiledMapTileLayer walls = null;
-        for (TiledMapTileLayer layer : tiledMap.getLayers().getByType(TiledMapTileLayer.class)) {
-            if (COLLISION_LAYER.equals(layer.getName())) {
-                collision = layer;
-            } else {
-                if (WALLS_LAYER.equals(layer.getName())) {
-                    walls = layer;
-                }
-                if (layer.isVisible()) {
-                    drawn.add(layer);
-                }
-            }
-        }
-        if (drawn.isEmpty()) {
-            throw new IllegalArgumentException("The map has no visible tile layer");
-        }
-        TiledMapTileLayer first = drawn.get(0);
-        float tileWidth = first.getTileWidth();
-        float tileHeight = first.getTileHeight();
-        if (tileWidth != WorldScale.PIXEL_ART_TILE_SIZE || tileHeight != WorldScale.PIXEL_ART_TILE_SIZE) {
-            throw new IllegalArgumentException(fileName + " has " + (int) tileWidth + "x" + (int) tileHeight
-                    + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE
-                    + " px");
-        }
-        float scale = WorldScale.TILE_SIZE / tileWidth;
-        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, tileWidth, tileHeight);
+        PackedLayers layers = sortLayers(tiledMap);
+        TiledMapTileLayer first = layers.drawn.get(0);
+        checkTileSize(first, fileName);
+        float scale = WorldScale.TILE_SIZE / first.getTileWidth();
+        Map<GridPoint2, TileObject> objects = createObjects(tiledMap, first, first.getTileWidth(),
+                first.getTileHeight());
 
         Map<GridPoint2, Tile> tilesByCell = new HashMap<>();
         List<Tile> tiles = new ArrayList<>();
         for (int x = 0; x < first.getWidth(); x++) {
             for (int y = 0; y < first.getHeight(); y++) {
-                List<TileGraphic> cellLayers = new ArrayList<>();
-                for (TiledMapTileLayer layer : drawn) {
-                    TiledMapTileLayer.Cell cell = layer.getCell(x, y);
-                    if (cell != null && cell.getTile() != null) {
-                        // Tiled measures offsets downwards, the game upwards
-                        cellLayers.add(
-                                new TileGraphic(cell.getTile(), cell.getFlipHorizontally(), cell.getFlipVertically(),
-                                        cell.getRotation(), layer.getOpacity(), layer.getRenderOffsetX() * scale,
-                                        -layer.getRenderOffsetY() * scale));
-                    }
+                Tile tile = createTile(layers, x, y, scale, objects);
+                if (tile != null) {
+                    tilesByCell.put(new GridPoint2(x, y), tile);
+                    tiles.add(tile);
                 }
-                boolean wall = hasCell(walls, x, y);
-                boolean blocked = hasCell(collision, x, y);
-                if (cellLayers.isEmpty() && !wall && !blocked) {
-                    continue;
-                }
-                Tile tile = TileFactory
-                        .createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
-                tile.setAttributes(new MapProperties());
-                tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
-                tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
-                GridPoint2 cellPosition = new GridPoint2(x, y);
-                TileObject object = objects.get(cellPosition);
-                if (object != null) {
-                    tile.addTileObject(object);
-                }
-                tilesByCell.put(cellPosition, tile);
-                tiles.add(tile);
             }
         }
         connectNeighbours(tilesByCell);
 
         TilesetProperties tilesetProperties = new TilesetProperties();
         tilesetProperties.setTileSize(of(WorldScale.TILE_SIZE, WorldScale.TILE_SIZE));
-        MapProperties mapProperties = tiledMap.getProperties();
-        if (mapProperties.containsKey(AMBIENT_LIGHT)) {
-            String value = String.valueOf(mapProperties.get(AMBIENT_LIGHT));
-            try {
-                tilesetProperties.setAmbientLight(Float.valueOf(value));
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException(
-                        fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
-                                + "(dark) to 1 (daylight), not '" + value + "'",
-                        e);
-            }
-        }
+        readAmbientLight(tiledMap, fileName, tilesetProperties);
 
         TileSet tileSet = new TileSet();
         tileSet.setTiles(tiles);
         tileSet.setProperties(tilesetProperties);
         return tileSet;
+    }
+
+    /** A packed map's tile layers by role: the drawn ones (in order), the collision one, the walls one. */
+    private static final class PackedLayers {
+        private final List<TiledMapTileLayer> drawn = new ArrayList<>();
+        private TiledMapTileLayer collision;
+        private TiledMapTileLayer walls;
+    }
+
+    /** The collision layer is never drawn; the walls layer is drawn (if visible) and also blocks. */
+    private static PackedLayers sortLayers(TiledMap tiledMap) {
+        PackedLayers layers = new PackedLayers();
+        for (TiledMapTileLayer layer : tiledMap.getLayers().getByType(TiledMapTileLayer.class)) {
+            if (COLLISION_LAYER.equals(layer.getName())) {
+                layers.collision = layer;
+                continue;
+            }
+            if (WALLS_LAYER.equals(layer.getName())) {
+                layers.walls = layer;
+            }
+            if (layer.isVisible()) {
+                layers.drawn.add(layer);
+            }
+        }
+        if (layers.drawn.isEmpty()) {
+            throw new IllegalArgumentException("The map has no visible tile layer");
+        }
+        return layers;
+    }
+
+    private static void checkTileSize(TiledMapTileLayer layer, String fileName) {
+        float tileWidth = layer.getTileWidth();
+        float tileHeight = layer.getTileHeight();
+        if (tileWidth != WorldScale.PIXEL_ART_TILE_SIZE || tileHeight != WorldScale.PIXEL_ART_TILE_SIZE) {
+            throw new IllegalArgumentException(fileName + " has " + (int) tileWidth + "x" + (int) tileHeight
+                    + " px tiles; the game's scale (WorldScale) is made for " + (int) WorldScale.PIXEL_ART_TILE_SIZE
+                    + " px");
+        }
+    }
+
+    /** The tile of one cell, or null when the cell has nothing: no picture, no wall, no collision. */
+    private static Tile createTile(PackedLayers layers, int x, int y, float scale,
+            Map<GridPoint2, TileObject> objects) {
+        List<TileGraphic> cellLayers = cellGraphics(layers.drawn, x, y, scale);
+        boolean wall = hasCell(layers.walls, x, y);
+        boolean blocked = hasCell(layers.collision, x, y);
+        if (cellLayers.isEmpty() && !wall && !blocked) {
+            return null;
+        }
+        Tile tile = TileFactory.createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
+        tile.setAttributes(new MapProperties());
+        tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
+        tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
+        TileObject object = objects.get(new GridPoint2(x, y));
+        if (object != null) {
+            tile.addTileObject(object);
+        }
+        return tile;
+    }
+
+    /** What the drawn layers paint on one cell, bottom layer first. */
+    private static List<TileGraphic> cellGraphics(List<TiledMapTileLayer> drawn, int x, int y, float scale) {
+        List<TileGraphic> cellLayers = new ArrayList<>();
+        for (TiledMapTileLayer layer : drawn) {
+            TiledMapTileLayer.Cell cell = layer.getCell(x, y);
+            if (cell != null && cell.getTile() != null) {
+                // Tiled measures offsets downwards, the game upwards
+                cellLayers.add(new TileGraphic(cell.getTile(), cell.getFlipHorizontally(), cell.getFlipVertically(),
+                        cell.getRotation(), layer.getOpacity(), layer.getRenderOffsetX() * scale,
+                        -layer.getRenderOffsetY() * scale));
+            }
+        }
+        return cellLayers;
+    }
+
+    private static void readAmbientLight(TiledMap tiledMap, String fileName, TilesetProperties tilesetProperties) {
+        MapProperties mapProperties = tiledMap.getProperties();
+        if (!mapProperties.containsKey(AMBIENT_LIGHT)) {
+            return;
+        }
+        String value = String.valueOf(mapProperties.get(AMBIENT_LIGHT));
+        try {
+            tilesetProperties.setAmbientLight(Float.valueOf(value));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException(
+                    fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
+                            + "(dark) to 1 (daylight), not '" + value + "'",
+                    e);
+        }
     }
 
     private static boolean hasCell(TiledMapTileLayer layer, int x, int y) {
@@ -252,8 +282,6 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     /**
      * Each object goes to the cell whose centre is nearest to the object's centre. A later object on the same cell replaces an earlier one.
      */
-    // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
-    @SuppressWarnings("PMD.CognitiveComplexity")
     private Map<GridPoint2, TileObject> createObjects(TiledMap tiledMap, TiledMapTileLayer tileLayer, float tileWidth,
             float tileHeight) {
         Map<GridPoint2, TileObject> objects = new HashMap<>();
@@ -265,28 +293,32 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
             if (object instanceof EllipseMapObject) {
                 Ellipse ellipse = ((EllipseMapObject) object).getEllipse();
                 Vector2 objectCenter = new Vector2(ellipse.x + ellipse.width / 2f, ellipse.y + ellipse.height / 2f);
-
-                int objectX = 0;
-                int objectY = 0;
-                for (int x = 0; x < tileLayer.getWidth(); x++) {
-                    for (int y = 0; y < tileLayer.getHeight(); y++) {
-                        float newDistance = objectCenter.dst2(cellCenter(x, y, tileWidth, tileHeight));
-                        float currentDistance = objectCenter.dst2(cellCenter(objectX, objectY, tileWidth, tileHeight));
-                        if (newDistance < currentDistance) {
-                            objectX = x;
-                            objectY = y;
-                        }
-                    }
-                }
-
                 MapProperties objectProperties = object.getProperties();
                 TileObjectType objectType = TileObjectType
                         .valueOf(objectProperties.get(OBJECT_CLASS.getValue(), String.class));
-                objects.put(new GridPoint2(objectX, objectY),
+                objects.put(nearestCell(objectCenter, tileLayer, tileWidth, tileHeight),
                         TileObjectFactory.createTileObject(objectType, objectProperties));
             }
         }
         return objects;
+    }
+
+    /** The cell whose centre is nearest to a point; of equally near ones, the first in column-by-column order. */
+    private static GridPoint2 nearestCell(Vector2 point, TiledMapTileLayer tileLayer, float tileWidth,
+            float tileHeight) {
+        int nearestX = 0;
+        int nearestY = 0;
+        for (int x = 0; x < tileLayer.getWidth(); x++) {
+            for (int y = 0; y < tileLayer.getHeight(); y++) {
+                float newDistance = point.dst2(cellCenter(x, y, tileWidth, tileHeight));
+                float currentDistance = point.dst2(cellCenter(nearestX, nearestY, tileWidth, tileHeight));
+                if (newDistance < currentDistance) {
+                    nearestX = x;
+                    nearestY = y;
+                }
+            }
+        }
+        return new GridPoint2(nearestX, nearestY);
     }
 
     /**

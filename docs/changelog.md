@@ -389,3 +389,14 @@ Phase 4, step 4 of [code-quality-plan.md](code-quality-plan.md).
   `ui`; `feature` depends on `board` instead. `package-dependencies.txt`: 78 → 77 lines.
 - The text now appears one frame (16 ms) later (features run after the stages each frame): golden `no-path`
   re-recorded, its only change being the text 0.2 px lower at the same moments (it has risen one frame less).
+
+## 2026‑11‑13, the packed map loader in steps (branch `quality-4e-split-map-loader`)
+
+Phase 4, step 5 of [code-quality-plan.md](code-quality-plan.md).
+
+- `TmxTiledMapLoader.loadPackedMap` (cognitive complexity 41, cyclomatic 24, NPath 954) is split into steps:
+  `sortLayers` (drawn, collision, walls), `checkTileSize`, `createTile` with `cellGraphics`, `readAmbientLight`;
+  `createObjects` (cognitive 16) hands the nearest-cell search to `nearestCell` (same scan order, same tie-break).
+  Behaviour unchanged: no golden or map test changed. Their four PMD baseline suppressions are gone; the class itself
+  is still over the limits for size and coupling (GodClass, CouplingBetweenObjects 28, ExcessiveImports 31), so its
+  class-level suppression stays until the loader is split into classes.

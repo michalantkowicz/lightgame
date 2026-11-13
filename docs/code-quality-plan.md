@@ -184,3 +184,20 @@ Each its own pull request; each removes lines from the dependency list or a supp
 
 All three fail `./gradlew build`, which is the required `test` check of the master branch protection (already set,
 also for admins), so such a pull request can't be merged. No change to the GitHub settings is needed.
+
+## Status (2026‑11‑13)
+
+Done, one pull request each: the plan (#36), Spotless and the reformat (#37), architecture tests (#38), PMD (#39),
+and phase 4 steps 1–5 (#40–#44). Where things stand after them:
+
+- Package dependencies: 77 lines (75 at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
+  `actor → ui`, `actor → ui.collect`, `board → notification`, `board → ui`; new, all from a higher package to a lower
+  one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,
+  `feature → board` and four into the new leaf `stage`. The 13 packages are still one cycle: what holds it together
+  now is mainly `GameContext` (imported by 9 packages) and `event`'s events carrying actors.
+- PMD baseline: 12 findings in 8 places (16 in 10 at the start): `TmxTiledMapLoader` (class: size, coupling,
+  imports), `ResourcesService` and its `loadUi`, `Tile`, `GameContext`'s constructor, `GameScreen`, `Hud`,
+  `Portrait.act`.
+- Not done: step 6, splitting `GameContext` (the hub of the cycle). It touches most classes; worth its own plan when
+  wanted. Smaller next candidates: `TmxTiledMapLoader` into a loader per map kind, `Portrait.act` into idle and
+  reaction steps.
