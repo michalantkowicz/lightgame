@@ -572,3 +572,10 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
 - Tests: `CollectTest` checks the carrot lands next to the player; `CollectTest.noButtonAboveTheChest`,
   `CowTest.noButtonAboveTheCow`; the chest checks in `AnimationTest` and `ShippedMapsTest` use the new rule
   (`GameDriver.usedFromNeighbours`).
+
+## 2026‑11‑13, idea: one round-button resolver, updated after the cow (branch `idea-one-action-resolver`)
+
+- `docs/ideas.md`, "Interactable objects": the cow (branch `cow-state-machine`) got its own resolver,
+  `CreatureFeature`, beside the chest's. The entry now says what a shared resolver has to cover because of it (offers
+  that change with a creature's state, wish rules in the creature, two things in reach at once, who owns the hint) and
+  why it is worth doing (the PMD numbers of `CreatureFeature`). Docs only.

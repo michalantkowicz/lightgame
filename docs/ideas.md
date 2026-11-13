@@ -51,7 +51,8 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   map, a `SpriteActor` subclass with its `TileObjectType` line. Update the READMEs (step 2 of "Adding an animated
   sprite" in README.md, "Sprites in the game" in tools/assets/README.md, whose note that animals still use `row_NN` is
   already out of date) and the `_help` notes in `pack.json`.
-- **Interactable objects: one reach rule for chests, fields, trees** (2026‑11‑10, updated 2026‑11‑13). A chest is used
+- **Interactable objects: one reach rule and one round-button resolver for chests, creatures, fields, trees**
+  (2026‑11‑10, updated 2026‑11‑13 twice). A chest is used
   only from its left, its right and below it (`Tile.getUsedFromNeighbours()`: not diagonally, because the characters
   face only up, down, left and right, and not from above, where its button would cover the player),
   but the code using that rule knows only `Collectible`: `CollectibleFinder.entered` (shows the button),
@@ -66,6 +67,21 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   too (a character adding a plugin fits the architecture). Open questions: does the player harvest standing on the field
   or next to it, and is a patch one object per crop cell or one object over several cells? Do it with the first object
   that isn't a chest.
+  *Update after the cow (branch `cow-state-machine`):* the cow was that first object, and it went the other way to stay
+  small: `CreatureFeature` (for any `actor.Creature`) is a second resolver beside `PlayerCollectResolver` (they
+  share only the tile rule, `Tile.getUsedFromNeighbours()`, since branch `chest-and-reach`). It is inside every PMD
+  limit but the heaviest class in `feature` (69 statements, complexity 27, its `run` at 8 of the allowed 10, coupled to 12 classes: fifth highest in the game), so
+  the next kind of action there would break the build. What the shared resolver must also cover:
+  - *A creature as a kind of `Interactable` whose offer changes with its state:* a paw to stroke it, the item it wishes
+    for when the player carries one, or nothing (walking, eating). So an interactable answers "what do you offer this
+    player right now" (picture and action, or none) instead of having one fixed picture.
+  - *Rules that belong to the object, not the resolver:* whether an item fulfils a wish (today `CreatureFeature`
+    compares item classes; should be e.g. `creature.accepts(item)`).
+  - *Two things in reach at once:* a chest and a cow next to the player each put a button on the same place today. One
+    resolver shows one button and needs a rule for which (e.g. the one the player walked to last, or wishes first).
+  - *Who owns the hint:* `CreatureFeature` resets what the question mark says every frame, so nothing else can set a
+    hint. The resolver (or the HUD) should take hints from whatever is in reach and fall back to the default.
+  Worth doing before the second creature or the first field or tree.
 - **Game modes by age: a simple backpack for the youngest** (2026‑11‑10). **Needs more discussion before any
   implementation: how the backpack should look and behave (for each mode) isn't decided yet.** The game should suit kids
   from about 3 years old up, with easier mechanics for the youngest. Today the player has 2 backpack slots (shown in the HUD); a chest's button
