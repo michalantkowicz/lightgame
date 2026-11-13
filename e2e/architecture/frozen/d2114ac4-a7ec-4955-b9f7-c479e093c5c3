@@ -1,0 +1,4 @@
+Method <com.mantkowicz.light.ui.MenuStage.addActor(com.badlogic.gdx.scenes.scene2d.Actor)> checks instanceof <com.mantkowicz.light.ui.menu.MenuButton> in (MenuStage.java:38)
+Method <com.mantkowicz.light.ui.MenuStage.getButtonUnderPointer()> checks instanceof <com.mantkowicz.light.ui.menu.MenuButton> in (MenuStage.java:30)
+Method <com.mantkowicz.light.ui.MenuStage.getButtonUnderPointer()> has return type <com.mantkowicz.light.ui.menu.MenuButton> in (MenuStage.java:0)
+Method <com.mantkowicz.light.ui.MenuStage.interactWithButtonUnderPointer()> calls method <com.mantkowicz.light.ui.menu.MenuButton.interact()> in (MenuStage.java:23)

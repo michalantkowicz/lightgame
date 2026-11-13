@@ -185,12 +185,42 @@ Each its own pull request; each removes lines from the dependency list or a supp
 All three fail `./gradlew build`, which is the required `test` check of the master branch protection (already set,
 also for admins), so such a pull request can't be merged. No change to the GitHub settings is needed.
 
+### Phase 5: the intended architecture as rules (replaces the dependency list of phase 2)
+
+The list of phase 2 only froze what was there, tangles included, and said nothing about what the architecture should
+be. Replaced by rules stating it, with the violations the code still has frozen (ArchUnit's `FreezingArchRule`):
+
+- **Layers**, from the bottom: leaves (`util`, `debug`, `resources`, `stage`), world (`board`, `actor`, `light`,
+  `event`), behaviour (`map`, `plugin`, `notification`), UI (`ui..`), application (`feature`, `game`); a layer uses
+  only the layers below it (`layeredArchitecture()`).
+- **No two packages of one layer using each other**, for the pairs that do: the board doesn't know actors, the event
+  bus uses nothing of the game, the basic UI doesn't know the menu / HUD / collecting, features don't know `game`.
+- **Conventions** (hold today, not frozen): `*Event` classes are `GameEvent`s, `*Plugin` are `Plugin`s, `*Feature` are
+  `Feature`s; no reflection, `java.util.concurrent` or `String.format` (the HTML5 build can't run them); scenario
+  tests use only `GameDriver`.
+- **Frozen baseline** in `e2e/architecture/frozen/`: 183 class-to-class dependencies (layers: 120 in 31 classes;
+  event bus: 24 in 8; features → game: 21 in 6; board → actor: 14 in 2; basic UI → menu: 4 in 1). Listed ones pass,
+  any other fails; when a refactoring removes some, the test deletes them from the files and CI fails until that is
+  committed, so the baseline only shrinks. Line numbers don't matter, so editing a file doesn't break it.
+  `-Darchitecture.update=true` records the current violations, only for a deliberate exception.
+- The metrics report stays.
+
+What empties the baseline (the estimate behind it: about 6 pull requests, 70–90 files, mostly moving code):
+1. `GameContext` into its own low package, handing out plain libGDX stages (most of the layer violations: 28 classes
+   below the application layer use it).
+2. The event bus alone in `event`; each event next to the code it is about; finding collectibles out of `BoardService`.
+3. The board without actors (a small "something on this tile" interface).
+4. The board without the map: loading moves up, a small "tile content" abstraction moves down.
+5. Concrete characters (`Player`, `Cow`, `Dog`, `Chest`) into a package above `plugin`; base classes stay in `actor`.
+6. The small ones: `CollectPlugin` into `ui.collect`, the menu's interactions, `UiStyle`.
+
 ## Status (2026‑11‑13)
 
 Done, one pull request each: the plan (#36), Spotless and the reformat (#37), architecture tests (#38), PMD (#39),
-and phase 4 steps 1–5 (#40–#44). Where things stand after them:
+phase 4 steps 1–5 (#40–#44) and the architecture rules of phase 5 (#45). Where things stand after them:
 
-- Package dependencies: 77 lines (75 at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
+- Architecture: 183 known violations frozen (phase 5). Before phase 5 replaced the list: 77 package dependencies (75
+  at the start: 7 gone, 9 new). Gone: `ui → actor`, `ui → game`, `ui → plugin`,
   `actor → ui`, `actor → ui.collect`, `board → notification`, `board → ui`; new, all from a higher package to a lower
   one or into a leaf: `ui.collect → ui.hud`, `ui.hud → plugin`, `feature → plugin`, `feature → ui.collect`,
   `feature → board` and four into the new leaf `stage`. The 13 packages are still one cycle: what holds it together

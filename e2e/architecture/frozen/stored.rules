@@ -1,0 +1,7 @@
+#
+#Fri Nov 13 10:44:37 CET 2026
+Features\ do\ not\ know\ the\ game\ package\ (it\ creates\ them)=ec998b61-ff2a-4c40-b509-3d785635ecc6
+Layers\ use\ only\ the\ layers\ below\ them\ (leaves,\ world,\ behaviour,\ UI,\ application)=101bf814-3385-4f30-9930-7ca4df013ab4
+The\ basic\ UI\ (stages,\ widgets,\ style)\ does\ not\ know\ the\ menu,\ the\ HUD\ or\ collecting=d2114ac4-a7ec-4955-b9f7-c479e093c5c3
+The\ board\ does\ not\ know\ actors\ (actors\ stand\ on\ the\ board)=9344abc9-9f19-4d9e-a98f-9503df4f98e1
+The\ event\ bus\ uses\ nothing\ of\ the\ game\ (events\ belong\ with\ the\ code\ they\ are\ about)=4fc5174c-b9b1-4664-9482-fe7eb5693d3a

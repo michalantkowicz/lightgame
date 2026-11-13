@@ -400,3 +400,19 @@ Phase 4, step 5 of [code-quality-plan.md](code-quality-plan.md).
   Behaviour unchanged: no golden or map test changed. Their four PMD baseline suppressions are gone; the class itself
   is still over the limits for size and coupling (GodClass, CouplingBetweenObjects 28, ExcessiveImports 31), so its
   class-level suppression stays until the loader is split into classes.
+
+## 2026‑11‑13, the intended architecture as rules (branch `quality-5-layers`)
+
+Phase 5 of [code-quality-plan.md](code-quality-plan.md): replaces the package dependency list of phase 2, which only
+froze the existing state.
+
+- `ArchitectureTest` now states the architecture: five layers (leaves, world, behaviour, UI, application) using only
+  the layers below; no mutual use inside a layer (the board doesn't know actors, the event bus uses nothing of the
+  game, the basic UI doesn't know the menu/HUD/collecting, features don't know `game`); naming conventions (`*Event`,
+  `*Plugin`, `*Feature`); nothing the HTML5 build can't run (reflection, `java.util.concurrent`, `String.format`);
+  scenario tests via `GameDriver`; plus the metrics report.
+- The violations the code still has are frozen in `e2e/architecture/frozen/` (183 class-to-class dependencies, the
+  layers' 120 in 31 classes): they pass, any new one fails; fixed ones are deleted from the files by the test, and a
+  new CI step (`Architecture baseline is committed`) fails until that is committed. Seen working both ways: a planted
+  `board → ui` dependency failed; recorded on purpose and removed again, the baseline shrank back by itself.
+- `e2e/architecture/package-dependencies.txt` is gone.
