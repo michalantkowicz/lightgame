@@ -347,3 +347,12 @@ Phase 3 of [code-quality-plan.md](code-quality-plan.md).
   `GameContext`'s constructor; `GameScreen`; `Hud`; `Portrait.act`), so new code meets the limits from now on.
 - Fixed instead: `BlockedTile`'s empty constructor (the compiler's is the same), `Board` uses `isEmpty()`.
 - Seen failing on a planted method (cognitive complexity 31).
+
+## 2026‑11‑13, the action button belongs to the HUD (branch `quality-4a-action-button`)
+
+Phase 4, step 1 of [code-quality-plan.md](code-quality-plan.md).
+
+- `ActionButton` moved from `ui` to `ui.hud`: it is a HUD element (it stands where `Hud` says, over the hint). `ui`
+  (stages, `RoundButton`, `UiStyle`) no longer depends on `actor`, `game` or `plugin`; instead `ui.collect` uses
+  `ui.hud` (the resolver shows the button) and `ui.hud` uses `plugin` (the button fades with
+  `RemoveWhenUnavailablePlugin`). `package-dependencies.txt`: 75 → 74.

@@ -27,10 +27,10 @@ import java.util.List;
 
 /**
  * The HUD ("face is the button", docs/hud-design.md). Bottom centre: the player's face in a frame, two backpack
- * slots on its left, the player's stamina as a bar under the face ({@link StaminaBar}); on its right a round button: the hint (a question mark, which
- * makes the face cheer and say "play around!" in a bubble over it) or, over it when there is something to do, the action button ({@link
- * com.mantkowicz.light.ui.ActionButton}). Top right: the settings gear,
- * which opens the settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
+ * slots on its left, the player's stamina as a bar under the face ({@link StaminaBar}); on its right a round button:
+ * the hint (a question mark, which makes the face cheer and say "play around!" in a bubble over it) or, over it when
+ * there is something to do, the action button ({@link ActionButton}). Top right: the settings gear, which opens the
+ * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
  * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
  * for now.

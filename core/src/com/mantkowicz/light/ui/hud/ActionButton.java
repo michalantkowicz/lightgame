@@ -1,4 +1,4 @@
-package com.mantkowicz.light.ui;
+package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
-import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.RoundButton;
 
 import java.util.function.BooleanSupplier;
 

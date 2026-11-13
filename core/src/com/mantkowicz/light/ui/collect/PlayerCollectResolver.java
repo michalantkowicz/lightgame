@@ -12,7 +12,7 @@ import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.TileTouchedEvent;
 import com.mantkowicz.light.game.GameContext;
-import com.mantkowicz.light.ui.ActionButton;
+import com.mantkowicz.light.ui.hud.ActionButton;
 
 import java.util.HashMap;
 import java.util.Map;
