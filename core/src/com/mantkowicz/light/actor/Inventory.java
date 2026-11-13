@@ -51,7 +51,8 @@ public class Inventory {
             throw new IllegalArgumentException("Items must not be null");
         }
         if (inputItems.size() > capacity) {
-            throw new IllegalArgumentException("Inventory capacity " + capacity + " is less than " + inputItems.size() + " items");
+            throw new IllegalArgumentException(
+                    "Inventory capacity " + capacity + " is less than " + inputItems.size() + " items");
         }
         this.items = inputItems;
         completeWithNulls();

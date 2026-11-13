@@ -26,7 +26,8 @@ public abstract class SpriteActor extends GameBoardActor {
     /**
      * @param firstFrame the row (without a direction) whose first frame is shown until an animation is played
      */
-    protected SpriteActor(GameActorType type, GameContext context, Sprite sprite, Action firstFrame, String description) {
+    protected SpriteActor(GameActorType type, GameContext context, Sprite sprite, Action firstFrame,
+            String description) {
         super(type, context, description);
         this.sprite = sprite;
         this.resources = context.getResourcesService();
@@ -40,14 +41,16 @@ public abstract class SpriteActor extends GameBoardActor {
      * Plays one of the sprite's rows without a direction (named after the action, e.g. "idle") from its start.
      */
     protected void playAnimation(Action action) {
-        animationPlugin.play(ResourcesService.animationName(sprite, action, null), resources.getAnimation(sprite, action));
+        animationPlugin.play(ResourcesService.animationName(sprite, action, null),
+                resources.getAnimation(sprite, action));
     }
 
     /**
      * Plays the row backwards, from its last frame to its first, and stops there.
      */
     protected void playBackwards(Action action) {
-        animationPlugin.playBackwards(ResourcesService.animationName(sprite, action, null), resources.getAnimation(sprite, action));
+        animationPlugin.playBackwards(ResourcesService.animationName(sprite, action, null),
+                resources.getAnimation(sprite, action));
     }
 
     /**

@@ -304,3 +304,16 @@ The collect window is gone (it was too complicated): `CollectWindow`, `CollectIt
 - Test: `CollectTest.aFullBackpackThrowsOutItsFirstItemToTakeTheNewOne` (a dead-end map: which carrot goes where and
   when, the first slot shakes and settles back); `GameDriver`: `putCarrotIntoBackpack`, `backpackItems`,
   `itemsOnGroundThemselves`, `backpackSlotShaking`.
+
+## 2026‑11‑13, code format checked by Spotless (branch `quality-1-spotless`)
+
+Phase 1 of [code-quality-plan.md](code-quality-plan.md).
+
+- `com.diffplug.spotless` 8.11.0 in the root `build.gradle`: all Java in core, desktop, html and e2e (not the vendored
+  GWT emulation sources in `html/src/**/emu/**`) is formatted by the Eclipse JDT formatter 4.41 (pinned) with
+  `config/eclipse-formatter.xml`, a profile matching the existing style (4 spaces, 120 columns, continuation indent 8,
+  hand-wrapped lines kept, comments untouched, enum constants one per line when they don't fit on one), imports in
+  IntelliJ's default order, unused imports removed, no trailing spaces, a final newline.
+- `./gradlew spotlessApply` formats; `./gradlew build` runs `spotlessCheck`, so CI (the required `test` check) fails on
+  unformatted code with "Run './gradlew spotlessApply' to fix these violations".
+- One formatting-only commit (50 files, +287/−193 lines), listed in `.git-blame-ignore-revs`.

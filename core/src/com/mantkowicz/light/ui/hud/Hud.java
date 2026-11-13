@@ -1,14 +1,12 @@
 package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.Camera;
-import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.event.BackpackItemEjectedEvent;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
@@ -16,6 +14,8 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.event.BackpackItemEjectedEvent;
+import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.game.GameContext;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
@@ -61,7 +61,8 @@ public class Hud extends Group {
     static final Portrait.Idle AWAKE = new Portrait.Idle("awake", null, UiImage.TEEMO_STILL, 2.5f,
             UiImage.TEEMO_BLINK, UiImage.TEEMO_BLINK, UiImage.TEEMO_EAR),
             TIRED = new Portrait.Idle("tired", null, UiImage.TEEMO_STILL, 1, UiImage.TEEMO_YAWN),
-            ASLEEP = new Portrait.Idle("asleep", UiImage.TEEMO_FALL_ASLEEP, null, 0, UiImage.TEEMO_SLEEP, UiImage.TEEMO_SLEEP_MORE);
+            ASLEEP = new Portrait.Idle("asleep", UiImage.TEEMO_FALL_ASLEEP, null, 0, UiImage.TEEMO_SLEEP,
+                    UiImage.TEEMO_SLEEP_MORE);
     /** Between the face's top and the tip of its bubble's pointer. */
     private static final float BUBBLE_GAP = 6;
     /** How far a shaken slot moves up and down, and how long the first move takes (the whole shake is 6 times that). */
@@ -124,7 +125,6 @@ public class Hud extends Group {
             shownItems.add(null);
         }
 
-
         stamina = new StaminaBar(resources, player.getStamina());
         row.addActor(stamina);
 
@@ -152,8 +152,9 @@ public class Hud extends Group {
     public void act(float delta) {
         followCamera();
         showBackpack();
-        for (BackpackItemEjectedEvent ejected = events.poll(BackpackItemEjectedEvent.class); ejected != null;
-             ejected = events.poll(BackpackItemEjectedEvent.class)) {
+        for (BackpackItemEjectedEvent ejected = events
+                .poll(BackpackItemEjectedEvent.class); ejected != null; ejected = events
+                        .poll(BackpackItemEjectedEvent.class)) {
             shake(ejected.getSlot());
         }
         UiImage mood = stamina.getMood();
@@ -189,7 +190,8 @@ public class Hud extends Group {
             x -= slot.getWidth();
             slot.setPosition(x, ground);
             Image item = slotItems.get(i);
-            item.setPosition(x + (slot.getWidth() - item.getWidth()) / 2f, slot.getY() + (slot.getHeight() - item.getHeight()) / 2f + 4);
+            item.setPosition(x + (slot.getWidth() - item.getWidth()) / 2f,
+                    slot.getY() + (slot.getHeight() - item.getHeight()) / 2f + 4);
             x -= SLOT_GAP;
         }
 

@@ -36,7 +36,8 @@ public class CameraActor extends GameActor {
         Actor debugActor = new Actor();
         addActor(debugActor);
         debugActor.setSize(distanceLeftRight, distanceTopBottom);
-        debugActor.setPosition(debugActor.getX() - debugActor.getWidth() / 2f, debugActor.getY() - debugActor.getHeight() / 2f);
+        debugActor.setPosition(debugActor.getX() - debugActor.getWidth() / 2f,
+                debugActor.getY() - debugActor.getHeight() / 2f);
         debugActor.setTouchable(Touchable.disabled);
         debugActor.debug();
     }

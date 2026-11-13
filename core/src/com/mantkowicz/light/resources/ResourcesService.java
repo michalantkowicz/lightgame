@@ -53,7 +53,8 @@ public class ResourcesService {
         textureParameter.magFilter = Texture.TextureFilter.Linear;
 
         List<String> textureNames = Arrays.asList("floor-tile.png", "wall-tile.png", "player.png", "chest.png",
-                "lighter.png", "item_background.png", "table_background.png", "item_background_pressed.png", "item_background_able_to_put.png",
+                "lighter.png", "item_background.png", "table_background.png", "item_background_pressed.png",
+                "item_background_able_to_put.png",
                 "item_background_chosen.png", "dog.png", "black.png");
 
         for (String textureName : textureNames) {
@@ -82,7 +83,8 @@ public class ResourcesService {
         for (UiFont font : UiFont.values()) {
             JsonValue entry = fonts.get(font.getFont());
             if (entry == null) {
-                throw new IllegalStateException("UiFont." + font + " ('" + font.getFont() + "') isn't in " + UI + ": " + RUN_TOOL);
+                throw new IllegalStateException(
+                        "UiFont." + font + " ('" + font.getFont() + "') isn't in " + UI + ": " + RUN_TOOL);
             }
             String fontName = file.parent().child(entry.getString("file")).path();
             assetManager.load(fontName, BitmapFont.class);
@@ -101,7 +103,8 @@ public class ResourcesService {
         for (UiImage image : UiImage.values()) {
             JsonValue entry = images.get(image.getPiece());
             if (entry == null) {
-                throw new IllegalStateException("UiImage." + image + " ('" + image.getPiece() + "') isn't in " + UI + ": " + RUN_TOOL);
+                throw new IllegalStateException(
+                        "UiImage." + image + " ('" + image.getPiece() + "') isn't in " + UI + ": " + RUN_TOOL);
             }
             Array<AtlasRegion> frames = uiAtlas.findRegions(image.getPiece());
             if (frames.size != entry.getInt("frames")) {
@@ -140,7 +143,8 @@ public class ResourcesService {
     public Animation<TextureRegion> getUiAnimation(UiImage image) {
         Animation<TextureRegion> animation = uiAnimations.get(image);
         if (animation == null) {
-            throw new IllegalArgumentException("UiImage." + image + " isn't an animation (see build/assets-preview/index.html#ui)");
+            throw new IllegalArgumentException(
+                    "UiImage." + image + " isn't an animation (see build/assets-preview/index.html#ui)");
         }
         return animation;
     }
@@ -165,7 +169,8 @@ public class ResourcesService {
 
         for (JsonValue sheet = root.get("sheets").child; sheet != null; sheet = sheet.next) {
             spriteSheets.put(sheet.name, new SpriteSheet(sheet.getInt("frameWidth"), sheet.getInt("frameHeight"),
-                    sheet.getInt("trimX"), sheet.getInt("trimY"), sheet.getFloat("anchorX"), sheet.getFloat("anchorY")));
+                    sheet.getInt("trimX"), sheet.getInt("trimY"), sheet.getFloat("anchorX"),
+                    sheet.getFloat("anchorY")));
         }
         for (JsonValue animation = root.get("animations").child; animation != null; animation = animation.next) {
             Array<AtlasRegion> frames = atlas.findRegions(animation.name);

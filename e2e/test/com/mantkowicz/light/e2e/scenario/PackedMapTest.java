@@ -77,7 +77,8 @@ class PackedMapTest {
         assertEquals(AS_IT_IS, corners(game.cellDrawing(plain).get(1)));
         assertEquals("BR,TR,TL,BL", corners(game.cellDrawing(mirrored).get(1)), "left and right swapped");
         assertEquals("TL,BL,BR,TR", corners(game.cellDrawing(upsideDown).get(1)), "top and bottom swapped");
-        assertEquals("BR,BL,TL,TR", corners(game.cellDrawing(turned).get(1)), "the picture's top-left is now top-right");
+        assertEquals("BR,BL,TL,TR", corners(game.cellDrawing(turned).get(1)),
+                "the picture's top-left is now top-right");
         assertTrue(game.cellDrawing(plain).get(2).endsWith("alpha=0.5"), "the shadow layer is half transparent");
         assertTrue(game.cellDrawing(plain).get(3).endsWith("alpha=1.0"), "the layer above it is opaque again");
     }

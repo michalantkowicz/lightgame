@@ -27,6 +27,7 @@ public class CenterActorByCameraPlugin implements Plugin {
 
     private Vector2 getPosition(Camera camera) {
         Vector3 cameraPosition = camera.position;
-        return new Vector2(cameraPosition.x, cameraPosition.y).sub(actor.getWidth() / 2f, actor.getHeight() / 2f).sub(offset);
+        return new Vector2(cameraPosition.x, cameraPosition.y).sub(actor.getWidth() / 2f, actor.getHeight() / 2f)
+                .sub(offset);
     }
 }

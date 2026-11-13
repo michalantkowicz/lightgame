@@ -60,7 +60,8 @@ public class StaminaBar extends Actor {
         batch.setColor(1, 1, 1, parentAlpha * getColor().a);
         TextureRegion face = resources.getUiImage(getMood());
         float faceHeight = face.getRegionHeight() * SCALE;
-        batch.draw(face, getX(), getY() + Math.round((getHeight() - faceHeight) / 2f), face.getRegionWidth() * SCALE, faceHeight);
+        batch.draw(face, getX(), getY() + Math.round((getHeight() - faceHeight) / 2f), face.getRegionWidth() * SCALE,
+                faceHeight);
 
         int fullSegments = getFullSegments();
         float width = empty.getRegionWidth() * SCALE, height = empty.getRegionHeight() * SCALE;

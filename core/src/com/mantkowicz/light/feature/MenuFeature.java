@@ -87,9 +87,7 @@ public class MenuFeature implements Feature {
                 parallel(
                         moveTo(targetPosition.x, targetPosition.y, MENU_ANIMATION_DURATION, swingOut),
                         scaleTo(1f, 1f, MENU_ANIMATION_DURATION, swingOut),
-                        alpha(1f, MENU_ANIMATION_DURATION / 2f)
-                )
-        );
+                        alpha(1f, MENU_ANIMATION_DURATION / 2f)));
     }
 
     private Vector2 calculatePosition(Actor button, int elementIndex, int elementsCount) {

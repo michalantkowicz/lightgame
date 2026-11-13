@@ -12,7 +12,8 @@ public class GameStage extends AbstractStage {
 
     public GameStage(Viewport viewport, ResourcesService resourcesService) {
         super(viewport);
-        shaderProgram = new ShaderProgram(resourcesService.getShaderVertex(FADE_OUT), resourcesService.getShaderFragment(FADE_OUT));
+        shaderProgram = new ShaderProgram(resourcesService.getShaderVertex(FADE_OUT),
+                resourcesService.getShaderFragment(FADE_OUT));
     }
 
     public void fadeOut() {

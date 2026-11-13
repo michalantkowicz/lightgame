@@ -5,14 +5,15 @@ import com.mantkowicz.light.resources.ResourcesService;
 public class TileFactory {
     static public Tile createTile(ResourcesService resourcesService, TileType tileType) {
         switch (tileType) {
-            case FLOOR:
+            case FLOOR :
                 return new FloorTile(resourcesService);
-            case WALL:
+            case WALL :
                 return new WallTile(resourcesService);
-            case BLOCKED:
+            case BLOCKED :
                 return new BlockedTile();
-            default:
-                throw new IllegalArgumentException("There is no tile implementation for this tile type: " + tileType.name());
+            default :
+                throw new IllegalArgumentException(
+                        "There is no tile implementation for this tile type: " + tileType.name());
         }
     }
 
@@ -22,14 +23,15 @@ public class TileFactory {
      */
     static public Tile createMapTile(TileType tileType) {
         switch (tileType) {
-            case FLOOR:
+            case FLOOR :
                 return new FloorTile();
-            case WALL:
+            case WALL :
                 return new WallTile();
-            case BLOCKED:
+            case BLOCKED :
                 return new BlockedTile();
-            default:
-                throw new IllegalArgumentException("There is no tile implementation for this tile type: " + tileType.name());
+            default :
+                throw new IllegalArgumentException(
+                        "There is no tile implementation for this tile type: " + tileType.name());
         }
     }
 }

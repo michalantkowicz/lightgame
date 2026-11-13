@@ -29,7 +29,8 @@ public class Chest extends SpriteActor implements Collectible {
         setName("Nice Chest");
         setTouchable(Touchable.disabled);
         // the closed chest without the empty rows above it in its frame
-        closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7, 16, 14);
+        closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7,
+                16, 14);
 
         List<Item> content = new ArrayList<>();
         content.add(new Carrot(context.getResourcesService()));

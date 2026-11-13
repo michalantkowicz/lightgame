@@ -52,8 +52,8 @@ class HudTest {
     @Test
     void theRowSitsInTheBottomCentreAndTheGearTopRight() {
         String hud = GameDriver.start(MAP.write("hud")).describeHud();
-        assertTrue(hud.contains("face: teemo at=(308.0,74.0) size=184.0x184.0"), hud);       // (800 - 184) / 2 = 308
-        assertTrue(hud.contains("gear: at=(664.0,1136.0) size=88.0x96.0"), hud);                  // 48 px from the top-right corner (room for its circle)
+        assertTrue(hud.contains("face: teemo at=(308.0,74.0) size=184.0x184.0"), hud); // (800 - 184) / 2 = 308
+        assertTrue(hud.contains("gear: at=(664.0,1136.0) size=88.0x96.0"), hud); // 48 px from the top-right corner (room for its circle)
     }
 
     @Test
@@ -82,7 +82,8 @@ class HudTest {
         // its right edge 64 px from the screen's edge, like the slots' left edge (800 - 64 - 108 = 628), its bottom on
         // the face's bottom
         assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(628.0,74.0) alpha=1.0"), next);
-        assertTrue(game.describeHud().contains("hint: at=(628.0,74.0) size=108.0x120.0"), "the action button covers the hint");
+        assertTrue(game.describeHud().contains("hint: at=(628.0,74.0) size=108.0x120.0"),
+                "the action button covers the hint");
     }
 
     @Test
@@ -199,8 +200,8 @@ class HudTest {
         game.resize(500, 640); // wider: the UI's world gets wider
         game.frames(1);
         String hud = game.describeHud();
-        assertTrue(hud.contains("face: teemo at=(408.0,74.0)"), hud);           // (1000 - 184) / 2: still centred
-        assertTrue(hud.contains("gear: at=(864.0,1136.0)"), hud);                 // still 48 px from the top-right corner
+        assertTrue(hud.contains("face: teemo at=(408.0,74.0)"), hud); // (1000 - 184) / 2: still centred
+        assertTrue(hud.contains("gear: at=(864.0,1136.0)"), hud); // still 48 px from the top-right corner
         assertFalse(game.crashed());
     }
 }

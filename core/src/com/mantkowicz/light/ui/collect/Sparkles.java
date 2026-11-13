@@ -44,7 +44,9 @@ public final class Sparkles {
             float distance = MathUtils.random(MIN_DISTANCE, MAX_DISTANCE);
             float seconds = MathUtils.random(MIN_SECONDS, MAX_SECONDS);
             image.addAction(sequence(
-                    parallel(moveBy(MathUtils.cos(angle) * distance, MathUtils.sin(angle) * distance, seconds, Interpolation.pow2Out),
+                    parallel(
+                            moveBy(MathUtils.cos(angle) * distance, MathUtils.sin(angle) * distance, seconds,
+                                    Interpolation.pow2Out),
                             sequence(scaleTo(1, 1, seconds * 0.3f), scaleTo(0.2f, 0.2f, seconds * 0.7f)),
                             sequence(delay(seconds * 0.5f), fadeOut(seconds * 0.5f))),
                     Actions.removeActor()));

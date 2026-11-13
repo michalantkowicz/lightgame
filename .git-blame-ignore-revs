@@ -1,0 +1,6 @@
+# Commits that only reformat code: `git blame` and GitHub's blame skip them.
+# Locally: git config blame.ignoreRevsFile .git-blame-ignore-revs
+# (The hashes survive only merge-commit merges; after a squash or rebase merge put the new hash here.)
+
+# style: format all Java with Spotless (./gradlew spotlessApply)
+a709aaaf3762ddcfbaa638d9714b35b4c00e2688

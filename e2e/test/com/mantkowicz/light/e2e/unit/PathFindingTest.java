@@ -31,15 +31,15 @@ class PathFindingTest {
             E = MAP.cell('e'), BLOCKED = MAP.cell('x');
     private static final Cell[][] ROUTES = {
             {A, B},
-            {A, C},                 // into the room through its opening
+            {A, C}, // into the room through its opening
             {D, C},
             {B, E},
-            {C, E},                 // out of the room
+            {C, E}, // out of the room
             {A, E},
             {E, A},
-            {A, A},                 // already there
-            {E, BLOCKED},           // target blocked
-            {BLOCKED, E},           // start blocked
+            {A, A}, // already there
+            {E, BLOCKED}, // target blocked
+            {BLOCKED, E}, // start blocked
     };
 
     private static GameDriver game;

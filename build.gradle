@@ -11,6 +11,24 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.diffplug.spotless' version '8.11.0'
+}
+
+// The code format (see config/eclipse-formatter.xml): `./gradlew spotlessApply` formats, `./gradlew build` fails on
+// unformatted code (spotlessCheck).
+spotless {
+    java {
+        target 'core/src/**/*.java', 'desktop/src/**/*.java', 'html/src/**/*.java', 'e2e/test/**/*.java'
+        targetExclude 'html/src/**/emu/**' // vendored libGDX / box2dlights sources the GWT build needs
+        eclipse('4.41').configFile('config/eclipse-formatter.xml') // pinned: an upgrade never reformats silently
+        importOrder('', 'javax|java', '\\#') // IntelliJ's default: everything else, then java/javax, then static
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
 allprojects {
     version = '1.0'
 

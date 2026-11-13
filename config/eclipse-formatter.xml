@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  The project's Java format, applied by Spotless (./gradlew spotlessApply; ./gradlew build checks it).
+  Only what differs from Eclipse's defaults is set: 4 spaces, lines up to 120 columns, continuation lines indented 8,
+  lines wrapped by hand are never joined, comments are left as written, enum constants that don't fit on one line go
+  one per line. "// @formatter:off" ... "// @formatter:on"
+  protects a hand-aligned block. IntelliJ can import it: Code Style > Java > Import Scheme > Eclipse XML Profile.
+-->
+<profiles version="23">
+  <profile kind="CodeFormatterProfile" name="lightgame" version="23">
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.char" value="space"/>
+    <setting id="org.eclipse.jdt.core.formatter.tabulation.size" value="4"/>
+    <setting id="org.eclipse.jdt.core.formatter.indentation.size" value="4"/>
+    <setting id="org.eclipse.jdt.core.formatter.lineSplit" value="120"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.line_length" value="120"/>
+    <setting id="org.eclipse.jdt.core.formatter.continuation_indentation" value="2"/>
+    <setting id="org.eclipse.jdt.core.formatter.continuation_indentation_for_array_initializer" value="2"/>
+    <setting id="org.eclipse.jdt.core.formatter.join_wrapped_lines" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.join_lines_in_comments" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_javadoc_comments" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_block_comments" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.comment.format_line_comments" value="false"/>
+    <setting id="org.eclipse.jdt.core.formatter.use_on_off_tags" value="true"/>
+    <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="48"/>
+  </profile>
+</profiles>

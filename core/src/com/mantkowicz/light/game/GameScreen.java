@@ -54,8 +54,9 @@ public class GameScreen extends ScreenAdapter {
     private RayHandler rayHandler;
     private final List<Feature> features = new ArrayList<>();
 
-    public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService, GameEventService gameEventService,
-                      World world) {
+    public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService,
+            GameEventService gameEventService,
+            World world) {
         this.mapName = mapName;
         this.cameraZoom = cameraZoom;
         this.resourcesService = resourcesService;
