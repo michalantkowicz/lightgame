@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Plugin;
 import com.mantkowicz.light.resources.ResourcesService;
 
 /**

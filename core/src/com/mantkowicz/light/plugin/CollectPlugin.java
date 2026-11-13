@@ -2,6 +2,7 @@ package com.mantkowicz.light.plugin;
 
 import com.mantkowicz.light.actor.CollectEvent;
 import com.mantkowicz.light.actor.Collectible;
+import com.mantkowicz.light.actor.Plugin;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.ui.collect.CollectResolver;

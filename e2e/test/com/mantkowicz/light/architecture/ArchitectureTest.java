@@ -33,8 +33,9 @@ import static com.tngtech.archunit.library.freeze.FreezingArchRule.freeze;
  * two packages of one layer using each other, and a few conventions.
  * <p>
  * Layers, from the bottom: <b>leaves</b> (util, debug, resources, stage: use nothing of the game), the <b>world</b>
- * (board, actor, light, event, context: what the game objects get from the game screen), <b>behaviour</b> (map, plugin, notification), the <b>UI</b> (ui and its subpackages),
- * the <b>application</b> (feature, game).
+ * (board, actor, light, event, context: what the game objects get from the game screen), <b>behaviour</b> (plugin,
+ * notification), the <b>characters</b> (character: the player, the dog, the cow, the chest...; map: creates them), the
+ * <b>UI</b> (ui and its subpackages), the <b>application</b> (feature, game).
  * <p>
  * The code doesn't follow all of it yet: the layer and same-layer rules are <i>frozen</i>. The violations the code had
  * when the rules came are listed in {@code e2e/architecture/frozen/} (one class-to-class dependency each) and pass; any
@@ -70,13 +71,15 @@ class ArchitectureTest {
         ArchRule layers = layeredArchitecture().consideringOnlyDependenciesInLayers()
                 .layer("Leaves").definedBy(packages("util", "debug", "resources", "stage"))
                 .layer("World").definedBy(packages("board", "actor", "light", "event", "context"))
-                .layer("Behaviour").definedBy(packages("map", "plugin", "notification"))
+                .layer("Behaviour").definedBy(packages("plugin", "notification"))
+                .layer("Characters").definedBy(packages("character", "map"))
                 .layer("UI").definedBy(packages("ui"))
                 .layer("Application").definedBy(packages("feature", "game"))
                 .whereLayer("Application").mayNotBeAccessedByAnyLayer()
                 .whereLayer("UI").mayOnlyBeAccessedByLayers("Application")
-                .whereLayer("Behaviour").mayOnlyBeAccessedByLayers("UI", "Application")
-                .whereLayer("World").mayOnlyBeAccessedByLayers("Behaviour", "UI", "Application")
+                .whereLayer("Characters").mayOnlyBeAccessedByLayers("UI", "Application")
+                .whereLayer("Behaviour").mayOnlyBeAccessedByLayers("Characters", "UI", "Application")
+                .whereLayer("World").mayOnlyBeAccessedByLayers("Behaviour", "Characters", "UI", "Application")
                 .as("Layers use only the layers below them (leaves, world, behaviour, UI, application)");
         freeze(layers).check(game);
     }
@@ -108,6 +111,20 @@ class ArchitectureTest {
     }
 
     @Test
+    void pluginsDoNotKnowCharacters() {
+        noClasses().that().resideInAPackage(GAME + ".plugin..")
+                .should().dependOnClassesThat().resideInAPackage(GAME + ".character..")
+                .because("characters put plugins together; a plugin works on any actor").check(game);
+    }
+
+    @Test
+    void charactersDoNotKnowTheMap() {
+        noClasses().that().resideInAPackage(GAME + ".character..")
+                .should().dependOnClassesThat().resideInAPackage(GAME + ".map..")
+                .because("the map creates characters").check(game);
+    }
+
+    @Test
     void basicUiDoesNotKnowItsSubpackages() {
         freeze(noClasses().that().resideInAPackage(GAME + ".ui")
                 .should().dependOnClassesThat().resideInAnyPackage(GAME + ".ui.menu..", GAME + ".ui.hud..",
@@ -127,7 +144,7 @@ class ArchitectureTest {
     void namesSayWhatClassesAre() {
         classes().that().haveSimpleNameEndingWith("Event").should().beAssignableTo(GAME + ".event.GameEvent")
                 .check(game);
-        classes().that().haveSimpleNameEndingWith("Plugin").should().beAssignableTo(GAME + ".plugin.Plugin")
+        classes().that().haveSimpleNameEndingWith("Plugin").should().beAssignableTo(GAME + ".actor.Plugin")
                 .check(game);
         classes().that().haveSimpleNameEndingWith("Feature").should().beAssignableTo(GAME + ".feature.Feature")
                 .check(game);

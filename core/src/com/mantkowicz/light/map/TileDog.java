@@ -1,6 +1,6 @@
 package com.mantkowicz.light.map;
 
-import com.mantkowicz.light.actor.Dog;
+import com.mantkowicz.light.character.Dog;
 import com.mantkowicz.light.context.GameContext;
 
 import static com.mantkowicz.light.map.TileObjectType.DOG;

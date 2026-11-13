@@ -465,3 +465,17 @@ Step 4 of emptying the architecture baseline ([code-quality-plan.md](code-qualit
 - Tiles hold `TileContent`s (new, in `board`: whether it blocks the tile, what it draws on it) instead of the map's
   `TileObject`s; `TileObject` implements it. `GameScreen` prepares the contents that are map objects.
 - Baseline: 40 → 28 recorded dependencies (all of the board's uses of the map). No golden changed.
+
+## 2026‑11‑13, characters above plugins (branch `arch-5-characters`)
+
+Step 5 of emptying the architecture baseline ([code-quality-plan.md](code-quality-plan.md), phase 5).
+
+- The concrete characters `Player`, `Dog`, `Cow`, `Chest`, their base `SpriteActor`, `PlayerCreatedEvent` and the
+  player-only `PlayerNotificationPlugin` moved from `actor`/`plugin` to the new package `character`. With `map` (which
+  creates them) it is a new layer, characters, between behaviour (plugins, notifications) and the UI. `actor` keeps the
+  base classes and what isn't a character (items, inventory, stamina, collectibles).
+- `Plugin` moved to `actor`: it is the actor's extension point; the plugins stay in `plugin`. `BoardMovementPlugin`
+  walks any `GameBoardActor` (it used nothing of the player but status, actions and tiles); `PlayerMoveEvent` carries
+  a `GameBoardActor` and stays in `actor`.
+- New plain rules: plugins don't know characters, characters don't know the map.
+- Baseline: 28 → 13 recorded dependencies (all of the actors' uses of plugins). No golden changed.

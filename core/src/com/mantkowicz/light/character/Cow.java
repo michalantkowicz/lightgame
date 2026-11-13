@@ -1,4 +1,4 @@
-package com.mantkowicz.light.actor;
+package com.mantkowicz.light.character;
 
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.context.GameContext;

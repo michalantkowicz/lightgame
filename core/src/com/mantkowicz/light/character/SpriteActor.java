@@ -1,5 +1,7 @@
-package com.mantkowicz.light.actor;
+package com.mantkowicz.light.character;
 
+import com.mantkowicz.light.actor.GameActorType;
+import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.plugin.SpriteAnimationPlugin;
 import com.mantkowicz.light.resources.Action;

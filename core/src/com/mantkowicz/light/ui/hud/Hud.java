@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
-import com.mantkowicz.light.actor.Player;
+import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.GameEventService;

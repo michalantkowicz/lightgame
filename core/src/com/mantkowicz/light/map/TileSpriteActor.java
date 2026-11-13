@@ -1,6 +1,6 @@
 package com.mantkowicz.light.map;
 
-import com.mantkowicz.light.actor.SpriteActor;
+import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
 
 import java.util.function.Function;

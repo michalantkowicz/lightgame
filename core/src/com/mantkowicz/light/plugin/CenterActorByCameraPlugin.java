@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mantkowicz.light.actor.GameActor;
+import com.mantkowicz.light.actor.Plugin;
 
 /**
  * Keeps the actor centred on its stage's camera, moved by an offset. On the UI stage that camera stays in the middle of
