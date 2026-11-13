@@ -54,10 +54,7 @@ plugin -> notification
 plugin -> resources
 plugin -> ui
 plugin -> ui.collect
-ui -> actor
-ui -> game
 ui -> notification
-ui -> plugin
 ui -> resources
 ui -> ui.menu
 ui.collect -> actor
@@ -66,9 +63,11 @@ ui.collect -> event
 ui.collect -> game
 ui.collect -> resources
 ui.collect -> ui
+ui.collect -> ui.hud
 ui.hud -> actor
 ui.hud -> event
 ui.hud -> game
+ui.hud -> plugin
 ui.hud -> resources
 ui.hud -> ui
 ui.menu -> actor

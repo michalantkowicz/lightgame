@@ -57,7 +57,7 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
-import com.mantkowicz.light.ui.ActionButton;
+import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
 import com.mantkowicz.light.ui.hud.SettingsPanel;
