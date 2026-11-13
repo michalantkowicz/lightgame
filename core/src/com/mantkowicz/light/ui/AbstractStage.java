@@ -2,6 +2,7 @@ package com.mantkowicz.light.ui;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mantkowicz.light.stage.StageType;
 
 public abstract class AbstractStage extends Stage {
     public AbstractStage(Viewport viewport) {

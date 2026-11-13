@@ -4,9 +4,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.mantkowicz.light.actor.GameActor;
 import com.mantkowicz.light.actor.GameActorDefinition;
-import com.mantkowicz.light.ui.StageType;
+import com.mantkowicz.light.stage.StageType;
 
-import static com.mantkowicz.light.ui.StageType.NOTIFICATION_STAGE;
+import static com.mantkowicz.light.stage.StageType.NOTIFICATION_STAGE;
 
 public class DescriptionDefinition implements GameActorDefinition<Description> {
     private GameActor parent;

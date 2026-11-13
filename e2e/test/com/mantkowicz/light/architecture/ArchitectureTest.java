@@ -44,7 +44,7 @@ class ArchitectureTest {
     private static final Path ALLOWED = ROOT.resolve("e2e/architecture/package-dependencies.txt");
     private static final Path METRICS = ROOT.resolve("e2e/build/reports/architecture/metrics.md");
     /** Packages that depend on no other game package: everything may use them, they use nothing of the game. */
-    private static final List<String> LEAVES = List.of("debug", "resources", "util");
+    private static final List<String> LEAVES = List.of("debug", "resources", "stage", "util");
 
     private static JavaClasses game;
 

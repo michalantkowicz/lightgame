@@ -3,9 +3,10 @@ package com.mantkowicz.light.ui;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.resources.ResourcesService;
+import com.mantkowicz.light.stage.StageType;
 
 import static com.mantkowicz.light.resources.ShaderType.FADE_OUT;
-import static com.mantkowicz.light.ui.StageType.GAME_STAGE;
+import static com.mantkowicz.light.stage.StageType.GAME_STAGE;
 
 public class GameStage extends AbstractStage {
     private final ShaderProgram shaderProgram;

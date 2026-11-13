@@ -4,8 +4,9 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.notification.Notification;
 import com.mantkowicz.light.notification.NotificationType;
+import com.mantkowicz.light.stage.StageType;
 
-import static com.mantkowicz.light.ui.StageType.NOTIFICATION_STAGE;
+import static com.mantkowicz.light.stage.StageType.NOTIFICATION_STAGE;
 
 public class NotificationStage extends AbstractStage {
     public NotificationStage(Viewport viewport) {
