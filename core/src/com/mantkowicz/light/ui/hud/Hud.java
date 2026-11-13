@@ -251,8 +251,8 @@ public class Hud extends Group {
         }
     }
 
-    /** The face says the hint in a bubble over it (a new tap starts it again). */
-    private void showHint() {
+    /** The face says the hint in a bubble over it (a new tap starts it again), as when the hint button is tapped. */
+    public void showHint() {
         if (bubble != null) {
             bubble.remove();
         }

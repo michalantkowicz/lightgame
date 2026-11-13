@@ -594,8 +594,15 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   (owner's choice): then tapping it shakes the button (`ActionButton.shake`) and the hint still says "find" with a
   carrot. Walking away brings the bubble back.
 - A chest and a cow next to the player now show one button each, over each (before, both buttons sat in one place).
+- **Several buttons over one thing** (usually one, at most about three) stand in a row centred over it, ordered by
+  `ActionButton.setPlace`. The cow keeps its **hand while it wishes** for a carrot: hand left, carrot right. A stroke
+  while wishing (`CowState.WISHING` can be stroked now) shows the heart and goes back to wishing (via STANDING, still
+  hungry), so the carrot button fades for the heart and comes back.
+- Tapping the carrot without one also makes the face say "find" with the carrot (`Hud.showHint`, as the hint button
+  does), not only shakes the button.
 - `CreatureFeature.run` reached PMD's complexity limit and was split (`updateGiveButton`).
 - Golden `collect.txt` re-recorded: only the button's position (from (628,74) beside the face to (355,976) over the
-  chest). Tests: `CowTest.theButtonTakesTheBubblesPlaceNextToTheCow`, the give button shaking without a carrot,
+  chest). Tests: `CowTest.theButtonTakesTheBubblesPlaceNextToTheCow`, `strokingTheCowWhileItWishesForACarrot`, the hand left of
+  the carrot, the give button shaking and the face saying "find" without a carrot,
   `HudTest.theActionButtonAppearsOverTheChest`; `CameraZoomTest` now checks only that the button doesn't grow (it moves
   with the chest).

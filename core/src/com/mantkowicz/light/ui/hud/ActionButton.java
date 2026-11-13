@@ -14,19 +14,22 @@ import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.RoundButton;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
 import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
 
 /**
  * A {@link RoundButton} with a picture of what it does (e.g. the open chest to collect from), over what it acts on (the
- * chest, the cow) and following it around. It is on the UI stage, so it keeps its size and catches taps before the map
+ * chest, the cow) and following it around. Several buttons over one thing (usually one, at most about three: the cow's
+ * hand and the carrot it wishes for) stand in a row centred over it, ordered by {@link #setPlace}. It is on the UI stage, so it keeps its size and catches taps before the map
  * under it. It stays while its action is available and fades out when it no longer is (and fades back in if it becomes
  * available again before it is gone). Its name (e.g. "COLLECT") is for tests only: players see the picture.
  */
 public class ActionButton extends GameActor {
-    /** Between the top of what it acts on and the button's bottom. */
-    private static final float GAP = 16;
+    /** Between the top of what it acts on and the button's bottom, and between buttons in a row over one thing. */
+    private static final float GAP = 16, ROW_GAP = 8;
     /** Screen pixels per pack pixel: smaller than the HUD's hint button (6 and 4), so it doesn't hide the map. */
     private static final int SCALE = 5, ICON_SCALE = 3;
     /** Darker than the hint's brown: it stands out from the grass and the water, and fits the wooden HUD. */
@@ -37,6 +40,8 @@ public class ActionButton extends GameActor {
     private final Stage gameStage;
     private final Actor over;
     private final RoundButton button;
+    /** Its place in the row over its thing: lower is further left. */
+    private int place;
 
     /**
      * @param over what it acts on, on the game stage: the button is drawn over it
@@ -64,11 +69,31 @@ public class ActionButton extends GameActor {
         }
     }
 
-    /** Centred over the top of what it acts on, wherever the camera shows it. */
+    /** Over the top of what it acts on, wherever the camera shows it: in its place in the row of buttons there. */
     private void followTarget() {
         Vector2 top = over.localToStageCoordinates(new Vector2(over.getWidth() / 2f, over.getHeight()));
         getStage().screenToStageCoordinates(gameStage.stageToScreenCoordinates(top));
-        setPosition(Math.round(top.x - getWidth() / 2f), Math.round(top.y + GAP));
+        List<ActionButton> row = rowOverTheSameThing();
+        float step = getWidth() + ROW_GAP;
+        float left = top.x - (row.size() * step - ROW_GAP) / 2f;
+        setPosition(Math.round(left + row.indexOf(this) * step), Math.round(top.y + GAP));
+    }
+
+    /** The buttons over the same thing (this one too, also any fading out), in their places from left to right. */
+    private List<ActionButton> rowOverTheSameThing() {
+        List<ActionButton> row = new ArrayList<>();
+        for (Actor actor : getStage().getActors()) {
+            if (actor instanceof ActionButton other && other.over == over) {
+                row.add(other);
+            }
+        }
+        row.sort((a, b) -> Integer.compare(a.place, b.place));
+        return row;
+    }
+
+    /** Its place in the row of buttons over the same thing: lower is further left (0 by default). */
+    public void setPlace(int place) {
+        this.place = place;
     }
 
     /** A quick shake sideways: tapped, but there is nothing it can do (e.g. nothing to give yet). */

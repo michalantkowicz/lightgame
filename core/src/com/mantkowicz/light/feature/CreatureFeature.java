@@ -20,13 +20,14 @@ import java.util.function.BooleanSupplier;
 
 /**
  * What the player does with a creature (a cow) the player stands next to (on a tile it is used from:
- * {@link Tile#getUsedFromNeighbours()}), on an action button over the creature:
+ * {@link Tile#getUsedFromNeighbours()}), on action buttons in a row over the creature:
  * <ul>
- * <li>the creature wishes for something: the button shows that item instead of the bubble with the wish. Tapping it
+ * <li>it can be stroked: a button with a hand (on the left); tapping it strokes the creature, and a heart floats up
+ * over the player;</li>
+ * <li>it wishes for something: a button with that item (on the right) instead of the bubble with the wish. Tapping it
  * takes the item out of the backpack (its slot shakes) and gives it to the creature; when the player doesn't carry
- * one, the button shakes and the HUD's hint button (the question mark) says "find" with the item's picture;</li>
- * <li>it wishes for nothing and can be stroked: the button shows a hand; tapping it strokes the creature, and a heart
- * floats up over the player.</li>
+ * one, the button shakes and the face says "find" with the item's picture, as the HUD's hint button (the question
+ * mark) does next to it.</li>
  * </ul>
  * The buttons fade out when what they do is no longer possible (the player walks away, the creature walks or eats);
  * once the button with the wish is gone, the bubble is back.
@@ -36,6 +37,9 @@ public class CreatureFeature implements Feature {
     static final String FIND = "find";
     /** The heart floating up over the player after a stroke: screen pixels per pack pixel, and how far over its tile (just over its ears). */
     private static final float HEART_SCALE = 2, HEART_GAP = -24;
+
+    /** Places in the row of buttons over the creature: the hand left of the wish. */
+    private static final int STROKE_PLACE = 0, GIVE_PLACE = 1;
 
     private final GameContext context;
     private final Player player;
@@ -65,6 +69,7 @@ public class CreatureFeature implements Feature {
         updateGiveButton(creature);
         if (canStroke() && !isShown(strokeButton)) {
             strokeButton = addButton("STROKE", hand, this::stroke, this::canStroke, creature);
+            strokeButton.setPlace(STROKE_PLACE);
         }
     }
 
@@ -76,6 +81,7 @@ public class CreatureFeature implements Feature {
         }
         if (canGive() && !isShown(giveButton)) {
             giveButton = addButton("GIVE", creature.getWish().getPicture(), this::give, this::canGive, creature);
+            giveButton.setPlace(GIVE_PLACE);
             givingTo = creature;
             creature.setWishShown(false);
         }
@@ -93,7 +99,8 @@ public class CreatureFeature implements Feature {
         Creature creature = creatureNextToPlayer();
         int slot = slotWith(creature.getWish());
         if (slot < 0) {
-            giveButton.shake(); // nothing to give: the hint says what to find
+            giveButton.shake(); // nothing to give: the face says what to find
+            hud.showHint();
             return;
         }
         Item item = player.getInventory().take(slot);
@@ -103,7 +110,7 @@ public class CreatureFeature implements Feature {
 
     private boolean canStroke() {
         Creature creature = creatureNextToPlayer();
-        return creature != null && creature.getWish() == null && creature.canBeStroked();
+        return creature != null && creature.canBeStroked();
     }
 
     private void stroke() {
