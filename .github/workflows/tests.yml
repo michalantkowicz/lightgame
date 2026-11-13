@@ -50,6 +50,11 @@ jobs:
       - name: Compile HTML5 version (GWT)
         run: ./gradlew html:dist --no-daemon
 
+      # How tangled the game's packages are (ArchitectureTest writes it), on the run's summary page. Not a gate.
+      - name: Architecture metrics
+        if: always()
+        run: cat e2e/build/reports/architecture/metrics.md >> "$GITHUB_STEP_SUMMARY" 2>/dev/null || true
+
       # On failure only: save test reports and golden-file diffs so you can
       # download them from the run page and see what broke.
       - name: Upload test reports

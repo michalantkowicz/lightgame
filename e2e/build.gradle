@@ -14,6 +14,7 @@ dependencies {
     testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.1' // architecture tests (docs/code-quality-plan.md)
     testImplementation platform("org.junit:junit-bom:$junitVersion")
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
@@ -29,6 +30,8 @@ tasks.named('test', Test) {
     systemProperty 'golden.actual.dir', layout.buildDirectory.dir('golden-actual').get().asFile.absolutePath
     systemProperty 'golden.update', System.getProperty('golden.update', 'false')
     systemProperty 'repo.root', rootProject.projectDir.absolutePath // AssetsUpToDateTest reads the asset sources
+    systemProperty 'architecture.update', System.getProperty('architecture.update', 'false')
+    inputs.dir(file('architecture')).withPropertyName('architecture')
     inputs.dir(goldenDir).withPropertyName('goldens')
     inputs.dir(rootProject.file('android/assets')).withPropertyName('assets')
     // sources of the generated assets: a level saved in Tiled must re-run AssetsUpToDateTest (images/ is git-ignored)
