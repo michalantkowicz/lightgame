@@ -64,18 +64,20 @@ public class Cow extends SpriteActor implements Creature {
 
     /** A cow that may wish for any crop. */
     public Cow(GameContext context) {
-        this(context, CropType.listOf(null));
+        this(context, CropType.all());
     }
 
-    /** A cow that wishes only for these crops (one at random each time it gets hungry). */
+    /**
+     * A cow that wishes only for these crops (one at random each time it gets hungry); for any crop when the list is
+     * null or empty.
+     */
     public Cow(GameContext context, List<CropType> favouriteDishes) {
         super(COW, context, Sprite.COW_BROWN, Action.IDLE, "A brown cow. It looks calm and a bit hungry.");
         resources = context.getResourcesService();
-        if (favouriteDishes.isEmpty()) {
-            throw new IllegalArgumentException("A cow needs at least one favourite dish");
-        }
-        this.favouriteDishes = new ArrayList<>(favouriteDishes);
-        favouriteFood = new Crop(favouriteDishes.get(0), resources);
+        this.favouriteDishes = favouriteDishes == null || favouriteDishes.isEmpty()
+                ? CropType.all()
+                : new ArrayList<>(favouriteDishes);
+        favouriteFood = new Crop(this.favouriteDishes.get(0), resources);
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, context.getGameEventService()));
 
@@ -151,7 +153,7 @@ public class Cow extends SpriteActor implements Creature {
 
     /** It got hungry: picks, at random, which of its favourite dishes it wishes for this time. */
     void chooseWish() {
-        favouriteFood = new Crop(CropType.oneOf(favouriteDishes), resources);
+        favouriteFood = new Crop(CropType.randomOf(favouriteDishes), resources);
     }
 
     /** The crops it may wish for. */

@@ -36,12 +36,17 @@ public enum CropType {
 
     /** One of them, at random. */
     public static CropType random() {
-        return oneOf(Arrays.asList(values()));
+        return randomOf(all());
     }
 
     /** One of these, at random. */
-    public static CropType oneOf(List<CropType> types) {
+    public static CropType randomOf(List<CropType> types) {
         return types.get(MathUtils.random(types.size() - 1));
+    }
+
+    /** All the kinds, e.g. a cow's favourite dishes when nothing else is set. */
+    public static List<CropType> all() {
+        return new ArrayList<>(Arrays.asList(values()));
     }
 
     /**
@@ -49,11 +54,10 @@ public enum CropType {
      * null or blank.
      */
     public static List<CropType> listOf(String names) {
-        List<CropType> types = new ArrayList<>();
         if (names == null || names.trim().isEmpty()) {
-            types.addAll(Arrays.asList(values()));
-            return types;
+            return all();
         }
+        List<CropType> types = new ArrayList<>();
         for (String name : names.split(",")) {
             types.add(named(name.trim()));
         }

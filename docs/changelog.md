@@ -670,7 +670,8 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   one, and only a carrot.
 - **A chest** holds one crop picked at random when the level starts.
 - **A cow** wishes, each time it gets hungry, for one of its **favourite dishes**, picked at random: the Tiled string
-  property `favouriteDish` on the `COW` object, e.g. `CARROT,CUCUMBER`; without it, any crop (owner's choice). An
+  property `favouriteDish` on the `COW` object, e.g. `CARROT,CUCUMBER`; without it or empty, any crop (owner's choice; `CropType.all()`, also for a `Cow` given an
+  empty list). `CropType.randomOf` picks one of a list. An
   unknown name stops the level with a message listing the crops. The wish is picked on getting hungry, not on
   entering `WISHING`, so a cow stroked while it wishes comes back wishing for the same crop. A cow may wish for a crop
   no chest holds; then it gives up after 90 s and grazes, as before.

@@ -265,11 +265,22 @@ class CowTest {
         assertFalse(game.crashed());
     }
 
-    /** Without favouriteDish in Tiled, the cow may wish for any crop. */
+    /** Without favouriteDish in Tiled, or with it empty, the cow may wish for any crop. */
     @Test
     void aCowMayWishForAnyCrop() {
+        List<String> all = List.of("corn", "carrot", "tomato", "pumpkin", "cucumber");
         GameDriver game = GameDriver.start(PEN.write("cow-pen"));
-        assertEquals(List.of("corn", "carrot", "tomato", "pumpkin", "cucumber"), game.cowFavouriteDishes());
+        assertEquals(all, game.cowFavouriteDishes(), "no favouriteDish");
+        assertFalse(game.crashed());
+
+        TestMap empty = TestMap.of(
+                "~~~~~",
+                "~~K~~",
+                "~~P~~",
+                "~~~~~")
+                .with('K', "COW", Map.of("favouriteDish", ""));
+        game = GameDriver.start(empty.write("cow-empty-dish"));
+        assertEquals(all, game.cowFavouriteDishes(), "an empty favouriteDish");
         assertFalse(game.crashed());
     }
 
