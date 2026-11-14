@@ -21,17 +21,17 @@ import static com.mantkowicz.light.actor.Status.IDLE;
 
 /**
  * How the player gets things. Next to a collectible that still holds something (a chest: on a tile it is used from)
- * its button appears over it (the open chest); it stays while the player is within reach and fades out once the player leaves. Coming back
- * before it is gone brings the same button back, so walking around a chest (past its corner cells) never shows two
- * buttons.
+ * its button appears over it (the open chest); it stays while the player is within reach and fades out once the
+ * player leaves. Coming back before it is gone brings the same button back, so walking around a chest (past its corner
+ * cells) never shows two buttons.
  * <p>
  * The button opens the collectible only where the player stands still: during a walk the click works like a click on
  * the collectible, so the player stops on (or steps back to) the nearest cell in reach, and it opens on arrival. While
  * the button fades (out of reach) it still catches clicks, so they don't walk the player to the board under it, but
  * does nothing. Opening it (a chest lifts its lid and stays open) pops stars and throws everything inside out onto
- * free tiles around it. A chest then keeps its button, showing the closed chest: it closes the lid, and the next tap
- * opens it again (with nothing left inside: no stars, nothing comes out). Something that can't be closed loses its
- * button once it is empty.
+ * free tiles around it; with nowhere for them to land, it stays shut and its button shakes. A chest then keeps its
+ * button, showing the closed chest: it closes the lid, and the next tap opens it again (with nothing left inside: no
+ * stars, nothing comes out). Something that can't be closed loses its button once it is empty.
  * <p>
  * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
  * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
@@ -138,9 +138,20 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
+    /**
+     * Opens it and throws out what is inside. When nothing inside has anywhere to land (every tile next to it is taken,
+     * e.g. the player stands on the only free one), it stays shut and its button shakes.
+     */
     private void open(Collectible collectible) {
-        collectible.beforeCollect(); // a chest lifts its lid (and keeps it open)
         Tile tile = collectible.getTile();
+        if (holdsSomething(collectible) && !thrower.hasRoomNextTo(tile)) {
+            ActionButton button = buttons.get(collectible);
+            if (button != null) {
+                button.shake();
+            }
+            return;
+        }
+        collectible.beforeCollect(); // a chest lifts its lid (and keeps it open)
         if (!holdsSomething(collectible)) {
             return; // opened again, empty: nothing comes out, no stars
         }

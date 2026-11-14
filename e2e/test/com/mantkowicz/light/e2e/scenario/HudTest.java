@@ -49,6 +49,26 @@ class HudTest {
         assertFalse(game.crashed());
     }
 
+    /** Bug: with the settings open, a tap on the map around the window walked the player there. */
+    @Test
+    void tapsOnTheMapDontWalkWhileTheSettingsAreOpen() {
+        GameDriver game = GameDriver.start(MAP.write("hud"));
+        Cell start = game.playerCell();
+        game.pressGear();
+        game.seconds(3.1f);
+        game.release();
+        Cell elsewhere = new Cell(1, 4);
+        game.click(elsewhere);
+        game.seconds(2);
+        assertEquals(start, game.playerCell(), "the dimmed screen takes the tap");
+
+        game.closeSettings();
+        game.click(elsewhere);
+        game.seconds(3);
+        assertEquals(elsewhere, game.playerCell(), "closed: the map walks again");
+        assertFalse(game.crashed());
+    }
+
     @Test
     void theRowSitsInTheBottomCentreAndTheGearTopRight() {
         String hud = GameDriver.start(MAP.write("hud")).describeHud();
