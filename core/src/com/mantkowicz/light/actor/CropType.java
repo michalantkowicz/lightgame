@@ -1,27 +1,43 @@
 package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.math.MathUtils;
+import com.mantkowicz.light.resources.Sprite;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * The kinds of crop (the sprites pack's farm items sheet, one item per row): what a chest holds, what a cow wishes for.
+ * The kinds of crop (the sprites pack's farm items sheet, one item per row): what a chest holds, what a cow wishes for,
+ * what grows on a field (its plant, one frame per stage, and the sign showing it).
  */
 public enum CropType {
-    CORN("corn", "farm_items/row_01"),
-    CARROT("carrot", "farm_items/row_02"),
-    TOMATO("tomato", "farm_items/row_04"),
-    PUMPKIN("pumpkin", "farm_items/row_09"),
-    CUCUMBER("cucumber", "farm_items/row_14");
+    CORN("corn", "farm_items/row_01", Sprite.PLANT_CORN, Sprite.SIGN_CORN),
+    CARROT("carrot", "farm_items/row_02", Sprite.PLANT_CARROT, Sprite.SIGN_CARROT),
+    TOMATO("tomato", "farm_items/row_04", Sprite.PLANT_TOMATO, Sprite.SIGN_TOMATO),
+    PUMPKIN("pumpkin", "farm_items/row_09", Sprite.PLANT_PUMPKIN, Sprite.SIGN_PUMPKIN),
+    CUCUMBER("cucumber", "farm_items/row_14", Sprite.PLANT_CUCUMBER, Sprite.SIGN_CUCUMBER);
 
     private final String name;
     private final String picture;
+    private final Sprite plant;
+    private final Sprite sign;
 
-    CropType(String name, String picture) {
+    CropType(String name, String picture, Sprite plant, Sprite sign) {
         this.name = name;
         this.picture = picture;
+        this.plant = plant;
+        this.sign = sign;
+    }
+
+    /** How it grows on a field: its GROW row has a frame per stage, from the seedling to the ripe crop. */
+    public Sprite getPlant() {
+        return plant;
+    }
+
+    /** The sign at a field's corner showing it (its SIGN row). */
+    public Sprite getSign() {
+        return sign;
     }
 
     /** What it is called, e.g. "carrot" (for tests and descriptions). */
@@ -62,6 +78,11 @@ public enum CropType {
             types.add(named(name.trim()));
         }
         return types;
+    }
+
+    /** The kind with this name, e.g. "CARROT" (a Tiled property); {@code fallback} when it is null or blank. */
+    public static CropType named(String name, CropType fallback) {
+        return name == null || name.trim().isEmpty() ? fallback : named(name.trim());
     }
 
     private static CropType named(String name) {

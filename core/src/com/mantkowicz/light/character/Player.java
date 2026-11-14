@@ -2,6 +2,7 @@ package com.mantkowicz.light.character;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mantkowicz.light.actor.Collecting;
@@ -108,6 +109,19 @@ public class Player extends GameBoardActor implements Collecting {
      */
     public String getCurrentAnimation() {
         return animationPlugin.getCurrentAnimation();
+    }
+
+    /**
+     * Waters what is at {@code target} (a stage point, e.g. a field's middle next to the player): the rabbit tips its
+     * watering can once, facing up when it is above, facing down otherwise (also when it is left or right: the owner
+     * prefers that pose to the side ones). The can never runs dry.
+     */
+    public void water(Vector2 target) {
+        Vector2 from = getCenter();
+        float dx = target.x - from.x;
+        float dy = target.y - from.y;
+        boolean above = dy > 0 && Math.abs(dy) >= Math.abs(dx);
+        animationPlugin.playOnce(Action.WATER, above ? Direction.UP : Direction.DOWN);
     }
 
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
