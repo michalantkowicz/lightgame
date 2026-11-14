@@ -16,7 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * S15: collecting. Clicking the chest walks next to it (it blocks its cell) and shows its button; the button opens the
  * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a free cell next to
- * the chest, one of those closest to the player; then the button goes (the chest is empty). Stepping onto the carrot puts it into the backpack (the HUD's
+ * the chest, one of those closest to the player; then the button shows the closed chest: it closes the lid, and opens
+ * it again (empty: nothing comes out, no stars). Stepping onto the carrot puts it into the backpack (the HUD's
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
  * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
  * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
@@ -88,7 +89,7 @@ class CollectTest {
         Cell carrot = game.itemCell();
         assertTrue(game.neighbours(chest).contains(carrot), "it lands next to the chest");
         assertTrue(game.neighbours(game.playerCell()).contains(carrot), "close to the player");
-        assertTrue(game.buttonAlphas("COLLECT").isEmpty(), "the chest is empty: no button");
+        assertEquals("close", game.chestButton(), "the chest is open: its button closes it now");
 
         game.click(carrot);
         game.seconds(2);
@@ -243,6 +244,50 @@ class CollectTest {
         assertEquals("chest/open_front (backwards)", game.chestAnimation(), "still shut");
         assertTrue(game.itemsOnGround().isEmpty());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"));
+    }
+
+    /**
+     * The open chest's button closes it; opened again, nothing comes out of it, and the button goes on toggling. While
+     * the lid moves the button fades a little and comes back with its new picture; open, it is over the lid, higher.
+     */
+    @Test
+    void theOpenChestClosesAndOpensAgainEmpty() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.click(MAP.cell('C'));
+        game.seconds(2);
+        assertEquals("open", game.chestButton());
+        float closedY = y(game);
+        game.clickButton("COLLECT");
+        game.frames(20);
+        float faded = game.buttonAlphas("COLLECT").get(0);
+        assertTrue(faded > 0 && faded < 1, "it fades a little while the lid lifts: " + faded);
+        assertEquals("open", game.chestButton(), "with its old picture");
+        game.seconds(2);
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "and comes back");
+        assertEquals("chest/open_front", game.chestAnimation());
+        assertEquals("close", game.chestButton());
+        assertTrue(y(game) < closedY, "higher on the screen: over the open lid");
+        assertEquals(1, game.itemsOnGround().size());
+
+        game.clickButton("COLLECT");
+        game.seconds(1);
+        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "the lid shuts");
+        assertEquals("open", game.chestButton(), "the button opens it again");
+        assertEquals("player=[-, -] chest=[-, -]", game.inventories(), "it doesn't refill");
+
+        game.clickButton("COLLECT");
+        game.frames(3);
+        assertEquals("chest/open_front", game.chestAnimation(), "the lid lifts");
+        assertEquals(0, game.starsOnScreen(), "empty: no stars");
+        game.seconds(2);
+        assertEquals(1, game.itemsOnGround().size(), "and nothing more comes out");
+        assertEquals("close", game.chestButton());
+        assertFalse(game.crashed());
+    }
+
+    /** The top of the chest's button on the screen (screen y grows downwards). */
+    private static float y(GameDriver game) {
+        return Float.parseFloat(game.buttonOnScreen("COLLECT").split("[, ]")[1]);
     }
 
     /** A chest is used only from its left, its right and below it: diagonally next to it there is no button. */

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tapping the cow walks the rabbit next to it. The cow's life (its state machine): it stands, lies down, rests, sleeps, gets up, walks a step onto a free cell next
  * to it (looking where it goes), and from time to time wishes for a carrot (a bubble over it). Next to it, the round
- * button strokes it (a hand; a heart over the cow and a small one floating up over the player) or, when it wishes for a carrot the player
+ * button strokes it (a hand; a heart over the cow and a small one floating up over the player, also while it is hungry) or, when it wishes for a carrot the player
  * carries, gives it (the carrot's picture; its slot shakes, the cow eats and is happy). Without a carrot the hint says
  * "find" with the carrot's picture.
  */
@@ -100,6 +100,46 @@ class CowTest {
         assertFalse(game.crashed());
     }
 
+    /** The bubble with the wish is over the cow until the rabbit comes next to it; then the button takes its place. */
+    @Test
+    void theButtonTakesTheBubblesPlaceNextToTheCow() {
+        GameDriver game = GameDriver.start(ROW.write("cow-row"));
+        waitFor(game, "WISHING", 23);
+        game.frames(2);
+        assertEquals("carrot", game.cowWish(), "far away: the bubble with a carrot");
+        assertEquals(List.of(), game.buttonAlphas("GIVE"));
+
+        game.click(GameDriver.Kind.COW);
+        game.seconds(1.5f);
+        assertTrue(game.usedFromNeighbours(game.cellOf(GameDriver.Kind.COW)).contains(game.playerCell()));
+        assertEquals("hidden", game.cowWish(), "next to it: no bubble");
+        assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "the button instead");
+
+        game.click(ROW.cell('P'));
+        game.seconds(3);
+        assertEquals(List.of(), game.buttonAlphas("GIVE"), "walked away: the button is gone");
+        assertEquals("carrot", game.cowWish(), "and the bubble is back");
+        assertFalse(game.crashed());
+    }
+
+    /** Stroked while it wishes for a carrot, the cow enjoys it and goes on wishing: the carrot button comes back. */
+    @Test
+    void strokingTheCowWhileItWishesForACarrot() {
+        GameDriver game = GameDriver.start(PEN.write("cow-pen"));
+        waitFor(game, "WISHING", 23);
+        game.seconds(1);
+        game.clickButton("STROKE");
+        game.frames(2);
+        assertEquals("STROKED", game.cowState());
+        assertEquals("cow_brown/love", game.cowAnimation());
+        assertEquals(List.of("heart"), game.floatingPictures());
+        waitFor(game, "WISHING", 3);
+        game.seconds(1);
+        assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "still hungry: the carrot again");
+        assertEquals(List.of(1f), game.buttonAlphas("STROKE"), "and the hand");
+        assertFalse(game.crashed());
+    }
+
     @Test
     void tappingTheCowWalksNextToIt() {
         GameDriver game = GameDriver.start(ROW.write("cow-row"));
@@ -117,19 +157,21 @@ class CowTest {
         GameDriver game = GameDriver.start(PEN.write("cow-pen"));
         assertEquals("none", game.cowWish());
         waitFor(game, "WISHING", 23); // hungry after 20 s; lying or asleep it first gets up
-        assertEquals("carrot", game.cowWish(), "a bubble with a carrot over the cow");
         game.seconds(1);
-        assertEquals(List.of(), game.buttonAlphas("STROKE"), "no stroking while it wishes for something");
-        assertEquals(List.of(), game.buttonAlphas("GIVE"), "and nothing to give");
+        assertEquals("hidden", game.cowWish(), "the rabbit is next to it: no bubble...");
+        assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "...but the button with the carrot over the cow");
+        assertEquals(List.of(1f), game.buttonAlphas("STROKE"), "and the hand still there");
+        assertTrue(x(game, "STROKE") < x(game, "GIVE"), "the hand left of the carrot");
 
-        game.tapHint();
+        game.clickButton("GIVE");
         game.frames(2);
-        assertTrue(game.describeHud().contains("bubble: \"find\""), game.describeHud());
-        assertTrue(game.hintShowsPicture(), "find... the carrot");
+        assertEquals("WISHING", game.cowState(), "no carrot in the backpack: nothing to give");
+        assertTrue(game.actionButtonShaking("GIVE"), "the button shakes");
+        assertTrue(game.describeHud().contains("bubble: \"find\""), "and the face says: find... " + game.describeHud());
+        assertTrue(game.hintShowsPicture(), "...the carrot");
 
         game.putCarrotIntoBackpack();
-        game.frames(2);
-        assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "with a carrot in the backpack: the button to give it");
+        game.seconds(1);
         game.clickButton("GIVE");
         game.frames(2);
         assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
@@ -159,9 +201,9 @@ class CowTest {
             if (!"WALKING".equals(state)) { // in the pen it can't walk: it turns back to standing at once
                 assertEquals(ANIMATIONS.get(state), game.cowAnimation(), state);
             }
-            if ("WISHING".equals(state) && game.buttonAlphas("GIVE").isEmpty()) {
+            if ("WISHING".equals(state) && game.describeHud().contains("backpack: [-, -]")) {
                 game.putCarrotIntoBackpack();
-            } else if ("WISHING".equals(state)) {
+            } else if ("WISHING".equals(state) && !game.buttonAlphas("GIVE").isEmpty()) {
                 game.clickButton("GIVE");
             }
             game.frames(1);
@@ -239,6 +281,11 @@ class CowTest {
         } finally {
             GameDriver.showStateLabels(false);
         }
+    }
+
+    /** The left edge of a button on the screen. */
+    private static float x(GameDriver game, String button) {
+        return Float.parseFloat(game.buttonOnScreen(button).split(",")[0]);
     }
 
     private static void waitFor(GameDriver game, String state, float maxSeconds) {

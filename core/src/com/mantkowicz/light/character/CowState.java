@@ -14,7 +14,7 @@ import com.mantkowicz.light.resources.Action;
  * STANDING ──(after a while)──▶ WALKING ──(arrived)──▶ STANDING
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * STANDING, RESTING, SLEEPING ──(stroked)──▶ STROKED ──▶ STANDING
+ * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
  * </pre>
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
@@ -130,7 +130,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Stands with a bubble showing what it wishes for, until it gets it. */
+    /** Stands with a bubble showing what it wishes for, until it gets it. It can be stroked meanwhile. */
     WISHING {
         @Override
         public void enter(Cow cow) {
@@ -149,7 +149,12 @@ public enum CowState implements State<Cow> {
                 cow.changeState(EATING);
                 return true;
             }
-            return false;
+            return super.onMessage(cow, telegram);
+        }
+
+        @Override
+        boolean canBeStroked() {
+            return true;
         }
     },
 
@@ -199,7 +204,7 @@ public enum CowState implements State<Cow> {
         }
     };
 
-    /** In this state the player can stroke the cow (the round button shows a hand). */
+    /** In this state the player can stroke the cow (an action button over it shows a hand). */
     boolean canBeStroked() {
         return false;
     }

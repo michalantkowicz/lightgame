@@ -31,7 +31,7 @@
     {"file": "UI Sprites/buttons/Icon Buttons/Icon Buttons Spritesheet.png", "name": "icon_buttons", "frame": [32, 32],
      "names": {"24": "gear", "25": "gear_down", "26": "question", "27": "question_down", "54": "check", "55": "check_down"}},
     {"file": "UI Sprites/buttons/round/medium colored round buttons.png", "name": "round_buttons", "pieces": "auto",
-     "names": {"6": "brown", "8": "brown_down"}},
+     "names": {"6": "brown", "8": "brown_down", "9": "dark_brown", "11": "dark_brown_down"}},
     {"file": "UI Sprites/buttons/round/small colored round buttons.png", "name": "round_buttons_small", "frame": [16, 16]},
     {"file": "UI Sprites/buttons/square/Small Square Buttons.png", "name": "square_buttons_small", "frame": [16, 16]},
     {"file": "UI Sprites/buttons/square/Square Buttons 19x26.png", "name": "square_buttons_19x26", "pieces": "auto"},

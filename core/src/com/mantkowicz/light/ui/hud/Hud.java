@@ -30,8 +30,8 @@ import java.util.function.IntConsumer;
 /**
  * The HUD ("face is the button", docs/hud-design.md). Bottom centre: the player's face in a frame, two backpack
  * slots on its left, the player's stamina as a bar under the face ({@link StaminaBar}); on its right a round button:
- * the hint (a question mark, which makes the face cheer and say "play around!" in a bubble over it) or, over it when
- * there is something to do, the action button ({@link ActionButton}). Top right: the settings gear, which opens the
+ * the hint (a question mark, which makes the face cheer and say "play around!" in a bubble over it); what there is to
+ * do is on action buttons over the things on the map ({@link ActionButton}). Top right: the settings gear, which opens the
  * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
  * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
@@ -218,7 +218,7 @@ public class Hud extends Group {
             child.moveBy(-left, 0);
         }
 
-        hint.setPosition(getWidth() / 2f + ACTION_RIGHT - hint.getWidth(), ACTION_Y); // where the action button goes over it
+        hint.setPosition(getWidth() / 2f + ACTION_RIGHT - hint.getWidth(), ACTION_Y);
         placeBubble();
         gear.setPosition(getWidth() - gear.getWidth() - GEAR_MARGIN, getHeight() - gear.getHeight() - GEAR_MARGIN);
         if (settings != null) {
@@ -251,8 +251,8 @@ public class Hud extends Group {
         }
     }
 
-    /** The face says the hint in a bubble over it (a new tap starts it again). */
-    private void showHint() {
+    /** The face says the hint in a bubble over it (a new tap starts it again), as when the hint button is tapped. */
+    public void showHint() {
         if (bubble != null) {
             bubble.remove();
         }

@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "52a545c8d055232001def09ae6aa33cc375026c6",
+  "uiJsonSha1": "15ca1890cc9efa48dafbafa8a5ff99c8314fc5b3",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -138,6 +138,12 @@
       "frames": 1
     },
     "round_buttons/brown_down": {
+      "frames": 1
+    },
+    "round_buttons/dark_brown": {
+      "frames": 1
+    },
+    "round_buttons/dark_brown_down": {
       "frames": 1
     },
     "selector_dot_1": {
