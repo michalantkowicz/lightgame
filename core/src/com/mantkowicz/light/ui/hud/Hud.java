@@ -25,7 +25,7 @@ import com.mantkowicz.light.ui.UiStyle;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntConsumer;
+import java.util.function.IntPredicate;
 
 /**
  * The HUD ("face is the button", docs/hud-design.md). Bottom centre: the player's face in a frame, two backpack
@@ -78,7 +78,7 @@ public class Hud extends Group {
     private final GameEventService events;
     private final Player player;
     /** Throws the item in a backpack slot out next to the player. */
-    private final IntConsumer throwOut;
+    private final IntPredicate throwOut;
     private final Group row = new Group();
     private final Portrait face;
     private final List<Image> slots = new ArrayList<>();
@@ -96,9 +96,9 @@ public class Hud extends Group {
 
     /**
      * @param throwOut throws the item in a backpack slot (0 = the left one) out next to the player, when its slot is
-     *                 tapped
+     *                 tapped; false when it has nowhere to land (the slot shakes)
      */
-    public Hud(GameContext context, Player player, IntConsumer throwOut) {
+    public Hud(GameContext context, Player player, IntPredicate throwOut) {
         this.throwOut = throwOut;
         this.resources = context.getResourcesService();
         this.events = context.getGameEventService();
@@ -125,7 +125,9 @@ public class Hud extends Group {
             slot.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    throwOut.accept(index); // what is in it jumps out next to the player
+                    if (!throwOut.test(index)) { // what is in it jumps out next to the player...
+                        shake(index); // ...or, with nowhere to land, the slot shakes
+                    }
                 }
             });
             row.addActor(slot);

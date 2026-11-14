@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
  * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
  * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
- * it is.
+ * it is (a chest with nowhere for its carrot to land stays shut, its button shakes). A chest next to the player at
+ * the start has its button at once.
  * <p>
  * The chest is used only from its left, its right and below it (no button diagonally next to it or above it, where the
  * button would cover the player); walking around it keeps one button,
@@ -135,6 +136,38 @@ class CollectTest {
         assertTrue(game.itemsOnGround().isEmpty());
         assertEquals("player=[-, -] chest=[Carrot, -]", game.inventories());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "it still holds something: the button stays");
+    }
+
+    /**
+     * Bug: with nowhere for the carrot to land (the player stands on the only free cell) the chest opened, popped stars
+     * and kept the carrot. It stays shut and its button shakes, like the cow's carrot button without a carrot.
+     */
+    @Test
+    void withNoFreeCellTheChestStaysShutAndItsButtonShakes() {
+        GameDriver game = GameDriver.start(NO_FREE_CELL.write("collect-no-free"));
+        game.click(NO_FREE_CELL.cell('C'));
+        game.seconds(2);
+        game.clickButton("COLLECT");
+        game.frames(3);
+        assertTrue(game.actionButtonShaking("COLLECT"), "the button shakes");
+        assertEquals(0, game.starsOnScreen(), "no stars");
+        game.seconds(1);
+        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "the lid stays shut");
+        assertEquals("open", game.chestButton(), "the button still offers to open it");
+        assertFalse(game.crashed());
+    }
+
+    /** Bug: a chest next to the player at the start (right of it, or above it) had no button until the player moved. */
+    @Test
+    void aChestNextToThePlayerAtTheStartHasItsButton() {
+        for (TestMap map : List.of(
+                TestMap.of("~~~~~", "~.PC~", "~...~", "~~~~~"),
+                TestMap.of("~~~~~", "~.C.~", "~.P.~", "~~~~~"),
+                TestMap.of("~~~~~", "~CP.~", "~...~", "~~~~~"))) {
+            GameDriver game = GameDriver.start(map.write("collect-start"));
+            assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "button at the start: " + map.cell('C'));
+            assertFalse(game.crashed());
+        }
     }
 
     /** A dead end: from {@code P} the only free cell is {@code a}, and from {@code a} only {@code P}. */
@@ -288,6 +321,36 @@ class CollectTest {
     /** The top of the chest's button on the screen (screen y grows downwards). */
     private static float y(GameDriver game) {
         return Float.parseFloat(game.buttonOnScreen("COLLECT").split("[, ]")[1]);
+    }
+
+    /** A button fades in when it appears, as it fades out when it goes. */
+    @Test
+    void theButtonFadesIn() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.click(MAP.cell('C'));
+        List<Float> first = List.of();
+        for (int frame = 0; frame < 180 && first.isEmpty(); frame++) {
+            game.frames(1);
+            first = game.buttonAlphas("COLLECT");
+        }
+        assertEquals(1, first.size(), "the button appeared");
+        assertTrue(first.get(0) < 0.5f, "faint at first: " + first);
+        game.seconds(0.5f);
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "then fully there");
+    }
+
+    /** With nowhere for it to land, a tapped slot keeps its item and shakes. */
+    @Test
+    void aSlotWithNowhereToThrowShakes() {
+        GameDriver game = GameDriver.start(TestMap.of("~~~~~", "~~P~~", "~~~~~").write("collect-island"));
+        game.putCarrotIntoBackpack();
+        game.frames(2);
+        game.tapBackpackSlot(0);
+        game.frames(2);
+        assertTrue(game.backpackSlotShaking(0), "the slot shakes");
+        assertTrue(game.itemsOnGround().isEmpty(), "nothing was thrown");
+        assertEquals(1, game.backpackItems().stream().filter(item -> item != null).count(), "the carrot stays");
+        assertFalse(game.crashed());
     }
 
     /** A chest is used only from its left, its right and below it: diagonally next to it there is no button. */

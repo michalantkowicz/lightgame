@@ -6,6 +6,9 @@ import com.mantkowicz.light.e2e.Golden;
 import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 /**
  * S2-S5: walking along the board. Targets have a single shortest path, so the expected route is the same
  * for any correct path finding.
@@ -44,6 +47,21 @@ class WalkingTest {
         traceWalk(game, 3);
         game.snapshot("rerouted");
         Golden.assertMatches("reroute", game.timeline());
+    }
+
+    /** Tapping the walking rabbit (where its own tile is) stops it in the middle of the tile it is on. */
+    @Test
+    void tappingTheWalkingRabbitStopsIt() {
+        GameDriver game = GameDriver.start(CORRIDOR.write("corridor"));
+        game.click(EAST);
+        game.seconds(0.6f);
+        assertEquals("MOVEMENT", game.playerStatus());
+        game.click(GameDriver.Kind.PLAYER);
+        Cell on = game.playerCell();
+        game.seconds(2);
+        assertEquals("IDLE", game.playerStatus());
+        assertEquals(on, game.playerCell(), "it stopped on the tile it was on, not at " + EAST);
+        assertFalse(game.crashed());
     }
 
     @Test
