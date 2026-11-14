@@ -2,6 +2,7 @@ package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -26,7 +27,7 @@ public class SettingsPanel extends Group {
         Image dim = new Image(resources.getDrawable("black.png"));
         dim.setSize(screenWidth, screenHeight);
         dim.getColor().a = 0.55f;
-        dim.setTouchable(Touchable.enabled); // nothing under the window gets tapped
+        dim.setTouchable(Touchable.enabled);
         addActor(dim);
 
         Table content = new Table();
@@ -47,6 +48,14 @@ public class SettingsPanel extends Group {
         window.setBounds((screenWidth - WIDTH) / 2f, (screenHeight - HEIGHT) / 2f, WIDTH, HEIGHT);
         window.setTouchable(Touchable.enabled);
         addActor(window);
+
+        // a tap anywhere on it (the dimmed screen, the window) is taken: the map under it doesn't get it
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
     }
 
     /** The check mark that closes the window. */

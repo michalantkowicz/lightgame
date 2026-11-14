@@ -614,3 +614,20 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   the carrot, the give button shaking and the face saying "find" without a carrot,
   `HudTest.theActionButtonAppearsOverTheChest`; `CameraZoomTest` now checks only that the button doesn't grow (it moves
   with the chest).
+
+## 2026‑11‑14, three bugs from the bug hunt (branch `three-bug-fixes`)
+
+Found by headless test agents playing the game (and confirmed by hand), fixed together on the owner's request.
+
+- **Taps went through the settings window to the map:** with the settings open, a tap on the window (not on its check
+  mark) walked the player to the cell under it. The dimmed screen and the window took the tap, but had no listener, so
+  the stage passed it on. `SettingsPanel` now takes every touch on it. Test: `HudTest.tapsOnTheMapDontWalkWhileTheSettingsAreOpen`.
+- **No button for a chest next to the player at the start:** the button appears when someone steps next to a chest
+  (`CollectibleFinder`); a chest put down after the player (to its right or above it) never got that step.
+  `CollectibleFinder` now also reports a collectible when it is put on its tile. Test:
+  `CollectTest.aChestNextToThePlayerAtTheStartHasItsButton`.
+- **A chest with nowhere for its carrot to land opened anyway:** stars, lid up, carrot still inside (e.g. a chest at the
+  end of a one-tile corridor: the player stands on its only free neighbour, so the carrot could never come out). Now it
+  stays shut and its button shakes, like the cow's carrot button without a carrot (`ItemThrower.hasRoomNextTo`). Test:
+  `CollectTest.withNoFreeCellTheChestStaysShutAndItsButtonShakes`.
+- No golden changed.
