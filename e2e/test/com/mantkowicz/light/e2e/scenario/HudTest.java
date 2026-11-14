@@ -82,11 +82,12 @@ class HudTest {
         assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
         game.click(MAP.cell('C'));
         game.seconds(3);
-        game.clickButton("COLLECT"); // the carrot jumps out of the chest
+        game.clickButton("COLLECT"); // the crop jumps out of the chest
         game.seconds(1.5f);
         game.click(game.itemCell());
         game.seconds(2);
-        assertTrue(game.describeHud().contains("backpack: [Carrot, -]"), game.describeHud());
+        assertTrue(game.describeHud().matches("(?s).*backpack: \\[(Corn|Carrot|Tomato|Pumpkin|Cucumber), -].*"),
+                game.describeHud());
         game.tapBackpackSlot(0); // and out again
         game.frames(2);
         assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());

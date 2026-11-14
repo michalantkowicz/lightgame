@@ -28,7 +28,7 @@ import java.util.List;
  * }
  * }</pre>
  * and is placed in Tiled with the objectClass of its {@link com.mantkowicz.light.map.TileObjectType} line, e.g.
- * {@code COW(Cow::new)}. It blocks its tile.
+ * {@code CHEST((context, properties) -> new Chest(context))}. It blocks its tile.
  */
 public abstract class SpriteActor extends GameBoardActor {
     private final Sprite sprite;

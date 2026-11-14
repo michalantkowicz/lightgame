@@ -28,7 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
-import com.mantkowicz.light.actor.Carrot;
+import com.mantkowicz.light.actor.Crop;
+import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.actor.Inventory;
@@ -206,7 +207,7 @@ public final class GameDriver {
                 face.getReaction() == null ? "" : " playing " + face.getReaction());
         List<String> backpack = new ArrayList<>();
         for (Item item : hud.getBackpack()) {
-            backpack.add(item == null ? "-" : item.getClass().getSimpleName());
+            backpack.add(item == null ? "-" : itemName(item));
         }
         snapshot.line("backpack: %s %s", backpack, uiBox(hud.getRow().getChildren().get(1)));
         StaminaBar stamina = hud.getStamina();
@@ -406,12 +407,23 @@ public final class GameDriver {
         return "player=" + describe(player.getInventory()) + " chest=" + describe(chest.getInventory());
     }
 
+    /** What every chest on the map holds, in the order they are on the stage, e.g. ["[Corn, -]", "[Carrot, -]"]. */
+    public List<String> chestContents() {
+        List<String> chests = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof Chest chest) {
+                chests.add(describe(chest.getInventory()));
+            }
+        }
+        return chests;
+    }
+
     /** Items lying on the ground, e.g. ["Carrot cell=(3,5)"], or "flying" while thrown; in the order they were thrown. */
     public List<String> itemsOnGround() {
         List<String> items = new ArrayList<>();
         for (Actor actor : gameStage().getActors()) {
             if (actor instanceof ItemOnGround lying) {
-                items.add(lying.getItem().getClass().getSimpleName()
+                items.add(itemName(lying.getItem())
                         + (lying.isLanded() ? " cell=" + cellOf(lying.getTile()) : " flying"));
             }
         }
@@ -420,10 +432,33 @@ public final class GameDriver {
 
     /** Puts a new carrot into the player's backpack (its first free slot), as if picked up somewhere. */
     public void putCarrotIntoBackpack() {
+        putIntoBackpack("carrot");
+    }
+
+    /** Puts a new crop, e.g. "corn", into the player's backpack (its first free slot), as if picked up somewhere. */
+    public void putIntoBackpack(String crop) {
         ResourcesService resources = screenField("resourcesService");
-        if (!((Player) actor(Kind.PLAYER)).getInventory().add(new Carrot(resources))) {
+        if (!((Player) actor(Kind.PLAYER)).getInventory().add(new Crop(cropType(crop), resources))) {
             throw new IllegalStateException("The backpack is full");
         }
+    }
+
+    private static CropType cropType(String name) {
+        for (CropType type : CropType.values()) {
+            if (type.getName().equals(name)) {
+                return type;
+            }
+        }
+        throw new IllegalArgumentException("No crop called " + name);
+    }
+
+    /** How an item is listed: a crop by its kind, e.g. "Carrot", "Corn"; anything else by its class. */
+    private static String itemName(Item item) {
+        if (item instanceof Crop crop) {
+            String name = crop.getType().getName();
+            return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        }
+        return item.getClass().getSimpleName();
     }
 
     /** The backpack's items themselves (null for a free slot), to tell which one went where. */
@@ -511,7 +546,7 @@ public final class GameDriver {
     private static String describe(Inventory inventory) {
         List<String> slots = new ArrayList<>();
         for (Item item : inventory.getItems()) {
-            slots.add(item == null ? "-" : item.getClass().getSimpleName());
+            slots.add(item == null ? "-" : itemName(item));
         }
         return slots.toString();
     }
@@ -724,6 +759,21 @@ public final class GameDriver {
     /** What the bubble over the cow shows (what it wishes for), e.g. "carrot", "hidden" (the button is there), or "none". */
     public String cowWish() {
         return bubbleOver(actor(Kind.COW));
+    }
+
+    /** What the cow wishes for right now, bubble or not, e.g. "carrot", or "none" when it isn't wishing. */
+    public String cowWants() {
+        Item wish = ((Cow) actor(Kind.COW)).getWish();
+        return wish == null ? "none" : ((Crop) wish).getType().getName();
+    }
+
+    /** The crops the cow may wish for (from Tiled's favouriteDish), e.g. ["carrot", "cucumber"]. */
+    public List<String> cowFavouriteDishes() {
+        List<String> names = new ArrayList<>();
+        for (CropType type : ((Cow) actor(Kind.COW)).getFavouriteDishes()) {
+            names.add(type.getName());
+        }
+        return names;
     }
 
     /** The picture bubbles on the map are drawn in front of every other actor (only the cow has one). */

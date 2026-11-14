@@ -46,7 +46,10 @@ tool again.
    - `collision`: cells with any tile here can't be walked on (the layer is never drawn: keep it hidden);
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
-   (`PLAYER`, `CHEST`, `COW`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`.
+   (`PLAYER`, `CHEST`, `COW`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
+   property `favouriteDish`: the crops it wishes for, comma-separated, e.g. `CARROT,CUCUMBER` (one of `CORN`,
+   `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`); without it, any of them. Each time it gets hungry it picks one at
+   random. A `CHEST` holds one crop, picked at random.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 

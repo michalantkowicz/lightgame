@@ -7,7 +7,9 @@ import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,13 +17,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * S15: collecting. Clicking the chest walks next to it (it blocks its cell) and shows its button; the button opens the
- * chest: the lid lifts and stays open, stars pop out, and the carrot inside jumps out onto a free cell next to
+ * chest: the lid lifts and stays open, stars pop out, and the crop inside (picked at random: corn, a carrot, a tomato,
+ * a pumpkin or a cucumber) jumps out onto a free cell next to
  * the chest, one of those closest to the player; then the button shows the closed chest: it closes the lid, and opens
- * it again (empty: nothing comes out, no stars). Stepping onto the carrot puts it into the backpack (the HUD's
+ * it again (empty: nothing comes out, no stars). Stepping onto the crop puts it into the backpack (the HUD's
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
  * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
  * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
- * it is (a chest with nowhere for its carrot to land stays shut, its button shakes). A chest next to the player at
+ * it is (a chest with nowhere for its crop to land stays shut, its button shakes). A chest next to the player at
  * the start has its button at once.
  * <p>
  * The chest is used only from its left, its right and below it (no button diagonally next to it or above it, where the
@@ -30,6 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * to the chest and it opens there. (Was bug B1: the game crashed when the button appeared.)
  */
 class CollectTest {
+    /** How a crop is listed, any of them. */
+    private static final String CROP = "(Corn|Carrot|Tomato|Pumpkin|Cucumber)";
+
     /** The rabbit starts two cells below the chest: clicking the chest walks one cell up, next to it. */
     private static final TestMap MAP = TestMap.of(
             "~~~~~~~",
@@ -56,7 +62,7 @@ class CollectTest {
             "~.....~",
             "~~~~~~~");
 
-    /** Next to the chest only {@code a} is free once the player stands below it: the carrot can land nowhere else. */
+    /** Next to the chest only {@code a} is free once the player stands below it: the crop can land nowhere else. */
     private static final TestMap ONE_FREE_CELL = TestMap.of(
             "~~~~~~",
             "~~Ca~~",
@@ -72,8 +78,30 @@ class CollectTest {
             "~~P~~",
             "~~~~~");
 
+    /** Many chests: each holds one crop of its own, picked at random. */
+    private static final TestMap CHESTS = TestMap.of(
+            "~~~~~~~~~~~~~",
+            "~C.C.C.C.C.C~",
+            "~.....P.....~",
+            "~C.C.C.C.C.C~",
+            "~~~~~~~~~~~~~");
+
     @Test
-    void theChestThrowsOutTheCarrotThePlayerPicksItUpAndThrowsItOutAgain() {
+    void everyChestHoldsACropPickedAtRandom() {
+        GameDriver game = GameDriver.start(CHESTS.write("collect-chests"));
+        List<String> chests = game.chestContents();
+        assertEquals(12, chests.size());
+        Set<String> crops = new HashSet<>();
+        for (String chest : chests) {
+            assertTrue(chest.matches("\\[" + CROP + ", -]"), "one crop in each: " + chests);
+            crops.add(chest);
+        }
+        assertTrue(crops.size() > 1, "not all the same: " + chests);
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void theChestThrowsOutTheCropThePlayerPicksItUpAndThrowsItOutAgain() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
         Cell chest = MAP.cell('C');
         game.click(chest);
@@ -85,16 +113,16 @@ class CollectTest {
         game.note("stars: " + game.starsOnScreen() + ", chest: " + game.chestAnimation() + ", items: "
                 + game.itemsOnGround());
         game.seconds(1.5f);
-        game.snapshot("the carrot has landed");
+        game.snapshot("the crop has landed");
         game.note("inventories: " + game.inventories());
-        Cell carrot = game.itemCell();
-        assertTrue(game.neighbours(chest).contains(carrot), "it lands next to the chest");
-        assertTrue(game.neighbours(game.playerCell()).contains(carrot), "close to the player");
+        Cell crop = game.itemCell();
+        assertTrue(game.neighbours(chest).contains(crop), "it lands next to the chest");
+        assertTrue(game.neighbours(game.playerCell()).contains(crop), "close to the player");
         assertEquals("close", game.chestButton(), "the chest is open: its button closes it now");
 
-        game.click(carrot);
+        game.click(crop);
         game.seconds(2);
-        game.snapshot("walked onto the carrot");
+        game.snapshot("walked onto the crop");
         game.note("inventories: " + game.inventories());
         assertTrue(game.itemsOnGround().isEmpty(), "picked up");
 
@@ -117,7 +145,7 @@ class CollectTest {
     }
 
     @Test
-    void theCarrotLandsOnlyOnAFreeCell() {
+    void theCropLandsOnlyOnAFreeCell() {
         GameDriver game = GameDriver.start(ONE_FREE_CELL.write("collect-one-free"));
         game.click(ONE_FREE_CELL.cell('C'));
         game.seconds(2);
@@ -127,14 +155,14 @@ class CollectTest {
     }
 
     @Test
-    void withNoFreeCellTheCarrotStaysInTheChest() {
+    void withNoFreeCellTheCropStaysInTheChest() {
         GameDriver game = GameDriver.start(NO_FREE_CELL.write("collect-no-free"));
         game.click(NO_FREE_CELL.cell('C'));
         game.seconds(2);
         game.clickButton("COLLECT");
         game.seconds(1.5f);
         assertTrue(game.itemsOnGround().isEmpty());
-        assertEquals("player=[-, -] chest=[Carrot, -]", game.inventories());
+        assertTrue(game.inventories().matches("player=\\[-, -] chest=\\[" + CROP + ", -]"), game.inventories());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "it still holds something: the button stays");
     }
 
