@@ -24,8 +24,12 @@ public class CollectFeature implements Feature {
         plugin.run(delta);
     }
 
-    /** Throws the item in a backpack slot out onto a free tile next to the player (nothing happens without one). */
-    public void throwOut(int slot) {
-        resolver.throwOut(slot);
+    /**
+     * Throws the item in a backpack slot out onto a free tile next to the player.
+     *
+     * @return false when there is an item but no free tile for it (it stays in the backpack)
+     */
+    public boolean throwOut(int slot) {
+        return resolver.throwOut(slot);
     }
 }

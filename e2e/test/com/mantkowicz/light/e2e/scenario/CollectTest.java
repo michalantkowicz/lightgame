@@ -323,6 +323,36 @@ class CollectTest {
         return Float.parseFloat(game.buttonOnScreen("COLLECT").split("[, ]")[1]);
     }
 
+    /** A button fades in when it appears, as it fades out when it goes. */
+    @Test
+    void theButtonFadesIn() {
+        GameDriver game = GameDriver.start(MAP.write("collect"));
+        game.click(MAP.cell('C'));
+        List<Float> first = List.of();
+        for (int frame = 0; frame < 180 && first.isEmpty(); frame++) {
+            game.frames(1);
+            first = game.buttonAlphas("COLLECT");
+        }
+        assertEquals(1, first.size(), "the button appeared");
+        assertTrue(first.get(0) < 0.5f, "faint at first: " + first);
+        game.seconds(0.5f);
+        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "then fully there");
+    }
+
+    /** With nowhere for it to land, a tapped slot keeps its item and shakes. */
+    @Test
+    void aSlotWithNowhereToThrowShakes() {
+        GameDriver game = GameDriver.start(TestMap.of("~~~~~", "~~P~~", "~~~~~").write("collect-island"));
+        game.putCarrotIntoBackpack();
+        game.frames(2);
+        game.tapBackpackSlot(0);
+        game.frames(2);
+        assertTrue(game.backpackSlotShaking(0), "the slot shakes");
+        assertTrue(game.itemsOnGround().isEmpty(), "nothing was thrown");
+        assertEquals(1, game.backpackItems().stream().filter(item -> item != null).count(), "the carrot stays");
+        assertFalse(game.crashed());
+    }
+
     /** A chest is used only from its left, its right and below it: diagonally next to it there is no button. */
     @Test
     void noButtonDiagonallyNextToTheChest() {

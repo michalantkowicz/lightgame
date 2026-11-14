@@ -637,3 +637,18 @@ Found by headless test agents playing the game (and confirmed by hand), fixed to
 - `docs/ideas.md`, "All texts in one place": the texts the player sees are spread over the code; collect them in one
   list for translations and to find every place that should become a picture. From the bug hunt's polish list. Docs
   only.
+
+## 2026‑11‑14, polish from the bug hunt (branch `bug-hunt-polish`)
+
+The owner's picks from the bug hunt's polish list (the rest was judged fine as it is).
+
+- **Action buttons fade in** when they appear (`ActionButton`, 0.3 s, quicker than the 0.75 s fade-out so a tap gets
+  its answer soon). Before, a button that had faded out completely popped back at full opacity.
+- **A backpack slot shakes** when its item has nowhere to land (no free tile next to the player), like an action
+  button that can't act. `Hud` takes the throw as an `IntPredicate` (false: nothing thrown), from
+  `CollectFeature.throwOut` / `PlayerCollectResolver.throwOut`.
+- **Tapping the walking rabbit stops it** in the middle of the tile it is on. A tap on the rabbit's own tile lands on the
+  rabbit (it recentres the camera), never on the board, so it couldn't stop the walk; the rabbit now also posts a tap
+  on the tile under it while walking (`StopWalkingOnTapListener`).
+- Tests: `CollectTest.theButtonFadesIn`, `CollectTest.aSlotWithNowhereToThrowShakes`,
+  `WalkingTest.tappingTheWalkingRabbitStopsIt`. No golden changed.

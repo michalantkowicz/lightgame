@@ -94,13 +94,22 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
-    /** Throws the item in a backpack slot out onto a free tile next to the player (nothing happens without one). */
-    public void throwOut(int slot) {
+    /**
+     * Throws the item in a backpack slot out onto a free tile next to the player.
+     *
+     * @return false when there is an item but no free tile for it (it stays in the backpack)
+     */
+    public boolean throwOut(int slot) {
         Inventory backpack = player.getInventory();
         Item item = backpack.getItems().get(slot);
-        if (item != null && thrower.throwOut(item, player.getTile(), player.getCenter())) {
-            backpack.take(slot);
+        if (item == null) {
+            return true; // an empty slot: nothing to do
         }
+        if (!thrower.throwOut(item, player.getTile(), player.getCenter())) {
+            return false;
+        }
+        backpack.take(slot);
+        return true;
     }
 
     /**

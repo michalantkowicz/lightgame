@@ -12,6 +12,7 @@ import com.mantkowicz.light.actor.LookAtMeOnClickListener;
 import com.mantkowicz.light.actor.PlayerMoveEvent;
 import com.mantkowicz.light.actor.Stamina;
 import com.mantkowicz.light.actor.Status;
+import com.mantkowicz.light.actor.StopWalkingOnTapListener;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
@@ -69,6 +70,7 @@ public class Player extends GameBoardActor implements Collecting {
         }
 
         addListener(new LookAtMeOnClickListener(this, gameEventService));
+        addListener(new StopWalkingOnTapListener(this, context.getBoardService(), gameEventService));
         setTouchable(Touchable.enabled);
     }
 
