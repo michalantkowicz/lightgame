@@ -10,7 +10,7 @@ import com.mantkowicz.light.resources.Action;
  * into it ({@code enter}), when it goes on to which state ({@code update}, called every frame) and how it answers the
  * player ({@code onMessage}). To change the cow's behaviour, change it here; {@link Cow} only has the helpers.
  * <pre>
- * STANDING ──(hungry)──▶ WISHING ──(gets its carrot)──▶ EATING ──▶ HAPPY ──▶ STANDING
+ * STANDING ──(hungry: picks a crop)──▶ WISHING ──(gets it)──▶ EATING ──▶ HAPPY ──▶ STANDING
  *                        WISHING ──(not fed for long)──▶ GRAZING ──▶ CHEWING ──(3 bites)──▶ STANDING
  * STANDING ──(after a while)──▶ WALKING ──(arrived)──▶ STANDING
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
@@ -20,7 +20,7 @@ import com.mantkowicz.light.resources.Action;
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
 public enum CowState implements State<Cow> {
-    /** On its feet, chewing. Hungry: wishes for a carrot. Otherwise after a while it walks a step or lies down. */
+    /** On its feet, chewing. Hungry: wishes for one of its favourite crops. Otherwise after a while it walks a step or lies down. */
     STANDING {
         @Override
         public void enter(Cow cow) {
@@ -31,6 +31,7 @@ public enum CowState implements State<Cow> {
         @Override
         public void update(Cow cow) {
             if (cow.isHungry()) {
+                cow.chooseWish(); // here, not in WISHING: stroked, it comes back wishing for the same
                 cow.changeState(WISHING);
             } else if (cow.isTimeUp()) {
                 cow.changeState(oneOf(WALKING, WALKING, LYING_DOWN)); // walks twice as often as it lies down

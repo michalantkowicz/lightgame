@@ -144,7 +144,7 @@ public class CreatureFeature implements Feature {
     private int slotWith(Item wish) {
         List<Item> items = player.getInventory().getItems();
         for (int slot = 0; slot < items.size(); slot++) {
-            if (items.get(slot) != null && items.get(slot).getClass() == wish.getClass()) {
+            if (wish.isSameKindAs(items.get(slot))) {
                 return slot;
             }
         }

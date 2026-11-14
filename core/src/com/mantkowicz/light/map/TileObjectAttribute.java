@@ -6,7 +6,9 @@ public enum TileObjectAttribute {
     TEXTURE_OFFSET("textureOffset"),
     LIGHT_TYPE("lightType"),
     LIGHT_COLOR_HEX("lightColorHex"),
-    BORDER_LIGHT_POSITION("borderLightPosition");
+    BORDER_LIGHT_POSITION("borderLightPosition"),
+    /** A cow's crops to wish for, e.g. "CARROT,CUCUMBER"; any crop without it. */
+    FAVOURITE_DISH("favouriteDish");
 
     private final String value;
 

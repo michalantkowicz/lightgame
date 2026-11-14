@@ -8,7 +8,7 @@ import static com.mantkowicz.light.map.TileObjectAttribute.TEXTURE_NAME;
 public class TileObjectFactory {
     public static TileObject createTileObject(TileObjectType objectType, MapProperties objectProperties) {
         if (objectType.getSpriteActor() != null) {
-            return new TileSpriteActor(objectType, objectType.getSpriteActor());
+            return new TileSpriteActor(objectType, objectType.getSpriteActor(), objectProperties);
         }
         switch (objectType) {
             case SPRITE :

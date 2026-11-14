@@ -4,8 +4,9 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.mantkowicz.light.actor.Carrot;
 import com.mantkowicz.light.actor.Collectible;
+import com.mantkowicz.light.actor.Crop;
+import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.board.WorldScale;
@@ -20,7 +21,7 @@ import java.util.List;
 import static com.mantkowicz.light.actor.GameActorType.CHEST;
 
 /**
- * The Sprout Lands chest, holding a carrot. It blocks its tile, so the player uses it from a neighbouring tile: walking
+ * The Sprout Lands chest, holding a crop picked at random (a carrot, corn...). It blocks its tile, so the player uses it from a neighbouring tile: walking
  * next to it shows its button. Opening it lifts the lid, which stays open, and what is inside jumps out.
  */
 public class Chest extends SpriteActor implements Collectible {
@@ -46,7 +47,7 @@ public class Chest extends SpriteActor implements Collectible {
         open = new TextureRegion(opening.getKeyFrame(opening.getAnimationDuration(), false), 1, 1, 16, 20);
 
         List<Item> content = new ArrayList<>();
-        content.add(new Carrot(context.getResourcesService()));
+        content.add(new Crop(CropType.random(), context.getResourcesService()));
         inventory = new Inventory(INVENTORY_SIZE, new ArrayList<Item>());
         inventory.setItemsAndCompleteWithNulls(content);
 

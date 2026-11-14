@@ -661,3 +661,30 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   on the tile under it while walking (`StopWalkingOnTapListener`).
 - Tests: `CollectTest.theButtonFadesIn`, `CollectTest.aSlotWithNowhereToThrowShakes`,
   `WalkingTest.tappingTheWalkingRabbitStopsIt`. No golden changed.
+
+## 2026‑11‑14, more crops (branch `more-crops`)
+
+- Besides the carrot there are **corn, a tomato, a pumpkin and a cucumber** (the farm items sheet, rows 1, 2, 4, 9 and
+  14: `CropType`). They work like the carrot did: `Carrot` became `Crop`, an `Item` of a `CropType`. Items of the same
+  kind are alike (`Item.isSameKindAs`, which a `Crop` answers by its type), so any carrot will do for a cow wishing for
+  one, and only a carrot.
+- **A chest** holds one crop picked at random when the level starts.
+- **A cow** wishes, each time it gets hungry, for one of its **favourite dishes**, picked at random: the Tiled string
+  property `favouriteDish` on the `COW` object, e.g. `CARROT,CUCUMBER`; without it, any crop (owner's choice). An
+  unknown name stops the level with a message listing the crops. The wish is picked on getting hungry, not on
+  entering `WISHING`, so a cow stroked while it wishes comes back wishing for the same crop. A cow may wish for a crop
+  no chest holds; then it gives up after 90 s and grazes, as before.
+- `TileObjectType`'s sprite-actor factories get the object's Tiled properties (`BiFunction<GameContext,
+  MapProperties, SpriteActor>`), so a sprite actor can be set up in Tiled. `tools/assets/README.md` documents
+  `favouriteDish`.
+- **Goldens re-recorded:** `collect` (the chest now throws out a cucumber, and with the shifted random draws the
+  thrown-out crop lands at (3,2) instead of (4,4), so the last snapshot is far from the chest, without its button) and
+  `torch-flicker` (the room's chest picks its crop with `MathUtils.random`, so the torch's flicker takes different
+  numbers). No other golden changed.
+- Tests: `CowTest.aCowMayWishForAnyCrop`, `theCowWishesOnlyForItsFavouriteDishes` (both dishes turn up over
+  5 minutes and nothing else; the other one can't be given), the stroke test checks the wish stays the same; the cow
+  tests feed whatever it wants (`GameDriver.cowWants`, `putIntoBackpack(crop)`). `everyStateShowsItsAnimation` runs
+  until it has seen every state (up to 15 min) instead of a fixed 5: with the new random draws the cow first slept
+  after 5 minutes. `CollectTest.everyChestHoldsACropPickedAtRandom` (12 chests, not all alike); the collect and HUD
+  tests accept any crop. `GameDriver` lists crops by their kind ("Carrot", "Corn") and adds `chestContents`,
+  `cowFavouriteDishes`.
