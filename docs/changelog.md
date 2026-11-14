@@ -614,3 +614,9 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   the carrot, the give button shaking and the face saying "find" without a carrot,
   `HudTest.theActionButtonAppearsOverTheChest`; `CameraZoomTest` now checks only that the button doesn't grow (it moves
   with the chest).
+
+## 2026‑11‑14, idea: all texts in one place (branch `idea-texts-in-one-place`)
+
+- `docs/ideas.md`, "All texts in one place": the texts the player sees are spread over the code; collect them in one
+  list for translations and to find every place that should become a picture. From the bug hunt's polish list. Docs
+  only.
