@@ -631,3 +631,9 @@ Found by headless test agents playing the game (and confirmed by hand), fixed to
   stays shut and its button shakes, like the cow's carrot button without a carrot (`ItemThrower.hasRoomNextTo`). Test:
   `CollectTest.withNoFreeCellTheChestStaysShutAndItsButtonShakes`.
 - No golden changed.
+
+## 2026‑11‑14, idea: all texts in one place (branch `idea-texts-in-one-place`)
+
+- `docs/ideas.md`, "All texts in one place": the texts the player sees are spread over the code; collect them in one
+  list for translations and to find every place that should become a picture. From the bug hunt's polish list. Docs
+  only.
