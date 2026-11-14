@@ -76,6 +76,16 @@ public class ItemThrower {
         return true;
     }
 
+    /** Is any tile next to {@code next} free, so something thrown from there has somewhere to land? */
+    public boolean hasRoomNextTo(Tile next) {
+        for (Tile tile : next.getNeighbours()) {
+            if (isFree(tile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private boolean isFree(Tile tile) {
         return tile.isAccessible() && boardService.getOccupants(tile).isEmpty() && !landing.contains(tile);
     }
