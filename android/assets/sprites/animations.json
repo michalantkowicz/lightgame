@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "5ed0697303dfe0cb7a187925f28f140ef881eadb",
+  "packJsonSha1": "53f4656fb8202161fc55a51f509139cac5f1b4d1",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -72,6 +72,12 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "cow_brown/graze": {
+      "sheet": "cow_brown",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "cow_brown/idle": {
       "sheet": "cow_brown",
       "frames": 3,
@@ -87,12 +93,6 @@
     "cow_brown/rest": {
       "sheet": "cow_brown",
       "frames": 3,
-      "frameDuration": 0.12,
-      "playMode": "LOOP"
-    },
-    "cow_brown/row_05": {
-      "sheet": "cow_brown",
-      "frames": 7,
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },

@@ -615,6 +615,15 @@ The cow gets a life, written as a gdx-ai state machine that other creatures (and
   `HudTest.theActionButtonAppearsOverTheChest`; `CameraZoomTest` now checks only that the button doesn't grow (it moves
   with the chest).
 
+## 2026‑11‑14, the cow grazes when nobody feeds it (branch `cow-grazes`)
+
+- A cow wishing for a carrot for **90 s** without getting one gives up: the wish (bubble or carrot button) goes and it
+  **grazes**, three bites of grass in a row, each a bite (`GRAZING`, the sheet's row that was `row_05`, now named
+  `graze` in `pack.json`; `Action.GRAZE` is generated) and a second of chewing (`CHEWING`, the `eat` row). Then it
+  stands again, fed (hungry again 20 s later). While grazing it can't be stroked. From the bug hunt (a hungry cow
+  wished for ever); the owner chose the animation and "a minute or two".
+- Test: `CowTest.theCowGrazesWhenNobodyFeedsIt` (the states in order, each with its animation, the wish gone, not hungry
+  right after). `everyStateShowsItsAnimation` feeds the cow every time, so it never grazes there. No golden changed.
 ## 2026‑11‑14, three bugs from the bug hunt (branch `three-bug-fixes`)
 
 Found by headless test agents playing the game (and confirmed by hand), fixed together on the owner's request.

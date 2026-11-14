@@ -10,6 +10,7 @@ public enum Action {
     CHOP("chop"),
     EAT("eat"),
     FALL("fall"),
+    GRAZE("graze"),
     IDLE("idle"),
     LOVE("love"),
     OPEN("open"),

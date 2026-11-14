@@ -5,6 +5,7 @@ import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,17 +59,19 @@ class CowTest {
             "~~~~~~");
 
     /** Which animation shows which state. */
-    private static final Map<String, String> ANIMATIONS = Map.of(
-            "STANDING", "cow_brown/idle",
-            "WALKING", "cow_brown/walk",
-            "LYING_DOWN", "cow_brown/settle",
-            "RESTING", "cow_brown/rest",
-            "SLEEPING", "cow_brown/sleep",
-            "GETTING_UP", "cow_brown/settle",
-            "WISHING", "cow_brown/idle",
-            "EATING", "cow_brown/eat",
-            "HAPPY", "cow_brown/love",
-            "STROKED", "cow_brown/love");
+    private static final Map<String, String> ANIMATIONS = Map.ofEntries(
+            Map.entry("STANDING", "cow_brown/idle"),
+            Map.entry("WALKING", "cow_brown/walk"),
+            Map.entry("LYING_DOWN", "cow_brown/settle"),
+            Map.entry("RESTING", "cow_brown/rest"),
+            Map.entry("SLEEPING", "cow_brown/sleep"),
+            Map.entry("GETTING_UP", "cow_brown/settle"),
+            Map.entry("WISHING", "cow_brown/idle"),
+            Map.entry("EATING", "cow_brown/eat"),
+            Map.entry("HAPPY", "cow_brown/love"),
+            Map.entry("STROKED", "cow_brown/love"),
+            Map.entry("GRAZING", "cow_brown/graze"),
+            Map.entry("CHEWING", "cow_brown/eat"));
 
     @Test
     void strokingTheCow() {
@@ -190,6 +193,35 @@ class CowTest {
         assertFalse(game.crashed());
     }
 
+    /**
+     * Wishing for a carrot for a minute and a half with nobody feeding it, the cow gives up: the bubble goes and it
+     * grazes, three bites of grass (each a bite and chewing), then stands again, no longer hungry.
+     */
+    @Test
+    void theCowGrazesWhenNobodyFeedsIt() {
+        GameDriver game = GameDriver.start(ROW.write("cow-row"));
+        waitFor(game, "WISHING", 23);
+        game.seconds(1);
+        assertEquals("carrot", game.cowWish());
+        List<String> states = new ArrayList<>();
+        for (int frame = 0; frame < 120 * 60 && !"STANDING".equals(game.cowState()); frame++) {
+            String state = game.cowState();
+            if (states.isEmpty() || !state.equals(states.get(states.size() - 1))) {
+                states.add(state);
+                if (!"WISHING".equals(state)) {
+                    assertEquals(ANIMATIONS.get(state), game.cowAnimation(), state);
+                }
+            }
+            game.frames(1);
+        }
+        assertEquals(List.of("WISHING", "GRAZING", "CHEWING", "GRAZING", "CHEWING", "GRAZING", "CHEWING"), states,
+                "it gives up and takes three bites");
+        assertEquals("none", game.cowWish(), "the bubble is gone");
+        game.seconds(15);
+        assertFalse("WISHING".equals(game.cowState()), "it has eaten: not hungry for a while");
+        assertFalse(game.crashed());
+    }
+
     /** Fed whenever it wishes for a carrot, in a few minutes the cow does everything it can; each state has its animation. */
     @Test
     void everyStateShowsItsAnimation() {
@@ -208,7 +240,8 @@ class CowTest {
             }
             game.frames(1);
         }
-        assertEquals(ANIMATIONS.keySet(), union(seen, "STROKED"), "everything but being stroked");
+        // fed each time, it never grazes (theCowGrazesWhenNobodyFeedsIt)
+        assertEquals(ANIMATIONS.keySet(), union(seen, "STROKED", "GRAZING", "CHEWING"), "everything but being stroked");
         assertEquals(PEN.cell('M'), game.cellOf(GameDriver.Kind.COW), "it never left the pen");
         assertFalse(game.crashed());
     }
@@ -295,9 +328,9 @@ class CowTest {
         assertEquals(state, game.cowState(), "after " + maxSeconds + " s");
     }
 
-    private static Set<String> union(Set<String> set, String more) {
+    private static Set<String> union(Set<String> set, String... more) {
         Set<String> all = new HashSet<>(set);
-        all.add(more);
+        all.addAll(List.of(more));
         return all;
     }
 }

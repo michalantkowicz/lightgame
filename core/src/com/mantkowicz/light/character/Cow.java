@@ -24,7 +24,8 @@ import static com.mantkowicz.light.actor.GameActorType.COW;
 import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
 
 /**
- * A brown cow. What it does (stands, walks a step, lies down, sleeps, wishes for a carrot, eats, enjoys a stroke) and
+ * A brown cow. What it does (stands, walks a step, lies down, sleeps, wishes for a carrot, eats, grazes when nobody
+ * feeds it, enjoys a stroke) and
  * when is all in {@link CowState}, a gdx-ai state machine; this class only has what the states use. Tapping it walks
  * the player next to it; holding it shows its description.
  */
@@ -33,8 +34,11 @@ public class Cow extends SpriteActor implements Creature {
     static final int MESSAGE_STROKE = 1, MESSAGE_GIFT = 2;
     /** Walking pace: seconds for its step onto the next tile. */
     static final float SECONDS_PER_TILE = 1.5f;
-    /** This long after the start or its last carrot it gets hungry again. */
+    /** This long after the start or its last meal it gets hungry again. */
     static final float HUNGRY_AFTER_SECONDS = 20;
+    /** Wishing this long without getting its carrot, it gives up and grazes, taking this many bites of grass. */
+    static final float GIVE_UP_WISHING_AFTER_SECONDS = 90;
+    static final int GRAZING_BITES = 3;
     /** A face floating up over it: screen pixels per pack pixel, and how far over its tile (over the heart it shows). */
     private static final float EMOTE_SCALE = 6, EMOTE_GAP = 60;
 
@@ -45,8 +49,10 @@ public class Cow extends SpriteActor implements Creature {
     private PictureBubble wishBubble;
     /** False while the action button with its wish is over it: the bubble is hidden. */
     private boolean wishShown = true;
-    /** Seconds left of what {@link #stayFor} set, and since the start or its last carrot. */
+    /** Seconds left of what {@link #stayFor} set, and since the start or its last meal. */
     private float timeLeft, sinceFed;
+    /** Bites of grass still to take while grazing. */
+    private int bitesLeft;
 
     public Cow(GameContext context) {
         super(COW, context, Sprite.COW_BROWN, Action.IDLE, "A brown cow. It looks calm and a bit hungry.");
@@ -123,6 +129,23 @@ public class Cow extends SpriteActor implements Creature {
 
     void stopBeingHungry() {
         sinceFed = 0;
+    }
+
+    /** It has wished for its carrot too long without getting it. */
+    boolean hasWishedTooLong() {
+        return sinceFed >= HUNGRY_AFTER_SECONDS + GIVE_UP_WISHING_AFTER_SECONDS;
+    }
+
+    void startGrazing() {
+        bitesLeft = GRAZING_BITES;
+    }
+
+    void takeBite() {
+        bitesLeft--;
+    }
+
+    boolean hasBitesLeft() {
+        return bitesLeft > 0;
     }
 
     /** A bubble over it with what it wishes for. */

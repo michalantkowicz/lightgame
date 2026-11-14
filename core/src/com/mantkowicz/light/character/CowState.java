@@ -11,6 +11,7 @@ import com.mantkowicz.light.resources.Action;
  * player ({@code onMessage}). To change the cow's behaviour, change it here; {@link Cow} only has the helpers.
  * <pre>
  * STANDING ──(hungry)──▶ WISHING ──(gets its carrot)──▶ EATING ──▶ HAPPY ──▶ STANDING
+ *                        WISHING ──(not fed for long)──▶ GRAZING ──▶ CHEWING ──(3 bites)──▶ STANDING
  * STANDING ──(after a while)──▶ WALKING ──(arrived)──▶ STANDING
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
@@ -153,6 +154,14 @@ public enum CowState implements State<Cow> {
         }
 
         @Override
+        public void update(Cow cow) {
+            if (cow.hasWishedTooLong()) { // it eats grass instead
+                cow.startGrazing();
+                cow.changeState(GRAZING);
+            }
+        }
+
+        @Override
         boolean canBeStroked() {
             return true;
         }
@@ -170,6 +179,41 @@ public enum CowState implements State<Cow> {
         public void update(Cow cow) {
             if (cow.isTimeUp()) {
                 cow.changeState(HAPPY);
+            }
+        }
+    },
+
+    /** Nobody fed it: it lowers its head and takes a bite of grass. */
+    GRAZING {
+        @Override
+        public void enter(Cow cow) {
+            cow.takeBite();
+            cow.playOnce(Action.GRAZE);
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (cow.isAnimationFinished()) {
+                cow.changeState(CHEWING);
+            }
+        }
+    },
+
+    /** Chews the grass it bit off; then the next bite, or back on its feet when the bites are taken. */
+    CHEWING {
+        @Override
+        public void enter(Cow cow) {
+            cow.playAnimation(Action.EAT);
+            cow.stayFor(1, 1);
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (cow.isTimeUp() && cow.hasBitesLeft()) {
+                cow.changeState(GRAZING);
+            } else if (cow.isTimeUp()) {
+                cow.stopBeingHungry(); // it has eaten
+                cow.changeState(STANDING);
             }
         }
     },
