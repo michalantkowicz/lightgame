@@ -155,7 +155,7 @@
                   "egg_hatch_green": "Animals/Chicken_Egg/Egg_Spritesheet_Green.png",
                   "egg_hatch_red": "Animals/Chicken_Egg/Egg_Spritesheet_red.png"}},
     {"name": "cow", "frame": [32, 32], "duration": 120, "anchor": [16, 21],
-     "rows": ["idle", "walk", "settle", "rest", "sleep", "row_05", "eat", "love"],
+     "rows": ["idle", "walk", "settle", "rest", "sleep", "graze", "eat", "love"],
      "variants": {"cow_brown": "Animals/Cow/Brown cow animations.png",
                   "cow_green": "Animals/Cow/Green cow animation sprites.png",
                   "cow_light": "Animals/Cow/Light cow animations.png",

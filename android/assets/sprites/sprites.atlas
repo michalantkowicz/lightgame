@@ -44,6 +44,27 @@ cow_brown/eat
 cow_brown/eat
   bounds:436,299,29,28
   index:3
+cow_brown/graze
+  bounds:126,299,29,28
+  index:0
+cow_brown/graze
+  bounds:157,299,29,28
+  index:1
+cow_brown/graze
+  bounds:188,299,29,28
+  index:2
+cow_brown/graze
+  bounds:219,299,29,28
+  index:3
+cow_brown/graze
+  bounds:250,299,29,28
+  index:4
+cow_brown/graze
+  bounds:281,299,29,28
+  index:5
+cow_brown/graze
+  bounds:312,299,29,28
+  index:6
 cow_brown/idle
   bounds:354,266,29,28
   index:0
@@ -80,27 +101,6 @@ cow_brown/rest
 cow_brown/rest
   bounds:974,266,29,28
   index:2
-cow_brown/row_05
-  bounds:126,299,29,28
-  index:0
-cow_brown/row_05
-  bounds:157,299,29,28
-  index:1
-cow_brown/row_05
-  bounds:188,299,29,28
-  index:2
-cow_brown/row_05
-  bounds:219,299,29,28
-  index:3
-cow_brown/row_05
-  bounds:250,299,29,28
-  index:4
-cow_brown/row_05
-  bounds:281,299,29,28
-  index:5
-cow_brown/row_05
-  bounds:312,299,29,28
-  index:6
 cow_brown/settle
   bounds:695,266,29,28
   index:0
