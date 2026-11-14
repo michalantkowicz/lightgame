@@ -24,9 +24,10 @@ import static com.mantkowicz.light.actor.GameActorType.ACTION_BUTTON;
 /**
  * A {@link RoundButton} with a picture of what it does (e.g. the open chest to collect from), over what it acts on (the
  * chest, the cow) and following it around. Several buttons over one thing (usually one, at most about three: the cow's
- * hand and the carrot it wishes for) stand in a row centred over it, ordered by {@link #setPlace}. It is on the UI stage, so it keeps its size and catches taps before the map
- * under it. It stays while its action is available and fades out when it no longer is (and fades back in if it becomes
- * available again before it is gone). Its name (e.g. "COLLECT") is for tests only: players see the picture.
+ * hand and the carrot it wishes for) stand in a row centred over it, ordered by {@link #setPlace}. It is on the UI
+ * stage, so it keeps its size and catches taps before the map under it. It fades in when it appears, stays while its
+ * action is available and fades out when it no longer is (and fades back in if it becomes available again before it
+ * is gone). Its name (e.g. "COLLECT") is for tests only: players see the picture.
  */
 public class ActionButton extends GameActor {
     /** Between the top of what it acts on and the button's bottom, and between buttons in a row over one thing. */
@@ -37,6 +38,8 @@ public class ActionButton extends GameActor {
     private static final UiImage UP = UiImage.ACTION_BUTTON_DARK_BROWN, DOWN = UiImage.ACTION_BUTTON_DARK_BROWN_DOWN;
     /** How far it moves sideways when shaken, and how long the first move takes (the whole shake is 6 times that). */
     private static final float SHAKE = 8, SHAKE_SECONDS = 0.04f;
+    /** How long it takes to fade in when it appears: quicker than fading out, so a tap gets its answer soon. */
+    private static final float APPEAR_SECONDS = 0.3f;
 
     private final Stage gameStage;
     private final Actor over;
@@ -62,6 +65,8 @@ public class ActionButton extends GameActor {
         addListener(listener);
 
         addPlugin(new RemoveWhenUnavailablePlugin(this, available));
+        getColor().a = 0;
+        addAction(Actions.fadeIn(APPEAR_SECONDS, Interpolation.sineIn));
     }
 
     @Override

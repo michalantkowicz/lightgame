@@ -118,3 +118,13 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   a busy map and see which UI pictures the game stage draws. If it matters, either draw those pictures together (one
   switch each way) or let the tool copy chosen UI pack pieces into `sprites.atlas` (e.g. a list in `pack.json`) and load
   them as sprites; that would also keep `UiImage` for the UI only.
+- **All texts in one place** (2026‑11‑14). The words the game shows are spread over the code: `Hud.HINT` ("play
+  around!"), `CreatureFeature.FIND` ("find"), `PhraseGroup.NO_PATH` ("no path"), the "SETTINGS" title
+  (`SettingsPanel`), the radial menu's "button" caption (`MenuButton`), and the descriptions in the characters
+  (`Player` "player", `Chest` "chest", `Lighter` "lighter", `Dog`, the cow's sentence in `Cow`'s constructor). Found
+  by the bug hunt (2026‑11‑14): most players can't read, and some of these are placeholders. Suggested fix: one place
+  that lists every text the player sees, e.g. a `Text` enum (key and English wording) or a libGDX `I18NBundle`
+  properties file (it works in GWT), and the code asking for a key instead of writing the words. Two gains: a
+  translation later only adds a file, and the list shows every place that still uses words, so each can be judged
+  (keep it for readers, or replace it with a picture, as the "Built" HUD already does). Debug texts (the state labels)
+  stay out of it. Open: enum or bundle; whether descriptions belong there or in the map data.
