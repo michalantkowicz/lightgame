@@ -11,6 +11,8 @@ public enum Action {
     EAT("eat"),
     FALL("fall"),
     GRAZE("graze"),
+    GROW("grow"),
+    ICON("icon"),
     IDLE("idle"),
     LOVE("love"),
     OPEN("open"),
@@ -20,7 +22,9 @@ public enum Action {
     REST("rest"),
     RUN("run"),
     SETTLE("settle"),
+    SIGN("sign"),
     SLEEP("sleep"),
+    SPLASH("splash"),
     TILL("till"),
     WALK("walk"),
     WATER("water");

@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "53f4656fb8202161fc55a51f509139cac5f1b4d1",
+  "packJsonSha1": "e9095d36d21e60dd33cd022b27aa083dc26e79bd",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -42,6 +42,56 @@
       "anchorX": 8,
       "anchorY": 8
     },
+    "plant_carrot": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 15,
+      "height": 13,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "plant_corn": {
+      "frameWidth": 16,
+      "frameHeight": 32,
+      "trimX": 2,
+      "trimY": 1,
+      "width": 12,
+      "height": 29,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "plant_cucumber": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 15,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "plant_pumpkin": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "plant_tomato": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
+    },
     "rabbit": {
       "frameWidth": 48,
       "frameHeight": 48,
@@ -51,6 +101,76 @@
       "height": 31,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "sign_carrot": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "sign_corn": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "sign_cucumber": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "sign_pumpkin": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "sign_tomato": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "watering": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 11,
+      "trimY": 13,
+      "width": 14,
+      "height": 11,
+      "anchorX": 18,
+      "anchorY": 18
+    },
+    "watering_can": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 2,
+      "width": 16,
+      "height": 10,
+      "anchorX": 8,
+      "anchorY": 8
     }
   },
   "animations": {
@@ -204,6 +324,36 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "plant_carrot/grow": {
+      "sheet": "plant_carrot",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_corn/grow": {
+      "sheet": "plant_corn",
+      "frames": 5,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_cucumber/grow": {
+      "sheet": "plant_cucumber",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_pumpkin/grow": {
+      "sheet": "plant_pumpkin",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_tomato/grow": {
+      "sheet": "plant_tomato",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "rabbit/chop_down": {
       "sheet": "rabbit",
       "frames": 8,
@@ -345,6 +495,48 @@
     "rabbit/water_up": {
       "sheet": "rabbit",
       "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_carrot/sign": {
+      "sheet": "sign_carrot",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_corn/sign": {
+      "sheet": "sign_corn",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_cucumber/sign": {
+      "sheet": "sign_cucumber",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_pumpkin/sign": {
+      "sheet": "sign_pumpkin",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_tomato/sign": {
+      "sheet": "sign_tomato",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "watering/splash": {
+      "sheet": "watering",
+      "frames": 9,
+      "frameDuration": 0.1,
+      "playMode": "NORMAL"
+    },
+    "watering_can/icon": {
+      "sheet": "watering_can",
+      "frames": 1,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     }

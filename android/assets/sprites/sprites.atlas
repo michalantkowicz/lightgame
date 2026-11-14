@@ -3,206 +3,269 @@ size:1024,512
 filter:Nearest,Nearest
 repeat:none
 chest/open_front
-  bounds:653,299,18,21
+  bounds:715,299,18,21
   index:0
 chest/open_front
-  bounds:673,299,18,21
+  bounds:735,299,18,21
   index:1
 chest/open_front
-  bounds:693,299,18,21
+  bounds:755,299,18,21
   index:2
 chest/open_front
-  bounds:713,299,18,21
+  bounds:775,299,18,21
   index:3
 chest/open_front
-  bounds:733,299,18,21
+  bounds:795,299,18,21
   index:4
 chest/open_side
-  bounds:753,299,18,21
+  bounds:815,299,18,21
   index:0
 chest/open_side
-  bounds:773,299,18,21
+  bounds:835,299,18,21
   index:1
 chest/open_side
-  bounds:793,299,18,21
+  bounds:855,299,18,21
   index:2
 chest/open_side
-  bounds:813,299,18,21
+  bounds:875,299,18,21
   index:3
 chest/open_side
-  bounds:833,299,18,21
+  bounds:895,299,18,21
   index:4
-cow_brown/eat
-  bounds:343,299,29,28
-  index:0
-cow_brown/eat
-  bounds:374,299,29,28
-  index:1
 cow_brown/eat
   bounds:405,299,29,28
-  index:2
+  index:0
 cow_brown/eat
   bounds:436,299,29,28
-  index:3
-cow_brown/graze
-  bounds:126,299,29,28
-  index:0
-cow_brown/graze
-  bounds:157,299,29,28
   index:1
+cow_brown/eat
+  bounds:467,299,29,28
+  index:2
+cow_brown/eat
+  bounds:498,299,29,28
+  index:3
 cow_brown/graze
   bounds:188,299,29,28
-  index:2
+  index:0
 cow_brown/graze
   bounds:219,299,29,28
-  index:3
+  index:1
 cow_brown/graze
   bounds:250,299,29,28
-  index:4
+  index:2
 cow_brown/graze
   bounds:281,299,29,28
-  index:5
+  index:3
 cow_brown/graze
   bounds:312,299,29,28
+  index:4
+cow_brown/graze
+  bounds:343,299,29,28
+  index:5
+cow_brown/graze
+  bounds:374,299,29,28
   index:6
 cow_brown/idle
-  bounds:354,266,29,28
+  bounds:424,266,29,28
   index:0
 cow_brown/idle
-  bounds:385,266,29,28
+  bounds:455,266,29,28
   index:1
 cow_brown/idle
-  bounds:416,266,29,28
+  bounds:486,266,29,28
   index:2
-cow_brown/love
-  bounds:467,299,29,28
-  index:0
-cow_brown/love
-  bounds:498,299,29,28
-  index:1
 cow_brown/love
   bounds:529,299,29,28
-  index:2
+  index:0
 cow_brown/love
   bounds:560,299,29,28
-  index:3
+  index:1
 cow_brown/love
   bounds:591,299,29,28
-  index:4
+  index:2
 cow_brown/love
   bounds:622,299,29,28
+  index:3
+cow_brown/love
+  bounds:653,299,29,28
+  index:4
+cow_brown/love
+  bounds:684,299,29,28
   index:5
 cow_brown/rest
-  bounds:912,266,29,28
+  bounds:982,266,29,28
   index:0
 cow_brown/rest
-  bounds:943,266,29,28
+  bounds:2,299,29,28
   index:1
 cow_brown/rest
-  bounds:974,266,29,28
+  bounds:33,299,29,28
   index:2
 cow_brown/settle
-  bounds:695,266,29,28
+  bounds:765,266,29,28
   index:0
 cow_brown/settle
-  bounds:726,266,29,28
+  bounds:796,266,29,28
   index:1
 cow_brown/settle
-  bounds:757,266,29,28
+  bounds:827,266,29,28
   index:2
 cow_brown/settle
-  bounds:788,266,29,28
+  bounds:858,266,29,28
   index:3
 cow_brown/settle
-  bounds:819,266,29,28
+  bounds:889,266,29,28
   index:4
 cow_brown/settle
-  bounds:850,266,29,28
+  bounds:920,266,29,28
   index:5
 cow_brown/settle
-  bounds:881,266,29,28
+  bounds:951,266,29,28
   index:6
-cow_brown/sleep
-  bounds:2,299,29,28
-  index:0
-cow_brown/sleep
-  bounds:33,299,29,28
-  index:1
 cow_brown/sleep
   bounds:64,299,29,28
-  index:2
+  index:0
 cow_brown/sleep
   bounds:95,299,29,28
+  index:1
+cow_brown/sleep
+  bounds:126,299,29,28
+  index:2
+cow_brown/sleep
+  bounds:157,299,29,28
   index:3
 cow_brown/walk
-  bounds:447,266,29,28
+  bounds:517,266,29,28
   index:0
 cow_brown/walk
-  bounds:478,266,29,28
+  bounds:548,266,29,28
   index:1
 cow_brown/walk
-  bounds:509,266,29,28
+  bounds:579,266,29,28
   index:2
 cow_brown/walk
-  bounds:540,266,29,28
+  bounds:610,266,29,28
   index:3
 cow_brown/walk
-  bounds:571,266,29,28
+  bounds:641,266,29,28
   index:4
 cow_brown/walk
-  bounds:602,266,29,28
+  bounds:672,266,29,28
   index:5
 cow_brown/walk
-  bounds:633,266,29,28
+  bounds:703,266,29,28
   index:6
 cow_brown/walk
-  bounds:664,266,29,28
+  bounds:734,266,29,28
   index:7
 farm_items/row_01
-  bounds:853,299,16,16
+  bounds:915,299,16,16
   index:0
 farm_items/row_02
-  bounds:871,299,16,16
+  bounds:933,299,16,16
   index:0
 farm_items/row_03
-  bounds:889,299,16,16
+  bounds:951,299,16,16
   index:0
 farm_items/row_04
-  bounds:907,299,16,16
+  bounds:969,299,16,16
   index:0
 farm_items/row_05
-  bounds:925,299,16,16
+  bounds:987,299,16,16
   index:0
 farm_items/row_06
-  bounds:943,299,16,16
+  bounds:1005,299,16,16
   index:0
 farm_items/row_07
-  bounds:961,299,16,16
-  index:0
-farm_items/row_08
-  bounds:979,299,16,16
-  index:0
-farm_items/row_09
-  bounds:997,299,16,16
-  index:0
-farm_items/row_10
   bounds:2,329,16,16
   index:0
-farm_items/row_11
+farm_items/row_08
   bounds:20,329,16,16
   index:0
-farm_items/row_12
+farm_items/row_09
   bounds:38,329,16,16
   index:0
-farm_items/row_13
+farm_items/row_10
   bounds:56,329,16,16
   index:0
-farm_items/row_14
+farm_items/row_11
   bounds:74,329,16,16
   index:0
-item_shadow/row_00
-  bounds:92,329,14,4
+farm_items/row_12
+  bounds:92,329,16,16
   index:0
+farm_items/row_13
+  bounds:110,329,16,16
+  index:0
+farm_items/row_14
+  bounds:128,329,16,16
+  index:0
+item_shadow/row_00
+  bounds:664,329,14,4
+  index:0
+plant_carrot/grow
+  bounds:434,329,15,13
+  index:0
+plant_carrot/grow
+  bounds:451,329,15,13
+  index:1
+plant_carrot/grow
+  bounds:468,329,15,13
+  index:2
+plant_carrot/grow
+  bounds:485,329,15,13
+  index:3
+plant_corn/grow
+  bounds:354,266,12,29
+  index:0
+plant_corn/grow
+  bounds:368,266,12,29
+  index:1
+plant_corn/grow
+  bounds:382,266,12,29
+  index:2
+plant_corn/grow
+  bounds:396,266,12,29
+  index:3
+plant_corn/grow
+  bounds:410,266,12,29
+  index:4
+plant_cucumber/grow
+  bounds:298,329,16,15
+  index:0
+plant_cucumber/grow
+  bounds:316,329,16,15
+  index:1
+plant_cucumber/grow
+  bounds:334,329,16,15
+  index:2
+plant_cucumber/grow
+  bounds:352,329,16,15
+  index:3
+plant_pumpkin/grow
+  bounds:146,329,16,16
+  index:0
+plant_pumpkin/grow
+  bounds:164,329,16,16
+  index:1
+plant_pumpkin/grow
+  bounds:182,329,16,16
+  index:2
+plant_pumpkin/grow
+  bounds:200,329,16,16
+  index:3
+plant_tomato/grow
+  bounds:370,329,14,14
+  index:0
+plant_tomato/grow
+  bounds:386,329,14,14
+  index:1
+plant_tomato/grow
+  bounds:402,329,14,14
+  index:2
+plant_tomato/grow
+  bounds:418,329,14,14
+  index:3
 rabbit/chop_down
   bounds:574,167,42,31
   index:0
@@ -779,3 +842,48 @@ rabbit/water_up
 rabbit/water_up
   bounds:618,233,42,31
   index:7
+sign_carrot/sign
+  bounds:234,329,14,16
+  index:0
+sign_corn/sign
+  bounds:218,329,14,16
+  index:0
+sign_cucumber/sign
+  bounds:282,329,14,16
+  index:0
+sign_pumpkin/sign
+  bounds:266,329,14,16
+  index:0
+sign_tomato/sign
+  bounds:250,329,14,16
+  index:0
+watering/splash
+  bounds:502,329,14,11
+  index:0
+watering/splash
+  bounds:518,329,14,11
+  index:1
+watering/splash
+  bounds:534,329,14,11
+  index:2
+watering/splash
+  bounds:550,329,14,11
+  index:3
+watering/splash
+  bounds:566,329,14,11
+  index:4
+watering/splash
+  bounds:582,329,14,11
+  index:5
+watering/splash
+  bounds:598,329,14,11
+  index:6
+watering/splash
+  bounds:614,329,14,11
+  index:7
+watering/splash
+  bounds:630,329,14,11
+  index:8
+watering_can/icon
+  bounds:646,329,16,10
+  index:0

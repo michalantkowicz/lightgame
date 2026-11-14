@@ -12,7 +12,23 @@ public enum Sprite {
     /** Farm produce lying on the ground, one per row (only the right column: the left one has seed bags). */
     FARM_ITEMS("farm_items"),
     /** The shadow under an item lying on the ground. */
-    ITEM_SHADOW("item_shadow");
+    ITEM_SHADOW("item_shadow"),
+    /** The watering can (the picture on a field's button while it needs water). */
+    WATERING_CAN("watering_can"),
+    /** Water falling from the can onto a field. */
+    WATERING("watering"),
+    /** A crop growing on a field, one frame per stage (the last one ripe). Corn is two tiles tall. */
+    PLANT_CORN("plant_corn"),
+    PLANT_CARROT("plant_carrot"),
+    PLANT_TOMATO("plant_tomato"),
+    PLANT_PUMPKIN("plant_pumpkin"),
+    PLANT_CUCUMBER("plant_cucumber"),
+    /** The sign at a field's corner showing what grows there. */
+    SIGN_CORN("sign_corn"),
+    SIGN_CARROT("sign_carrot"),
+    SIGN_TOMATO("sign_tomato"),
+    SIGN_PUMPKIN("sign_pumpkin"),
+    SIGN_CUCUMBER("sign_cucumber");
 
     private final String sheet;
 

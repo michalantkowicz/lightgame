@@ -87,7 +87,7 @@ public final class GameDriver {
     private static final int FRAMES_PER_SECOND = 60;
 
     public enum Kind {
-        PLAYER, DOG, CHEST, COW
+        PLAYER, DOG, CHEST, COW, FIELD
     }
 
     private final HeadlessGame game;
@@ -516,6 +516,24 @@ public final class GameDriver {
             }
         }
         throw new IllegalStateException("No chest button on screen");
+    }
+
+    /** The field: its crop and how far it has grown, e.g. "carrot 1/3" (3/3 is ripe), "+ water" while watered. */
+    public String field() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        return field.getCrop().getName() + " " + field.getGrowthStage() + "/" + field.getRipeStage()
+                + (field.isBeingWatered() ? " + water" : "");
+    }
+
+    /** What the field's button shows: "crop" (picks it), "water" (the watering can), or "none" (no button). */
+    public String fieldButton() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        for (Actor actor : uiActors()) {
+            if (actor instanceof ActionButton button && "COLLECT".equals(button.getName())) {
+                return button.getPicture() == field.getWateringCanIcon() ? "water" : "crop";
+            }
+        }
+        return "none";
     }
 
     /** Is the action button with this name shaking (tapped when there was nothing it could do)? */
@@ -1056,6 +1074,7 @@ public final class GameDriver {
             case DOG -> Dog.class;
             case CHEST -> Chest.class;
             case COW -> Cow.class;
+            case FIELD -> com.mantkowicz.light.character.Field.class;
         };
         for (Actor actor : gameStage().getActors()) {
             if (type.isInstance(actor)) {

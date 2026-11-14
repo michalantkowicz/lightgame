@@ -22,6 +22,7 @@ import static com.mantkowicz.light.resources.Direction.UP;
  * Animates an actor's picture from its sprite sheet: WALK in the direction it moves while it moves (e.g. the rabbit's
  * "walk_left"), and when it stops it turns back to the default IDLE facing DOWN. The direction follows the way the
  * actor actually moves; on a diagonal it keeps the direction it had if that one still fits, so it doesn't flicker.
+ * Standing, it can play another action once ({@link #playOnce}, e.g. watering), then it stands as before.
  */
 public class AnimationPlugin implements Plugin {
     /** How much one axis must dominate to switch the direction to it. */
@@ -35,6 +36,9 @@ public class AnimationPlugin implements Plugin {
     private String current;
     private Animation<TextureRegion> animation;
     private float stateTime;
+    /** An action played once while standing (e.g. "rabbit/water_left"), or null. */
+    private Action once;
+    private Direction onceDirection;
 
     public AnimationPlugin(GameActor actor, ResourcesService resourcesService, Sprite sprite) {
         this.actor = actor;
@@ -48,25 +52,46 @@ public class AnimationPlugin implements Plugin {
         if (avatar == null) {
             return;
         }
-        Vector2 center = actor.getCenter();
         boolean walking = MOVEMENT.equals(actor.getStatus());
+        followMovement(walking);
+        if (walking) {
+            once = null; // walking off stops it
+        }
+        Action action = once != null ? once : walking ? Action.WALK : Action.IDLE;
+        Direction facing = once != null ? onceDirection : direction;
+        String name = ResourcesService.animationName(sprite, action, facing);
+        if (!name.equals(current)) {
+            current = name;
+            animation = resourcesService.getAnimation(sprite, action, facing);
+            stateTime = 0;
+        } else {
+            stateTime += delta;
+        }
+        ((TextureRegionDrawable) avatar.getDrawable()).setRegion(animation.getKeyFrame(stateTime));
+        if (once != null && stateTime >= animation.getAnimationDuration()) {
+            once = null; // played once: standing again from the next frame
+        }
+    }
+
+    /**
+     * Plays an action once in a direction, e.g. (WATER, LEFT) "rabbit/water_left", unless the actor walks off
+     * meanwhile; then it stands as before.
+     */
+    public void playOnce(Action action, Direction direction) {
+        once = action;
+        onceDirection = direction;
+        current = null; // starts from its first frame, also when the same action is played again
+    }
+
+    /** Walking, it faces the way it moves; standing, it faces down (towards the player). */
+    private void followMovement(boolean walking) {
+        Vector2 center = actor.getCenter();
         if (!walking) {
             direction = DOWN; // standing: the default pose, facing the player
         } else if (lastCenter != null) {
             updateDirection(center.x - lastCenter.x, center.y - lastCenter.y);
         }
         lastCenter = center;
-
-        Action action = walking ? Action.WALK : Action.IDLE;
-        String name = ResourcesService.animationName(sprite, action, direction);
-        if (!name.equals(current)) {
-            current = name;
-            animation = resourcesService.getAnimation(sprite, action, direction);
-            stateTime = 0;
-        } else {
-            stateTime += delta;
-        }
-        ((TextureRegionDrawable) avatar.getDrawable()).setRegion(animation.getKeyFrame(stateTime));
     }
 
     private void updateDirection(float dx, float dy) {

@@ -4,6 +4,7 @@ import com.badlogic.gdx.maps.MapProperties;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.character.Chest;
 import com.mantkowicz.light.character.Cow;
+import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
 
@@ -22,7 +23,9 @@ public enum TileObjectType {
     // sprite actors
     CHEST((context, properties) -> new Chest(context)),
     COW((context, properties) -> new Cow(context,
-            CropType.listOf(properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class))));
+            CropType.listOf(properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class)))),
+    FIELD((context, properties) -> new Field(context,
+            CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT)));
 
     private final BiFunction<GameContext, MapProperties, SpriteActor> spriteActor;
 

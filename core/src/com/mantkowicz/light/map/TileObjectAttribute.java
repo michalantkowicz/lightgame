@@ -8,7 +8,9 @@ public enum TileObjectAttribute {
     LIGHT_COLOR_HEX("lightColorHex"),
     BORDER_LIGHT_POSITION("borderLightPosition"),
     /** A cow's crops to wish for, e.g. "CARROT,CUCUMBER"; any crop without it. */
-    FAVOURITE_DISH("favouriteDish");
+    FAVOURITE_DISH("favouriteDish"),
+    /** What grows on a field, e.g. "CORN"; a carrot without it. */
+    CROP_TYPE("cropType");
 
     private final String value;
 

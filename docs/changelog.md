@@ -689,3 +689,33 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   after 5 minutes. `CollectTest.everyChestHoldsACropPickedAtRandom` (12 chests, not all alike); the collect and HUD
   tests accept any crop. `GameDriver` lists crops by their kind ("Carrot", "Corn") and adds `chestContents`,
   `cowFavouriteDishes`.
+
+## 2026‑11‑14, the field (branch `field`)
+
+- **`Field`** (Tiled `objectClass` `FIELD`, string property `cropType`, e.g. `CORN`; `CARROT` without it): a
+  `Collectible` like the chest (it blocks its tile, used from the left, the right and below) that starts ripe. Its
+  action button shows the crop: the crop jumps out onto a free tile next to it (stars, as from a chest) and a seedling
+  is left. While the crop grows the button shows the **watering can**: the rabbit plays its watering animation
+  (`Player.water`: facing up below the field; facing down left or right of it, the owner didn't like the side poses; a
+  one-off action in `AnimationPlugin.playOnce`; walking off stops it), water falls onto the field (the pack's `watering`
+  sheet, row 0, 0.9 s; the button waits, faded), then it grows a stage. Ripe again, the crop is back on the button. The
+  can never runs dry (owner's choice for now).
+- Growing uses the pack's `Farming Plants.png`: corn has five stages and is two tiles tall, carrot, tomato, pumpkin
+  and cucumber four. A **sign** with the crop (`signs.png`) stands at the tile's top left corner, at half the world's
+  pixel scale, sticking out one pack pixel over the tile's left and top edges, behind the plant. The water from the
+  watering can sheet doesn't line up with the premium rabbit's pose, so it falls onto the field's middle instead.
+- `CropType` knows its plant and sign sprites; `CropType.named(name, fallback)` reads the Tiled property.
+  `Waterable` (actor): something whose button waters it while it needs water; `PlayerCollectResolver.use` waters it
+  before anything else, and keeps its button while it needs water.
+- Assets: pack.json sheets `plant_corn`… `plant_cucumber` (row `grow`), `sign_corn`… `sign_cucumber` (row `sign`),
+  `watering_can` (row `icon`, from the tools items sheet: the UI pack has no can) and the `watering` sheet's row 0
+  named `splash` with its anchor on the falling water; new `Sprite` constants; `Action` gained `GROW`, `ICON`, `SIGN`,
+  `SPLASH`.
+- `AnimationPlugin.run` split (`followMovement`) to stay under PMD's complexity limit.
+- Looked at it in a hidden LWJGL3 window: the five ripe fields with their signs, seedlings, water falling and the
+  crop growing a stage, the rabbit watering, the button with the crop and then the can.
+- `level1` (owner's request): one field per crop on the right of the island, column 19, rows 3 to 11 from the top
+  with a free row between them (corn at the top, so its tall plant has room): corn, carrot, tomato, pumpkin, cucumber.
+- Tests: `FieldTest` (picking, watering three times back to ripe and picking again, corn's five stages, the rabbit
+  watering facing down beside the field, walking away while watering). No golden changed. `GameDriver`: `Kind.FIELD`, `field()`,
+  `fieldButton()`.

@@ -6,6 +6,7 @@ import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
+import com.mantkowicz.light.actor.Waterable;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.board.TileTouchedEvent;
@@ -31,7 +32,8 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * does nothing. Opening it (a chest lifts its lid and stays open) pops stars and throws everything inside out onto
  * free tiles around it; with nowhere for them to land, it stays shut and its button shakes. A chest then keeps its
  * button, showing the closed chest: it closes the lid, and the next tap opens it again (with nothing left inside: no
- * stars, nothing comes out). Something that can't be closed loses its button once it is empty.
+ * stars, nothing comes out). Something that can't be closed loses its button once it is empty. Something that needs
+ * water (a field with a growing crop) keeps its button, the watering can: the player waters it, and it grows.
  * <p>
  * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
  * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
@@ -138,9 +140,12 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
-    /** Closes it when it is open (a chest shuts its lid), opens it otherwise. */
+    /** Waters it when it needs water (a growing field), closes it when it is open (a chest's lid), opens it otherwise. */
     private void use(Collectible collectible) {
-        if (collectible.isOpen()) {
+        if (needsWater(collectible)) {
+            player.water(collectible.getTile().getCenter());
+            ((Waterable) collectible).water();
+        } else if (collectible.isOpen()) {
             collectible.afterCollect();
         } else {
             open(collectible);
@@ -210,9 +215,13 @@ public class PlayerCollectResolver implements CollectResolver {
         return isInReach(collectible) && isUsable(collectible) && !collectible.isBusy();
     }
 
-    /** It holds something, or it can be closed and opened again (a chest, even empty). */
+    /** It holds something, it can be closed and opened again (a chest, even empty), or it needs water (a field). */
     private static boolean isUsable(Collectible collectible) {
-        return holdsSomething(collectible) || collectible.canBeClosed();
+        return holdsSomething(collectible) || collectible.canBeClosed() || needsWater(collectible);
+    }
+
+    private static boolean needsWater(Collectible collectible) {
+        return collectible instanceof Waterable waterable && waterable.needsWater();
     }
 
     private static boolean holdsSomething(Collectible collectible) {
