@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * The kinds of crop (the sprites pack's farm items sheet, one item per row): what a chest holds, what a cow wishes for,
- * what grows on a field (its plant, one frame per stage, and the sign showing it).
+ * what grows on a field (its plant, one frame per phase, and the sign showing it).
  */
 public enum CropType {
     CORN("corn", "farm_items/row_01", Sprite.PLANT_CORN, Sprite.SIGN_CORN),
@@ -30,7 +30,7 @@ public enum CropType {
         this.sign = sign;
     }
 
-    /** How it grows on a field: its GROW row has a frame per stage, from the seedling to the ripe crop. */
+    /** How it grows on a field: its GROW row has a frame per phase, from its smallest plant to the ripe crop (a field shows the shared sprout, {@link Sprite#PLANT_SEEDLING}, before them). */
     public Sprite getPlant() {
         return plant;
     }

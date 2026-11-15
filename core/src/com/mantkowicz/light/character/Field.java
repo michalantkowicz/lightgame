@@ -1,19 +1,20 @@
 package com.mantkowicz.light.character;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.Waterable;
+import com.mantkowicz.light.actor.Weedable;
 import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.context.GameContext;
+import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
@@ -27,63 +28,103 @@ import static com.mantkowicz.light.actor.GameActorType.FIELD;
 /**
  * A field with one kind of crop (Tiled's cropType, a carrot without it) and a sign at its top left corner showing it.
  * It starts ripe. Like a chest it blocks its tile and is used from a neighbouring one: its button (the crop) makes the
- * crop jump out, and the field starts again with a seedling. Then its button (the watering can) waters it: water falls
- * onto it and it grows a stage; ripe again, the crop can be picked again.
+ * crop jump out, and the field is empty again but for a tiny sprout, the same for every crop (phase 0), and its sign
+ * shows a question mark instead of the crop (with seeds, later, what grows there will be the player's choice); the
+ * crop's own pictures are the phases after it. Then its button (the watering can) waters it: water falls
+ * onto it and it grows a phase at once, then by itself a phase every {@link #SECONDS_PER_PHASE} seconds, without a
+ * button meanwhile (the plant bounces a little at each phase and slowly squashes and stretches while it grows); ripe
+ * again, the crop can be picked again (the HUD's face is happy). So a field gives a crop only now and then.
+ * <p>
+ * Nobody chose what grows on it (no seeds yet, see docs/ideas.md), so when the water has fallen on an empty field a
+ * weed may grow instead of the crop ({@link #DEFAULT_WEED_CHANCE}, Tiled's weedChance): the sprout's row goes on, a
+ * blue flower, and the sign keeps its question mark. Its button pulls the ripe weed out: it disappears, nothing is
+ * gained (the face sweats and says so), and the field is empty again.
  */
-public class Field extends SpriteActor implements Collectible, Waterable {
-    /** The sign is drawn at half the world's pixel scale, so it fits in the corner. */
-    private static final float SIGN_SCALE = WorldScale.PIXEL_SCALE / 2;
-    /** How far the sign sticks out over the tile's left and top edges. */
-    private static final float SIGN_OVERFLOW = WorldScale.PIXEL_SCALE;
+public class Field extends SpriteActor implements Collectible, Waterable, Weedable {
+    /** How likely a weed grows instead of the crop, when Tiled's weedChance doesn't say. */
+    public static final float DEFAULT_WEED_CHANCE = 0.4f;
+    /** Watered, it grows a phase at once and then one every this many seconds until it is ripe. */
+    static final float SECONDS_PER_PHASE = 30;
 
     private final CropType crop;
     private final ResourcesService resources;
+    private final GameEventService events;
     private final Inventory inventory = new Inventory(1, new ArrayList<Item>());
-    private final int ripeStage;
+    private final int ripePhase;
+    private final float weedChance;
     private final TextureRegion cropIcon;
     private final TextureRegion canIcon;
-    private int stage;
+    /** The sign: the crop, or blank with a question mark while the field is empty (phase 0) or a weed grows. */
+    private final FieldSign sign;
+    /** The tiny sprout of an empty field (phase 0), shown instead of the plant. */
+    private final Image seedling;
+    /** The weed's picture, shown instead of the crop's while a weed grows. */
+    private final WeedPlant weedPlant;
+    private int phase;
+    /** A weed grows on it instead of the crop. */
+    private boolean weed;
     /** The water falling onto it, while it is watered; null otherwise. */
-    private Image splash;
-    private float splashTime;
+    private WaterSplash splash;
+    /** Watered: it grows by itself until it is ripe. */
+    private boolean growing;
+    /** Seconds since its last phase while it grows. */
+    private float sincePhase;
 
-    public Field(GameContext context, CropType crop) {
+    /** @param weedChance how likely a weed grows instead of the crop after watering, 0 never, 1 always */
+    public Field(GameContext context, CropType crop, float weedChance) {
         super(FIELD, context, crop.getPlant(), Action.GROW, "A field with " + crop.getName() + "s.");
         this.crop = crop;
         this.resources = context.getResourcesService();
+        this.events = context.getGameEventService();
+        this.weedChance = weedChance;
         setName(crop.getName() + " field");
         setTouchable(Touchable.disabled);
-        ripeStage = resources.getAnimation(crop.getPlant(), Action.GROW).getKeyFrames().length - 1;
+        ripePhase = resources.getAnimation(crop.getPlant(), Action.GROW).getKeyFrames().length; // + the sprout
         cropIcon = resources.getTexture(crop.getPicture());
         canIcon = resources.getAnimation(Sprite.WATERING_CAN, Action.ICON).getKeyFrame(0);
-        addSign();
-        stage = ripeStage;
+        sign = new FieldSign(resources, crop.getSign(), getHeight());
+        addActorAt(0, sign); // behind the plant
+        seedling = sheetImage(Sprite.PLANT_SEEDLING, Action.GROW);
+        addActor(seedling);
+        weedPlant = place(new WeedPlant(resources), Sprite.PLANT_WEED);
+        addActor(weedPlant);
+        phase = ripePhase;
         inventory.add(new Crop(crop, resources));
-        showStage();
-        addPlugin(this::updateSplash);
-    }
-
-    /** The sign, behind the plant, at the tile's top left corner and sticking out over it a little. */
-    private void addSign() {
-        TextureRegion picture = resources.getAnimation(crop.getSign(), Action.SIGN).getKeyFrame(0);
-        Image sign = new Image(picture);
-        sign.setTouchable(Touchable.disabled);
-        sign.setSize(picture.getRegionWidth() * SIGN_SCALE, picture.getRegionHeight() * SIGN_SCALE);
-        sign.setPosition(-SIGN_OVERFLOW, getHeight() + SIGN_OVERFLOW - sign.getHeight());
-        addActorAt(0, sign);
+        showPhase();
+        addPlugin(this::updateGrowing);
     }
 
     public CropType getCrop() {
         return crop;
     }
 
-    /** How far it has grown: 0 a seedling, {@link #getRipeStage()} ripe. */
-    public int getGrowthStage() {
-        return stage;
+    /** How far it has grown: 0 an empty field (a tiny sprout), {@link #getRipePhase()} ripe. */
+    public int getGrowthPhase() {
+        return phase;
     }
 
-    public int getRipeStage() {
-        return ripeStage;
+    /** The phase it is ripe at: the crop's, or the weed's while one grows. */
+    public int getRipePhase() {
+        return weed ? weedPlant.getRipePhase() : ripePhase;
+    }
+
+    /** Does a weed grow on it (instead of the crop)? */
+    public boolean isWeed() {
+        return weed;
+    }
+
+    public float getWeedChance() {
+        return weedChance;
+    }
+
+    /** Does its sign show the crop (not the question mark of an empty field or a weed)? */
+    public boolean isCropOnSign() {
+        return sign.showsCrop();
+    }
+
+    /** Watered, is it growing by itself now (no button until it is ripe)? */
+    public boolean isGrowing() {
+        return growing;
     }
 
     /** Is water falling onto it right now? */
@@ -91,15 +132,53 @@ public class Field extends SpriteActor implements Collectible, Waterable {
         return splash != null;
     }
 
-    private void showStage() {
-        playOnce(Action.GROW, stage, stage);
+    /** Phase 0 the sprout; then the crop's own pictures (or the weed's), the first one at phase 1. */
+    private void showPhase() {
+        boolean empty = phase == 0;
+        boolean unknownCrop = empty || weed;
+        sign.showCrop(!unknownCrop);
+        seedling.setVisible(empty);
+        getAvatar().setVisible(!unknownCrop);
+        weedPlant.setVisible(!empty && weed);
+        int frame = Math.max(0, phase - 1);
+        if (weed) {
+            weedPlant.showPhase(phase);
+        } else {
+            playOnce(Action.GROW, frame, frame);
+        }
+    }
+
+    /** The picture of what grows now: the weed's or the crop's. */
+    private Image plant() {
+        return weed ? weedPlant : getAvatar();
+    }
+
+    /**
+     * A picture from the first frame of a sheet's row, at the world's pixel scale, with the sheet's anchor on the
+     * tile's middle (like the plant itself).
+     */
+    private Image sheetImage(Sprite sprite, Action action) {
+        Image image = new Image(resources.getAnimation(sprite, action).getKeyFrame(0));
+        image.setTouchable(Touchable.disabled);
+        return place(image, sprite);
+    }
+
+    /** Sizes a picture of the sheet at the world's pixel scale and puts the sheet's anchor on the tile's middle. */
+    private <T extends Image> T place(T image, Sprite sprite) {
+        SpriteSheet sheet = resources.getSpriteSheet(sprite);
+        float scale = WorldScale.PIXEL_SCALE;
+        image.setSize(image.getPrefWidth() * scale, image.getPrefHeight() * scale);
+        image.setPosition(getWidth() / 2f + (sheet.trimX() - sheet.anchorX()) * scale,
+                getHeight() / 2f + (sheet.trimY() - sheet.anchorY()) * scale);
+        return image;
     }
 
     // watering
 
+    /** A crop still to grow and nobody has watered it since it was picked. */
     @Override
     public boolean needsWater() {
-        return stage < ripeStage;
+        return phase < getRipePhase() && !growing;
     }
 
     @Override
@@ -107,41 +186,41 @@ public class Field extends SpriteActor implements Collectible, Waterable {
         if (!needsWater() || isBeingWatered()) {
             return;
         }
-        Animation<TextureRegion> falling = resources.getAnimation(Sprite.WATERING, Action.SPLASH);
-        TextureRegion first = falling.getKeyFrame(0);
-        SpriteSheet sheet = resources.getSpriteSheet(Sprite.WATERING);
-        float scale = WorldScale.PIXEL_SCALE;
-        splash = new Image(first);
-        splash.setTouchable(Touchable.disabled);
-        splash.setSize(first.getRegionWidth() * scale, first.getRegionHeight() * scale);
-        splash.setPosition(getWidth() / 2f + (sheet.trimX() - sheet.anchorX()) * scale,
-                getHeight() / 2f + (sheet.trimY() - sheet.anchorY()) * scale);
-        splashTime = 0;
+        splash = place(new WaterSplash(resources, this::watered), Sprite.WATERING);
         addActor(splash);
     }
 
-    /** The water falls; once it has, the crop grows a stage (ripe: it can be picked). */
-    private void updateSplash(float delta) {
-        if (splash == null) {
-            return;
+    /** The water has fallen: the crop (or a weed) grows a phase and goes on growing by itself. */
+    private void watered() {
+        splash = null;
+        sincePhase = 0;
+        if (phase == 0) {
+            weed = MathUtils.random() < weedChance; // nobody chose what grows: maybe a weed
         }
-        splashTime += delta;
-        Animation<TextureRegion> falling = resources.getAnimation(Sprite.WATERING, Action.SPLASH);
-        if (falling.isAnimationFinished(splashTime)) {
-            splash.remove();
-            splash = null;
-            grow();
-            return;
-        }
-        ((TextureRegionDrawable) splash.getDrawable()).setRegion(falling.getKeyFrame(splashTime));
+        grow();
     }
 
+    /** Watered, a phase every {@link #SECONDS_PER_PHASE} seconds until it is ripe. */
+    private void updateGrowing(float delta) {
+        if (!growing) {
+            return;
+        }
+        sincePhase += delta;
+        if (sincePhase >= SECONDS_PER_PHASE) {
+            sincePhase = 0;
+            grow();
+        }
+    }
+
+    /** A phase on; it goes on growing until it is ripe. */
     private void grow() {
-        stage++;
-        if (stage == ripeStage) {
+        phase++;
+        growing = phase < getRipePhase();
+        if (!growing && !weed) {
             inventory.add(new Crop(crop, resources));
         }
-        showStage();
+        showPhase();
+        PlantMoves.bounce(plant(), growing); // a bounce, then squashing while it grows
     }
 
     // collecting
@@ -152,10 +231,10 @@ public class Field extends SpriteActor implements Collectible, Waterable {
         return true;
     }
 
-    /** The crop while it is ripe (picks it), the watering can while it grows (waters it). */
+    /** The crop while it is ripe (picks it), the weed (pulls it out), the watering can after picking (waters it). */
     @Override
     public TextureRegion getActionIcon() {
-        return needsWater() ? canIcon : cropIcon;
+        return needsWater() ? canIcon : weed ? weedPlant.getRipePicture() : cropIcon;
     }
 
     /** The watering can: the button's picture while the crop grows (for tests and descriptions). */
@@ -168,17 +247,51 @@ public class Field extends SpriteActor implements Collectible, Waterable {
         return isBeingWatered();
     }
 
-    /** The top of its plant when it sticks out above the tile (ripe corn), else the tile's top. */
+    /**
+     * The top of its plant when it sticks out above the tile (ripe corn), else the tile's top: an empty field's button
+     * (the watering can) is as high as any other field's.
+     */
     @Override
     public float getTopY() {
-        return Math.max(getHeight(), getAvatar().getY() + getAvatar().getHeight());
+        if (phase == 0) {
+            return getHeight();
+        }
+        Image plant = plant();
+        return Math.max(getHeight(), plant.getY() + plant.getHeight());
     }
 
-    /** The crop is picked: it jumps out and a seedling is left. */
+    /** The crop is picked: it jumps out and the field is empty, a tiny sprout left; the face is happy. */
     @Override
     public void beforeCollect() {
-        stage = 0;
-        showStage();
+        phase = 0;
+        showPhase();
+        events.post(new FieldHarvestedEvent(false));
+    }
+
+    // weeds
+
+    /** A ripe weed grows on it. */
+    @Override
+    public boolean hasWeed() {
+        return weed && phase == weedPlant.getRipePhase();
+    }
+
+    /** The weed disappears and the field is empty again (the face sweats: no use). */
+    @Override
+    public void pullWeed() {
+        if (!hasWeed()) {
+            return;
+        }
+        weedPlant.pullOut();
+        weed = false;
+        phase = 0;
+        showPhase();
+        events.post(new FieldHarvestedEvent(true));
+    }
+
+    /** Is a pulled weed still fading out? */
+    public boolean isWeedFadingOut() {
+        return weedPlant.isFadingOut();
     }
 
     @Override

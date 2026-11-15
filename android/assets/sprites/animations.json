@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "e9095d36d21e60dd33cd022b27aa083dc26e79bd",
+  "packJsonSha1": "b4fd58975989edcd10a625a6228049e3b595bd4c",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -82,6 +82,16 @@
       "anchorX": 8,
       "anchorY": 8
     },
+    "plant_seedling": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 6,
+      "height": 4,
+      "anchorX": 8,
+      "anchorY": 8
+    },
     "plant_tomato": {
       "frameWidth": 16,
       "frameHeight": 16,
@@ -89,6 +99,16 @@
       "trimY": 0,
       "width": 14,
       "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "plant_weed": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 2,
+      "trimY": 1,
+      "width": 12,
+      "height": 12,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -101,6 +121,16 @@
       "height": 31,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "sign_blank": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "sign_carrot": {
       "frameWidth": 16,
@@ -348,9 +378,21 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "plant_seedling/grow": {
+      "sheet": "plant_seedling",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "plant_tomato/grow": {
       "sheet": "plant_tomato",
       "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_weed/grow": {
+      "sheet": "plant_weed",
+      "frames": 3,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
@@ -495,6 +537,12 @@
     "rabbit/water_up": {
       "sheet": "rabbit",
       "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_blank/sign": {
+      "sheet": "sign_blank",
+      "frames": 1,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },

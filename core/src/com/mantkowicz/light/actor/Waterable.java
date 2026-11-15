@@ -8,6 +8,6 @@ public interface Waterable {
     /** It needs water now (a field with a crop still growing). */
     boolean needsWater();
 
-    /** It is watered: water falls onto it and it grows a stage. */
+    /** It is watered: water falls onto it and it grows a phase. */
     void water();
 }

@@ -719,3 +719,60 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
 - Tests: `FieldTest` (picking, watering three times back to ripe and picking again, corn's five stages, the rabbit
   watering facing down beside the field, walking away while watering). No golden changed. `GameDriver`: `Kind.FIELD`, `field()`,
   `fieldButton()`.
+
+## 2026‑11‑15, a field grows over time (branch `field-grows-over-time`)
+
+- The owner found fields too generous: picking and three quick waterings gave a crop every ~15 s. Now **one
+  watering** is enough: once the water has fallen, the crop grows a phase at once (instant reward) and then by itself,
+  a phase every **30 s** (`Field.SECONDS_PER_PHASE`; 15 s felt too fast to the owner) until it is ripe (for how
+  long, see the sprout below). While it grows the field has nothing to do, so its button fades out (`needsWater` is false and it holds nothing) and comes back with the crop once it is ripe. It grows also with
+  nobody next to it.
+- Each new phase the plant **bounces** (scales to 1.15 from its bottom and back, 0.3 s), so a child sees something
+  happened. Looked at it in a hidden LWJGL3 window.
+- While it grows the plant slowly **squashes and stretches** (5 % shorter and wider and back, 0.75 s each way, from
+  its bottom), so a field visibly lives without looking like a crop to pick up (those bob up and down). It stops when
+  the crop is ripe.
+- The other options (the can runs dry and is refilled at water; seed bags to plant again) are in `docs/ideas.md`
+  (PR #63), to do together with the owner.
+- Tests: `FieldTest` rewritten for one watering and the 30 s phases (no button while growing, the button back when
+  ripe, corn's four timed phases, growing with nobody next to it). `GameDriver.field()` says "growing". No golden
+  changed.
+- Growth **stages are called phases** now (`Field.getGrowthPhase()`, `SECONDS_PER_PHASE`, ...): the owner noted that
+  "stage" already means scene2d's `Stage`.
+- A field just picked is **empty but for a tiny sprout**, the same for every crop (the first picture of the blue
+  flower's row in `Farming Plants.png`, sheet `plant_seedling`), drawn as its own picture since the plant sheets are
+  trimmed differently. The crop's own pictures follow from phase 1, so every crop has one phase more (a carrot field
+  ripens 1.5 min after its watering, corn 2 min). The owner wanted the field to look empty before it's watered.
+- An empty field's **sign shows a question mark** instead of the crop: the pack's blank sign (`sign_blank`) with the UI
+  pack's question icon (`UiImage.HINT_ICON`, the hint button's "?") on its board, 7 sign pixels tall. Once watered the
+  sign shows the crop again. With seeds (`docs/ideas.md`) the player will choose what grows there, so the default
+  shouldn't be given away.
+- **Weeds.** Nobody chooses what grows on a field yet (seeds are an idea), so when the water has fallen on an empty
+  field a **weed** may grow instead of the crop: 40 % (`Field.DEFAULT_WEED_CHANCE`), or Tiled's new `weedChance`
+  property (0..1; tests use 0 and 1 so the dice don't decide). The weed is the rest of the sprout's row (the blue
+  flower, sheet `plant_weed`, three phases after the sprout) and the sign keeps its question mark. Ripe, its button
+  (showing the weed; `Weedable`) pulls it out: it disappears, nothing is gained, the field is empty again, and the
+  HUD's face plays the premium emotes' sweat row (`TEEMO_SWEAT`, row 10) while saying "Beautiful weed but unusable!"
+  for 3 s (`SpeechBubble` can now stay longer). Picking a real crop plays the happy row once (`TEEMO_HAPPY`, row 16).
+  The field tells the HUD through `FieldHarvestedEvent`. The owner's idea; looked at it in a hidden LWJGL3 window.
+  Vanishing at once looked odd to the owner, so the pulled weed rises a little (4 art pixels) and fades out in 0.5 s
+  while the sprout shows under it.
+- An empty corn field's watering button sat as high as over ripe corn (the plant's picture box is two tiles tall in
+  every phase). `Field.getTopY` now gives the tile's top for an empty field and the shown plant's top otherwise, so
+  the can's button is as high as on any field; ripe corn's button stays over the plant.
+- PMD then called `Field` and `Hud` possible God Classes, so parts moved out rather than adding exceptions: the sign
+  and its question mark (`FieldSign`), the falling water (`WaterSplash`) and the face's reactions to a harvest
+  (`HarvestReactions`); later also the weed's picture and fade-out (`WeedPlant`) and the bounce and squash
+  (`PlantMoves`).
+- **Bug: the right mouse button** (found by the owner in the HTML build) walked the rabbit but didn't press any
+  button: the board took any mouse button, while scene2d's `ClickListener` (behind every button) listens to the left
+  one only. Wanted: the right button behaves exactly like the left; fixed on this branch at the owner's request (too
+  small for its own). `GameScreen` hands input to the stages through `AnyButtonInput` (an `InputMultiplexer`) that
+  reports every mouse button as the left one; a second button pressed while one is held does nothing more, so
+  pressing both is one click. The browser's right-click menu was already kept away by `html/webapp/index.html`.
+  `MouseButtonsTest` (right click walks to the chest, opens it with its button, taps the hint; both buttons at once
+  open the chest once) failed before the fix. `GameDriver`: `rightClick`, `rightClickButton`, `rightClickHint`,
+  `clickButtonWithBothButtons`; `tap` takes the button.
+- On this branch too, at the owner's request: their own level1 edits in Tiled (new tilesets: darker soil, mushrooms and
+  flowers, trees and bushes, barn, fences, water objects, chicken houses; a new layer `graound0` with decorations), with
+  the tiles atlas regenerated by `build_assets.py`.

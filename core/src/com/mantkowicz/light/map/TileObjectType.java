@@ -25,7 +25,8 @@ public enum TileObjectType {
     COW((context, properties) -> new Cow(context,
             CropType.listOf(properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class)))),
     FIELD((context, properties) -> new Field(context,
-            CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT)));
+            CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT),
+            number(properties, TileObjectAttribute.WEED_CHANCE, Field.DEFAULT_WEED_CHANCE)));
 
     private final BiFunction<GameContext, MapProperties, SpriteActor> spriteActor;
 
@@ -35,6 +36,21 @@ public enum TileObjectType {
 
     TileObjectType(BiFunction<GameContext, MapProperties, SpriteActor> spriteActor) {
         this.spriteActor = spriteActor;
+    }
+
+    /**
+     * A number property: Tiled's float or int property, or a string property holding a number; {@code fallback}
+     * without it.
+     */
+    private static float number(MapProperties properties, TileObjectAttribute attribute, float fallback) {
+        Object value = properties.get(attribute.getValue());
+        if (value instanceof Number number) {
+            return number.floatValue();
+        }
+        if (value instanceof String text && !text.trim().isEmpty()) {
+            return Float.parseFloat(text.trim());
+        }
+        return fallback;
     }
 
     /**

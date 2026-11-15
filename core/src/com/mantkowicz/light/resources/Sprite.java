@@ -17,18 +17,24 @@ public enum Sprite {
     WATERING_CAN("watering_can"),
     /** Water falling from the can onto a field. */
     WATERING("watering"),
-    /** A crop growing on a field, one frame per stage (the last one ripe). Corn is two tiles tall. */
+    /** A crop growing on a field, one frame per phase (the last one ripe). Corn is two tiles tall. */
     PLANT_CORN("plant_corn"),
     PLANT_CARROT("plant_carrot"),
     PLANT_TOMATO("plant_tomato"),
     PLANT_PUMPKIN("plant_pumpkin"),
     PLANT_CUCUMBER("plant_cucumber"),
+    /** A field just picked, the same for every crop: a tiny sprout (it grows into the crop once watered). */
+    PLANT_SEEDLING("plant_seedling"),
+    /** A weed growing instead of the crop, after the sprout: the rest of the sprout's row (a blue flower). */
+    PLANT_WEED("plant_weed"),
     /** The sign at a field's corner showing what grows there. */
     SIGN_CORN("sign_corn"),
     SIGN_CARROT("sign_carrot"),
     SIGN_TOMATO("sign_tomato"),
     SIGN_PUMPKIN("sign_pumpkin"),
-    SIGN_CUCUMBER("sign_cucumber");
+    SIGN_CUCUMBER("sign_cucumber"),
+    /** An empty sign: a field's sign while nothing grows there yet, with a question mark on it ({@link UiImage#HINT_ICON}). */
+    SIGN_BLANK("sign_blank");
 
     private final String sheet;
 
