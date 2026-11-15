@@ -17,7 +17,8 @@ import com.mantkowicz.light.resources.Action;
  * STANDING ──(after a moment)──▶ PECKING ──▶ STANDING
  * STANDING ──(after a moment)──▶ SITTING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                                 RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * STANDING, RESTING, SLEEPING, WISHING, PECKING ──(stroked)──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
+ * all but WALKING, EATING, FORAGING and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING
+ *                                                                        (still hungry: WISHING again, the same corn)
  * </pre>
  */
 public enum ChickenState implements State<Chicken> {
@@ -45,12 +46,15 @@ public enum ChickenState implements State<Chicken> {
         }
     },
 
-    /** One step onto a free tile next to it. With no free tile it pecks where it stands instead. */
+    /**
+     * One step onto a free tile next to it. With no free tile, or with the rabbit next to it or coming to it, it
+     * pecks where it stands instead.
+     */
     WALKING {
         @Override
         public void enter(Chicken chicken) {
             chicken.playAnimation(Action.WALK);
-            if (!chicken.walkAStep()) {
+            if (chicken.isPlayerNear() || !chicken.walkAStep()) {
                 chicken.changeState(PECKING);
             }
         }
@@ -94,6 +98,11 @@ public enum ChickenState implements State<Chicken> {
             if (chicken.isAnimationFinished()) {
                 chicken.changeState(RESTING);
             }
+        }
+
+        @Override
+        boolean canBeStroked() {
+            return true; // next to the rabbit it never walks: these are the moments a tap would otherwise miss
         }
     },
 
@@ -152,6 +161,11 @@ public enum ChickenState implements State<Chicken> {
             if (chicken.isAnimationFinished()) {
                 chicken.changeState(STANDING);
             }
+        }
+
+        @Override
+        boolean canBeStroked() {
+            return true; // next to the rabbit it never walks: these are the moments a tap would otherwise miss
         }
     },
 
@@ -245,6 +259,22 @@ public enum ChickenState implements State<Chicken> {
         }
     },
 
+    /** Tapped with the hand: it stands still while the hand fades out, so nothing covers its hearts. */
+    BEING_STROKED {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.IDLE);
+            chicken.waitForTheHand();
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (chicken.isTimeUp()) {
+                chicken.changeState(STROKED);
+            }
+        }
+    },
+
     /** The player stroked it: hearts over it. */
     STROKED {
         @Override
@@ -277,7 +307,7 @@ public enum ChickenState implements State<Chicken> {
     @Override
     public boolean onMessage(Chicken chicken, Telegram telegram) {
         if (telegram.message == FarmAnimal.MESSAGE_STROKE && canBeStroked()) {
-            chicken.changeState(STROKED);
+            chicken.changeState(BEING_STROKED);
             return true;
         }
         return false;

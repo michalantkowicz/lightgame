@@ -16,6 +16,7 @@ import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.actor.WalkNextToOnTapListener;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
 import com.mantkowicz.light.plugin.StateLabelPlugin;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.ResourcesService;
@@ -37,6 +38,8 @@ import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
 public abstract class FarmAnimal extends SpriteActor implements Creature {
     /** What the player tells the animal (gdx-ai messages, answered in its states). */
     static final int MESSAGE_STROKE = 1, MESSAGE_GIFT = 2;
+    /** After a stroke it can't be stroked again for this long (the hand doesn't come back meanwhile). */
+    static final float SECONDS_BETWEEN_STROKES = 20;
     /** A face floating up over it: screen pixels per pack pixel, and how far over its tile (over the heart it shows). */
     private static final float EMOTE_SCALE = 6, EMOTE_GAP = 60;
 
@@ -51,8 +54,12 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     private boolean wishShown = true;
     /** Seconds left of what {@link #stayFor} set, and since the start or its last meal. */
     private float timeLeft, sinceFed;
+    /** Seconds since it was last stroked (from the start: long enough, it can be stroked at once). */
+    private float sinceStroked = SECONDS_BETWEEN_STROKES;
     /** Bites still to take when it feeds itself (grazing, pecking) after giving up its wish. */
     private int bitesLeft;
+    /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
+    private boolean wishChosen;
 
     /**
      * @param favouriteDishes           the crops it wishes for (one at random each time it gets hungry); any crop when
@@ -82,6 +89,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         addPlugin(delta -> {
             timeLeft -= delta;
             sinceFed += delta;
+            sinceStroked += delta;
             think();
         });
         if (Debug.isOn(STATE_LABELS)) {
@@ -100,6 +108,18 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
 
     /** Is it wishing for its crop right now (its wish is what the player can give it)? */
     protected abstract boolean isWishing();
+
+    /** Does what it is doing right now allow a stroke (e.g. standing, resting; not walking or eating)? */
+    protected abstract boolean isStrokable();
+
+    /**
+     * It can be stroked: what it does allows it ({@link #isStrokable()}) and it wasn't stroked in the last
+     * {@link #SECONDS_BETWEEN_STROKES} seconds.
+     */
+    @Override
+    public boolean canBeStroked() {
+        return isStrokable() && sinceStroked >= SECONDS_BETWEEN_STROKES;
+    }
 
     // what the player does with it (a tap on it, the round buttons)
 
@@ -126,6 +146,15 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
 
     // what the states use (with SpriteActor's playAnimation, playOnce, isAnimationFinished, walkToFreeNeighbour)
 
+    /**
+     * Tapped with the hand, it stands still until the hand has faded out ({@link RemoveWhenUnavailablePlugin#DURATION})
+     * and only then shows its hearts, so the button never covers them.
+     */
+    void waitForTheHand() {
+        timeLeft = RemoveWhenUnavailablePlugin.DURATION; // no dice: the cow's other random choices stay as they were
+        sinceStroked = 0; // the next stroke only after a while
+    }
+
     /** Starts a wait of a random length between the two; {@link #isTimeUp()} says when it is over. */
     void stayFor(float minSeconds, float maxSeconds) {
         timeLeft = MathUtils.random(minSeconds, maxSeconds);
@@ -145,11 +174,18 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
 
     void stopBeingHungry() {
         sinceFed = 0;
+        wishChosen = false;
     }
 
-    /** It got hungry: picks, at random, which of its favourite dishes it wishes for this time. */
+    /**
+     * It got hungry: picks, at random, which of its favourite dishes it wishes for this time; once per hunger, so
+     * after a stroke it wishes for the same again.
+     */
     void chooseWish() {
-        favouriteFood = new Crop(CropType.randomOf(favouriteDishes), resources);
+        if (!wishChosen) {
+            favouriteFood = new Crop(CropType.randomOf(favouriteDishes), resources);
+            wishChosen = true;
+        }
     }
 
     /** The crops it may wish for. */

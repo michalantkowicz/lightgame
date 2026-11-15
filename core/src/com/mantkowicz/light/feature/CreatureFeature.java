@@ -23,8 +23,8 @@ import java.util.function.BooleanSupplier;
  * What the player does with a creature (a cow) the player stands next to (on a tile it is used from:
  * {@link Tile#getUsedFromNeighbours()}), on action buttons in a row over the creature:
  * <ul>
- * <li>it can be stroked: a button with a hand (on the left); tapping it strokes the creature, and a heart floats up
- * over the player;</li>
+ * <li>it can be stroked: a button with a hand (on the left); tapping it strokes the creature: it stands still while
+ * the hand fades out, then shows its hearts (not covered by the button), and a heart floats up over the player;</li>
  * <li>it wishes for something: a button with that item (on the right) instead of the bubble with the wish. Tapping it
  * takes the item out of the backpack (its slot shakes) and gives it to the creature; when the player doesn't carry
  * one, the button shakes and the face says "find" with the item's picture, as the HUD's hint button (the question
@@ -38,8 +38,11 @@ import java.util.function.BooleanSupplier;
 public class CreatureFeature implements Feature {
     /** What the hint says next to a creature wishing for something the player doesn't carry; the item's picture follows. */
     static final String FIND = "find";
-    /** The heart floating up over the player after a stroke: screen pixels per pack pixel, and how far over its tile (just over its ears). */
-    private static final float HEART_SCALE = 2, HEART_GAP = -24;
+    /**
+     * The heart floating up over the player after a stroke: screen pixels per pack pixel (smaller than the UI's), and
+     * how far over its tile it starts (right over its ears).
+     */
+    private static final float HEART_SCALE = 1.5f, HEART_GAP = 0;
 
     /** Places in the row of buttons over the creature: the hand left of the wish. */
     private static final int STROKE_PLACE = 0, GIVE_PLACE = 1;
@@ -51,6 +54,8 @@ public class CreatureFeature implements Feature {
     private ActionButton strokeButton, giveButton;
     /** The creature the give button is over (its bubble hidden meanwhile), or null. */
     private Creature givingTo;
+    /** Stroked: the small heart floats up over the player once the hand has faded out. */
+    private boolean heartAfterTheHand;
 
     public CreatureFeature(GameContext context, Player player, Hud hud) {
         this.context = context;
@@ -62,6 +67,7 @@ public class CreatureFeature implements Feature {
 
     @Override
     public void run(float delta) {
+        heartOnceTheHandIsGone();
         List<Creature> near = creaturesNextToPlayer();
         Creature wishing = wishingCreature(near);
         if (wishing != null && slotWith(wishing.getWish()) < 0) {
@@ -157,12 +163,23 @@ public class CreatureFeature implements Feature {
         return isNextToPlayer(creature) && creature.canBeStroked();
     }
 
+    /**
+     * Strokes it at once: it stands still while the hand fades out and then shows its hearts (so nothing covers them,
+     * and it can't walk off meanwhile); then a small heart floats up over the player.
+     */
     private void stroke(Creature creature) {
         if (!canStroke(creature)) {
             return;
         }
         creature.stroke();
-        new FloatingPicture("heart", heart, HEART_SCALE).showOver(player, HEART_GAP);
+        heartAfterTheHand = true;
+    }
+
+    private void heartOnceTheHandIsGone() {
+        if (heartAfterTheHand && !isShown(strokeButton)) {
+            heartAfterTheHand = false;
+            new FloatingPicture("heart", heart, HEART_SCALE).showOver(player, HEART_GAP);
+        }
     }
 
     private boolean isNextToPlayer(Creature creature) {

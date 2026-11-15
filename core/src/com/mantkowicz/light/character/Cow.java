@@ -21,7 +21,7 @@ public class Cow extends FarmAnimal {
     /** Walking pace: seconds for its step onto the next tile. */
     static final float SECONDS_PER_TILE = 1.5f;
     /** This long after the start or its last meal it gets hungry again. */
-    static final float HUNGRY_AFTER_SECONDS = 20;
+    static final float HUNGRY_AFTER_SECONDS = 60;
     /** Wishing this long without getting its crop, it gives up and grazes, taking this many bites of grass. */
     static final float GIVE_UP_WISHING_AFTER_SECONDS = 90;
     static final int GRAZING_BITES = 3;
@@ -69,7 +69,7 @@ public class Cow extends FarmAnimal {
     }
 
     @Override
-    public boolean canBeStroked() {
+    protected boolean isStrokable() {
         return getState().canBeStroked();
     }
 

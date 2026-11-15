@@ -793,9 +793,9 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   most steps, then the chicken, then the cow (`ChickenTest.chickensAreRestless`).
 - **Pecking.** Standing, they often peck at the ground (`PECKING`, the peck row), looking for something: chicken 2 in
   6 choices, chick 2 in 7, besides walking and sitting down.
-- **Wishes only for corn, bored soon.** Hungry 20 s after their last meal (like the cow) they wish for corn; after
-  15 s without it (the cow: 90 s) they peck at the ground three times instead (`FORAGING`) and are no longer hungry.
-  Fed corn they eat (the eat row: pecking at it) and are happy.
+- **Wishes only for corn, bored soon.** Hungry 20 s after their last meal (the cow at first too) they wish for corn;
+  after 15 s without it (the cow: 90 s) they peck at the ground three times instead (`FORAGING`) and are no longer
+  hungry. Fed corn they eat (the eat row: pecking at it) and are happy.
 - **Hearts.** The pack draws a chicken's hearts on the row above its love row, so `Chicken.playLove` plays the love
   row and the hearts row as a picture of its own one frame (16 art pixels) higher (`PlayOnceImage`).
 - **Shared with the cow.** What both do (hunger, wishes and the bubble, being fed and stroked, waiting, feeding
@@ -818,10 +818,46 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   what another one next to the rabbit wants didn't move the button there (it shook "find"). Now a wish button stays
   only while its animal is still the one to give to (`ChickenTest.theGiveButtonGoesToTheAnimalTheRabbitCanFeed`,
   failed before).
-- Left for the owner: chickens' resting and sleeping rows look much alike in the pack (no Zzz for chickens); the
-  hearts sit partly under the stroke button while it fades (as with the cow); in level 1 the chickens are off screen
-  at the start; chickens look hungry about 39 % of the time (20 s hunger, 15 s wish); a wish bubble near the map's top
-  edge can be cut off (any animal).
+- Owner's review of the open questions: the small heart over the player after a stroke is **smaller and starts
+  higher** (1.5× instead of 2×, from just over its ears instead of over its face; looked at 2×, 1.5× and 1× side by
+  side); the rest stays as it is.
+- Owner's request: a stroke plays **once the hand has faded out**, so the button never covers the hearts. The tap
+  strokes the animal at once, but it first stands still in the new state `BEING_STROKED` for as long as the hand
+  fades (`RemoveWhenUnavailablePlugin.DURATION`, 0.75 s; no dice drawn, so the cow's other choices stay the same),
+  then `STROKED` shows its hearts and the small heart floats up over the rabbit. For every animal, the cow too.
+  (A first version only remembered the tap and stroked after the fade: the owner found strokes lost when the animal
+  started walking meanwhile.) Chickens can now also be stroked while sitting down or getting up: next to the rabbit
+  they never walk, so those were the moments a tap could still miss (`ChickenTest.everyStrokeIsPlayed`).
+- **Bug (owner): the chick couldn't be tapped from far away.** Two causes, found with throwaway probes on level 1 on a
+  big screen: (1) when none of the cells an animal is used from can be reached (in the bottom right corner the chick
+  is used only from its left, and the chicken shut that cell in), a tap did nothing at all; now the rabbit walks as
+  close as it can get, to the nearest reachable cell next to it (`BoardMovementPlugin.walkTarget`, for chests too;
+  `ChickenTest.tappingAChickNobodyCanGetToWalksAsCloseAsPossible`). (2) With the rabbit far up the map, the bottom of
+  the map is behind the HUD's bottom row, which caught every tap inside its whole box, also in the gaps between the
+  slots, the face and the stamina bar where the map shows; now only its pieces keep their taps
+  (`HudTest.aTapBetweenTheHudsPiecesReachesTheMap`). Both tests failed before. A first guess (chickens keeping still
+  for a rabbit above them blocking a corridor) was wrong and reverted.
+- Owner's request: **20 s between strokes** (`FarmAnimal.SECONDS_BETWEEN_STROKES`): once stroked, an animal can't be
+  stroked again for 20 s and the hand doesn't come back meanwhile (`FarmAnimal.canBeStroked` = what it does allows
+  it, `isStrokable` from its state, and the pause is over). For every animal; the first stroke works at once.
+  `CowTest.strokingTheCow` checks the hand is back only after 20 s.
+- Owner's request: **the cow walks a little more and wishes about once a minute**: it gets hungry 60 s after its last
+  meal (was 20 s), stands 2–4 s between choices (was 3–6 s) and walks 3 times in 4 (was 2 in 3) rather than lying
+  down. `CowTest` waits up to 63 s for the first wish; two tests checking the bubble "far away" now use a longer row
+  and step the rabbit away, since the busier cow may wander next to it first. No golden changed.
+- A wish is chosen **once per hunger** (`FarmAnimal.chooseWish`): stroked while wishing, an animal comes back wishing
+  for the same crop. `CowState.STANDING` meant this already, but it chose again; `CowTest` passed only by the luck of
+  the seeded dice, and the new state's timing showed it.
+- Owner's request: a chicken **never walks away from the rabbit** next to it (diagonally too) or walking to a tile
+  next to it (`Chicken.isPlayerNear`, the player's walk target from `BoardMovementPlugin.getTarget`): it pecks
+  instead. It may still be hard to catch while the rabbit isn't coming. And it **keeps looking the way it walked**
+  (`SpriteActor.walkToFreeNeighbour(seconds, keepFacing)`; the cow still turns back), the hearts mirrored with it.
+  `ChickenTest`: `theyDontWalkAwayFromTheRabbitNextToThem`, `aChickWaitsForTheRabbitComingToIt` (both fail without
+  the rule), `aChickenKeepsLookingTheWayItWent`. `Player.getWalkTarget` names `Tile` in
+  full: `Player` is at PMD's import limit.
+- Left as they are (owner): sleeping stays 4–8 s, though the chickens' rest and sleep rows look much alike; in level 1
+  the chickens are off screen at the start; chickens look hungry about 39 % of the time (20 s hunger, 15 s wish); a
+  wish bubble near the map's top edge can be cut off (no walkable ground planned there).
 - `level1` (owner's request): a chicken and a chick at the bottom right, cells (17, 13) and (19, 13) from the top.
 - Tests: `ChickenTest` (corn only, restless, bored soon, fed corn with hearts one frame up, stroking a chick, every
   state's animation for both, level 1). `GameDriver`: `Kind.CHICKEN` and `CHICKEN_BABY` and per-animal helpers

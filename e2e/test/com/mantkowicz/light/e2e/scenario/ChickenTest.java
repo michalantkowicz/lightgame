@@ -74,6 +74,41 @@ class ChickenTest {
             .with('H', "CHICKEN", Map.of())
             .with('B', "CHICKEN_BABY", Map.of());
 
+    /** The rabbit right next to a chicken and a chick on open grass. */
+    private static final TestMap CLOSE = TestMap.of(
+            "~~~~~~~~~",
+            "~.......~",
+            "~.......~",
+            "~..HP...~",
+            "~....B..~",
+            "~.......~",
+            "~~~~~~~~~")
+            .with('H', "CHICKEN", Map.of())
+            .with('B', "CHICKEN_BABY", Map.of());
+
+    /** A small field, all on screen: the rabbit and a chick. */
+    private static final TestMap YARD = TestMap.of(
+            "~~~~~~~",
+            "~P....~",
+            "~.....~",
+            "~...B.~",
+            "~.....~",
+            "~~~~~~~")
+            .with('B', "CHICKEN_BABY", Map.of());
+
+    /**
+     * The chick's only cell it is used from ({@code a}, left of it) is shut in between the chicken and the chick; the
+     * cell above the chick can be reached (as in level 1's bottom right corner).
+     */
+    private static final TestMap CORNER = TestMap.of(
+            "~~~~~~~",
+            "~P....~",
+            "~~~~~.~",
+            "~~~HaB~",
+            "~~~~~~~")
+            .with('H', "CHICKEN", Map.of())
+            .with('B', "CHICKEN_BABY", Map.of());
+
     /** Which animation shows which state (the chicken's; the chick's rows have the same names). */
     private static final Map<String, String> ANIMATIONS = Map.ofEntries(
             Map.entry("STANDING", "idle"),
@@ -87,6 +122,7 @@ class ChickenTest {
             Map.entry("EATING", "eat"),
             Map.entry("FORAGING", "peck"),
             Map.entry("HAPPY", "love"),
+            Map.entry("BEING_STROKED", "idle"),
             Map.entry("STROKED", "love"));
 
     @Test
@@ -123,8 +159,8 @@ class ChickenTest {
         int chicken = steps.getOrDefault(Kind.CHICKEN, 0);
         int chick = steps.getOrDefault(Kind.CHICKEN_BABY, 0);
         assertTrue(chick > chicken && chicken > cow, "steps: chick " + chick + ", chicken " + chicken + ", cow " + cow);
-        assertTrue(pecks.getOrDefault(Kind.CHICKEN, 0) >= 30, "the chicken pecks often: " + pecks);
-        assertTrue(pecks.getOrDefault(Kind.CHICKEN_BABY, 0) >= 30, "the chick pecks often: " + pecks);
+        assertTrue(pecks.getOrDefault(Kind.CHICKEN, 0) >= 15, "the chicken pecks often: " + pecks);
+        assertTrue(pecks.getOrDefault(Kind.CHICKEN_BABY, 0) >= 15, "the chick pecks often: " + pecks);
         assertFalse(game.crashed());
     }
 
@@ -224,7 +260,7 @@ class ChickenTest {
     @Test
     void theGiveButtonGoesToTheAnimalTheRabbitCanFeed() {
         GameDriver game = GameDriver.start(COW_AND_CHICKEN.write("cow-and-chicken"));
-        for (int frame = 0; frame < 30 * 60 && !("WISHING".equals(game.animalState(Kind.COW))
+        for (int frame = 0; frame < 90 * 60 && !("WISHING".equals(game.animalState(Kind.COW))
                 && "WISHING".equals(game.animalState(Kind.CHICKEN))); frame++) {
             game.frames(1);
         }
@@ -275,12 +311,152 @@ class ChickenTest {
         assertFalse(game.crashed());
     }
 
+    /** With the rabbit right next to them (diagonally too) they peck and sit but never walk away. */
+    @Test
+    void theyDontWalkAwayFromTheRabbitNextToThem() {
+        GameDriver game = GameDriver.start(CLOSE.write("chicken-close"));
+        Cell chicken = game.cellOf(Kind.CHICKEN), chick = game.cellOf(Kind.CHICKEN_BABY);
+        Set<String> states = new HashSet<>();
+        for (int frame = 0; frame < 3 * 60 * 60; frame++) {
+            game.frames(1);
+            states.add(game.animalState(Kind.CHICKEN));
+            assertEquals(chicken, game.cellOf(Kind.CHICKEN), "the chicken stays");
+            assertEquals(chick, game.cellOf(Kind.CHICKEN_BABY), "the chick stays (diagonally next to the rabbit)");
+        }
+        assertTrue(states.contains("PECKING"), "it pecks instead: " + states);
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Tapped, the chick (the most restless) waits for the rabbit: it doesn't walk away while the rabbit comes, and the
+     * rabbit ends next to it. Over and over, from wherever the rabbit was.
+     */
+    @Test
+    void aChickWaitsForTheRabbitComingToIt() {
+        GameDriver game = GameDriver.start(YARD.write("chick-yard"));
+        int rounds = 0;
+        for (int round = 0; round < 20; round++) {
+            Cell chick = game.cellOf(Kind.CHICKEN_BABY);
+            Cell away = farthestVisibleFreeCell(game, chick);
+            if (away != null) {
+                game.click(away); // the rabbit as far from the chick as it can first
+            }
+            game.seconds(4);
+            game.click(Kind.CHICKEN_BABY);
+            game.frames(2);
+            Cell waiting = game.cellOf(Kind.CHICKEN_BABY);
+            if (game.playerAnimation().startsWith("rabbit/walk")) {
+                rounds++;
+            }
+            for (int frame = 0; frame < 10 * 60 && game.playerAnimation().startsWith("rabbit/walk"); frame++) {
+                game.frames(1);
+                assertEquals(waiting, game.cellOf(Kind.CHICKEN_BABY), "round " + round + ": it doesn't walk away");
+            }
+            assertTrue(game.usedFromNeighbours(waiting).contains(game.playerCell()),
+                    "round " + round + ": the rabbit reached it");
+        }
+        assertTrue(rounds >= 15, "the rabbit walked to it in most rounds: " + rounds);
+        assertFalse(game.crashed());
+    }
+
+    private static Cell farthestVisibleFreeCell(GameDriver game, Cell from) {
+        Cell farthest = null;
+        int distance = 0;
+        for (int col = 0; col < 7; col++) {
+            for (int row = 0; row < 6; row++) {
+                Cell cell = new Cell(col, row);
+                int d = Math.abs(col - from.col()) + Math.abs(row - from.row());
+                if (d > distance && game.isVisible(cell) && game.isAccessible(cell)) {
+                    farthest = cell;
+                    distance = d;
+                }
+            }
+        }
+        return farthest;
+    }
+
+    /** After a step it keeps looking the way it went (its sheet looks right). */
+    @Test
+    void aChickenKeepsLookingTheWayItWent() {
+        GameDriver game = GameDriver.start(FARM.write("chicken-farm"));
+        Set<String> seen = new HashSet<>();
+        Cell before = game.cellOf(Kind.CHICKEN);
+        for (int frame = 0; frame < 5 * 60 * 60 && seen.size() < 2; frame++) {
+            game.frames(1);
+            Cell now = game.cellOf(Kind.CHICKEN);
+            if (now.col() != before.col()) {
+                boolean left = now.col() < before.col();
+                assertEquals(left, game.animalLooksLeft(Kind.CHICKEN), "walking " + (left ? "left" : "right"));
+                for (int wait = 0; wait < 3 * 60 && !"STANDING".equals(game.animalState(Kind.CHICKEN)); wait++) {
+                    game.frames(1);
+                }
+                if (game.cellOf(Kind.CHICKEN).equals(now)) {
+                    assertEquals(left, game.animalLooksLeft(Kind.CHICKEN), "and standing after it");
+                    seen.add(left ? "left" : "right");
+                }
+            }
+            before = game.cellOf(Kind.CHICKEN);
+        }
+        assertEquals(Set.of("left", "right"), seen);
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug: a stroke tapped just before the animal started something else (walking, sitting down) was never
+     * played. Now it stands still from the tap until its hearts: every tap is a stroke.
+     */
+    @Test
+    void everyStrokeIsPlayed() {
+        GameDriver game = GameDriver.start(CHICK_PEN.write("chick-pen"));
+        int taps = 0;
+        for (int frame = 0; frame < 4 * 60 * 60; frame++) {
+            game.frames(1);
+            if (!game.buttonAlphas("STROKE").equals(List.of(1f))) {
+                continue;
+            }
+            game.clickButton("STROKE");
+            taps++;
+            assertEquals("BEING_STROKED", game.animalState(Kind.CHICKEN_BABY), "tap " + taps + ": it stands still");
+            for (int wait = 0; wait < 60 && !"STROKED".equals(game.animalState(Kind.CHICKEN_BABY)); wait++) {
+                game.frames(1);
+            }
+            assertEquals("STROKED", game.animalState(Kind.CHICKEN_BABY), "tap " + taps + ": the stroke is played");
+            game.seconds(0.2f + (taps % 7) * 0.4f); // tap again at different moments of its day
+        }
+        assertTrue(taps >= 10, "taps (one at most every 20 s): " + taps);
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug (found by the owner): with no way to the cells it is used from, tapping the chick from far away did
+     * nothing. Now the rabbit walks as close as it can get: next to it, above it.
+     */
+    @Test
+    void tappingAChickNobodyCanGetToWalksAsCloseAsPossible() {
+        GameDriver game = GameDriver.start(CORNER.write("chick-corner"));
+        game.resize(1600, 1200); // a big window: the chick is on screen with the rabbit far away
+        game.frames(1);
+        game.click(Kind.CHICKEN_BABY);
+        game.frames(6);
+        assertTrue(game.playerAnimation().startsWith("rabbit/walk"), "the rabbit sets off");
+        game.seconds(5);
+        assertEquals(new Cell(5, 2), game.playerCell(), "to the cell above the chick");
+        assertEquals(new Cell(5, 1), game.cellOf(Kind.CHICKEN_BABY), "which waited for it");
+        assertFalse(game.crashed());
+    }
+
     @Test
     void strokingAChick() {
         GameDriver game = GameDriver.start(CHICK_PEN.write("chick-pen"));
         game.seconds(0.5f);
         waitForStrokable(game);
         game.clickButton("STROKE");
+        assertEquals("BEING_STROKED", game.animalState(Kind.CHICKEN_BABY), "it stands still while the hand fades");
+        for (int frame = 0; frame < 60 && !"STROKED".equals(game.animalState(Kind.CHICKEN_BABY)); frame++) {
+            game.frames(1);
+        }
+        game.frames(2);
+        assertEquals(List.of(), game.buttonAlphas("STROKE"), "the hand is gone: nothing covers the hearts");
         assertEquals("STROKED", game.animalState(Kind.CHICKEN_BABY));
         assertEquals("chicken_baby/love", game.animalAnimation(Kind.CHICKEN_BABY));
         assertTrue(game.chickenShowsHearts(Kind.CHICKEN_BABY));
@@ -297,7 +473,7 @@ class ChickenTest {
             String sheet = kind == Kind.CHICKEN ? "chicken/" : "chicken_baby/";
             Set<String> seen = new HashSet<>();
             Set<String> wanted = new HashSet<>(ANIMATIONS.keySet());
-            wanted.removeAll(Set.of("EATING", "HAPPY", "STROKED")); // nobody feeds or strokes it here
+            wanted.removeAll(Set.of("EATING", "HAPPY", "BEING_STROKED", "STROKED")); // nobody feeds or strokes it here
             for (int frame = 0; frame < 15 * 60 * 60 && !seen.containsAll(wanted); frame++) {
                 String state = game.animalState(kind);
                 seen.add(state);

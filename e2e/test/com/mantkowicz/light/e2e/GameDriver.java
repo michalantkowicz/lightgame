@@ -313,6 +313,18 @@ public final class GameDriver {
         tap(uiScreenPosition(hud().getHint()));
     }
 
+    /**
+     * Short tap on the screen between the right backpack slot and the face, at the face's middle height: on the map
+     * behind the HUD's bottom row, not on one of its pieces.
+     */
+    public void tapBetweenBackpackAndFace() {
+        Actor slot = hud().getSlots().get(hud().getSlots().size() - 1);
+        Actor face = hud().getFace();
+        Vector2 right = slot.localToStageCoordinates(new Vector2(slot.getWidth(), 0));
+        Vector2 left = face.localToStageCoordinates(new Vector2(0, face.getHeight() / 2f));
+        tap(uiStage().stageToScreenCoordinates(new Vector2((right.x + left.x) / 2f, left.y)));
+    }
+
     /** Short tap on the player's face in the HUD. */
     public void tapFace() {
         tap(uiScreenPosition(hud().getFace()));
@@ -937,6 +949,11 @@ public final class GameDriver {
         return names;
     }
 
+    /** Is the animal's picture mirrored (its sheet looks right; it looks left)? */
+    public boolean animalLooksLeft(Kind kind) {
+        return ((FarmAnimal) actor(kind)).isMirrored();
+    }
+
     /** Are hearts over the chicken (or chick) right now? */
     public boolean chickenShowsHearts(Kind kind) {
         return ((Chicken) actor(kind)).showsHearts();
@@ -1374,6 +1391,12 @@ public final class GameDriver {
         Vector2 right = gameStage()
                 .stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
         return right.x - left.x;
+    }
+
+    /** Where the centre of an actor on the map is on the screen: "x,y" in screen pixels (y down). */
+    public String onScreen(Kind kind) {
+        Vector2 screen = gameStage().stageToScreenCoordinates(actor(kind).getCenter().cpy());
+        return Snapshot.number(screen.x) + "," + Snapshot.number(screen.y);
     }
 
     /** Where a button is on the screen and how big: "x,y wxh" in screen pixels (bottom-left corner, y down). */

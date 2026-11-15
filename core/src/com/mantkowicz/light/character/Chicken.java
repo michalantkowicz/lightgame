@@ -4,6 +4,7 @@ import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.msg.Telegraph;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.actor.CropType;
+import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
@@ -67,7 +68,7 @@ public class Chicken extends FarmAnimal {
     }
 
     @Override
-    public boolean canBeStroked() {
+    protected boolean isStrokable() {
         return getState().canBeStroked();
     }
 
@@ -80,9 +81,39 @@ public class Chicken extends FarmAnimal {
         stayFor(type.getMinPause(), type.getMaxPause());
     }
 
-    /** One step onto a free tile next to it, at its pace; false when no tile next to it is free. */
+    /**
+     * One step onto a free tile next to it, at its pace, after which it keeps looking the way it went; false when no
+     * tile next to it is free.
+     */
     boolean walkAStep() {
-        return walkToFreeNeighbour(type.getSecondsPerTile());
+        return walkToFreeNeighbour(type.getSecondsPerTile(), true);
+    }
+
+    /**
+     * Is the rabbit right next to it (diagonally too) or on its way to a tile next to it? Then it doesn't walk away:
+     * it may be hard to catch, but it never runs from the rabbit coming to it.
+     */
+    boolean isPlayerNear() {
+        Player player = findPlayer();
+        Tile tile = getTile();
+        return player != null && tile != null && (isNextTo(tile, player.getTile())
+                || isNextTo(tile, player.getWalkTarget()));
+    }
+
+    private static boolean isNextTo(Tile tile, Tile other) {
+        return other != null && (other == tile || tile.getNeighbours().contains(other));
+    }
+
+    private Player findPlayer() {
+        if (getStage() == null) {
+            return null;
+        }
+        for (com.badlogic.gdx.scenes.scene2d.Actor actor : getStage().getActors()) {
+            if (actor instanceof Player player) {
+                return player;
+            }
+        }
+        return null;
     }
 
     /**
@@ -96,6 +127,8 @@ public class Chicken extends FarmAnimal {
         PlayOnceImage hearts = new PlayOnceImage(getResources().getAnimation(getSprite(), Action.HEARTS), null);
         hearts.setBounds(bird.getX(), bird.getY() + sheet.frameHeight() * WorldScale.PIXEL_SCALE, bird.getWidth(),
                 bird.getHeight());
+        hearts.setOrigin(bird.getOriginX(), bird.getOriginY()); // looking left, the hearts turn with it
+        hearts.setScaleX(bird.getScaleX());
         addActor(hearts);
     }
 
