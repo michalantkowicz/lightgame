@@ -805,6 +805,14 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
 - Assets: the `chicken` and `chicken_baby` sheets got row names (idle, walk, settle, rise, rest, sleep, peck, eat,
   hearts, love; duplicate rows keep `row_NN` names so they show in the preview but make no actions); `Sprite.CHICKEN`
   and `CHICKEN_BABY`; `Action` gained `HEARTS`, `PECK`, `RISE`.
+- **Bugs found by test agents** (Haiku, five per round, each in its own worktree; owner's request), both in
+  `CreatureFeature` and likely only now that animals move about: (1) only the first animal found next to the rabbit
+  got buttons, so with a chicken on each side the second one, still wishing, could not be fed; (2) a button stayed
+  over the animal it came for after that one walked away, while tapping it stroked or fed whichever animal was next
+  to the rabbit now. Now each button is for one animal and stays with it (it fades once that animal is out of reach
+  or done): the wish button for one wishing for something the rabbit carries (else any wishing one), the hand for
+  that one too if it can be stroked. `ChickenTest.bothWishingNeighboursCanBeFed` and `aButtonStaysWithItsAnimal`
+  failed before the fix; `ActionButton.getOver`, `GameDriver.buttonOver`.
 - `level1` (owner's request): a chicken and a chick at the bottom right, cells (17, 13) and (19, 13) from the top.
 - Tests: `ChickenTest` (corn only, restless, bored soon, fed corn with hearts one frame up, stroking a chick, every
   state's animation for both, level 1). `GameDriver`: `Kind.CHICKEN` and `CHICKEN_BABY` and per-animal helpers

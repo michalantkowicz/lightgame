@@ -134,6 +134,11 @@ public class ActionButton extends GameActor {
                 Actions.moveBy(-SHAKE, 0, SHAKE_SECONDS, Interpolation.sine)));
     }
 
+    /** What it stands over on the map, e.g. the chest or the creature it acts on. */
+    public Actor getOver() {
+        return over;
+    }
+
     /** Shaken and not still yet ({@link #shake()}). */
     public boolean isShaking() {
         return button.hasActions();

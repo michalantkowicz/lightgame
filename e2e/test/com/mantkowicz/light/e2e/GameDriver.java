@@ -954,6 +954,20 @@ public final class GameDriver {
         throw new IllegalStateException("No hearts over the " + kind);
     }
 
+    /** Which animal a shown action button (e.g. "STROKE", "GIVE") stands over, or null when there is none. */
+    public Kind buttonOver(String name) {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof ActionButton button && name.equals(button.getName()) && button.getOver() != null) {
+                for (Kind kind : List.of(Kind.COW, Kind.CHICKEN, Kind.CHICKEN_BABY)) {
+                    if (has(kind) && actor(kind) == button.getOver()) {
+                        return kind;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     /** Strokes the animal as the round button would (the player needn't be next to it). */
     public void strokeAnimal(Kind kind) {
         ((FarmAnimal) actor(kind)).stroke();

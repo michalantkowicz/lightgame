@@ -58,6 +58,22 @@ class ChickenTest {
             .with('H', "CHICKEN", Map.of())
             .with('B', "CHICKEN_BABY", Map.of());
 
+    /** The rabbit between a chicken and a chick, neither of which can walk away. */
+    private static final TestMap BETWEEN = TestMap.of(
+            "~~~~~~~",
+            "~~HPB~~",
+            "~~~~~~~")
+            .with('H', "CHICKEN", Map.of())
+            .with('B', "CHICKEN_BABY", Map.of());
+
+    /** The same, but the chicken can wander off to the right (the chick can't). */
+    private static final TestMap WANDERING = TestMap.of(
+            "~~~~~~~~",
+            "~BPH...~",
+            "~~~~~~~~")
+            .with('H', "CHICKEN", Map.of())
+            .with('B', "CHICKEN_BABY", Map.of());
+
     /** Which animation shows which state (the chicken's; the chick's rows have the same names). */
     private static final Map<String, String> ANIMATIONS = Map.ofEntries(
             Map.entry("STANDING", "idle"),
@@ -160,6 +176,67 @@ class ChickenTest {
         game.seconds(1.5f);
         assertFalse(game.chickenShowsHearts(Kind.CHICKEN), "the hearts are gone");
         assertEquals("STANDING", game.animalState(Kind.CHICKEN));
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug: with two animals next to the rabbit only the first one found got buttons, so after feeding one the
+     * other, still wishing, could not be fed. Now the button with the corn comes over the other one.
+     */
+    @Test
+    void bothWishingNeighboursCanBeFed() {
+        GameDriver game = GameDriver.start(BETWEEN.write("chicken-between"));
+        game.putIntoBackpack("corn");
+        game.putIntoBackpack("corn");
+        for (int frame = 0; frame < 30 * 60 && !("WISHING".equals(game.animalState(Kind.CHICKEN))
+                && "WISHING".equals(game.animalState(Kind.CHICKEN_BABY))); frame++) {
+            game.frames(1);
+        }
+        game.seconds(0.5f);
+        Kind first = game.buttonOver("GIVE");
+        Kind other = first == Kind.CHICKEN ? Kind.CHICKEN_BABY : Kind.CHICKEN;
+        game.clickButton("GIVE");
+        assertEquals("EATING", game.animalState(first), "the one under the button eats");
+        assertEquals("WISHING", game.animalState(other));
+        for (int frame = 0; frame < 3 * 60 && !(other == game.buttonOver("GIVE")
+                && game.buttonAlphas("GIVE").equals(List.of(1f))); frame++) {
+            game.frames(1); // the first button fades out, the next one fades in
+        }
+        assertEquals(other, game.buttonOver("GIVE"), "then the button with the corn is over the other one");
+        assertEquals(List.of(1f), game.buttonAlphas("GIVE"));
+        game.clickButton("GIVE");
+        assertEquals("EATING", game.animalState(other), "and it eats too");
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug: a button stayed over the animal it came for even after that one walked away, while tapping it
+     * stroked another one next to the rabbit. A fully shown button is always over an animal next to the rabbit.
+     */
+    @Test
+    void aButtonStaysWithItsAnimal() {
+        GameDriver game = GameDriver.start(WANDERING.write("chicken-wandering"));
+        int checked = 0;
+        Map<String, Integer> awayFor = new HashMap<>();
+        for (int frame = 0; frame < 3 * 60 * 60; frame++) {
+            game.frames(1);
+            for (String name : List.of("STROKE", "GIVE")) {
+                Kind over = game.buttonOver(name);
+                if (over == null || !game.buttonAlphas(name).equals(List.of(1f))) {
+                    awayFor.put(name, 0);
+                    continue;
+                }
+                checked++;
+                Cell cell = game.cellOf(over), player = game.playerCell();
+                boolean next = Math.abs(cell.col() - player.col()) + Math.abs(cell.row() - player.row()) == 1;
+                int away = next ? 0 : awayFor.getOrDefault(name, 0) + 1;
+                awayFor.put(name, away);
+                // the frame its animal steps away the button is still whole; it fades from the next one
+                assertTrue(away <= 2, name + " still over the " + over + " at " + cell
+                        + ", not next to the rabbit at " + player + ", for " + away + " frames");
+            }
+        }
+        assertTrue(checked > 60 * 60, "buttons were shown for a while: " + checked + " frames");
         assertFalse(game.crashed());
     }
 
