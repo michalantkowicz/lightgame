@@ -85,8 +85,10 @@ class FieldTest {
 
         game.clickButton("COLLECT");
         game.frames(2);
-        assertEquals("TEEMO_HAPPY", game.faceReaction(), "a crop: the face is happy (once)");
+        assertEquals("TEEMO_HAPPY", game.faceReaction(), "a crop: the face is happy...");
         game.seconds(1.5f);
+        assertEquals("TEEMO_HAPPY", game.faceReaction(), "...three times over (2.5 s), once is easy to miss");
+        game.seconds(1.2f);
         assertEquals("idle", game.faceReaction());
         assertEquals("carrot 0/4", game.field(), "an empty field is left, a tiny sprout");
         assertEquals("?", game.fieldSign(), "empty: a question mark on the sign");

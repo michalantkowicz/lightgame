@@ -35,7 +35,7 @@ import java.util.function.IntPredicate;
  * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
  * The face reacts to the field: picking a crop makes it happy, pulling out a weed makes it sweat and say so
- * ({@link HarvestReactions}).
+ * ({@link FaceReactions}).
  * <p>
  * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
  * for now.
@@ -90,7 +90,7 @@ public class Hud extends Group {
     private final StaminaBar stamina;
     private final HoldButton gear;
     private final RoundButton hint;
-    private final HarvestReactions harvests;
+    private final FaceReactions reactions;
     private SpeechBubble bubble;
     /** What the face says when the hint button is tapped, and the picture after it (or null). */
     private String hintText = HINT;
@@ -121,7 +121,7 @@ public class Hud extends Group {
 
         face = new Portrait(resources, "teemo", AWAKE);
         row.addActor(face);
-        harvests = new HarvestReactions(events, face, (text, seconds) -> say(text, null, seconds));
+        reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
 
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             Image slot = new Image(UiStyle.stretching(resources, UiImage.SLOT));
@@ -178,7 +178,7 @@ public class Hud extends Group {
                         .poll(BackpackItemEjectedEvent.class)) {
             shake(ejected.getSlot());
         }
-        harvests.update();
+        reactions.react();
         UiImage mood = stamina.getMood();
         face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);

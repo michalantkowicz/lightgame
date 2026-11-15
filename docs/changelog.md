@@ -753,7 +753,7 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   flower, sheet `plant_weed`, three phases after the sprout) and the sign keeps its question mark. Ripe, its button
   (showing the weed; `Weedable`) pulls it out: it disappears, nothing is gained, the field is empty again, and the
   HUD's face plays the premium emotes' sweat row (`TEEMO_SWEAT`, row 10) while saying "Beautiful weed but unusable!"
-  for 3 s (`SpeechBubble` can now stay longer). Picking a real crop plays the happy row once (`TEEMO_HAPPY`, row 16).
+  for 3 s (`SpeechBubble` can now stay longer). Picking a real crop plays the happy row 3 times (`TEEMO_HAPPY`, row 16; once was easy to miss).
   The field tells the HUD through `FieldHarvestedEvent`. The owner's idea; looked at it in a hidden LWJGL3 window.
   Vanishing at once looked odd to the owner, so the pulled weed rises a little (4 art pixels) and fades out in 0.5 s
   while the sprout shows under it.
@@ -762,8 +762,15 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   the can's button is as high as on any field; ripe corn's button stays over the plant.
 - PMD then called `Field` and `Hud` possible God Classes, so parts moved out rather than adding exceptions: the sign
   and its question mark (`FieldSign`), the falling water (`WaterSplash`) and the face's reactions to a harvest
-  (`HarvestReactions`); later also the weed's picture and fade-out (`WeedPlant`) and the bounce and squash
-  (`PlantMoves`).
+  (`FaceReactions`, first `HarvestReactions`); later also the weed's picture and fade-out (`WeedPlant`, now `WeedGrowth`) and the
+  bounce and squash (`PlantMoves`).
+- Review (owner): what grows after the sprout is now a `Growth`, the crop (`CropGrowth`: its pictures, ripe it puts
+  the crop into the field) or a weed (`WeedGrowth`, formerly `WeedPlant`: its pictures, gives nothing, fades out when
+  pulled); the field picks one when the water has fallen on it (the weed chance), so `Field` has no weed branches.
+  Swapping the whole actor for a weed field was considered and left: the board, the buttons and the state would all
+  have to move over. With seeds, planting would pick the crop without the dice. The HUD's `HarvestReactions` became `FaceReactions`
+  (`reactions.react()`: it read as if the HUD updated the harvests), kept plain with a note to rework it once the
+  face reacts to more things (no reaction framework yet). The happy face plays 3 times.
 - **Bug: the right mouse button** (found by the owner in the HTML build) walked the rabbit but didn't press any
   button: the board took any mouse button, while scene2d's `ClickListener` (behind every button) listens to the left
   one only. Wanted: the right button behaves exactly like the left; fixed on this branch at the owner's request (too

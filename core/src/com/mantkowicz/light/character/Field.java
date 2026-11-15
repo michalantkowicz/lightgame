@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.actor.Collectible;
-import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
@@ -37,8 +36,11 @@ import static com.mantkowicz.light.actor.GameActorType.FIELD;
  * <p>
  * Nobody chose what grows on it (no seeds yet, see docs/ideas.md), so when the water has fallen on an empty field a
  * weed may grow instead of the crop ({@link #DEFAULT_WEED_CHANCE}, Tiled's weedChance): the sprout's row goes on, a
- * blue flower, and the sign keeps its question mark. Its button pulls the ripe weed out: it disappears, nothing is
- * gained (the face sweats and says so), and the field is empty again.
+ * blue flower, and the sign keeps its question mark. Its button pulls the ripe weed out: it
+ * rises a little and fades out, nothing is gained (the face sweats and says so), and the field is empty again.
+ * <p>
+ * What grows after the sprout is a {@link Growth}: the crop ({@link CropGrowth}) or a weed ({@link WeedGrowth}),
+ * picked when the water has fallen on the empty field.
  */
 public class Field extends SpriteActor implements Collectible, Waterable, Weedable {
     /** How likely a weed grows instead of the crop, when Tiled's weedChance doesn't say. */
@@ -50,19 +52,17 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     private final ResourcesService resources;
     private final GameEventService events;
     private final Inventory inventory = new Inventory(1, new ArrayList<Item>());
-    private final int ripePhase;
     private final float weedChance;
-    private final TextureRegion cropIcon;
     private final TextureRegion canIcon;
     /** The sign: the crop, or blank with a question mark while the field is empty (phase 0) or a weed grows. */
     private final FieldSign sign;
     /** The tiny sprout of an empty field (phase 0), shown instead of the plant. */
     private final Image seedling;
-    /** The weed's picture, shown instead of the crop's while a weed grows. */
-    private final WeedPlant weedPlant;
+    private final CropGrowth cropGrowth;
+    private final WeedGrowth weedGrowth;
+    /** What grows now (or grew last, while the field is empty): the crop or a weed. */
+    private Growth growth;
     private int phase;
-    /** A weed grows on it instead of the crop. */
-    private boolean weed;
     /** The water falling onto it, while it is watered; null otherwise. */
     private WaterSplash splash;
     /** Watered: it grows by itself until it is ripe. */
@@ -79,17 +79,17 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
         this.weedChance = weedChance;
         setName(crop.getName() + " field");
         setTouchable(Touchable.disabled);
-        ripePhase = resources.getAnimation(crop.getPlant(), Action.GROW).getKeyFrames().length; // + the sprout
-        cropIcon = resources.getTexture(crop.getPicture());
         canIcon = resources.getAnimation(Sprite.WATERING_CAN, Action.ICON).getKeyFrame(0);
         sign = new FieldSign(resources, crop.getSign(), getHeight());
         addActorAt(0, sign); // behind the plant
         seedling = sheetImage(Sprite.PLANT_SEEDLING, Action.GROW);
         addActor(seedling);
-        weedPlant = place(new WeedPlant(resources), Sprite.PLANT_WEED);
-        addActor(weedPlant);
-        phase = ripePhase;
-        inventory.add(new Crop(crop, resources));
+        cropGrowth = new CropGrowth(getAvatar(), frame -> playOnce(Action.GROW, frame, frame), crop, resources);
+        weedGrowth = place(new WeedGrowth(resources), Sprite.PLANT_WEED);
+        addActor(weedGrowth);
+        growth = cropGrowth; // it starts ripe, with its crop
+        phase = growth.getRipePhase();
+        growth.ripe(inventory);
         showPhase();
         addPlugin(this::updateGrowing);
     }
@@ -105,12 +105,12 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
 
     /** The phase it is ripe at: the crop's, or the weed's while one grows. */
     public int getRipePhase() {
-        return weed ? weedPlant.getRipePhase() : ripePhase;
+        return growth.getRipePhase();
     }
 
     /** Does a weed grow on it (instead of the crop)? */
     public boolean isWeed() {
-        return weed;
+        return growth == weedGrowth;
     }
 
     public float getWeedChance() {
@@ -132,25 +132,16 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
         return splash != null;
     }
 
-    /** Phase 0 the sprout; then the crop's own pictures (or the weed's), the first one at phase 1. */
+    /** Phase 0 the sprout; then what grows (the crop or a weed), its first picture at phase 1. */
     private void showPhase() {
         boolean empty = phase == 0;
-        boolean unknownCrop = empty || weed;
-        sign.showCrop(!unknownCrop);
+        sign.showCrop(!empty && growth.givesCrop());
         seedling.setVisible(empty);
-        getAvatar().setVisible(!unknownCrop);
-        weedPlant.setVisible(!empty && weed);
-        int frame = Math.max(0, phase - 1);
-        if (weed) {
-            weedPlant.showPhase(phase);
-        } else {
-            playOnce(Action.GROW, frame, frame);
+        cropGrowth.getPlant().setVisible(!empty && growth == cropGrowth);
+        weedGrowth.getPlant().setVisible(!empty && growth == weedGrowth);
+        if (!empty) {
+            growth.showPhase(phase);
         }
-    }
-
-    /** The picture of what grows now: the weed's or the crop's. */
-    private Image plant() {
-        return weed ? weedPlant : getAvatar();
     }
 
     /**
@@ -194,8 +185,8 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     private void watered() {
         splash = null;
         sincePhase = 0;
-        if (phase == 0) {
-            weed = MathUtils.random() < weedChance; // nobody chose what grows: maybe a weed
+        if (phase == 0) { // nobody chose what grows: maybe a weed
+            growth = MathUtils.random() < weedChance ? weedGrowth : cropGrowth;
         }
         grow();
     }
@@ -216,11 +207,11 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     private void grow() {
         phase++;
         growing = phase < getRipePhase();
-        if (!growing && !weed) {
-            inventory.add(new Crop(crop, resources));
+        if (!growing) {
+            growth.ripe(inventory);
         }
         showPhase();
-        PlantMoves.bounce(plant(), growing); // a bounce, then squashing while it grows
+        PlantMoves.bounce(growth.getPlant(), growing); // a bounce, then squashing while it grows
     }
 
     // collecting
@@ -234,7 +225,7 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     /** The crop while it is ripe (picks it), the weed (pulls it out), the watering can after picking (waters it). */
     @Override
     public TextureRegion getActionIcon() {
-        return needsWater() ? canIcon : weed ? weedPlant.getRipePicture() : cropIcon;
+        return needsWater() ? canIcon : growth.getRipePicture();
     }
 
     /** The watering can: the button's picture while the crop grows (for tests and descriptions). */
@@ -256,7 +247,7 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
         if (phase == 0) {
             return getHeight();
         }
-        Image plant = plant();
+        Image plant = growth.getPlant();
         return Math.max(getHeight(), plant.getY() + plant.getHeight());
     }
 
@@ -273,7 +264,7 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     /** A ripe weed grows on it. */
     @Override
     public boolean hasWeed() {
-        return weed && phase == weedPlant.getRipePhase();
+        return isWeed() && phase == growth.getRipePhase();
     }
 
     /** The weed disappears and the field is empty again (the face sweats: no use). */
@@ -282,8 +273,8 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
         if (!hasWeed()) {
             return;
         }
-        weedPlant.pullOut();
-        weed = false;
+        weedGrowth.pullOut();
+        growth = cropGrowth; // the next time, the dice again
         phase = 0;
         showPhase();
         events.post(new FieldHarvestedEvent(true));
@@ -291,7 +282,7 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
 
     /** Is a pulled weed still fading out? */
     public boolean isWeedFadingOut() {
-        return weedPlant.isFadingOut();
+        return weedGrowth.isFadingOut();
     }
 
     @Override
