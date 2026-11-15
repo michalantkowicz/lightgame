@@ -128,3 +128,15 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   translation later only adds a file, and the list shows every place that still uses words, so each can be judged
   (keep it for readers, or replace it with a picture, as the "Built" HUD already does). Debug texts (the state labels)
   stay out of it. Open: enum or bundle; whether descriptions belong there or in the map data.
+- **The watering can runs dry** (2026‑11‑15). A field gives crops too easily: the can never runs dry, so watering
+  costs nothing. Suggested fix: the can holds a few pours (e.g. 3) and is filled again by walking next to water (the
+  island is surrounded by it; later a well, the pack has `Objects/Water well.png`). An empty can shakes its button and
+  the face says "find" with a water drop, like the cow's wish. Open: where the can's level is shown (a small meter on
+  the field's button or a HUD slot), whether the rabbit needs a filling animation, and whether the can is an item in
+  the backpack or always carried. Worth doing together with the owner, once growing over time has been played a while.
+- **Seeds to plant a field again** (2026‑11‑15). After picking, a field could stay bare soil until it is given a seed
+  bag of its crop: the farm items sheet's left column has a bag per crop (`Farming Plants items.png`, column 0), and
+  chests could hold them besides crops. Giving works like feeding the cow (the button shows the bag; without one it
+  shakes and the face says "find" with the bag). It ties fields to exploring the map. Open: one bag per crop kind or
+  any bag fits any field; whether a bag could choose what grows (a field without `cropType`); what a chest holds then.
+  Bigger than the can: a new item kind and chest contents. Worth doing together with the owner.
