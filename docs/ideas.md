@@ -114,10 +114,14 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   `SpriteBatch` send what it collected (one more draw call). For the stars that is at most 2 more draw calls per frame
   for under a second, nothing to notice; it would matter if many map objects each drew a UI picture next to their
   sprite (e.g. an icon over each of 50 animals: ~100 draw calls instead of a few), on weak phones and in the browser.
-  First check how often it happens: count draw calls per frame (libGDX `GLProfiler`, or `SpriteBatch.renderCalls`) on
-  a busy map and see which UI pictures the game stage draws. If it matters, either draw those pictures together (one
-  switch each way) or let the tool copy chosen UI pack pieces into `sprites.atlas` (e.g. a list in `pack.json`) and load
-  them as sprites; that would also keep `UiImage` for the UI only.
+  A second case came with growing fields (branch `field-grows-over-time`, 2026‑11‑15): an empty field's sign shows the
+  UI pack's question mark (`UiImage.HINT_ICON`) on the blank sign, about 2 more draw calls per empty field (sign,
+  "?", sprout). **The owner's choice of fix:** duplicate the UI pack pieces the game stage uses into the game sprites,
+  so the map draws from `sprites.atlas` only. The tool would copy chosen UI pack pieces into `sprites.atlas` (e.g. a
+  list in `pack.json` naming the UI pack file and piece) and the game loads them as `Sprite`s; `Sparkles` and `Field`
+  then use those, and `UiImage` stays for the UI only (`HINT_ICON` back to the hint button alone). Before doing it,
+  count draw calls per frame (libGDX `GLProfiler`, or `SpriteBatch.renderCalls`) on a busy map to see the gain; not
+  urgent while it is a few pictures.
 - **All texts in one place** (2026‑11‑14). The words the game shows are spread over the code: `Hud.HINT` ("play
   around!"), `CreatureFeature.FIND` ("find"), `PhraseGroup.NO_PATH` ("no path"), the "SETTINGS" title
   (`SettingsPanel`), the radial menu's "button" caption (`MenuButton`), and the descriptions in the characters
