@@ -44,6 +44,10 @@ public enum UiImage {
     TEEMO_EAR("emotes_premium/row_04"),
     /** Teemo's reactions (the face's {@code play}): waving its arms with an open mouth. */
     TEEMO_CHEER("emotes_premium/row_15"),
+    /** Teemo happy, arms up and eyes closed (a crop picked from a field). */
+    TEEMO_HAPPY("emotes_premium/row_16"),
+    /** Teemo sweating, a drop at its head (a weed pulled from a field: all that work for nothing). */
+    TEEMO_SWEAT("emotes_premium/row_10"),
     /** Teemo tired: a yawn; sleeping: falling asleep, then two rows of sleep with a bubble growing and shrinking. */
     TEEMO_YAWN("emotes_premium/row_29"),
     TEEMO_FALL_ASLEEP("emotes_premium/row_41"),
@@ -55,7 +59,7 @@ public enum UiImage {
     /** The action buttons over things on the map: up, and pressed. */
     ACTION_BUTTON_DARK_BROWN("round_buttons/dark_brown"),
     ACTION_BUTTON_DARK_BROWN_DOWN("round_buttons/dark_brown_down"),
-    /** On the round button when there is nothing to do: tapping it gives a hint. */
+    /** On the round button when there is nothing to do: tapping it gives a hint. Also on an empty field's sign. */
     HINT_ICON("icons/question"),
     /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */
     DIALOG_BOX_DOWN("dialog_box_down"),

@@ -4,6 +4,7 @@ import box2dLight.Light;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -152,6 +153,50 @@ public final class GameDriver {
     /** Short click (press, one frame, release) on the centre of a cell - with or without a tile on it. */
     public void click(Cell cell) {
         tap(gameScreenPosition(cellCenter(cell)));
+    }
+
+    /** Short click with the right mouse button (libGDX's {@code Buttons}) on the centre of a cell. */
+    public void rightClick(Cell cell) {
+        tap(gameScreenPosition(cellCenter(cell)), Buttons.RIGHT);
+    }
+
+    /** Short click with the right mouse button on a UI button by its text (see {@link #clickButton}). */
+    public void rightClickButton(String text) {
+        for (Actor actor : uiActors()) {
+            if (isButton(actor, text)) {
+                tap(uiScreenPosition(actor), Buttons.RIGHT);
+                return;
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** Short click with the right mouse button on the hint button. */
+    public void rightClickHint() {
+        tap(uiScreenPosition(hud().getHint()), Buttons.RIGHT);
+    }
+
+    /**
+     * Presses the left mouse button on a UI button, presses the right one too, then lets go of the left one and the
+     * right one: one press, which should give one click.
+     */
+    public void clickButtonWithBothButtons(String text) {
+        for (Actor actor : uiActors()) {
+            if (isButton(actor, text)) {
+                movePointer(uiScreenPosition(actor));
+                int x = (int) pointer.x, y = (int) pointer.y;
+                inputProcessor().touchDown(x, y, 0, Buttons.LEFT);
+                frames(1);
+                inputProcessor().touchDown(x, y, 0, Buttons.RIGHT);
+                frames(1);
+                inputProcessor().touchUp(x, y, 0, Buttons.LEFT);
+                frames(1);
+                inputProcessor().touchUp(x, y, 0, Buttons.RIGHT);
+                frames(1);
+                return;
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
     }
 
     /** Short click on the centre of an actor. */
@@ -358,10 +403,14 @@ public final class GameDriver {
     }
 
     private void tap(Vector2 screenPosition) {
+        tap(screenPosition, Buttons.LEFT);
+    }
+
+    private void tap(Vector2 screenPosition, int button) {
         movePointer(screenPosition);
-        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
+        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, button);
         frames(1);
-        inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, 0);
+        inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, button);
         frames(1);
     }
 
@@ -518,11 +567,49 @@ public final class GameDriver {
         throw new IllegalStateException("No chest button on screen");
     }
 
-    /** The field: its crop and how far it has grown, e.g. "carrot 1/3" (3/3 is ripe), "+ water" while watered. */
+    /**
+     * The field: its crop (or "weed" while one grows instead) and how far it has grown, e.g. "carrot 1/4" (4/4 is
+     * ripe), "+ water" while water falls, "growing" while it grows by itself.
+     */
     public String field() {
         com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
-        return field.getCrop().getName() + " " + field.getGrowthStage() + "/" + field.getRipeStage()
-                + (field.isBeingWatered() ? " + water" : "");
+        return (field.isWeed() ? "weed" : field.getCrop().getName()) + " " + field.getGrowthPhase() + "/"
+                + field.getRipePhase()
+                + (field.isBeingWatered() ? " + water" : "") + (field.isGrowing() ? " growing" : "");
+    }
+
+    /** How likely the field grows a weed instead of its crop (Tiled's weedChance, 0.4 without it). */
+    public float fieldWeedChance() {
+        return ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).getWeedChance();
+    }
+
+    /** Is a weed pulled out of the field still fading out? */
+    public boolean fieldWeedFadingOut() {
+        return ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).isWeedFadingOut();
+    }
+
+    /** How high the field's button sits: the top it is placed over, in tiles (1 = the tile's top, ripe corn higher). */
+    public float fieldTopInTiles() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        return field.getTopY() / field.getHeight();
+    }
+
+    /** What the bubble over the HUD's face says, or null when there is none. */
+    public String faceSays() {
+        SpeechBubble bubble = hud().getBubble();
+        return bubble == null || bubble.getStage() == null ? null : bubble.getText();
+    }
+
+    /** What the field's sign shows: its crop's name, or "?" while the field is empty. */
+    public String fieldSign() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        return field.isCropOnSign() ? field.getCrop().getName() : "?";
+    }
+
+    /** The field's plant scale "x/y" rounded to hundredths, e.g. "1.0/1.0" standing still, "1.03/0.97" squashed. */
+    public String fieldPlantScale() {
+        Actor plant = ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).getAvatar();
+        return Math.round(plant.getScaleX() * 100) / 100f + "/" + Math.round(plant.getScaleY() * 100) / 100f;
     }
 
     /** What the field's button shows: "crop" (picks it), "water" (the watering can), or "none" (no button). */

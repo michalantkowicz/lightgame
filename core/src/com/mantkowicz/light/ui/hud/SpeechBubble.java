@@ -51,6 +51,14 @@ public class SpeechBubble extends Group {
      * @param picture shown after the text at the UI's scale (a 16 px item is 48 px), or null for text only
      */
     public SpeechBubble(ResourcesService resources, String text, TextureRegion picture) {
+        this(resources, text, picture, SECONDS);
+    }
+
+    /**
+     * @param picture shown after the text at the UI's scale, or null for text only
+     * @param seconds how long it stays before it fades out
+     */
+    public SpeechBubble(ResourcesService resources, String text, TextureRegion picture, float seconds) {
         setTouchable(Touchable.disabled);
 
         TextureRegion box = resources.getUiImage(UiImage.DIALOG_BOX_DOWN);
@@ -91,7 +99,7 @@ public class SpeechBubble extends Group {
         }
         setSize(width, below + height);
 
-        addAction(sequence(delay(SECONDS), fadeOut(FADE_SECONDS), Actions.removeActor()));
+        addAction(sequence(delay(seconds), fadeOut(FADE_SECONDS), Actions.removeActor()));
     }
 
     private static TextureRegion part(TextureRegion region, int x, int y, int width, int height) {

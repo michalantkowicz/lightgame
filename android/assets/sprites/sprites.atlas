@@ -201,19 +201,19 @@ farm_items/row_14
   bounds:128,329,16,16
   index:0
 item_shadow/row_00
-  bounds:664,329,14,4
+  bounds:722,329,14,4
   index:0
 plant_carrot/grow
-  bounds:434,329,15,13
+  bounds:450,329,15,13
   index:0
 plant_carrot/grow
-  bounds:451,329,15,13
+  bounds:467,329,15,13
   index:1
 plant_carrot/grow
-  bounds:468,329,15,13
+  bounds:484,329,15,13
   index:2
 plant_carrot/grow
-  bounds:485,329,15,13
+  bounds:501,329,15,13
   index:3
 plant_corn/grow
   bounds:354,266,12,29
@@ -231,16 +231,16 @@ plant_corn/grow
   bounds:410,266,12,29
   index:4
 plant_cucumber/grow
-  bounds:298,329,16,15
+  bounds:314,329,16,15
   index:0
 plant_cucumber/grow
-  bounds:316,329,16,15
+  bounds:332,329,16,15
   index:1
 plant_cucumber/grow
-  bounds:334,329,16,15
+  bounds:350,329,16,15
   index:2
 plant_cucumber/grow
-  bounds:352,329,16,15
+  bounds:368,329,16,15
   index:3
 plant_pumpkin/grow
   bounds:146,329,16,16
@@ -254,18 +254,30 @@ plant_pumpkin/grow
 plant_pumpkin/grow
   bounds:200,329,16,16
   index:3
-plant_tomato/grow
-  bounds:370,329,14,14
+plant_seedling/grow
+  bounds:738,329,6,4
   index:0
 plant_tomato/grow
   bounds:386,329,14,14
-  index:1
+  index:0
 plant_tomato/grow
   bounds:402,329,14,14
-  index:2
+  index:1
 plant_tomato/grow
   bounds:418,329,14,14
+  index:2
+plant_tomato/grow
+  bounds:434,329,14,14
   index:3
+plant_weed/grow
+  bounds:518,329,12,12
+  index:0
+plant_weed/grow
+  bounds:532,329,12,12
+  index:1
+plant_weed/grow
+  bounds:546,329,12,12
+  index:2
 rabbit/chop_down
   bounds:574,167,42,31
   index:0
@@ -842,48 +854,51 @@ rabbit/water_up
 rabbit/water_up
   bounds:618,233,42,31
   index:7
-sign_carrot/sign
-  bounds:234,329,14,16
-  index:0
-sign_corn/sign
+sign_blank/sign
   bounds:218,329,14,16
   index:0
-sign_cucumber/sign
-  bounds:282,329,14,16
-  index:0
-sign_pumpkin/sign
-  bounds:266,329,14,16
-  index:0
-sign_tomato/sign
+sign_carrot/sign
   bounds:250,329,14,16
   index:0
-watering/splash
-  bounds:502,329,14,11
+sign_corn/sign
+  bounds:234,329,14,16
+  index:0
+sign_cucumber/sign
+  bounds:298,329,14,16
+  index:0
+sign_pumpkin/sign
+  bounds:282,329,14,16
+  index:0
+sign_tomato/sign
+  bounds:266,329,14,16
   index:0
 watering/splash
-  bounds:518,329,14,11
+  bounds:560,329,14,11
+  index:0
+watering/splash
+  bounds:576,329,14,11
   index:1
 watering/splash
-  bounds:534,329,14,11
+  bounds:592,329,14,11
   index:2
 watering/splash
-  bounds:550,329,14,11
+  bounds:608,329,14,11
   index:3
 watering/splash
-  bounds:566,329,14,11
+  bounds:624,329,14,11
   index:4
 watering/splash
-  bounds:582,329,14,11
+  bounds:640,329,14,11
   index:5
 watering/splash
-  bounds:598,329,14,11
+  bounds:656,329,14,11
   index:6
 watering/splash
-  bounds:614,329,14,11
+  bounds:672,329,14,11
   index:7
 watering/splash
-  bounds:630,329,14,11
+  bounds:688,329,14,11
   index:8
 watering_can/icon
-  bounds:646,329,16,10
+  bounds:704,329,16,10
   index:0

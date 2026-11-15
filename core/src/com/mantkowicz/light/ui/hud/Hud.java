@@ -34,6 +34,9 @@ import java.util.function.IntPredicate;
  * do is on action buttons over the things on the map ({@link ActionButton}). Top right: the settings gear, which opens the
  * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
+ * The face reacts to the field: picking a crop makes it happy, pulling out a weed makes it sweat and say so
+ * ({@link FaceReactions}).
+ * <p>
  * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
  * for now.
  */
@@ -87,6 +90,7 @@ public class Hud extends Group {
     private final StaminaBar stamina;
     private final HoldButton gear;
     private final RoundButton hint;
+    private final FaceReactions reactions;
     private SpeechBubble bubble;
     /** What the face says when the hint button is tapped, and the picture after it (or null). */
     private String hintText = HINT;
@@ -117,6 +121,7 @@ public class Hud extends Group {
 
         face = new Portrait(resources, "teemo", AWAKE);
         row.addActor(face);
+        reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
 
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             Image slot = new Image(UiStyle.stretching(resources, UiImage.SLOT));
@@ -173,6 +178,7 @@ public class Hud extends Group {
                         .poll(BackpackItemEjectedEvent.class)) {
             shake(ejected.getSlot());
         }
+        reactions.react();
         UiImage mood = stamina.getMood();
         face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);
@@ -255,13 +261,18 @@ public class Hud extends Group {
 
     /** The face says the hint in a bubble over it (a new tap starts it again), as when the hint button is tapped. */
     public void showHint() {
+        say(hintText, hintPicture, SpeechBubble.SECONDS);
+        face.play(UiImage.TEEMO_CHEER, SpeechBubble.SECONDS); // cheering while it says it
+    }
+
+    /** A bubble over the face (replacing one still there) says something for a while, then fades out. */
+    private void say(String text, TextureRegion picture, float seconds) {
         if (bubble != null) {
             bubble.remove();
         }
-        bubble = new SpeechBubble(resources, hintText, hintPicture);
+        bubble = new SpeechBubble(resources, text, picture, seconds);
         addActor(bubble);
         placeBubble();
-        face.play(UiImage.TEEMO_CHEER, SpeechBubble.SECONDS); // cheering while it says it
     }
 
     /**

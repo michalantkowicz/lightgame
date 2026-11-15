@@ -88,7 +88,7 @@ public class GameScreen extends ScreenAdapter {
         notificationStage = new NotificationStage(worldViewport);
         uiStage = new UiStage(uiViewport);
 
-        InputMultiplexer multiplexer = new InputMultiplexer();
+        InputMultiplexer multiplexer = new AnyButtonInput(); // the right mouse button does what the left does
         multiplexer.addProcessor(uiStage);
         multiplexer.addProcessor(menuStage);
         multiplexer.addProcessor(gameStage);
