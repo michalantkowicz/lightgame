@@ -17,6 +17,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the bottom row don't walk the player.
  */
 class HudTest {
+    /** Grass all around the rabbit, also far below it (behind the HUD's bottom row). */
+    private static final TestMap FIELD = TestMap.of(
+            "~~~~~~~~~~~",
+            "~.........~",
+            "~.........~",
+            "~....P....~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~~~~~~~~~~~");
+
     private static final TestMap MAP = TestMap.of(
             "~~~~~~~",
             "~.....~",
@@ -212,6 +226,20 @@ class HudTest {
         game.tapFace();
         game.seconds(2);
         assertEquals(start, game.playerCell(), "the face is in front of the map: the tap stays in the HUD");
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug (found by the owner: a chick near the bottom of the screen couldn't be tapped): the bottom row caught
+     * every tap inside its whole box, also between its pieces where the map shows. Now a tap there reaches the map.
+     */
+    @Test
+    void aTapBetweenTheHudsPiecesReachesTheMap() {
+        GameDriver game = GameDriver.start(FIELD.write("hud-field"));
+        Cell start = game.playerCell();
+        game.tapBetweenBackpackAndFace();
+        game.seconds(3);
+        assertTrue(!start.equals(game.playerCell()), "the rabbit walked to the cell tapped there");
         assertFalse(game.crashed());
     }
 

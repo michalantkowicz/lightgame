@@ -47,8 +47,9 @@ design, change the rule on purpose in its own PR.
 - `GameScreen` builds everything and hands a `GameContext` (services, plain `Stage`s) to game objects.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
-- A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`), all its
-  transitions in that one file, no framework on top. `Debug.Tool.STATE_LABELS` shows the states while playing.
+- A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
+  `ChickenState` for `Chicken`), all its transitions in that one file, no framework on top. What farm animals share
+  (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. `Debug.Tool.STATE_LABELS` shows the states while playing.
 - Events go through `GameEventService`; an event class lives next to what it is about (one that carries nothing of the
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).
 - The board tracks `TileOccupant`s and `TileContent`s and knows nothing of actors or the map.

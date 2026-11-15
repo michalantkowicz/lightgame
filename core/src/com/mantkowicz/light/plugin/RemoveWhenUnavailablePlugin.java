@@ -15,7 +15,8 @@ import java.util.function.BooleanSupplier;
  * would walk the player there); the actor's own listener decides whether the click does anything.
  */
 public class RemoveWhenUnavailablePlugin implements Plugin {
-    private static final float DURATION = 0.75f;
+    /** How long it takes to fade out (a stroked animal waits this long, so the hand never covers its hearts). */
+    public static final float DURATION = 0.75f;
 
     private final GameActor actor;
     private final BooleanSupplier available;

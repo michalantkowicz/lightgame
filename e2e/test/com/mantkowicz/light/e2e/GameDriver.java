@@ -42,8 +42,11 @@ import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.character.Chest;
+import com.mantkowicz.light.character.Chicken;
+import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Dog;
+import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.debug.Debug;
@@ -88,7 +91,7 @@ public final class GameDriver {
     private static final int FRAMES_PER_SECOND = 60;
 
     public enum Kind {
-        PLAYER, DOG, CHEST, COW, FIELD
+        PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY
     }
 
     private final HeadlessGame game;
@@ -308,6 +311,18 @@ public final class GameDriver {
     /** Short tap on the hint button (the question mark right of the face). */
     public void tapHint() {
         tap(uiScreenPosition(hud().getHint()));
+    }
+
+    /**
+     * Short tap on the screen between the right backpack slot and the face, at the face's middle height: on the map
+     * behind the HUD's bottom row, not on one of its pieces.
+     */
+    public void tapBetweenBackpackAndFace() {
+        Actor slot = hud().getSlots().get(hud().getSlots().size() - 1);
+        Actor face = hud().getFace();
+        Vector2 right = slot.localToStageCoordinates(new Vector2(slot.getWidth(), 0));
+        Vector2 left = face.localToStageCoordinates(new Vector2(0, face.getHeight() / 2f));
+        tap(uiStage().stageToScreenCoordinates(new Vector2((right.x + left.x) / 2f, left.y)));
     }
 
     /** Short tap on the player's face in the HUD. */
@@ -881,18 +896,98 @@ public final class GameDriver {
         return names;
     }
 
-    /** The picture bubbles on the map are drawn in front of every other actor (only the cow has one). */
+    /** The picture bubble over a character; the bubbles on the map are drawn in front of every other actor. */
     private String bubbleOver(Group character) {
         Array<Actor> actors = gameStage().getActors();
-        for (Actor actor : actors) {
-            if (actor instanceof PictureBubble bubble) {
-                if (actor != actors.peek()) {
-                    throw new IllegalStateException("The bubble isn't in front of everything on the map");
-                }
-                return bubble.isVisible() ? bubble.getPictureName() : "hidden";
+        boolean bubblesSoFar = true; // from the front: only bubbles until the first other actor
+        String found = "none";
+        for (int i = actors.size - 1; i >= 0; i--) {
+            Actor actor = actors.get(i);
+            if (!(actor instanceof PictureBubble bubble)) {
+                bubblesSoFar = false;
+                continue;
+            }
+            if (!bubblesSoFar) {
+                throw new IllegalStateException("A bubble isn't in front of everything on the map");
+            }
+            if (bubble.getCharacter() == character) {
+                found = bubble.isVisible() ? bubble.getPictureName() : "hidden";
             }
         }
-        return "none";
+        return found;
+    }
+
+    // farm animals by kind: COW, CHICKEN, CHICKEN_BABY
+
+    /** What the animal is doing (its state machine's state), e.g. "STANDING", "PECKING", "WISHING". */
+    public String animalState(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getStateName();
+    }
+
+    /** The animal's animation right now, e.g. "chicken/peck". */
+    public String animalAnimation(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getCurrentAnimation();
+    }
+
+    /** What the bubble over the animal shows, e.g. "corn", "hidden" (the button is there), or "none". */
+    public String animalWish(Kind kind) {
+        return bubbleOver(actor(kind));
+    }
+
+    /** What the animal wishes for right now, bubble or not, e.g. "corn", or "none" when it isn't wishing. */
+    public String animalWants(Kind kind) {
+        Item wish = ((FarmAnimal) actor(kind)).getWish();
+        return wish == null ? "none" : ((Crop) wish).getType().getName();
+    }
+
+    /** The crops the animal may wish for, e.g. ["corn"]. */
+    public List<String> animalFavouriteDishes(Kind kind) {
+        List<String> names = new ArrayList<>();
+        for (CropType type : ((FarmAnimal) actor(kind)).getFavouriteDishes()) {
+            names.add(type.getName());
+        }
+        return names;
+    }
+
+    /** Is the animal's picture mirrored (its sheet looks right; it looks left)? */
+    public boolean animalLooksLeft(Kind kind) {
+        return ((FarmAnimal) actor(kind)).isMirrored();
+    }
+
+    /** Are hearts over the chicken (or chick) right now? */
+    public boolean chickenShowsHearts(Kind kind) {
+        return ((Chicken) actor(kind)).showsHearts();
+    }
+
+    /** Where the hearts over the chicken (or chick) are drawn relative to its picture: {dx, dy} in screen pixels. */
+    public float[] chickenHeartsOffset(Kind kind) {
+        Chicken chicken = (Chicken) actor(kind);
+        for (Actor child : chicken.getChildren()) {
+            if (child.getClass().getSimpleName().equals("PlayOnceImage")) {
+                return new float[]{child.getX() - chicken.getAvatar().getX(),
+                        child.getY() - chicken.getAvatar().getY()};
+            }
+        }
+        throw new IllegalStateException("No hearts over the " + kind);
+    }
+
+    /** Which animal a shown action button (e.g. "STROKE", "GIVE") stands over, or null when there is none. */
+    public Kind buttonOver(String name) {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof ActionButton button && name.equals(button.getName()) && button.getOver() != null) {
+                for (Kind kind : List.of(Kind.COW, Kind.CHICKEN, Kind.CHICKEN_BABY)) {
+                    if (has(kind) && actor(kind) == button.getOver()) {
+                        return kind;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Strokes the animal as the round button would (the player needn't be next to it). */
+    public void strokeAnimal(Kind kind) {
+        ((FarmAnimal) actor(kind)).stroke();
     }
 
     /** The small pictures floating up on the map right now, e.g. ["heart"] over the player after stroking the cow. */
@@ -1162,9 +1257,11 @@ public final class GameDriver {
             case CHEST -> Chest.class;
             case COW -> Cow.class;
             case FIELD -> com.mantkowicz.light.character.Field.class;
+            case CHICKEN, CHICKEN_BABY -> Chicken.class;
         };
         for (Actor actor : gameStage().getActors()) {
-            if (type.isInstance(actor)) {
+            if (type.isInstance(actor) && (!(actor instanceof Chicken chicken)
+                    || chicken.getType() == ChickenType.valueOf(kind.name()))) {
                 return type.cast(actor);
             }
         }
@@ -1294,6 +1391,12 @@ public final class GameDriver {
         Vector2 right = gameStage()
                 .stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
         return right.x - left.x;
+    }
+
+    /** Where the centre of an actor on the map is on the screen: "x,y" in screen pixels (y down). */
+    public String onScreen(Kind kind) {
+        Vector2 screen = gameStage().stageToScreenCoordinates(actor(kind).getCenter().cpy());
+        return Snapshot.number(screen.x) + "," + Snapshot.number(screen.y);
     }
 
     /** Where a button is on the screen and how big: "x,y wxh" in screen pixels (bottom-left corner, y down). */

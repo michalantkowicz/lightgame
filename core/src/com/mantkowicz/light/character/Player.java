@@ -48,6 +48,7 @@ public class Player extends GameBoardActor implements Collecting {
     private final Inventory inventory;
     private final Stamina stamina = new Stamina();
     private final AnimationPlugin animationPlugin;
+    private final BoardMovementPlugin boardMovementPlugin;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
@@ -59,7 +60,7 @@ public class Player extends GameBoardActor implements Collecting {
         createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),
                 resourcesService.getSpriteSheet(SPRITE));
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
+        boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
         addPlugin(new HopPlugin(this, HOP_HEIGHT, HOP_DURATION));
         animationPlugin = new AnimationPlugin(this, resourcesService, SPRITE);
@@ -125,6 +126,11 @@ public class Player extends GameBoardActor implements Collecting {
     }
 
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
+    /** The tile the player walks to, or null while it stands (written out: the class is at PMD's import limit). */
+    public com.mantkowicz.light.board.Tile getWalkTarget() {
+        return boardMovementPlugin.getTarget();
+    }
+
     public Stamina getStamina() {
         return stamina;
     }

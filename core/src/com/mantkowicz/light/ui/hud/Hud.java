@@ -109,17 +109,13 @@ public class Hud extends Group {
         this.player = player;
         setTouchable(Touchable.childrenOnly);
 
-        // taps on the bottom row stay in the HUD: they don't walk the player to a cell hidden behind it
-        row.setTouchable(Touchable.enabled);
-        row.addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return true;
-            }
-        });
+        // taps on the bottom row's pieces stay in the HUD (they don't walk the player to a cell hidden behind them);
+        // taps in the gaps between them reach the map (an animal showing there can be tapped)
+        row.setTouchable(Touchable.childrenOnly);
         addActor(row);
 
         face = new Portrait(resources, "teemo", AWAKE);
+        keepTaps(face);
         row.addActor(face);
         reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
 
@@ -147,6 +143,7 @@ public class Hud extends Group {
         }
 
         stamina = new StaminaBar(resources, player.getStamina());
+        keepTaps(stamina);
         row.addActor(stamina);
 
         gear = new HoldButton(resources, UiImage.GEAR_BUTTON, SCALE, this::openSettings);
@@ -161,6 +158,17 @@ public class Hud extends Group {
             }
         });
         addActor(hint);
+    }
+
+    /** Taps on this piece stay in the HUD: they don't reach the map behind it. */
+    private static void keepTaps(com.badlogic.gdx.scenes.scene2d.Actor piece) {
+        piece.setTouchable(Touchable.enabled);
+        piece.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
     }
 
     private Image picture(UiImage image, float scale) {

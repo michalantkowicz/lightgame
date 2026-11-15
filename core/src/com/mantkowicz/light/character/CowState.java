@@ -15,7 +15,7 @@ import com.mantkowicz.light.resources.Action;
  * STANDING ──(after a while)──▶ WALKING ──(arrived)──▶ STANDING
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
+ * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
  * </pre>
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
@@ -25,7 +25,7 @@ public enum CowState implements State<Cow> {
         @Override
         public void enter(Cow cow) {
             cow.playAnimation(Action.IDLE);
-            cow.stayFor(3, 6);
+            cow.stayFor(2, 4);
         }
 
         @Override
@@ -34,7 +34,7 @@ public enum CowState implements State<Cow> {
                 cow.chooseWish(); // here, not in WISHING: stroked, it comes back wishing for the same
                 cow.changeState(WISHING);
             } else if (cow.isTimeUp()) {
-                cow.changeState(oneOf(WALKING, WALKING, LYING_DOWN)); // walks twice as often as it lies down
+                cow.changeState(oneOf(WALKING, WALKING, WALKING, LYING_DOWN)); // walks 3 times as often as it lies down
             }
         }
 
@@ -234,6 +234,22 @@ public enum CowState implements State<Cow> {
         }
     },
 
+    /** Tapped with the hand: it stands still while the hand fades out, so nothing covers its hearts. */
+    BEING_STROKED {
+        @Override
+        public void enter(Cow cow) {
+            cow.playAnimation(Action.IDLE);
+            cow.waitForTheHand();
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (cow.isTimeUp()) {
+                cow.changeState(STROKED);
+            }
+        }
+    },
+
     /** The player stroked it: a heart over its head. */
     STROKED {
         @Override
@@ -266,7 +282,7 @@ public enum CowState implements State<Cow> {
     @Override
     public boolean onMessage(Cow cow, Telegram telegram) {
         if (telegram.message == Cow.MESSAGE_STROKE && canBeStroked()) {
-            cow.changeState(STROKED);
+            cow.changeState(BEING_STROKED);
             return true;
         }
         return false;

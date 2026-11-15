@@ -86,6 +86,11 @@ public class PictureBubble extends Group {
         bubble.setRegion(pop.getKeyFrame(time));
     }
 
+    /** Who it is over (null until shown). */
+    public Group getCharacter() {
+        return character;
+    }
+
     /** What its picture shows, e.g. "carrot". */
     public String getPictureName() {
         return name;
