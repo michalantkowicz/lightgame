@@ -3,6 +3,8 @@ package com.mantkowicz.light.map;
 import com.badlogic.gdx.maps.MapProperties;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.character.Chest;
+import com.mantkowicz.light.character.Chicken;
+import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.SpriteActor;
@@ -24,6 +26,8 @@ public enum TileObjectType {
     CHEST((context, properties) -> new Chest(context)),
     COW((context, properties) -> new Cow(context,
             CropType.listOf(properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class)))),
+    CHICKEN((context, properties) -> new Chicken(context, ChickenType.CHICKEN)),
+    CHICKEN_BABY((context, properties) -> new Chicken(context, ChickenType.CHICKEN_BABY)),
     FIELD((context, properties) -> new Field(context,
             CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT),
             number(properties, TileObjectAttribute.WEED_CHANCE, Field.DEFAULT_WEED_CHANCE)));

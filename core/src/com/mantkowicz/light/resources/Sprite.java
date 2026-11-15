@@ -8,6 +8,9 @@ package com.mantkowicz.light.resources;
 public enum Sprite {
     RABBIT("rabbit"),
     COW_BROWN("cow_brown"),
+    /** A chicken and a chick; their love rows have the hearts on the row above (drawn over the bird). */
+    CHICKEN("chicken"),
+    CHICKEN_BABY("chicken_baby"),
     CHEST("chest"),
     /** Farm produce lying on the ground, one per row (only the right column: the left one has seed bags). */
     FARM_ITEMS("farm_items"),

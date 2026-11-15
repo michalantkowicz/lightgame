@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "b4fd58975989edcd10a625a6228049e3b595bd4c",
+  "packJsonSha1": "26f4d31a9c85354f57e911396f7e013a80dc70a1",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -11,6 +11,26 @@
       "height": 21,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "chicken": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "chicken_baby": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "cow_brown": {
       "frameWidth": 32,
@@ -215,6 +235,210 @@
       "frames": 5,
       "frameDuration": 0.1,
       "playMode": "NORMAL"
+    },
+    "chicken/eat": {
+      "sheet": "chicken",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/hearts": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/idle": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/love": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/peck": {
+      "sheet": "chicken",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/rest": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/rise": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_01": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_05": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_06": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_09": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_10": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/settle": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/sleep": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/walk": {
+      "sheet": "chicken",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/eat": {
+      "sheet": "chicken_baby",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/hearts": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/idle": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/love": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/peck": {
+      "sheet": "chicken_baby",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/rest": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/rise": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_01": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_05": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_06": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_09": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_10": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_15": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_16": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_17": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_18": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/settle": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/sleep": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/walk": {
+      "sheet": "chicken_baby",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
     },
     "cow_brown/eat": {
       "sheet": "cow_brown",
