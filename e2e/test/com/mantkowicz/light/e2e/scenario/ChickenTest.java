@@ -209,6 +209,41 @@ class ChickenTest {
         assertFalse(game.crashed());
     }
 
+    /** The rabbit between a cow that wants only carrots and a chicken (corn). */
+    private static final TestMap COW_AND_CHICKEN = TestMap.of(
+            "~~~~~~~",
+            "~~KPH~~",
+            "~~~~~~~")
+            .with('K', "COW", Map.of("favouriteDish", "CARROT"))
+            .with('H', "CHICKEN", Map.of());
+
+    /**
+     * Found by a test agent: with the button over one wishing animal, getting what the other one wants didn't move the
+     * button there. Now it moves to the one the rabbit can feed.
+     */
+    @Test
+    void theGiveButtonGoesToTheAnimalTheRabbitCanFeed() {
+        GameDriver game = GameDriver.start(COW_AND_CHICKEN.write("cow-and-chicken"));
+        for (int frame = 0; frame < 30 * 60 && !("WISHING".equals(game.animalState(Kind.COW))
+                && "WISHING".equals(game.animalState(Kind.CHICKEN))); frame++) {
+            game.frames(1);
+        }
+        game.seconds(1);
+        Kind first = game.buttonOver("GIVE");
+        Kind other = first == Kind.COW ? Kind.CHICKEN : Kind.COW;
+        game.putIntoBackpack(other == Kind.COW ? "carrot" : "corn");
+        for (int frame = 0; frame < 3 * 60 && !(other == game.buttonOver("GIVE")
+                && game.buttonAlphas("GIVE").equals(List.of(1f))); frame++) {
+            game.frames(1);
+        }
+        assertEquals(other, game.buttonOver("GIVE"), "the button went to the one it can feed");
+        assertEquals("hidden", game.animalWish(other));
+        assertEquals(first == Kind.COW ? "carrot" : "corn", game.animalWish(first), "the other one's bubble is back");
+        game.clickButton("GIVE");
+        assertEquals("EATING", game.animalState(other), "and eats");
+        assertFalse(game.crashed());
+    }
+
     /**
      * Was a bug: a button stayed over the animal it came for even after that one walked away, while tapping it
      * stroked another one next to the rabbit. A fully shown button is always over an animal next to the rabbit.

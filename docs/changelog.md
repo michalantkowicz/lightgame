@@ -813,6 +813,15 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   or done): the wish button for one wishing for something the rabbit carries (else any wishing one), the hand for
   that one too if it can be stroked. `ChickenTest.bothWishingNeighboursCanBeFed` and `aButtonStaysWithItsAnimal`
   failed before the fix; `ActionButton.getOver`, `GameDriver.buttonOver`.
+  Round two (two agents: a stress run with 2 cows, 3 chickens and 2 chicks for 30 minutes, 608 taps; the button fix
+  with a cow and chickens) found no bugs, and one case to improve: with the wish button over one animal, getting
+  what another one next to the rabbit wants didn't move the button there (it shook "find"). Now a wish button stays
+  only while its animal is still the one to give to (`ChickenTest.theGiveButtonGoesToTheAnimalTheRabbitCanFeed`,
+  failed before).
+- Left for the owner: chickens' resting and sleeping rows look much alike in the pack (no Zzz for chickens); the
+  hearts sit partly under the stroke button while it fades (as with the cow); in level 1 the chickens are off screen
+  at the start; chickens look hungry about 39 % of the time (20 s hunger, 15 s wish); a wish bubble near the map's top
+  edge can be cut off (any animal).
 - `level1` (owner's request): a chicken and a chick at the bottom right, cells (17, 13) and (19, 13) from the top.
 - Tests: `ChickenTest` (corn only, restless, bored soon, fed corn with hearts one frame up, stroking a chick, every
   state's animation for both, level 1). `GameDriver`: `Kind.CHICKEN` and `CHICKEN_BABY` and per-animal helpers

@@ -129,8 +129,13 @@ public class CreatureFeature implements Feature {
         return null;
     }
 
+    /**
+     * Its button stays while it is still the one to give to: next to the player and wishing, and no other one next to
+     * the player wishes for something the player carries when it doesn't (then its button fades and comes over that
+     * one).
+     */
     private boolean canGive(Creature creature) {
-        return isNextToPlayer(creature) && creature.getWish() != null;
+        return wishingCreature(creaturesNextToPlayer()) == creature;
     }
 
     private void give(Creature creature) {
