@@ -133,8 +133,11 @@ public abstract class SpriteActor extends GameBoardActor {
     }
 
     /**
-     * Walks onto a tile next to it (up, down, left or right), which must be free, as
-     * {@link #walkToFreeNeighbour(float, boolean)} does once it has picked one.
+     * Takes one step, onto {@code target}: a free tile right next to it (up, down, left or right; the caller checks
+     * both, nothing is checked here). It takes {@code seconds}; the target is blocked at once, the tile it leaves is
+     * freed on arrival, and meanwhile its status is MOVEMENT. Going somewhere further is many steps, each its own call
+     * (e.g. a chicken going for a crop, {@code CropHunt}). {@link #walkToFreeNeighbour(float, boolean)} picks a random
+     * free tile and takes this step onto it.
      */
     protected void stepOnto(Tile target, float seconds, boolean keepFacing) {
         Tile from = getTile();
