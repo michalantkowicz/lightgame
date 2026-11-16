@@ -21,13 +21,20 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * (someone standing behind the character doesn't cover it); the HUD is on its own stage, above it.
  */
 public class PictureBubble extends Group {
-    /** Screen pixels per pack pixel: the bubble, and the biggest a picture in it gets (it is scaled by whole numbers). */
-    private static final int SCALE = 4;
-    private static final float PICTURE_SIZE = 100;
+    /** Screen pixels per pack pixel: the bubble (3: 25 % smaller than the 4 it was at first). */
+    private static final int SCALE = 3;
+    /**
+     * The biggest a picture in it gets: scaled by whole numbers up to 100 px, then made as much smaller as the bubble
+     * (a 16 px crop: 6 times, then 3/4 of that, 72 px).
+     */
+    private static final float PICTURE_SIZE = 100, PICTURE_SHRINK = SCALE / 4f;
     /** The bubble's frame is 44x56 pack pixels; the box's middle is 32 above its bottom (its pointer is under it). */
     private static final float BOX_MIDDLE_Y = 32;
-    /** Between the character's tile and the bubble's frame. */
-    private static final float GAP = 8;
+    /**
+     * Between the character's tile and the bubble's frame: 4 (8 at first; the smaller frame's empty bottom rows bring
+     * it closer too). Closer, it covers the action buttons over the character.
+     */
+    private static final float GAP = 4;
     private static final float FADE_SECONDS = 0.15f;
 
     private final Animation<TextureRegion> pop;
@@ -50,7 +57,8 @@ public class PictureBubble extends Group {
         addActor(background);
         setSize(background.getWidth(), background.getHeight());
 
-        int scale = Math.max(1, (int) (PICTURE_SIZE / Math.max(picture.getRegionWidth(), picture.getRegionHeight())));
+        float scale = PICTURE_SHRINK
+                * Math.max(1, (int) (PICTURE_SIZE / Math.max(picture.getRegionWidth(), picture.getRegionHeight())));
         Image inside = new Image(picture);
         inside.setSize(picture.getRegionWidth() * scale, picture.getRegionHeight() * scale);
         inside.setPosition(Math.round((getWidth() - inside.getWidth()) / 2f),

@@ -31,12 +31,12 @@ class MouseButtonsTest {
         game.rightClick(chest);
         game.seconds(2);
         assertTrue(game.usedFromNeighbours(chest).contains(game.playerCell()), "walked next to the chest");
-        assertEquals("open", game.chestButton());
+        assertEquals("treasure", game.chestButton());
 
         game.rightClickButton("COLLECT");
         game.seconds(1.5f);
         assertEquals(1, game.itemsOnGround().size(), "the chest opened: " + game.itemsOnGround());
-        assertEquals("close", game.chestButton());
+        assertEquals("none", game.chestButton(), "empty: its button is gone");
 
         game.rightClickHint();
         assertEquals("TEEMO_CHEER", game.faceReaction(), "the hint button too");
@@ -50,7 +50,7 @@ class MouseButtonsTest {
         game.seconds(2);
         game.clickButtonWithBothButtons("COLLECT");
         game.seconds(1.5f);
-        assertEquals("close", game.chestButton(), "opened once (not opened and closed again)");
+        assertEquals("chest/open_front", game.chestAnimation(), "opened once (not opened and closed again)");
         assertEquals(1, game.itemsOnGround().size());
         assertFalse(game.crashed());
     }

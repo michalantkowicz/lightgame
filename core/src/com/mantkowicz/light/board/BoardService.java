@@ -27,6 +27,11 @@ public class BoardService {
         this.pathFinder = new IndexedAStarPathFinder<>(boardGraph);
     }
 
+    /** Every tile of the map. */
+    public List<Tile> getTiles() {
+        return tiles;
+    }
+
     /**
      * The tile under a stage point, or {@code null} where the map has no tile.
      */

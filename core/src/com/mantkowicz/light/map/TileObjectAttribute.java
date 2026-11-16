@@ -12,7 +12,9 @@ public enum TileObjectAttribute {
     /** What grows on a field, e.g. "CORN"; a carrot without it. */
     CROP_TYPE("cropType"),
     /** How likely a field grows a weed instead of its crop after watering, 0..1, e.g. "0" for never; 0.4 without it. */
-    WEED_CHANCE("weedChance");
+    WEED_CHANCE("weedChance"),
+    /** How far grass (objectClass GRASS) has grown: 1 a tuft, 2 two tufts, 3 a bush, 4 a big bush; 1 without it. */
+    PHASE("phase");
 
     private final String value;
 

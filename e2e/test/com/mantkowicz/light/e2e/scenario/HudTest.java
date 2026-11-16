@@ -6,8 +6,13 @@ import com.mantkowicz.light.e2e.Golden;
 import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -226,6 +231,46 @@ class HudTest {
         game.tapFace();
         game.seconds(2);
         assertEquals(start, game.playerCell(), "the face is in front of the map: the tap stays in the HUD");
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * A tap on the face (or the stamina bar under it) doesn't go unanswered: the face plays a gesture once, picked at
+     * random, never the same one twice in a row.
+     */
+    @Test
+    void tappingTheFacePlaysAGesture() {
+        GameDriver game = GameDriver.start(MAP.write("hud"));
+        List<String> gestures = List.of("TEEMO_HAPPY", "TEEMO_CHEER", "TEEMO_EAR", "TEEMO_BLINK");
+        Set<String> played = new HashSet<>();
+        String last = "idle";
+        for (int tap = 0; tap < 12; tap++) {
+            if (tap % 2 == 0) {
+                game.tapFace();
+            } else {
+                game.tapStaminaBar();
+            }
+            game.frames(2);
+            String now = game.faceReaction();
+            assertTrue(gestures.contains(now), "a gesture: " + now);
+            assertNotEquals(last, now, "not the same twice in a row");
+            played.add(now);
+            last = now;
+        }
+        assertTrue(played.size() > 2, "picked at random: " + played);
+        game.seconds(3);
+        assertEquals("idle", game.faceReaction(), "once, then back to idle");
+        assertFalse(game.crashed());
+    }
+
+    /** A tap doesn't cut short what the face is busy with (e.g. sweating over a weed). */
+    @Test
+    void tappingTheFaceDoesntInterruptAReaction() {
+        GameDriver game = GameDriver.start(MAP.write("hud"));
+        game.faceReacts("TEEMO_SWEAT", 3f);
+        game.tapFace();
+        game.frames(2);
+        assertEquals("TEEMO_SWEAT", game.faceReaction());
         assertFalse(game.crashed());
     }
 

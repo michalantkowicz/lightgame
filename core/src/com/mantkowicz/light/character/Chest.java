@@ -1,6 +1,5 @@
 package com.mantkowicz.light.character;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -14,6 +13,7 @@ import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.ThumbnailType;
+import com.mantkowicz.light.resources.UiImage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +22,8 @@ import static com.mantkowicz.light.actor.GameActorType.CHEST;
 
 /**
  * The Sprout Lands chest, holding a crop picked at random (a carrot, corn...). It blocks its tile, so the player uses it from a neighbouring tile: walking
- * next to it shows its button. Opening it lifts the lid, which stays open, and what is inside jumps out.
+ * next to it shows its button, a gold star (treasure inside). Opening it lifts the lid, which stays open, and what is
+ * inside jumps out; empty, it has no button any more.
  */
 public class Chest extends SpriteActor implements Collectible {
     private static final Action OPEN = Action.OPEN_FRONT;
@@ -30,7 +31,7 @@ public class Chest extends SpriteActor implements Collectible {
     private static final int INVENTORY_SIZE = 2;
 
     private final Inventory inventory;
-    private final TextureRegion closed, open;
+    private final TextureRegion closed, treasure;
     private boolean isOpen;
     /** How high it is drawn, as of the end of its last opening or closing (it doesn't change while the lid moves). */
     private float topY;
@@ -42,9 +43,7 @@ public class Chest extends SpriteActor implements Collectible {
         // the closed chest without the empty rows above it in its frame
         closed = new TextureRegion(context.getResourcesService().getAnimation(Sprite.CHEST, OPEN).getKeyFrame(0), 1, 7,
                 16, 14);
-        // the open chest (the lid up) without the empty column and row around it
-        Animation<TextureRegion> opening = context.getResourcesService().getAnimation(Sprite.CHEST, OPEN);
-        open = new TextureRegion(opening.getKeyFrame(opening.getAnimationDuration(), false), 1, 1, 16, 20);
+        treasure = context.getResourcesService().getUiImage(UiImage.TREASURE);
 
         List<Item> content = new ArrayList<>();
         content.add(new Crop(CropType.random(), context.getResourcesService()));
@@ -64,22 +63,17 @@ public class Chest extends SpriteActor implements Collectible {
     }
 
     /**
-     * What the button does: the open chest while it is closed, the closed chest while it is open.
+     * The button's picture: a gold star, there is treasure inside. (Once open it has no button: it stays open and
+     * empty.)
      */
     @Override
     public TextureRegion getActionIcon() {
-        return isOpen ? closed : open;
+        return treasure;
     }
 
-    /** The closed chest, as the player sees it on the map: the button's picture while the chest is open. */
+    /** The closed chest, as the player sees it on the map (the button's picture before the star). */
     public TextureRegion getClosedIcon() {
         return closed;
-    }
-
-    /** It opens and closes as often as the player likes; what was inside comes out only once. */
-    @Override
-    public boolean canBeClosed() {
-        return true;
     }
 
     @Override

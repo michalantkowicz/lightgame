@@ -118,7 +118,7 @@ class CollectTest {
         Cell crop = game.itemCell();
         assertTrue(game.neighbours(chest).contains(crop), "it lands next to the chest");
         assertTrue(game.neighbours(game.playerCell()).contains(crop), "close to the player");
-        assertEquals("close", game.chestButton(), "the chest is open: its button closes it now");
+        assertEquals("chest/open_front", game.chestAnimation(), "it stays open, without a button");
 
         game.click(crop);
         game.seconds(2);
@@ -181,7 +181,7 @@ class CollectTest {
         assertEquals(0, game.starsOnScreen(), "no stars");
         game.seconds(1);
         assertEquals("chest/open_front (backwards)", game.chestAnimation(), "the lid stays shut");
-        assertEquals("open", game.chestButton(), "the button still offers to open it");
+        assertEquals("treasure", game.chestButton(), "the button still offers to open it");
         assertFalse(game.crashed());
     }
 
@@ -308,47 +308,30 @@ class CollectTest {
     }
 
     /**
-     * The open chest's button closes it; opened again, nothing comes out of it, and the button goes on toggling. While
-     * the lid moves the button fades a little and comes back with its new picture; open, it is over the lid, higher.
+     * The chest's button shows a gold star (treasure inside). Tapped, the lid lifts (the button fades a little
+     * meanwhile) and stays up, what is inside jumps out, and the empty chest has no button any more: nothing to close,
+     * nothing to open again.
      */
     @Test
-    void theOpenChestClosesAndOpensAgainEmpty() {
+    void theOpenedChestStaysOpenWithoutAButton() {
         GameDriver game = GameDriver.start(MAP.write("collect"));
         game.click(MAP.cell('C'));
         game.seconds(2);
-        assertEquals("open", game.chestButton());
-        float closedY = y(game);
+        assertEquals("treasure", game.chestButton());
         game.clickButton("COLLECT");
         game.frames(20);
         float faded = game.buttonAlphas("COLLECT").get(0);
-        assertTrue(faded > 0 && faded < 1, "it fades a little while the lid lifts: " + faded);
-        assertEquals("open", game.chestButton(), "with its old picture");
+        assertTrue(faded > 0 && faded < 1, "it fades while the lid lifts: " + faded);
         game.seconds(2);
-        assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "and comes back");
-        assertEquals("chest/open_front", game.chestAnimation());
-        assertEquals("close", game.chestButton());
-        assertTrue(y(game) < closedY, "higher on the screen: over the open lid");
+        assertEquals("chest/open_front", game.chestAnimation(), "the lid stays up");
+        assertEquals(List.of(), game.buttonAlphas("COLLECT"), "empty: no button");
+        assertEquals("none", game.chestButton());
         assertEquals(1, game.itemsOnGround().size());
-
-        game.clickButton("COLLECT");
-        game.seconds(1);
-        assertEquals("chest/open_front (backwards)", game.chestAnimation(), "the lid shuts");
-        assertEquals("open", game.chestButton(), "the button opens it again");
-        assertEquals("player=[-, -] chest=[-, -]", game.inventories(), "it doesn't refill");
-
-        game.clickButton("COLLECT");
-        game.frames(3);
-        assertEquals("chest/open_front", game.chestAnimation(), "the lid lifts");
-        assertEquals(0, game.starsOnScreen(), "empty: no stars");
-        game.seconds(2);
-        assertEquals(1, game.itemsOnGround().size(), "and nothing more comes out");
-        assertEquals("close", game.chestButton());
+        assertEquals("player=[-, -] chest=[-, -]", game.inventories());
+        game.seconds(10);
+        assertEquals("chest/open_front", game.chestAnimation(), "still open");
+        assertEquals(List.of(), game.buttonAlphas("COLLECT"), "still no button");
         assertFalse(game.crashed());
-    }
-
-    /** The top of the chest's button on the screen (screen y grows downwards). */
-    private static float y(GameDriver game) {
-        return Float.parseFloat(game.buttonOnScreen("COLLECT").split("[, ]")[1]);
     }
 
     /** A button fades in when it appears, as it fades out when it goes. */

@@ -1,6 +1,5 @@
 package com.mantkowicz.light.feature;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.RandomXS128;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
@@ -12,13 +11,16 @@ import com.mantkowicz.light.actor.PictureBubble;
 import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TileContent;
 import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
+import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.util.Dice;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.util.Set;
 /**
  * Grass grows on the map, and the rabbit cuts it with its scythe ({@link com.mantkowicz.light.debug.FeatureFlag#GROWING_GRASS}).
  * <ul>
+ * <li>At the start there is the grass the map puts on its tiles (Tiled's GRASS objects, {@link TileGrass}), as far
+ * grown as they say.</li>
  * <li>Every {@link #SECONDS_BETWEEN_SPROUTS} each tile the rabbit can get to (also one an animal stands on; never a
  * chest's or a field's, which nobody stands on) without grass may sprout some: {@link #CHANCE}, or
  * {@link #CHANCE_NEXT_TO_GRASS} next to (diagonally too) a tile with grass, so it spreads.</li>
@@ -51,7 +55,7 @@ public class GrassFeature implements Feature {
     /** How often each free tile may sprout grass. */
     public static final float SECONDS_BETWEEN_SPROUTS = 30;
     /** The chance a tile sprouts grass each time; next to grass it is likelier (it spreads). */
-    public static final float CHANCE = 0.01f, CHANCE_NEXT_TO_GRASS = 0.10f;
+    public static final float CHANCE = 0.001f, CHANCE_NEXT_TO_GRASS = 0.01f;
     /** It grows a phase this often: as the crops on a field. */
     public static final float SECONDS_PER_PHASE = Field.SECONDS_PER_PHASE;
     /** Tall grass is drawn over whoever stands there this see-through (1 not at all). */
@@ -79,20 +83,24 @@ public class GrassFeature implements Feature {
         this.context = context;
         this.player = player;
         this.hud = hud;
-        this.random = copyOfTheGamesDice();
+        this.random = Dice.copyOfTheGames();
         below.setTouchable(Touchable.disabled);
         above.setTouchable(Touchable.disabled);
         Stage stage = context.getGameStage();
         stage.getRoot().addActorAt(1, below); // the board is the first: right over it
         stage.addActor(above);
+        plantWhatTheMapSays();
     }
 
-    /** Dice that roll as the game's would from now on, without taking any of the game's own rolls. */
-    private static RandomXS128 copyOfTheGamesDice() {
-        if (MathUtils.random instanceof RandomXS128 dice) {
-            return new RandomXS128(dice.getState(0), dice.getState(1));
+    /** The grass put on the map in Tiled (objectClass GRASS), as far grown as its phase says. */
+    private void plantWhatTheMapSays() {
+        for (Tile tile : context.getBoardService().getTiles()) {
+            for (TileContent content : tile.getTileObjects()) {
+                if (content instanceof TileGrass mark) {
+                    sprout(tile).growTo(mark.getPhase() - TileGrass.FIRST_PHASE);
+                }
+            }
         }
-        return new RandomXS128();
     }
 
     @Override

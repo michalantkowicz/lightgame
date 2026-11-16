@@ -58,6 +58,7 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
+import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
@@ -344,6 +345,11 @@ public final class GameDriver {
         tap(uiScreenPosition(hud().getFace()));
     }
 
+    /** Short tap on the stamina bar under the face. */
+    public void tapStaminaBar() {
+        tap(uiScreenPosition(hud().getStamina()));
+    }
+
     /** Taps the check mark of the open settings window. */
     public void closeSettings() {
         SettingsPanel settings = hud().getSettings();
@@ -585,15 +591,18 @@ public final class GameDriver {
         return hud().getSlots().get(slot).hasActions();
     }
 
-    /** What the chest's button does now, by its picture: "open" (the open chest) or "close" (the closed chest). */
+    /**
+     * The chest's button by its picture: "treasure" (a gold star: something inside, the button opens it); "none"
+     * without a button.
+     */
     public String chestButton() {
         Chest chest = (Chest) actor(Kind.CHEST);
         for (Actor actor : uiActors()) {
             if (actor instanceof ActionButton button && "COLLECT".equals(button.getName())) {
-                return button.getPicture() == chest.getClosedIcon() ? "close" : "open";
+                return button.getPicture() == chest.getActionIcon() ? "treasure" : "other";
             }
         }
-        throw new IllegalStateException("No chest button on screen");
+        return "none";
     }
 
     /**
@@ -1377,6 +1386,8 @@ public final class GameDriver {
             return "PLAYER";
         if (object instanceof TileLight)
             return "LIGHT";
+        if (object instanceof TileGrass)
+            return "GRASS";
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 
