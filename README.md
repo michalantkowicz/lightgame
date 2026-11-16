@@ -45,7 +45,12 @@ redistributing them). A tool turns it into what the game and Tiled need, and onl
 2. Unzip both packs into `tools/assets/`, keeping their folder names (`tools/assets/Sprout Lands - Sprites - premium
    pack/`, `tools/assets/Sprout Lands - UI Pack - Premium pack/`). Those folders are git-ignored. Anywhere else works
    too, as long as it isn't committed.
-3. Run the tool with the sprites pack's path. It finds the UI pack next to it (or give it with `--ui`) and remembers
+3. Add what the game draws itself on top of the pack: the rabbit's scythe swing (a copy of its sheet with one more
+   row) and the scythe's icon, saved into the pack folder:
+   ```sh
+   python3 tools/assets/scythe_animation.py
+   ```
+4. Run the tool with the sprites pack's path. It finds the UI pack next to it (or give it with `--ui`) and remembers
    both paths for next time:
    ```sh
    python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"

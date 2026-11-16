@@ -20,7 +20,6 @@ import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
-import com.mantkowicz.light.ui.RoundButton;
 import com.mantkowicz.light.ui.UiStyle;
 
 import java.util.ArrayList;
@@ -29,15 +28,16 @@ import java.util.function.IntPredicate;
 
 /**
  * The HUD ("face is the button", docs/hud-design.md). Bottom centre: the player's face in a frame, two backpack
- * slots on its left, the player's stamina as a bar under the face ({@link StaminaBar}); on its right a round button:
- * the hint (a question mark, which makes the face cheer and say "play around!" in a bubble over it); what there is to
- * do is on action buttons over the things on the map ({@link ActionButton}). Top right: the settings gear, which opens the
+ * slots on its left, the player's stamina as a bar under the face ({@link StaminaBar}); on its right the big round
+ * <b>tool button</b> ({@link ToolButton}): what the player can do where it stands (e.g. the scythe on grass), else the
+ * hint (a question mark, which makes the face cheer and say "play around!" in a bubble over it). What there is to do
+ * with the things on the map is on the small <b>action buttons</b> over them ({@link ActionButton}). Top right: the settings gear, which opens the
  * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
  * The face reacts to the field: picking a crop makes it happy, pulling out a weed makes it sweat and say so
  * ({@link FaceReactions}).
  * <p>
- * Unlike the design, the action isn't on the face but on its own round button beside it; the day picture is left out
+ * Unlike the design, the action isn't on the face but on its own round button beside it (the tool button); the day picture is left out
  * for now.
  */
 // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
@@ -57,9 +57,9 @@ public class Hud extends Group {
      * Where the action button stands: its right edge this far right of the screen's middle (as far as the slots' left
      * edge is left of it), its bottom this high above the screen's bottom (on the face's bottom, like the slots).
      */
-    public static final float ACTION_RIGHT = Portrait.WIDTH / 2f + GAP + BACKPACK_SLOTS * SLOT_WIDTH
-            + (BACKPACK_SLOTS - 1) * SLOT_GAP, ACTION_Y = FACE_Y;
-    /** What the player says when the hint button is tapped (later: where to go next). */
+    public static final float TOOL_RIGHT = Portrait.WIDTH / 2f + GAP + BACKPACK_SLOTS * SLOT_WIDTH
+            + (BACKPACK_SLOTS - 1) * SLOT_GAP, TOOL_Y = FACE_Y;
+    /** What the player says when the tool button is tapped without a tool (later: where to go next). */
     static final String HINT = "play around!";
     /**
      * The face's idle by the stamina bar's face: awake (green: still, blinking, twitching an ear), tired (yellow:
@@ -89,10 +89,11 @@ public class Hud extends Group {
     private final List<Item> shownItems = new ArrayList<>();
     private final StaminaBar stamina;
     private final HoldButton gear;
-    private final RoundButton hint;
+    /** The big round button right of the face: the tool for where the player stands, or the hint. */
+    private final ToolButton toolButton;
     private final FaceReactions reactions;
     private SpeechBubble bubble;
-    /** What the face says when the hint button is tapped, and the picture after it (or null). */
+    /** What the face says when the tool button is tapped without a tool, and the picture after it (or null). */
     private String hintText = HINT;
     private TextureRegion hintPicture;
     private SettingsPanel settings;
@@ -149,15 +150,8 @@ public class Hud extends Group {
         gear = new HoldButton(resources, UiImage.GEAR_BUTTON, SCALE, this::openSettings);
         addActor(gear);
 
-        hint = new RoundButton(resources, resources.getUiImage(UiImage.HINT_ICON));
-        hint.setName("HINT");
-        hint.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                showHint();
-            }
-        });
-        addActor(hint);
+        toolButton = new ToolButton(resources, this::showHint);
+        addActor(toolButton);
     }
 
     /** Taps on this piece stay in the HUD: they don't reach the map behind it. */
@@ -234,7 +228,7 @@ public class Hud extends Group {
             child.moveBy(-left, 0);
         }
 
-        hint.setPosition(getWidth() / 2f + ACTION_RIGHT - hint.getWidth(), ACTION_Y);
+        toolButton.setPosition(getWidth() / 2f + TOOL_RIGHT - toolButton.getWidth(), TOOL_Y);
         placeBubble();
         gear.setPosition(getWidth() - gear.getWidth() - GEAR_MARGIN, getHeight() - gear.getHeight() - GEAR_MARGIN);
         if (settings != null) {
@@ -267,7 +261,7 @@ public class Hud extends Group {
         }
     }
 
-    /** The face says the hint in a bubble over it (a new tap starts it again), as when the hint button is tapped. */
+    /** The face says the hint in a bubble over it (a new tap starts it again), as when the tool button is tapped without a tool. */
     public void showHint() {
         say(hintText, hintPicture, SpeechBubble.SECONDS);
         face.play(UiImage.TEEMO_CHEER, SpeechBubble.SECONDS); // cheering while it says it
@@ -284,7 +278,7 @@ public class Hud extends Group {
     }
 
     /**
-     * What the hint button says from now on, e.g. "find" and a carrot next to a cow wishing for one.
+     * What the tool button says from now on (without a tool), e.g. "find" and a carrot next to a cow wishing for one.
      *
      * @param picture shown after the text, or null
      */
@@ -321,12 +315,12 @@ public class Hud extends Group {
         return gear;
     }
 
-    /** The round button right of the face when there is nothing to do (the action button covers it otherwise). */
-    public RoundButton getHint() {
-        return hint;
+    /** The big round button right of the face: the tool for where the player stands, or the hint. */
+    public ToolButton getToolButton() {
+        return toolButton;
     }
 
-    /** The picture after the text the hint button says now ("find" and a carrot), or null. */
+    /** The picture after the text the tool button says now (without a tool) ("find" and a carrot), or null. */
     public TextureRegion getHintPicture() {
         return hintPicture;
     }

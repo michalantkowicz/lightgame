@@ -864,3 +864,52 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   (`animalState`, `animalAnimation`, `animalWish`, `animalWants`, `animalFavouriteDishes`, `chickenShowsHearts`,
   `chickenHeartsOffset`, `strokeAnimal`); wish bubbles are found per character, since several can wish at once
   (`PictureBubble.getCharacter`). Looked at both in a hidden LWJGL3 window.
+
+## 2026‑11‑15 and 16, cutting grass: a scythe swing, its icon, growing grass (branch `cutting-grass`)
+
+- The owner's request: an 8-frame scything animation for the player, facing down only, to be used next (cutting
+  grass). The pack has no scythe, so `tools/assets/scythe_animation.py` (Pillow, run once per pack copy) makes it from
+  the rabbit's `chop_down` row: the axe is taken out (its two greys and two browns appear nowhere else on the rabbit)
+  and a scythe is drawn along where the axe was held, a 10 px handle and an 8 px curved blade with a light cutting
+  edge, hooking the way each frame needs: held low on the left, raised up and left (the blade curving down, as a
+  raised scythe), swept down past the rabbit with the pack's white arc, and ending low in front of its feet, the blade
+  along the grass. Tried on the till row too, which swings straight up and down: no good for a scythe.
+- The game draws the rabbit from one sheet (one trim box and anchor for all its rows), so the frames go into a copy of
+  `Characters/Premium Charakter Spritesheet.png` with one more row, `scythe_down` (row 24), saved as `... with
+  scythe.png` in the pack folder (owner's choice: a file next to the pack's, git-ignored like the pack). `pack.json`
+  reads the rabbit from it and ignores the original; `Action` gained `SCYTHE`; the atlas is regenerated. README.md and
+  tools/assets/README.md say to run the script once after copying the pack. Not used by the game yet.
+- The owner's request: a **scythe item icon** in the style of the pack's `Objects/Items/tools and meterials.png`. The
+  same script draws it pixel by pixel (16x16): the handle from the bottom left up to the right as the axe icon's (its
+  three browns), a crescent blade across the top curving down at its tip (the icons' four greys), all in their 1 px
+  light outline. Saved as `Objects/Items/scythe icon.png` in the pack folder; the sheet `scythe_icon` (row `icon`,
+  like `watering_can`) and `Sprite.SCYTHE_ICON` put it into the atlas. Looked at it 16x and at game size next to the
+  pack's axe and pickaxe.
+- The owner's request: **growing grass, cut with the scythe** (feature flag `GROWING_GRASS`, a new `debug.FeatureFlag`
+  enum for whole features, on as the game ships; the feature isn't even created when it is off).
+  `feature.GrassFeature` holds the settings as constants: every 30 s (`SECONDS_BETWEEN_SPROUTS`) each tile the rabbit
+  can get to (from its start; a tile only animals stand on counts, a chest's or a field's never does) without grass
+  sprouts some with 1 % (`CHANCE`), 10 % next to grass, diagonally too (`CHANCE_NEXT_TO_GRASS`), all decided on the
+  grass there was before. It grows a phase every 30 s like the crops (`Field.SECONDS_PER_PHASE`, now public), a still
+  picture each from `Objects/Mushrooms, Flowers, Stones.png` row 2 (sheet `grass_tuft`, `Sprite.GRASS_TUFT`): a tuft
+  and two tufts in a layer right over the board (under everyone), a bush and a big bush in a layer kept in front of
+  the map, 90 % opaque (`TALL_ALPHA`), under only the wish bubbles (kept in front so wishes stay readable), the HUD and
+  the action buttons. `actor.Grass` blocks nothing and taps go through it.
+- Owner's review: grass **stands on its tile's bottom edge** (it was centred on the tile, like the sprites, so its
+  blades floated 1–3 px above it): the packed box's bottom on the edge, and the single tuft (2 empty rows under it,
+  `Grass.EMPTY_ROWS_BELOW`, measured from the pack) 2 px lower. `GrassTest` checks it (`grassBelowTileBottom`).
+- Cutting: standing still on grass the HUD's **tool button** shows the scythe icon instead of the hint (owner: not an
+  action button over the grass); tapped, the rabbit swings the scythe once (`Player.scythe`, 8 frames of 100 ms = 0.8 s, under the owner's 1 s, so once) and then the
+  grass fades out in 0.5 s; walking off mid-swing (which stops the swing) leaves it. `AnimationPlugin.isPlayingOnce`.
+- The grass has its own dice: a copy of the game's at the start (`RandomXS128` state, no roll taken), so the animals'
+  random choices are the same with or without grass and no golden changed.
+- Tests: `GrassTest` (sprouting and spreading only where the rabbit can go, none with the flag off, the phases and the
+  tall layer, cutting, walking off mid-swing, blocking nothing). `GameDriver`: `growingGrass`, `grass`,
+  `sproutGrass`, `grassDrawn`, `grassFadingOut`. Looked at the phases, the button and the swing in a hidden window.
+- **Naming (owner):** the big round HUD button right of the face is the **tool button** (`ui.hud.ToolButton`, actor
+  name "TOOL"; it was the hint button, `Hud.getHint`): it shows a tool for where the player stands (`setTool`, the
+  scythe on grass) or, without one, the hint (question mark). The small round buttons over things on the map stay
+  **action buttons**. `Hud.ACTION_RIGHT`/`ACTION_Y` (they placed the round HUD button) became `TOOL_RIGHT`/`TOOL_Y`;
+  `GameDriver.tapToolButton`, `toolButton`. The tool's logic moved out of `Hud` into `ToolButton` (PMD: Hud a possible
+  God Class otherwise). The goldens `hud` and `hud-hint` were re-recorded for the rename only: their HUD line says
+  "tool button: hint" instead of "hint:" (nothing else changed); CLAUDE.md, hud-design.md and e2e/README.md say so too.

@@ -125,12 +125,24 @@ public class Player extends GameBoardActor implements Collecting {
         animationPlugin.playOnce(Action.WATER, above ? Direction.UP : Direction.DOWN);
     }
 
-    /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
+    /**
+     * Swings its scythe once, facing down (the only direction it has: 8 frames, 0.8 s); walking off stops it.
+     */
+    public void scythe() {
+        animationPlugin.playOnce(Action.SCYTHE, Direction.DOWN);
+    }
+
+    /** Is it swinging its scythe right now? */
+    public boolean isScything() {
+        return animationPlugin.isPlayingOnce(Action.SCYTHE);
+    }
+
     /** The tile the player walks to, or null while it stands (written out: the class is at PMD's import limit). */
     public com.mantkowicz.light.board.Tile getWalkTarget() {
         return boardMovementPlugin.getTarget();
     }
 
+    /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
     public Stamina getStamina() {
         return stamina;
     }

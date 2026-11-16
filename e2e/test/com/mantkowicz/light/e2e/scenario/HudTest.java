@@ -117,8 +117,8 @@ class HudTest {
         // the chest's cell (3,4) is 384..512 x 512..640 on the map, the camera's middle (448,320) is the screen's (400,640):
         // centred over the chest (400 - 90 / 2 = 355), 16 px over its top (640 + 16 - 320 + 640 = 976)
         assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(355.0,976.0) alpha=1.0"), next);
-        assertTrue(game.describeHud().contains("hint: at=(628.0,74.0) size=108.0x120.0"),
-                "the hint stays right of the face");
+        assertTrue(game.describeHud().contains("tool button: hint at=(628.0,74.0) size=108.0x120.0"),
+                "the tool button (the hint) stays right of the face");
     }
 
     @Test

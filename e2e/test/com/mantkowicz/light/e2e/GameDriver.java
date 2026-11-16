@@ -33,6 +33,7 @@ import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Grass;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
@@ -50,8 +51,11 @@ import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
@@ -174,9 +178,9 @@ public final class GameDriver {
         throw new IllegalStateException("No \"" + text + "\" button on screen");
     }
 
-    /** Short click with the right mouse button on the hint button. */
+    /** Short click with the right mouse button on the tool button (the hint). */
     public void rightClickHint() {
-        tap(uiScreenPosition(hud().getHint()), Buttons.RIGHT);
+        tap(uiScreenPosition(hud().getToolButton()), Buttons.RIGHT);
     }
 
     /**
@@ -244,7 +248,7 @@ public final class GameDriver {
 
     /**
      * What the HUD shows, one line each, positions in UI pixels (800 wide, y up): the face, the backpack, the
-     * stamina bar, the hint button, the bubble over the face, the gear and how full its hold circle is, whether the
+     * stamina bar, the tool button, the bubble over the face, the gear and how full its hold circle is, whether the
      * settings window is open.
      */
     public String describeHud() {
@@ -261,7 +265,7 @@ public final class GameDriver {
         StaminaBar stamina = hud.getStamina();
         snapshot.line("stamina: %d of %d segments, face %s %s", stamina.getFullSegments(), stamina.getSegments(),
                 stamina.getMood(), uiBox(stamina));
-        snapshot.line("hint: %s", uiBox(hud.getHint()));
+        snapshot.line("tool button: %s %s", hud.getToolButton().getToolName(), uiBox(hud.getToolButton()));
         SpeechBubble bubble = hud.getBubble();
         snapshot.line("bubble: %s", bubble == null
                 ? "none"
@@ -308,9 +312,19 @@ public final class GameDriver {
         ((Player) actor(Kind.PLAYER)).getStamina().fill();
     }
 
-    /** Short tap on the hint button (the question mark right of the face). */
+    /** Short tap on the tool button (the big round button right of the face): its tool, or the hint without one. */
+    public void tapToolButton() {
+        tap(uiScreenPosition(hud().getToolButton()));
+    }
+
+    /** What the tool button shows: its tool, e.g. "scythe", or "hint" (the question mark). */
+    public String toolButton() {
+        return hud().getToolButton().getToolName();
+    }
+
+    /** Short tap on the tool button while it shows the hint (the question mark right of the face). */
     public void tapHint() {
-        tap(uiScreenPosition(hud().getHint()));
+        tap(uiScreenPosition(hud().getToolButton()));
     }
 
     /**
@@ -1018,6 +1032,79 @@ public final class GameDriver {
         } else {
             Debug.switchOff(Debug.Tool.STATE_LABELS);
         }
+    }
+
+    // grass (feature.GrassFeature)
+
+    /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
+    public static void growingGrass(boolean on) {
+        if (on) {
+            FeatureFlag.GROWING_GRASS.switchOn();
+        } else {
+            FeatureFlag.GROWING_GRASS.switchOff();
+        }
+    }
+
+    private GrassFeature grassFeature() {
+        List<Feature> features = screenField("features");
+        for (Feature feature : features) {
+            if (feature instanceof GrassFeature grass) {
+                return grass;
+            }
+        }
+        return null;
+    }
+
+    /** The grass on the map by cell, with its phase (0 a tuft ... 3 a big bush); empty without the feature. */
+    public Map<Cell, Integer> grass() {
+        Map<Cell, Integer> cells = new TreeMap<>();
+        GrassFeature feature = grassFeature();
+        if (feature != null) {
+            for (Map.Entry<Tile, Grass> entry : feature.getGrass().entrySet()) {
+                cells.put(cellOf(entry.getKey()), entry.getValue().getPhase());
+            }
+        }
+        return cells;
+    }
+
+    /** Grass sprouts on this cell now (a tuft), as if the dice said so. */
+    public void sproutGrass(Cell cell) {
+        grassFeature().sprout(tile(cell));
+    }
+
+    /** How the grass on this cell is drawn: "under" (behind whoever stands there) or "over alpha=0.9". */
+    public String grassDrawn(Cell cell) {
+        GrassFeature feature = grassFeature();
+        Grass tuft = feature.getGrass().get(tile(cell));
+        return feature.isDrawnOverEveryone(tuft) ? "over alpha=" + Snapshot.number(tuft.getColor().a) : "under";
+    }
+
+    /**
+     * How far the grass picture on this cell starts below the cell's bottom edge, in art pixels (its packed box; the
+     * single tuft has 2 empty rows under it, so it starts 2 lower and its blades stand on the edge).
+     */
+    public float grassBelowTileBottom(Cell cell) {
+        Grass tuft = grassFeature().getGrass().get(tile(cell));
+        Tile tile = tile(cell);
+        float bottom = tile.getCenter().y - tile.getHeight() / 2f;
+        return (bottom - tuft.getY()) / com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
+    }
+
+    /** How many cut tufts are still fading out on the map. */
+    public int grassFadingOut() {
+        int fading = 0;
+        for (Actor actor : gameStageActorsDeep()) {
+            if (actor instanceof Grass tuft && tuft.isCut()) {
+                fading++;
+            }
+        }
+        return fading;
+    }
+
+    private List<Actor> gameStageActorsDeep() {
+        List<Actor> actors = new ArrayList<>();
+        collectActors(gameStage().getRoot(), actors);
+        return actors;
     }
 
     /** Does the hint button's bubble show a picture after its text right now ("find" and a carrot)? */

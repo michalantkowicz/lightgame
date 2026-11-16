@@ -3,1478 +3,1517 @@ size:1024,512
 filter:Nearest,Nearest
 repeat:none
 chest/open_front
-  bounds:715,299,18,21
+  bounds:467,362,18,21
   index:0
 chest/open_front
-  bounds:735,299,18,21
+  bounds:487,362,18,21
   index:1
 chest/open_front
-  bounds:755,299,18,21
+  bounds:507,362,18,21
   index:2
 chest/open_front
-  bounds:775,299,18,21
+  bounds:527,362,18,21
   index:3
 chest/open_front
-  bounds:795,299,18,21
+  bounds:547,362,18,21
   index:4
 chest/open_side
-  bounds:815,299,18,21
+  bounds:567,362,18,21
   index:0
 chest/open_side
-  bounds:835,299,18,21
+  bounds:587,362,18,21
   index:1
 chest/open_side
-  bounds:855,299,18,21
+  bounds:607,362,18,21
   index:2
 chest/open_side
-  bounds:875,299,18,21
+  bounds:627,362,18,21
   index:3
 chest/open_side
-  bounds:895,299,18,21
+  bounds:647,362,18,21
   index:4
 chicken/eat
-  bounds:164,347,16,16
+  bounds:938,392,16,16
   index:0
 chicken/eat
-  bounds:182,347,16,16
+  bounds:956,392,16,16
   index:1
 chicken/hearts
-  bounds:200,347,16,16
+  bounds:974,392,16,16
   index:0
 chicken/hearts
-  bounds:218,347,16,16
+  bounds:992,392,16,16
   index:1
 chicken/hearts
-  bounds:236,347,16,16
+  bounds:2,410,16,16
   index:2
 chicken/hearts
-  bounds:254,347,16,16
+  bounds:20,410,16,16
   index:3
 chicken/hearts
-  bounds:272,347,16,16
+  bounds:38,410,16,16
   index:4
 chicken/hearts
-  bounds:290,347,16,16
+  bounds:56,410,16,16
   index:5
 chicken/hearts
-  bounds:308,347,16,16
+  bounds:74,410,16,16
   index:6
 chicken/idle
-  bounds:915,299,16,16
+  bounds:667,362,16,16
   index:0
 chicken/idle
-  bounds:933,299,16,16
+  bounds:685,362,16,16
   index:1
 chicken/idle
-  bounds:951,299,16,16
+  bounds:703,362,16,16
   index:2
 chicken/idle
-  bounds:969,299,16,16
+  bounds:721,362,16,16
   index:3
 chicken/love
-  bounds:326,347,16,16
+  bounds:92,410,16,16
   index:0
 chicken/love
-  bounds:344,347,16,16
+  bounds:110,410,16,16
   index:1
 chicken/love
-  bounds:362,347,16,16
+  bounds:128,410,16,16
   index:2
 chicken/love
-  bounds:380,347,16,16
+  bounds:146,410,16,16
   index:3
 chicken/love
-  bounds:398,347,16,16
+  bounds:164,410,16,16
   index:4
 chicken/love
-  bounds:416,347,16,16
+  bounds:182,410,16,16
   index:5
 chicken/love
-  bounds:434,347,16,16
+  bounds:200,410,16,16
   index:6
 chicken/peck
-  bounds:56,347,16,16
+  bounds:830,392,16,16
   index:0
 chicken/peck
-  bounds:74,347,16,16
+  bounds:848,392,16,16
   index:1
 chicken/peck
-  bounds:92,347,16,16
+  bounds:866,392,16,16
   index:2
 chicken/peck
-  bounds:110,347,16,16
+  bounds:884,392,16,16
   index:3
 chicken/peck
-  bounds:128,347,16,16
+  bounds:902,392,16,16
   index:4
 chicken/peck
-  bounds:146,347,16,16
+  bounds:920,392,16,16
   index:5
 chicken/rest
-  bounds:740,329,16,16
+  bounds:506,392,16,16
   index:0
 chicken/rest
-  bounds:758,329,16,16
+  bounds:524,392,16,16
   index:1
 chicken/rest
-  bounds:776,329,16,16
+  bounds:542,392,16,16
   index:2
 chicken/rest
-  bounds:794,329,16,16
+  bounds:560,392,16,16
   index:3
 chicken/rest
-  bounds:812,329,16,16
+  bounds:578,392,16,16
   index:4
 chicken/rise
-  bounds:362,329,16,16
+  bounds:128,392,16,16
   index:0
 chicken/rise
-  bounds:380,329,16,16
+  bounds:146,392,16,16
   index:1
 chicken/rise
-  bounds:398,329,16,16
+  bounds:164,392,16,16
   index:2
 chicken/rise
-  bounds:416,329,16,16
+  bounds:182,392,16,16
   index:3
 chicken/rise
-  bounds:434,329,16,16
+  bounds:200,392,16,16
   index:4
 chicken/rise
-  bounds:452,329,16,16
+  bounds:218,392,16,16
   index:5
 chicken/rise
-  bounds:470,329,16,16
+  bounds:236,392,16,16
   index:6
 chicken/row_01
-  bounds:987,299,16,16
+  bounds:739,362,16,16
   index:0
 chicken/row_01
-  bounds:1005,299,16,16
+  bounds:757,362,16,16
   index:1
 chicken/row_01
-  bounds:2,329,16,16
+  bounds:775,362,16,16
   index:2
 chicken/row_01
-  bounds:20,329,16,16
+  bounds:793,362,16,16
   index:3
 chicken/row_01
-  bounds:38,329,16,16
+  bounds:811,362,16,16
   index:4
 chicken/row_01
-  bounds:56,329,16,16
+  bounds:829,362,16,16
   index:5
 chicken/row_01
-  bounds:74,329,16,16
+  bounds:847,362,16,16
   index:6
 chicken/row_05
-  bounds:488,329,16,16
+  bounds:254,392,16,16
   index:0
 chicken/row_05
-  bounds:506,329,16,16
+  bounds:272,392,16,16
   index:1
 chicken/row_05
-  bounds:524,329,16,16
+  bounds:290,392,16,16
   index:2
 chicken/row_05
-  bounds:542,329,16,16
+  bounds:308,392,16,16
   index:3
 chicken/row_05
-  bounds:560,329,16,16
+  bounds:326,392,16,16
   index:4
 chicken/row_05
-  bounds:578,329,16,16
+  bounds:344,392,16,16
   index:5
 chicken/row_05
-  bounds:596,329,16,16
+  bounds:362,392,16,16
   index:6
 chicken/row_06
-  bounds:614,329,16,16
+  bounds:380,392,16,16
   index:0
 chicken/row_06
-  bounds:632,329,16,16
+  bounds:398,392,16,16
   index:1
 chicken/row_06
-  bounds:650,329,16,16
+  bounds:416,392,16,16
   index:2
 chicken/row_06
-  bounds:668,329,16,16
+  bounds:434,392,16,16
   index:3
 chicken/row_06
-  bounds:686,329,16,16
+  bounds:452,392,16,16
   index:4
 chicken/row_06
-  bounds:704,329,16,16
+  bounds:470,392,16,16
   index:5
 chicken/row_06
-  bounds:722,329,16,16
+  bounds:488,392,16,16
   index:6
 chicken/row_09
-  bounds:902,329,16,16
+  bounds:668,392,16,16
   index:0
 chicken/row_09
-  bounds:920,329,16,16
+  bounds:686,392,16,16
   index:1
 chicken/row_09
-  bounds:938,329,16,16
+  bounds:704,392,16,16
   index:2
 chicken/row_09
-  bounds:956,329,16,16
+  bounds:722,392,16,16
   index:3
 chicken/row_09
-  bounds:974,329,16,16
+  bounds:740,392,16,16
   index:4
 chicken/row_10
-  bounds:992,329,16,16
+  bounds:758,392,16,16
   index:0
 chicken/row_10
-  bounds:2,347,16,16
+  bounds:776,392,16,16
   index:1
 chicken/row_10
-  bounds:20,347,16,16
+  bounds:794,392,16,16
   index:2
 chicken/row_10
-  bounds:38,347,16,16
+  bounds:812,392,16,16
   index:3
 chicken/settle
-  bounds:236,329,16,16
+  bounds:2,392,16,16
   index:0
 chicken/settle
-  bounds:254,329,16,16
+  bounds:20,392,16,16
   index:1
 chicken/settle
-  bounds:272,329,16,16
+  bounds:38,392,16,16
   index:2
 chicken/settle
-  bounds:290,329,16,16
+  bounds:56,392,16,16
   index:3
 chicken/settle
-  bounds:308,329,16,16
+  bounds:74,392,16,16
   index:4
 chicken/settle
-  bounds:326,329,16,16
+  bounds:92,392,16,16
   index:5
 chicken/settle
-  bounds:344,329,16,16
+  bounds:110,392,16,16
   index:6
 chicken/sleep
-  bounds:830,329,16,16
+  bounds:596,392,16,16
   index:0
 chicken/sleep
-  bounds:848,329,16,16
+  bounds:614,392,16,16
   index:1
 chicken/sleep
-  bounds:866,329,16,16
+  bounds:632,392,16,16
   index:2
 chicken/sleep
-  bounds:884,329,16,16
+  bounds:650,392,16,16
   index:3
 chicken/walk
-  bounds:92,329,16,16
+  bounds:865,362,16,16
   index:0
 chicken/walk
-  bounds:110,329,16,16
+  bounds:883,362,16,16
   index:1
 chicken/walk
-  bounds:128,329,16,16
+  bounds:901,362,16,16
   index:2
 chicken/walk
-  bounds:146,329,16,16
+  bounds:919,362,16,16
   index:3
 chicken/walk
-  bounds:164,329,16,16
+  bounds:937,362,16,16
   index:4
 chicken/walk
-  bounds:182,329,16,16
+  bounds:955,362,16,16
   index:5
 chicken/walk
-  bounds:200,329,16,16
+  bounds:973,362,16,16
   index:6
 chicken/walk
-  bounds:218,329,16,16
+  bounds:991,362,16,16
   index:7
 chicken_baby/eat
-  bounds:200,381,16,14
+  bounds:992,428,16,14
   index:0
 chicken_baby/eat
-  bounds:218,381,16,14
+  bounds:2,444,16,14
   index:1
 chicken_baby/hearts
-  bounds:236,381,16,14
+  bounds:20,444,16,14
   index:0
 chicken_baby/hearts
-  bounds:254,381,16,14
+  bounds:38,444,16,14
   index:1
 chicken_baby/hearts
-  bounds:272,381,16,14
+  bounds:56,444,16,14
   index:2
 chicken_baby/hearts
-  bounds:290,381,16,14
+  bounds:74,444,16,14
   index:3
 chicken_baby/hearts
-  bounds:308,381,16,14
+  bounds:92,444,16,14
   index:4
 chicken_baby/hearts
-  bounds:326,381,16,14
+  bounds:110,444,16,14
   index:5
 chicken_baby/hearts
-  bounds:344,381,16,14
+  bounds:128,444,16,14
   index:6
 chicken_baby/idle
-  bounds:944,347,16,14
+  bounds:726,410,16,14
   index:0
 chicken_baby/idle
-  bounds:962,347,16,14
+  bounds:744,410,16,14
   index:1
 chicken_baby/idle
-  bounds:980,347,16,14
+  bounds:762,410,16,14
   index:2
 chicken_baby/idle
-  bounds:998,347,16,14
+  bounds:780,410,16,14
   index:3
 chicken_baby/love
-  bounds:362,381,16,14
+  bounds:146,444,16,14
   index:0
 chicken_baby/love
-  bounds:380,381,16,14
+  bounds:164,444,16,14
   index:1
 chicken_baby/love
-  bounds:398,381,16,14
+  bounds:182,444,16,14
   index:2
 chicken_baby/love
-  bounds:416,381,16,14
+  bounds:200,444,16,14
   index:3
 chicken_baby/love
-  bounds:434,381,16,14
+  bounds:218,444,16,14
   index:4
 chicken_baby/love
-  bounds:452,381,16,14
+  bounds:236,444,16,14
   index:5
 chicken_baby/love
-  bounds:470,381,16,14
+  bounds:254,444,16,14
   index:6
 chicken_baby/peck
-  bounds:92,381,16,14
+  bounds:884,428,16,14
   index:0
 chicken_baby/peck
-  bounds:110,381,16,14
+  bounds:902,428,16,14
   index:1
 chicken_baby/peck
-  bounds:128,381,16,14
+  bounds:920,428,16,14
   index:2
 chicken_baby/peck
-  bounds:146,381,16,14
+  bounds:938,428,16,14
   index:3
 chicken_baby/peck
-  bounds:164,381,16,14
+  bounds:956,428,16,14
   index:4
 chicken_baby/peck
-  bounds:182,381,16,14
+  bounds:974,428,16,14
   index:5
 chicken_baby/rest
-  bounds:776,365,16,14
+  bounds:560,428,16,14
   index:0
 chicken_baby/rest
-  bounds:794,365,16,14
+  bounds:578,428,16,14
   index:1
 chicken_baby/rest
-  bounds:812,365,16,14
+  bounds:596,428,16,14
   index:2
 chicken_baby/rest
-  bounds:830,365,16,14
+  bounds:614,428,16,14
   index:3
 chicken_baby/rest
-  bounds:848,365,16,14
+  bounds:632,428,16,14
   index:4
 chicken_baby/rise
-  bounds:398,365,16,14
+  bounds:182,428,16,14
   index:0
 chicken_baby/rise
-  bounds:416,365,16,14
+  bounds:200,428,16,14
   index:1
 chicken_baby/rise
-  bounds:434,365,16,14
+  bounds:218,428,16,14
   index:2
 chicken_baby/rise
-  bounds:452,365,16,14
+  bounds:236,428,16,14
   index:3
 chicken_baby/rise
-  bounds:470,365,16,14
+  bounds:254,428,16,14
   index:4
 chicken_baby/rise
-  bounds:488,365,16,14
+  bounds:272,428,16,14
   index:5
 chicken_baby/rise
-  bounds:506,365,16,14
+  bounds:290,428,16,14
   index:6
 chicken_baby/row_01
-  bounds:2,365,16,14
+  bounds:798,410,16,14
   index:0
 chicken_baby/row_01
-  bounds:20,365,16,14
+  bounds:816,410,16,14
   index:1
 chicken_baby/row_01
-  bounds:38,365,16,14
+  bounds:834,410,16,14
   index:2
 chicken_baby/row_01
-  bounds:56,365,16,14
+  bounds:852,410,16,14
   index:3
 chicken_baby/row_01
-  bounds:74,365,16,14
+  bounds:870,410,16,14
   index:4
 chicken_baby/row_01
-  bounds:92,365,16,14
+  bounds:888,410,16,14
   index:5
 chicken_baby/row_01
-  bounds:110,365,16,14
+  bounds:906,410,16,14
   index:6
 chicken_baby/row_05
-  bounds:524,365,16,14
+  bounds:308,428,16,14
   index:0
 chicken_baby/row_05
-  bounds:542,365,16,14
+  bounds:326,428,16,14
   index:1
 chicken_baby/row_05
-  bounds:560,365,16,14
+  bounds:344,428,16,14
   index:2
 chicken_baby/row_05
-  bounds:578,365,16,14
+  bounds:362,428,16,14
   index:3
 chicken_baby/row_05
-  bounds:596,365,16,14
+  bounds:380,428,16,14
   index:4
 chicken_baby/row_05
-  bounds:614,365,16,14
+  bounds:398,428,16,14
   index:5
 chicken_baby/row_05
-  bounds:632,365,16,14
+  bounds:416,428,16,14
   index:6
 chicken_baby/row_06
-  bounds:650,365,16,14
+  bounds:434,428,16,14
   index:0
 chicken_baby/row_06
-  bounds:668,365,16,14
+  bounds:452,428,16,14
   index:1
 chicken_baby/row_06
-  bounds:686,365,16,14
+  bounds:470,428,16,14
   index:2
 chicken_baby/row_06
-  bounds:704,365,16,14
+  bounds:488,428,16,14
   index:3
 chicken_baby/row_06
-  bounds:722,365,16,14
+  bounds:506,428,16,14
   index:4
 chicken_baby/row_06
-  bounds:740,365,16,14
+  bounds:524,428,16,14
   index:5
 chicken_baby/row_06
-  bounds:758,365,16,14
+  bounds:542,428,16,14
   index:6
 chicken_baby/row_09
-  bounds:938,365,16,14
+  bounds:722,428,16,14
   index:0
 chicken_baby/row_09
-  bounds:956,365,16,14
+  bounds:740,428,16,14
   index:1
 chicken_baby/row_09
-  bounds:974,365,16,14
+  bounds:758,428,16,14
   index:2
 chicken_baby/row_09
-  bounds:992,365,16,14
+  bounds:776,428,16,14
   index:3
 chicken_baby/row_09
-  bounds:2,381,16,14
+  bounds:794,428,16,14
   index:4
 chicken_baby/row_10
-  bounds:20,381,16,14
+  bounds:812,428,16,14
   index:0
 chicken_baby/row_10
-  bounds:38,381,16,14
+  bounds:830,428,16,14
   index:1
 chicken_baby/row_10
-  bounds:56,381,16,14
+  bounds:848,428,16,14
   index:2
 chicken_baby/row_10
-  bounds:74,381,16,14
+  bounds:866,428,16,14
   index:3
 chicken_baby/row_15
-  bounds:488,381,16,14
+  bounds:272,444,16,14
   index:0
 chicken_baby/row_15
-  bounds:506,381,16,14
+  bounds:290,444,16,14
   index:1
 chicken_baby/row_15
-  bounds:524,381,16,14
+  bounds:308,444,16,14
   index:2
 chicken_baby/row_15
-  bounds:542,381,16,14
+  bounds:326,444,16,14
   index:3
 chicken_baby/row_15
-  bounds:560,381,16,14
+  bounds:344,444,16,14
   index:4
 chicken_baby/row_16
-  bounds:578,381,16,14
+  bounds:362,444,16,14
   index:0
 chicken_baby/row_16
-  bounds:596,381,16,14
+  bounds:380,444,16,14
   index:1
 chicken_baby/row_16
-  bounds:614,381,16,14
+  bounds:398,444,16,14
   index:2
 chicken_baby/row_16
-  bounds:632,381,16,14
+  bounds:416,444,16,14
   index:3
 chicken_baby/row_17
-  bounds:650,381,16,14
+  bounds:434,444,16,14
   index:0
 chicken_baby/row_17
-  bounds:668,381,16,14
+  bounds:452,444,16,14
   index:1
 chicken_baby/row_17
-  bounds:686,381,16,14
+  bounds:470,444,16,14
   index:2
 chicken_baby/row_17
-  bounds:704,381,16,14
+  bounds:488,444,16,14
   index:3
 chicken_baby/row_17
-  bounds:722,381,16,14
+  bounds:506,444,16,14
   index:4
 chicken_baby/row_18
-  bounds:740,381,16,14
+  bounds:524,444,16,14
   index:0
 chicken_baby/row_18
-  bounds:758,381,16,14
+  bounds:542,444,16,14
   index:1
 chicken_baby/row_18
-  bounds:776,381,16,14
+  bounds:560,444,16,14
   index:2
 chicken_baby/row_18
-  bounds:794,381,16,14
+  bounds:578,444,16,14
   index:3
 chicken_baby/settle
-  bounds:272,365,16,14
+  bounds:56,428,16,14
   index:0
 chicken_baby/settle
-  bounds:290,365,16,14
+  bounds:74,428,16,14
   index:1
 chicken_baby/settle
-  bounds:308,365,16,14
+  bounds:92,428,16,14
   index:2
 chicken_baby/settle
-  bounds:326,365,16,14
+  bounds:110,428,16,14
   index:3
 chicken_baby/settle
-  bounds:344,365,16,14
+  bounds:128,428,16,14
   index:4
 chicken_baby/settle
-  bounds:362,365,16,14
+  bounds:146,428,16,14
   index:5
 chicken_baby/settle
-  bounds:380,365,16,14
+  bounds:164,428,16,14
   index:6
 chicken_baby/sleep
-  bounds:866,365,16,14
+  bounds:650,428,16,14
   index:0
 chicken_baby/sleep
-  bounds:884,365,16,14
+  bounds:668,428,16,14
   index:1
 chicken_baby/sleep
-  bounds:902,365,16,14
+  bounds:686,428,16,14
   index:2
 chicken_baby/sleep
-  bounds:920,365,16,14
+  bounds:704,428,16,14
   index:3
 chicken_baby/walk
-  bounds:128,365,16,14
+  bounds:924,410,16,14
   index:0
 chicken_baby/walk
-  bounds:146,365,16,14
+  bounds:942,410,16,14
   index:1
 chicken_baby/walk
-  bounds:164,365,16,14
+  bounds:960,410,16,14
   index:2
 chicken_baby/walk
-  bounds:182,365,16,14
+  bounds:978,410,16,14
   index:3
 chicken_baby/walk
-  bounds:200,365,16,14
+  bounds:996,410,16,14
   index:4
 chicken_baby/walk
-  bounds:218,365,16,14
+  bounds:2,428,16,14
   index:5
 chicken_baby/walk
-  bounds:236,365,16,14
+  bounds:20,428,16,14
   index:6
 chicken_baby/walk
-  bounds:254,365,16,14
+  bounds:38,428,16,14
   index:7
 cow_brown/eat
-  bounds:405,299,29,28
+  bounds:157,362,29,28
   index:0
 cow_brown/eat
-  bounds:436,299,29,28
+  bounds:188,362,29,28
   index:1
 cow_brown/eat
-  bounds:467,299,29,28
+  bounds:219,362,29,28
   index:2
 cow_brown/eat
-  bounds:498,299,29,28
+  bounds:250,362,29,28
   index:3
 cow_brown/graze
-  bounds:188,299,29,28
+  bounds:937,326,29,28
   index:0
 cow_brown/graze
-  bounds:219,299,29,28
+  bounds:968,326,29,28
   index:1
 cow_brown/graze
-  bounds:250,299,29,28
+  bounds:2,362,29,28
   index:2
 cow_brown/graze
-  bounds:281,299,29,28
+  bounds:33,362,29,28
   index:3
 cow_brown/graze
-  bounds:312,299,29,28
+  bounds:64,362,29,28
   index:4
 cow_brown/graze
-  bounds:343,299,29,28
+  bounds:95,362,29,28
   index:5
 cow_brown/graze
-  bounds:374,299,29,28
+  bounds:126,362,29,28
   index:6
 cow_brown/idle
-  bounds:424,266,29,28
+  bounds:162,326,29,28
   index:0
 cow_brown/idle
-  bounds:455,266,29,28
+  bounds:193,326,29,28
   index:1
 cow_brown/idle
-  bounds:486,266,29,28
+  bounds:224,326,29,28
   index:2
 cow_brown/love
-  bounds:529,299,29,28
+  bounds:281,362,29,28
   index:0
 cow_brown/love
-  bounds:560,299,29,28
+  bounds:312,362,29,28
   index:1
 cow_brown/love
-  bounds:591,299,29,28
+  bounds:343,362,29,28
   index:2
 cow_brown/love
-  bounds:622,299,29,28
+  bounds:374,362,29,28
   index:3
 cow_brown/love
-  bounds:653,299,29,28
+  bounds:405,362,29,28
   index:4
 cow_brown/love
-  bounds:684,299,29,28
+  bounds:436,362,29,28
   index:5
 cow_brown/rest
-  bounds:982,266,29,28
+  bounds:720,326,29,28
   index:0
 cow_brown/rest
-  bounds:2,299,29,28
+  bounds:751,326,29,28
   index:1
 cow_brown/rest
-  bounds:33,299,29,28
+  bounds:782,326,29,28
   index:2
 cow_brown/settle
-  bounds:765,266,29,28
+  bounds:503,326,29,28
   index:0
 cow_brown/settle
-  bounds:796,266,29,28
+  bounds:534,326,29,28
   index:1
 cow_brown/settle
-  bounds:827,266,29,28
+  bounds:565,326,29,28
   index:2
 cow_brown/settle
-  bounds:858,266,29,28
+  bounds:596,326,29,28
   index:3
 cow_brown/settle
-  bounds:889,266,29,28
+  bounds:627,326,29,28
   index:4
 cow_brown/settle
-  bounds:920,266,29,28
+  bounds:658,326,29,28
   index:5
 cow_brown/settle
-  bounds:951,266,29,28
+  bounds:689,326,29,28
   index:6
 cow_brown/sleep
-  bounds:64,299,29,28
+  bounds:813,326,29,28
   index:0
 cow_brown/sleep
-  bounds:95,299,29,28
+  bounds:844,326,29,28
   index:1
 cow_brown/sleep
-  bounds:126,299,29,28
+  bounds:875,326,29,28
   index:2
 cow_brown/sleep
-  bounds:157,299,29,28
+  bounds:906,326,29,28
   index:3
 cow_brown/walk
-  bounds:517,266,29,28
+  bounds:255,326,29,28
   index:0
 cow_brown/walk
-  bounds:548,266,29,28
+  bounds:286,326,29,28
   index:1
 cow_brown/walk
-  bounds:579,266,29,28
+  bounds:317,326,29,28
   index:2
 cow_brown/walk
-  bounds:610,266,29,28
+  bounds:348,326,29,28
   index:3
 cow_brown/walk
-  bounds:641,266,29,28
+  bounds:379,326,29,28
   index:4
 cow_brown/walk
-  bounds:672,266,29,28
+  bounds:410,326,29,28
   index:5
 cow_brown/walk
-  bounds:703,266,29,28
+  bounds:441,326,29,28
   index:6
 cow_brown/walk
-  bounds:734,266,29,28
+  bounds:472,326,29,28
   index:7
 farm_items/row_01
-  bounds:452,347,16,16
+  bounds:218,410,16,16
   index:0
 farm_items/row_02
-  bounds:470,347,16,16
+  bounds:236,410,16,16
   index:0
 farm_items/row_03
-  bounds:488,347,16,16
+  bounds:254,410,16,16
   index:0
 farm_items/row_04
-  bounds:506,347,16,16
+  bounds:272,410,16,16
   index:0
 farm_items/row_05
-  bounds:524,347,16,16
+  bounds:290,410,16,16
   index:0
 farm_items/row_06
-  bounds:542,347,16,16
+  bounds:308,410,16,16
   index:0
 farm_items/row_07
-  bounds:560,347,16,16
+  bounds:326,410,16,16
   index:0
 farm_items/row_08
-  bounds:578,347,16,16
+  bounds:344,410,16,16
   index:0
 farm_items/row_09
-  bounds:596,347,16,16
+  bounds:362,410,16,16
   index:0
 farm_items/row_10
-  bounds:614,347,16,16
+  bounds:380,410,16,16
   index:0
 farm_items/row_11
-  bounds:632,347,16,16
+  bounds:398,410,16,16
   index:0
 farm_items/row_12
-  bounds:650,347,16,16
+  bounds:416,410,16,16
   index:0
 farm_items/row_13
-  bounds:668,347,16,16
+  bounds:434,410,16,16
   index:0
 farm_items/row_14
-  bounds:686,347,16,16
+  bounds:452,410,16,16
   index:0
+grass_tuft/grow
+  bounds:660,444,16,13
+  index:0
+grass_tuft/grow
+  bounds:678,444,16,13
+  index:1
+grass_tuft/grow
+  bounds:696,444,16,13
+  index:2
+grass_tuft/grow
+  bounds:714,444,16,13
+  index:3
 item_shadow/row_00
-  bounds:132,397,14,4
+  bounds:1004,444,14,4
   index:0
 plant_carrot/grow
-  bounds:876,381,15,13
+  bounds:732,444,15,13
   index:0
 plant_carrot/grow
-  bounds:893,381,15,13
+  bounds:749,444,15,13
   index:1
 plant_carrot/grow
-  bounds:910,381,15,13
+  bounds:766,444,15,13
   index:2
 plant_carrot/grow
-  bounds:927,381,15,13
+  bounds:783,444,15,13
   index:3
 plant_corn/grow
-  bounds:354,266,12,29
+  bounds:92,326,12,29
   index:0
 plant_corn/grow
-  bounds:368,266,12,29
+  bounds:106,326,12,29
   index:1
 plant_corn/grow
-  bounds:382,266,12,29
+  bounds:120,326,12,29
   index:2
 plant_corn/grow
-  bounds:396,266,12,29
+  bounds:134,326,12,29
   index:3
 plant_corn/grow
-  bounds:410,266,12,29
+  bounds:148,326,12,29
   index:4
 plant_cucumber/grow
-  bounds:872,347,16,15
+  bounds:638,410,16,15
   index:0
 plant_cucumber/grow
-  bounds:890,347,16,15
+  bounds:656,410,16,15
   index:1
 plant_cucumber/grow
-  bounds:908,347,16,15
+  bounds:674,410,16,15
   index:2
 plant_cucumber/grow
-  bounds:926,347,16,15
+  bounds:692,410,16,15
   index:3
 plant_pumpkin/grow
-  bounds:704,347,16,16
+  bounds:470,410,16,16
   index:0
 plant_pumpkin/grow
-  bounds:722,347,16,16
+  bounds:488,410,16,16
   index:1
 plant_pumpkin/grow
-  bounds:740,347,16,16
+  bounds:506,410,16,16
   index:2
 plant_pumpkin/grow
-  bounds:758,347,16,16
+  bounds:524,410,16,16
   index:3
 plant_seedling/grow
-  bounds:148,397,6,4
+  bounds:2,460,6,4
   index:0
 plant_tomato/grow
-  bounds:812,381,14,14
+  bounds:596,444,14,14
   index:0
 plant_tomato/grow
-  bounds:828,381,14,14
+  bounds:612,444,14,14
   index:1
 plant_tomato/grow
-  bounds:844,381,14,14
+  bounds:628,444,14,14
   index:2
 plant_tomato/grow
-  bounds:860,381,14,14
+  bounds:644,444,14,14
   index:3
 plant_weed/grow
-  bounds:944,381,12,12
+  bounds:800,444,12,12
   index:0
 plant_weed/grow
-  bounds:958,381,12,12
+  bounds:814,444,12,12
   index:1
 plant_weed/grow
-  bounds:972,381,12,12
+  bounds:828,444,12,12
   index:2
 rabbit/chop_down
-  bounds:574,167,42,31
+  bounds:812,182,43,34
   index:0
 rabbit/chop_down
-  bounds:618,167,42,31
+  bounds:857,182,43,34
   index:1
 rabbit/chop_down
-  bounds:662,167,42,31
+  bounds:902,182,43,34
   index:2
 rabbit/chop_down
-  bounds:706,167,42,31
+  bounds:947,182,43,34
   index:3
 rabbit/chop_down
-  bounds:750,167,42,31
+  bounds:2,218,43,34
   index:4
 rabbit/chop_down
-  bounds:794,167,42,31
+  bounds:47,218,43,34
   index:5
 rabbit/chop_down
-  bounds:838,167,42,31
+  bounds:92,218,43,34
   index:6
 rabbit/chop_down
-  bounds:882,167,42,31
+  bounds:137,218,43,34
   index:7
 rabbit/chop_left
-  bounds:618,200,42,31
+  bounds:902,218,43,34
   index:0
 rabbit/chop_left
-  bounds:662,200,42,31
+  bounds:947,218,43,34
   index:1
 rabbit/chop_left
-  bounds:706,200,42,31
+  bounds:2,254,43,34
   index:2
 rabbit/chop_left
-  bounds:750,200,42,31
+  bounds:47,254,43,34
   index:3
 rabbit/chop_left
-  bounds:794,200,42,31
+  bounds:92,254,43,34
   index:4
 rabbit/chop_left
-  bounds:838,200,42,31
+  bounds:137,254,43,34
   index:5
 rabbit/chop_left
-  bounds:882,200,42,31
+  bounds:182,254,43,34
   index:6
 rabbit/chop_left
-  bounds:926,200,42,31
+  bounds:227,254,43,34
   index:7
 rabbit/chop_right
-  bounds:266,200,42,31
+  bounds:542,218,43,34
   index:0
 rabbit/chop_right
-  bounds:310,200,42,31
+  bounds:587,218,43,34
   index:1
 rabbit/chop_right
-  bounds:354,200,42,31
+  bounds:632,218,43,34
   index:2
 rabbit/chop_right
-  bounds:398,200,42,31
+  bounds:677,218,43,34
   index:3
 rabbit/chop_right
-  bounds:442,200,42,31
+  bounds:722,218,43,34
   index:4
 rabbit/chop_right
-  bounds:486,200,42,31
+  bounds:767,218,43,34
   index:5
 rabbit/chop_right
-  bounds:530,200,42,31
+  bounds:812,218,43,34
   index:6
 rabbit/chop_right
-  bounds:574,200,42,31
+  bounds:857,218,43,34
   index:7
 rabbit/chop_up
-  bounds:926,167,42,31
+  bounds:182,218,43,34
   index:0
 rabbit/chop_up
-  bounds:970,167,42,31
+  bounds:227,218,43,34
   index:1
 rabbit/chop_up
-  bounds:2,200,42,31
+  bounds:272,218,43,34
   index:2
 rabbit/chop_up
-  bounds:46,200,42,31
+  bounds:317,218,43,34
   index:3
 rabbit/chop_up
-  bounds:90,200,42,31
+  bounds:362,218,43,34
   index:4
 rabbit/chop_up
-  bounds:134,200,42,31
+  bounds:407,218,43,34
   index:5
 rabbit/chop_up
-  bounds:178,200,42,31
+  bounds:452,218,43,34
   index:6
 rabbit/chop_up
-  bounds:222,200,42,31
+  bounds:497,218,43,34
   index:7
 rabbit/idle_down
-  bounds:2,2,42,31
+  bounds:2,2,43,34
   index:0
 rabbit/idle_down
-  bounds:46,2,42,31
+  bounds:47,2,43,34
   index:1
 rabbit/idle_down
-  bounds:90,2,42,31
+  bounds:92,2,43,34
   index:2
 rabbit/idle_down
-  bounds:134,2,42,31
+  bounds:137,2,43,34
   index:3
 rabbit/idle_down
-  bounds:178,2,42,31
+  bounds:182,2,43,34
   index:4
 rabbit/idle_down
-  bounds:222,2,42,31
+  bounds:227,2,43,34
   index:5
 rabbit/idle_down
-  bounds:266,2,42,31
+  bounds:272,2,43,34
   index:6
 rabbit/idle_down
-  bounds:310,2,42,31
+  bounds:317,2,43,34
   index:7
 rabbit/idle_left
-  bounds:46,35,42,31
+  bounds:92,38,43,34
   index:0
 rabbit/idle_left
-  bounds:90,35,42,31
+  bounds:137,38,43,34
   index:1
 rabbit/idle_left
-  bounds:134,35,42,31
+  bounds:182,38,43,34
   index:2
 rabbit/idle_left
-  bounds:178,35,42,31
+  bounds:227,38,43,34
   index:3
 rabbit/idle_left
-  bounds:222,35,42,31
+  bounds:272,38,43,34
   index:4
 rabbit/idle_left
-  bounds:266,35,42,31
+  bounds:317,38,43,34
   index:5
 rabbit/idle_left
-  bounds:310,35,42,31
+  bounds:362,38,43,34
   index:6
 rabbit/idle_left
-  bounds:354,35,42,31
+  bounds:407,38,43,34
   index:7
 rabbit/idle_right
-  bounds:706,2,42,31
+  bounds:722,2,43,34
   index:0
 rabbit/idle_right
-  bounds:750,2,42,31
+  bounds:767,2,43,34
   index:1
 rabbit/idle_right
-  bounds:794,2,42,31
+  bounds:812,2,43,34
   index:2
 rabbit/idle_right
-  bounds:838,2,42,31
+  bounds:857,2,43,34
   index:3
 rabbit/idle_right
-  bounds:882,2,42,31
+  bounds:902,2,43,34
   index:4
 rabbit/idle_right
-  bounds:926,2,42,31
+  bounds:947,2,43,34
   index:5
 rabbit/idle_right
-  bounds:970,2,42,31
+  bounds:2,38,43,34
   index:6
 rabbit/idle_right
-  bounds:2,35,42,31
+  bounds:47,38,43,34
   index:7
 rabbit/idle_up
-  bounds:354,2,42,31
+  bounds:362,2,43,34
   index:0
 rabbit/idle_up
-  bounds:398,2,42,31
+  bounds:407,2,43,34
   index:1
 rabbit/idle_up
-  bounds:442,2,42,31
+  bounds:452,2,43,34
   index:2
 rabbit/idle_up
-  bounds:486,2,42,31
+  bounds:497,2,43,34
   index:3
 rabbit/idle_up
-  bounds:530,2,42,31
+  bounds:542,2,43,34
   index:4
 rabbit/idle_up
-  bounds:574,2,42,31
+  bounds:587,2,43,34
   index:5
 rabbit/idle_up
-  bounds:618,2,42,31
+  bounds:632,2,43,34
   index:6
 rabbit/idle_up
-  bounds:662,2,42,31
+  bounds:677,2,43,34
   index:7
 rabbit/run_down
-  bounds:794,68,42,31
+  bounds:902,74,43,34
   index:0
 rabbit/run_down
-  bounds:838,68,42,31
+  bounds:947,74,43,34
   index:1
 rabbit/run_down
-  bounds:882,68,42,31
+  bounds:2,110,43,34
   index:2
 rabbit/run_down
-  bounds:926,68,42,31
+  bounds:47,110,43,34
   index:3
 rabbit/run_down
-  bounds:970,68,42,31
+  bounds:92,110,43,34
   index:4
 rabbit/run_down
-  bounds:2,101,42,31
+  bounds:137,110,43,34
   index:5
 rabbit/run_down
-  bounds:46,101,42,31
+  bounds:182,110,43,34
   index:6
 rabbit/run_down
-  bounds:90,101,42,31
+  bounds:227,110,43,34
   index:7
 rabbit/run_left
-  bounds:838,101,42,31
+  bounds:2,146,43,34
   index:0
 rabbit/run_left
-  bounds:882,101,42,31
+  bounds:47,146,43,34
   index:1
 rabbit/run_left
-  bounds:926,101,42,31
+  bounds:92,146,43,34
   index:2
 rabbit/run_left
-  bounds:970,101,42,31
+  bounds:137,146,43,34
   index:3
 rabbit/run_left
-  bounds:2,134,42,31
+  bounds:182,146,43,34
   index:4
 rabbit/run_left
-  bounds:46,134,42,31
+  bounds:227,146,43,34
   index:5
 rabbit/run_left
-  bounds:90,134,42,31
+  bounds:272,146,43,34
   index:6
 rabbit/run_left
-  bounds:134,134,42,31
+  bounds:317,146,43,34
   index:7
 rabbit/run_right
-  bounds:486,101,42,31
+  bounds:632,110,43,34
   index:0
 rabbit/run_right
-  bounds:530,101,42,31
+  bounds:677,110,43,34
   index:1
 rabbit/run_right
-  bounds:574,101,42,31
+  bounds:722,110,43,34
   index:2
 rabbit/run_right
-  bounds:618,101,42,31
+  bounds:767,110,43,34
   index:3
 rabbit/run_right
-  bounds:662,101,42,31
+  bounds:812,110,43,34
   index:4
 rabbit/run_right
-  bounds:706,101,42,31
+  bounds:857,110,43,34
   index:5
 rabbit/run_right
-  bounds:750,101,42,31
+  bounds:902,110,43,34
   index:6
 rabbit/run_right
-  bounds:794,101,42,31
+  bounds:947,110,43,34
   index:7
 rabbit/run_up
-  bounds:134,101,42,31
+  bounds:272,110,43,34
   index:0
 rabbit/run_up
-  bounds:178,101,42,31
+  bounds:317,110,43,34
   index:1
 rabbit/run_up
-  bounds:222,101,42,31
+  bounds:362,110,43,34
   index:2
 rabbit/run_up
-  bounds:266,101,42,31
+  bounds:407,110,43,34
   index:3
 rabbit/run_up
-  bounds:310,101,42,31
+  bounds:452,110,43,34
   index:4
 rabbit/run_up
-  bounds:354,101,42,31
+  bounds:497,110,43,34
   index:5
 rabbit/run_up
-  bounds:398,101,42,31
+  bounds:542,110,43,34
   index:6
 rabbit/run_up
-  bounds:442,101,42,31
+  bounds:587,110,43,34
+  index:7
+rabbit/scythe_down
+  bounds:722,290,43,34
+  index:0
+rabbit/scythe_down
+  bounds:767,290,43,34
+  index:1
+rabbit/scythe_down
+  bounds:812,290,43,34
+  index:2
+rabbit/scythe_down
+  bounds:857,290,43,34
+  index:3
+rabbit/scythe_down
+  bounds:902,290,43,34
+  index:4
+rabbit/scythe_down
+  bounds:947,290,43,34
+  index:5
+rabbit/scythe_down
+  bounds:2,326,43,34
+  index:6
+rabbit/scythe_down
+  bounds:47,326,43,34
   index:7
 rabbit/till_down
-  bounds:178,134,42,31
+  bounds:362,146,43,34
   index:0
 rabbit/till_down
-  bounds:222,134,42,31
+  bounds:407,146,43,34
   index:1
 rabbit/till_down
-  bounds:266,134,42,31
+  bounds:452,146,43,34
   index:2
 rabbit/till_down
-  bounds:310,134,42,31
+  bounds:497,146,43,34
   index:3
 rabbit/till_down
-  bounds:354,134,42,31
+  bounds:542,146,43,34
   index:4
 rabbit/till_down
-  bounds:398,134,42,31
+  bounds:587,146,43,34
   index:5
 rabbit/till_down
-  bounds:442,134,42,31
+  bounds:632,146,43,34
   index:6
 rabbit/till_down
-  bounds:486,134,42,31
+  bounds:677,146,43,34
   index:7
 rabbit/till_left
-  bounds:222,167,42,31
+  bounds:452,182,43,34
   index:0
 rabbit/till_left
-  bounds:266,167,42,31
+  bounds:497,182,43,34
   index:1
 rabbit/till_left
-  bounds:310,167,42,31
+  bounds:542,182,43,34
   index:2
 rabbit/till_left
-  bounds:354,167,42,31
+  bounds:587,182,43,34
   index:3
 rabbit/till_left
-  bounds:398,167,42,31
+  bounds:632,182,43,34
   index:4
 rabbit/till_left
-  bounds:442,167,42,31
+  bounds:677,182,43,34
   index:5
 rabbit/till_left
-  bounds:486,167,42,31
+  bounds:722,182,43,34
   index:6
 rabbit/till_left
-  bounds:530,167,42,31
+  bounds:767,182,43,34
   index:7
 rabbit/till_right
-  bounds:882,134,42,31
+  bounds:92,182,43,34
   index:0
 rabbit/till_right
-  bounds:926,134,42,31
+  bounds:137,182,43,34
   index:1
 rabbit/till_right
-  bounds:970,134,42,31
+  bounds:182,182,43,34
   index:2
 rabbit/till_right
-  bounds:2,167,42,31
+  bounds:227,182,43,34
   index:3
 rabbit/till_right
-  bounds:46,167,42,31
+  bounds:272,182,43,34
   index:4
 rabbit/till_right
-  bounds:90,167,42,31
+  bounds:317,182,43,34
   index:5
 rabbit/till_right
-  bounds:134,167,42,31
+  bounds:362,182,43,34
   index:6
 rabbit/till_right
-  bounds:178,167,42,31
+  bounds:407,182,43,34
   index:7
 rabbit/till_up
-  bounds:530,134,42,31
+  bounds:722,146,43,34
   index:0
 rabbit/till_up
-  bounds:574,134,42,31
+  bounds:767,146,43,34
   index:1
 rabbit/till_up
-  bounds:618,134,42,31
+  bounds:812,146,43,34
   index:2
 rabbit/till_up
-  bounds:662,134,42,31
+  bounds:857,146,43,34
   index:3
 rabbit/till_up
-  bounds:706,134,42,31
+  bounds:902,146,43,34
   index:4
 rabbit/till_up
-  bounds:750,134,42,31
+  bounds:947,146,43,34
   index:5
 rabbit/till_up
-  bounds:794,134,42,31
+  bounds:2,182,43,34
   index:6
 rabbit/till_up
-  bounds:838,134,42,31
+  bounds:47,182,43,34
   index:7
 rabbit/walk_down
-  bounds:398,35,42,31
+  bounds:452,38,43,34
   index:0
 rabbit/walk_down
-  bounds:442,35,42,31
+  bounds:497,38,43,34
   index:1
 rabbit/walk_down
-  bounds:486,35,42,31
+  bounds:542,38,43,34
   index:2
 rabbit/walk_down
-  bounds:530,35,42,31
+  bounds:587,38,43,34
   index:3
 rabbit/walk_down
-  bounds:574,35,42,31
+  bounds:632,38,43,34
   index:4
 rabbit/walk_down
-  bounds:618,35,42,31
+  bounds:677,38,43,34
   index:5
 rabbit/walk_down
-  bounds:662,35,42,31
+  bounds:722,38,43,34
   index:6
 rabbit/walk_down
-  bounds:706,35,42,31
+  bounds:767,38,43,34
   index:7
 rabbit/walk_left
-  bounds:442,68,42,31
+  bounds:542,74,43,34
   index:0
 rabbit/walk_left
-  bounds:486,68,42,31
+  bounds:587,74,43,34
   index:1
 rabbit/walk_left
-  bounds:530,68,42,31
+  bounds:632,74,43,34
   index:2
 rabbit/walk_left
-  bounds:574,68,42,31
+  bounds:677,74,43,34
   index:3
 rabbit/walk_left
-  bounds:618,68,42,31
+  bounds:722,74,43,34
   index:4
 rabbit/walk_left
-  bounds:662,68,42,31
+  bounds:767,74,43,34
   index:5
 rabbit/walk_left
-  bounds:706,68,42,31
+  bounds:812,74,43,34
   index:6
 rabbit/walk_left
-  bounds:750,68,42,31
+  bounds:857,74,43,34
   index:7
 rabbit/walk_right
-  bounds:90,68,42,31
+  bounds:182,74,43,34
   index:0
 rabbit/walk_right
-  bounds:134,68,42,31
+  bounds:227,74,43,34
   index:1
 rabbit/walk_right
-  bounds:178,68,42,31
+  bounds:272,74,43,34
   index:2
 rabbit/walk_right
-  bounds:222,68,42,31
+  bounds:317,74,43,34
   index:3
 rabbit/walk_right
-  bounds:266,68,42,31
+  bounds:362,74,43,34
   index:4
 rabbit/walk_right
-  bounds:310,68,42,31
+  bounds:407,74,43,34
   index:5
 rabbit/walk_right
-  bounds:354,68,42,31
+  bounds:452,74,43,34
   index:6
 rabbit/walk_right
-  bounds:398,68,42,31
+  bounds:497,74,43,34
   index:7
 rabbit/walk_up
-  bounds:750,35,42,31
+  bounds:812,38,43,34
   index:0
 rabbit/walk_up
-  bounds:794,35,42,31
+  bounds:857,38,43,34
   index:1
 rabbit/walk_up
-  bounds:838,35,42,31
+  bounds:902,38,43,34
   index:2
 rabbit/walk_up
-  bounds:882,35,42,31
+  bounds:947,38,43,34
   index:3
 rabbit/walk_up
-  bounds:926,35,42,31
+  bounds:2,74,43,34
   index:4
 rabbit/walk_up
-  bounds:970,35,42,31
+  bounds:47,74,43,34
   index:5
 rabbit/walk_up
-  bounds:2,68,42,31
+  bounds:92,74,43,34
   index:6
 rabbit/walk_up
-  bounds:46,68,42,31
+  bounds:137,74,43,34
   index:7
 rabbit/water_down
-  bounds:970,200,42,31
+  bounds:272,254,43,34
   index:0
 rabbit/water_down
-  bounds:2,233,42,31
+  bounds:317,254,43,34
   index:1
 rabbit/water_down
-  bounds:46,233,42,31
+  bounds:362,254,43,34
   index:2
 rabbit/water_down
-  bounds:90,233,42,31
+  bounds:407,254,43,34
   index:3
 rabbit/water_down
-  bounds:134,233,42,31
+  bounds:452,254,43,34
   index:4
 rabbit/water_down
-  bounds:178,233,42,31
+  bounds:497,254,43,34
   index:5
 rabbit/water_down
-  bounds:222,233,42,31
+  bounds:542,254,43,34
   index:6
 rabbit/water_down
-  bounds:266,233,42,31
+  bounds:587,254,43,34
   index:7
 rabbit/water_left
-  bounds:2,266,42,31
+  bounds:362,290,43,34
   index:0
 rabbit/water_left
-  bounds:46,266,42,31
+  bounds:407,290,43,34
   index:1
 rabbit/water_left
-  bounds:90,266,42,31
+  bounds:452,290,43,34
   index:2
 rabbit/water_left
-  bounds:134,266,42,31
+  bounds:497,290,43,34
   index:3
 rabbit/water_left
-  bounds:178,266,42,31
+  bounds:542,290,43,34
   index:4
 rabbit/water_left
-  bounds:222,266,42,31
+  bounds:587,290,43,34
   index:5
 rabbit/water_left
-  bounds:266,266,42,31
+  bounds:632,290,43,34
   index:6
 rabbit/water_left
-  bounds:310,266,42,31
+  bounds:677,290,43,34
   index:7
 rabbit/water_right
-  bounds:662,233,42,31
+  bounds:2,290,43,34
   index:0
 rabbit/water_right
-  bounds:706,233,42,31
+  bounds:47,290,43,34
   index:1
 rabbit/water_right
-  bounds:750,233,42,31
+  bounds:92,290,43,34
   index:2
 rabbit/water_right
-  bounds:794,233,42,31
+  bounds:137,290,43,34
   index:3
 rabbit/water_right
-  bounds:838,233,42,31
+  bounds:182,290,43,34
   index:4
 rabbit/water_right
-  bounds:882,233,42,31
+  bounds:227,290,43,34
   index:5
 rabbit/water_right
-  bounds:926,233,42,31
+  bounds:272,290,43,34
   index:6
 rabbit/water_right
-  bounds:970,233,42,31
+  bounds:317,290,43,34
   index:7
 rabbit/water_up
-  bounds:310,233,42,31
+  bounds:632,254,43,34
   index:0
 rabbit/water_up
-  bounds:354,233,42,31
+  bounds:677,254,43,34
   index:1
 rabbit/water_up
-  bounds:398,233,42,31
+  bounds:722,254,43,34
   index:2
 rabbit/water_up
-  bounds:442,233,42,31
+  bounds:767,254,43,34
   index:3
 rabbit/water_up
-  bounds:486,233,42,31
+  bounds:812,254,43,34
   index:4
 rabbit/water_up
-  bounds:530,233,42,31
+  bounds:857,254,43,34
   index:5
 rabbit/water_up
-  bounds:574,233,42,31
+  bounds:902,254,43,34
   index:6
 rabbit/water_up
-  bounds:618,233,42,31
+  bounds:947,254,43,34
   index:7
+scythe_icon/icon
+  bounds:710,410,14,15
+  index:0
 sign_blank/sign
-  bounds:776,347,14,16
+  bounds:542,410,14,16
   index:0
 sign_carrot/sign
-  bounds:808,347,14,16
+  bounds:574,410,14,16
   index:0
 sign_corn/sign
-  bounds:792,347,14,16
+  bounds:558,410,14,16
   index:0
 sign_cucumber/sign
-  bounds:856,347,14,16
+  bounds:622,410,14,16
   index:0
 sign_pumpkin/sign
-  bounds:840,347,14,16
+  bounds:606,410,14,16
   index:0
 sign_tomato/sign
-  bounds:824,347,14,16
+  bounds:590,410,14,16
   index:0
 watering/splash
-  bounds:986,381,14,11
+  bounds:842,444,14,11
   index:0
 watering/splash
-  bounds:1002,381,14,11
+  bounds:858,444,14,11
   index:1
 watering/splash
-  bounds:2,397,14,11
+  bounds:874,444,14,11
   index:2
 watering/splash
-  bounds:18,397,14,11
+  bounds:890,444,14,11
   index:3
 watering/splash
-  bounds:34,397,14,11
+  bounds:906,444,14,11
   index:4
 watering/splash
-  bounds:50,397,14,11
+  bounds:922,444,14,11
   index:5
 watering/splash
-  bounds:66,397,14,11
+  bounds:938,444,14,11
   index:6
 watering/splash
-  bounds:82,397,14,11
+  bounds:954,444,14,11
   index:7
 watering/splash
-  bounds:98,397,14,11
+  bounds:970,444,14,11
   index:8
 watering_can/icon
-  bounds:114,397,16,10
+  bounds:986,444,16,10
   index:0

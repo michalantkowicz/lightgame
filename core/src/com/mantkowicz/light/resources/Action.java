@@ -24,6 +24,7 @@ public enum Action {
     REST("rest"),
     RISE("rise"),
     RUN("run"),
+    SCYTHE("scythe"),
     SETTLE("settle"),
     SIGN("sign"),
     SLEEP("sleep"),

@@ -83,6 +83,11 @@ public class AnimationPlugin implements Plugin {
         current = null; // starts from its first frame, also when the same action is played again
     }
 
+    /** Is it playing this action once right now (not finished, not stopped by walking off)? */
+    public boolean isPlayingOnce(Action action) {
+        return once == action;
+    }
+
     /** Walking, it faces the way it moves; standing, it faces down (towards the player). */
     private void followMovement(boolean walking) {
         Vector2 center = actor.getCenter();
