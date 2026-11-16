@@ -141,7 +141,7 @@ class CropHunt {
             }
             return false;
         }
-        chicken.walkOnto(steps.get(0), chicken.getType().getSecondsPerTile(), true);
+        chicken.stepOnto(steps.get(0), chicken.getType().getSecondsPerTile(), true);
         return true;
     }
 
@@ -267,7 +267,7 @@ class CropHunt {
             backTo = nearestReachableTo(home); // something stepped in the way: as near as it gets now
             return false;
         }
-        chicken.walkOnto(steps.get(0), chicken.getType().getSecondsPerTile(), true);
+        chicken.stepOnto(steps.get(0), chicken.getType().getSecondsPerTile(), true);
         return true;
     }
 

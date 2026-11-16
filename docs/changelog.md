@@ -979,7 +979,7 @@ by a chicken, slowly enough that the player can still save it.
   started, or, taken or out of reach, to the reachable tile nearest to it; then it goes on as before (also looking
   for more crops).
 - New chicken states `GOING_FOR_CROP`, `STEPPING_TO_CROP`, `PECKING_CROP`, `GOING_BACK` (not strokable meanwhile).
-  `SpriteActor.walkOnto` (a step onto a given tile, split out of `walkToFreeNeighbour`), `FarmAnimal.stayExactly`
+  `SpriteActor.stepOnto` (a step onto a given tile, split out of `walkToFreeNeighbour`), `FarmAnimal.stayExactly`
   (a wait without dice, so the animals' other random choices stay as they were: no golden changed).
 - Tests: `ChickenEatsCropsTest` (slow steps, never on the crop's tile, facing, the pulse, eaten after 10 s, back
   home, picked up first, never shutting the player out of a corridor or of another crop (also going back), already

@@ -113,12 +113,12 @@ public class Chicken extends FarmAnimal {
     }
 
     @Override
-    protected void walkOnto(Tile target, float seconds, boolean keepFacing) {
+    protected void stepOnto(Tile target, float seconds, boolean keepFacing) {
         if (straighten != null) {
             removeAction(straighten); // the step goes on from where it is
             straighten = null;
         }
-        super.walkOnto(target, seconds, keepFacing);
+        super.stepOnto(target, seconds, keepFacing);
     }
 
     /** Going for a crop on the ground: what it goes for, where it started, its steps. */
