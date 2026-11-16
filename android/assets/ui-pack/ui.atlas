@@ -7,31 +7,31 @@ backdrops_c1
   split:7,7,7,7
   index:0
 bar/empty
-  bounds:386,357,4,12
+  bounds:418,357,4,12
   index:0
 bar/full
-  bounds:392,357,4,12
+  bounds:424,357,4,12
   index:0
 continue_indicator
-  bounds:462,357,7,6
+  bounds:494,357,7,6
   index:0
 continue_indicator
-  bounds:471,357,7,6
+  bounds:503,357,7,6
   index:1
 continue_indicator
-  bounds:480,357,7,6
+  bounds:2,373,7,6
   index:2
 continue_indicator
-  bounds:489,357,7,6
+  bounds:11,373,7,6
   index:3
 continue_indicator
-  bounds:498,357,7,6
+  bounds:20,373,7,6
   index:4
 continue_indicator
-  bounds:2,373,7,6
+  bounds:29,373,7,6
   index:5
 continue_indicator
-  bounds:11,373,7,6
+  bounds:38,373,7,6
   index:6
 dialog_box
   bounds:354,296,30,28
@@ -299,7 +299,7 @@ icon_buttons/question
   bounds:118,330,22,24
   index:0
 icons/question
-  bounds:274,330,12,16
+  bounds:294,330,12,16
   index:0
 inventory/slot
   bounds:134,296,30,32
@@ -315,7 +315,7 @@ inventory/slot_pressed
   bounds:166,296,30,32
   index:0
 mouse_catpaw_mouse_icon
-  bounds:370,357,14,13
+  bounds:402,357,14,13
   index:0
 play_button/blank
   bounds:386,296,90,27
@@ -329,19 +329,19 @@ round_buttons/brown
   bounds:194,330,18,20
   index:0
 round_buttons/brown_down
-  bounds:234,330,18,17
+  bounds:254,330,18,17
   index:0
 round_buttons/dark_brown
   bounds:214,330,18,20
   index:0
 round_buttons/dark_brown_down
-  bounds:254,330,18,17
+  bounds:274,330,18,17
   index:0
 selector_dot_1
-  bounds:454,357,6,7
+  bounds:486,357,6,7
   index:0
 selector_dot_6
-  bounds:20,373,5,6
+  bounds:47,373,5,6
   index:0
 settings_menu/panel
   bounds:2,2,106,122
@@ -369,125 +369,128 @@ speech_bubble_grey/row_01
   bounds:386,2,44,56
   index:6
 stamina_black
-  bounds:288,330,14,14
+  bounds:308,330,14,14
   index:0
 stamina_black
-  bounds:304,330,14,14
+  bounds:324,330,14,14
   index:1
 stamina_black
-  bounds:320,330,14,14
+  bounds:340,330,14,14
   index:2
 stamina_black
-  bounds:336,330,14,14
+  bounds:356,330,14,14
   index:3
 stamina_black
-  bounds:352,330,14,14
+  bounds:372,330,14,14
   index:4
 stamina_black
-  bounds:368,330,14,14
+  bounds:388,330,14,14
   index:5
 stamina_black
-  bounds:384,330,14,14
+  bounds:404,330,14,14
   index:6
 stamina_black
-  bounds:400,330,14,14
+  bounds:420,330,14,14
   index:7
 stamina_black
-  bounds:416,330,14,14
+  bounds:436,330,14,14
   index:8
 stamina_black
-  bounds:432,330,14,14
+  bounds:452,330,14,14
   index:9
 stamina_black
-  bounds:448,330,14,14
+  bounds:468,330,14,14
   index:10
 stamina_black
-  bounds:464,330,14,14
+  bounds:484,330,14,14
   index:11
 stamina_black
-  bounds:480,330,14,14
+  bounds:2,357,14,14
   index:12
 stamina_black
-  bounds:496,330,14,14
+  bounds:18,357,14,14
   index:13
 stamina_black
-  bounds:2,357,14,14
+  bounds:34,357,14,14
   index:14
 stamina_black
-  bounds:18,357,14,14
+  bounds:50,357,14,14
   index:15
 stamina_black
-  bounds:34,357,14,14
+  bounds:66,357,14,14
   index:16
 stamina_black
-  bounds:50,357,14,14
+  bounds:82,357,14,14
   index:17
 stamina_black
-  bounds:66,357,14,14
+  bounds:98,357,14,14
   index:18
 stamina_black
-  bounds:82,357,14,14
+  bounds:114,357,14,14
   index:19
 stamina_black
-  bounds:98,357,14,14
+  bounds:130,357,14,14
   index:20
 stamina_black
-  bounds:114,357,14,14
+  bounds:146,357,14,14
   index:21
 stamina_black
-  bounds:130,357,14,14
+  bounds:162,357,14,14
   index:22
 stamina_black
-  bounds:146,357,14,14
+  bounds:178,357,14,14
   index:23
 stamina_black
-  bounds:162,357,14,14
+  bounds:194,357,14,14
   index:24
 stamina_black
-  bounds:178,357,14,14
+  bounds:210,357,14,14
   index:25
 stamina_black
-  bounds:194,357,14,14
+  bounds:226,357,14,14
   index:26
 stamina_black
-  bounds:210,357,14,14
+  bounds:242,357,14,14
   index:27
 stamina_black
-  bounds:226,357,14,14
+  bounds:258,357,14,14
   index:28
 stamina_black
-  bounds:242,357,14,14
+  bounds:274,357,14,14
   index:29
 stamina_black
-  bounds:258,357,14,14
+  bounds:290,357,14,14
   index:30
 stamina_black
-  bounds:274,357,14,14
+  bounds:306,357,14,14
   index:31
 stamina_black
-  bounds:290,357,14,14
+  bounds:322,357,14,14
   index:32
 stamina_black
-  bounds:306,357,14,14
+  bounds:338,357,14,14
   index:33
 stamina_black
-  bounds:322,357,14,14
+  bounds:354,357,14,14
   index:34
 stamina_black
-  bounds:338,357,14,14
+  bounds:370,357,14,14
   index:35
 stamina_black
-  bounds:354,357,14,14
+  bounds:386,357,14,14
   index:36
 stars/small
-  bounds:440,357,12,10
+  bounds:472,357,12,10
+  index:0
+stars/treasure
+  bounds:234,330,18,17
   index:0
 tiny_emotes/happy
-  bounds:398,357,12,11
+  bounds:430,357,12,11
   index:0
 tiny_emotes/neutral
-  bounds:412,357,12,11
+  bounds:444,357,12,11
   index:0
 tiny_emotes/sad
-  bounds:426,357,12,11
+  bounds:458,357,12,11
   index:0

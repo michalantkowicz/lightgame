@@ -485,12 +485,12 @@ class ChickenTest {
         }
     }
 
-    /** Level 1 has a chicken and a chick at its bottom right (cells count rows from the bottom). */
+    /** Level 1 has a chicken and a chick on its right, where the owner put them (cells count rows from the bottom). */
     @Test
     void levelOneHasAChickenAndAChick() {
         GameDriver game = GameDriver.start(GameDriver.defaultMap());
-        assertEquals(new Cell(17, 2), game.cellOf(Kind.CHICKEN));
-        assertEquals(new Cell(19, 2), game.cellOf(Kind.CHICKEN_BABY));
+        assertEquals(new Cell(15, 7), game.cellOf(Kind.CHICKEN));
+        assertEquals(new Cell(16, 6), game.cellOf(Kind.CHICKEN_BABY));
         game.seconds(60);
         assertFalse(game.crashed());
     }

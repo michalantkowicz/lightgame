@@ -76,14 +76,20 @@ public class Grass extends Image {
         }
         sincePhase += delta;
         if (sincePhase >= secondsPerPhase) {
-            sincePhase = 0;
-            phase++;
-            ((TextureRegionDrawable) getDrawable()).setRegion(phases[phase]);
-            standOnTheTilesBottom();
-            if (isTall()) {
-                getColor().a = tallAlpha;
-            }
+            growTo(phase + 1);
         }
+    }
+
+    /**
+     * Grown this far at once, e.g. grass put on the map in Tiled (0 a tuft ... {@link #getLastPhase()} a big bush); it
+     * grows on from there.
+     */
+    public void growTo(int phase) {
+        this.phase = Math.max(0, Math.min(getLastPhase(), phase));
+        sincePhase = 0;
+        ((TextureRegionDrawable) getDrawable()).setRegion(phases[this.phase]);
+        standOnTheTilesBottom();
+        getColor().a = isTall() ? tallAlpha : 1;
     }
 
     public Tile getTile() {

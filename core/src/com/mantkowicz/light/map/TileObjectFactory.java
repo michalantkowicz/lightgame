@@ -21,6 +21,9 @@ public class TileObjectFactory {
                 return new TilePlayer();
             case DOG :
                 return new TileDog();
+            case GRASS :
+                return new TileGrass((int) TileObjectType.number(objectProperties, TileObjectAttribute.PHASE,
+                        TileGrass.FIRST_PHASE));
             default :
                 throw new IllegalArgumentException(
                         "There is no tile implementation for this tile object type: " + objectType.name());

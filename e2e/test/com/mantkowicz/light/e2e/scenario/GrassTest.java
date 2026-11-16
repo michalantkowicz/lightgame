@@ -14,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Grass (FeatureFlag.GROWING_GRASS, on as the game ships): every 30 s each tile the rabbit can get to may sprout grass
- * (1 %, 10 % next to grass), never a chest's or a field's. It grows a phase every 30 s: a tuft and two tufts under
+ * (0.1 %, 1 % next to grass), never a chest's or a field's; the map may put grass on tiles too (Tiled's GRASS
+ * objects, with a phase 1-4). It grows a phase every 30 s: a tuft and two tufts under
  * whoever stands there, a bush and a big bush over them, a little see-through. It blocks nothing. Standing still on
  * grass, the HUD's tool button (the big round one right of the face) has the scythe instead of the hint (just next to
  * grass: the hint): tapped, the rabbit swings once and the grass on its tile and all eight around fades out; walking
@@ -49,9 +50,9 @@ class GrassTest {
     void grassSproutsAndSpreadsWhereTheRabbitCanGo() {
         GameDriver game = GameDriver.start(MEADOW.write("grass-meadow"));
         assertEquals(Map.of(), game.grass(), "no grass at the start");
-        game.seconds(10 * 60);
+        game.seconds(30 * 60); // slow on purpose: about 2 tufts after 10 minutes here, 17 after 30
         Map<Cell, Integer> grass = game.grass();
-        assertTrue(grass.size() > 10, "after ten minutes there is grass: " + grass);
+        assertTrue(grass.size() > 10, "after half an hour there is grass: " + grass);
         assertFalse(grass.containsKey(MEADOW.cell('C')), "never on the chest");
         assertFalse(grass.containsKey(MEADOW.cell('F')), "never on the field");
         for (Cell cell : grass.keySet()) {
@@ -66,6 +67,44 @@ class GrassTest {
         assertTrue(nextToGrass > grass.size() / 2, "it spreads: most grass is next to grass (" + nextToGrass + " of "
                 + grass.size() + ")");
         assertFalse(game.crashed());
+    }
+
+    /** Grass put on the map in Tiled: as far grown as its phase says (1 a tuft ... 4 a big bush; 1 without it). */
+    private static final TestMap PLANTED = TestMap.of(
+            "~~~~~~~~",
+            "~abcde.~",
+            "~......~",
+            "~..P...~",
+            "~~~~~~~~")
+            .with('a', "GRASS", Map.of())
+            .with('b', "GRASS", Map.of("phase", "2"))
+            .with('c', "GRASS", Map.of("phase", "3"))
+            .with('d', "GRASS", Map.of("phase", "4"))
+            .with('e', "GRASS", Map.of("phase", "9"));
+
+    @Test
+    void theMapPutsGrassOnTiles() {
+        GameDriver game = GameDriver.start(PLANTED.write("grass-planted"));
+        assertEquals(Map.of(PLANTED.cell('a'), 0, PLANTED.cell('b'), 1, PLANTED.cell('c'), 2, PLANTED.cell('d'), 3,
+                PLANTED.cell('e'), 3), game.grass(), "phases 1-4 (0-3 here); without one a tuft, too big a big bush");
+        assertEquals("under", game.grassDrawn(PLANTED.cell('b')));
+        assertEquals("over alpha=0.9", game.grassDrawn(PLANTED.cell('c')), "tall from the start");
+        assertTrue(game.isAccessible(PLANTED.cell('a')), "it blocks nothing");
+        game.seconds(31);
+        assertEquals(1, game.grass().get(PLANTED.cell('a')), "it grows on");
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void withTheFlagOffTheMapsGrassIsntThere() {
+        GameDriver.growingGrass(false);
+        try {
+            GameDriver game = GameDriver.start(PLANTED.write("grass-planted"));
+            assertEquals(Map.of(), game.grass());
+            assertFalse(game.crashed());
+        } finally {
+            GameDriver.growingGrass(true);
+        }
     }
 
     @Test

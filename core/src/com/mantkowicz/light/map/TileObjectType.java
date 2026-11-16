@@ -22,6 +22,8 @@ public enum TileObjectType {
     LIGHT,
     PLAYER,
     DOG,
+    /** Grass on a tile, grown as far as its phase property says ({@link TileGrass}). */
+    GRASS,
     // sprite actors
     CHEST((context, properties) -> new Chest(context)),
     COW((context, properties) -> new Cow(context,
@@ -46,7 +48,7 @@ public enum TileObjectType {
      * A number property: Tiled's float or int property, or a string property holding a number; {@code fallback}
      * without it.
      */
-    private static float number(MapProperties properties, TileObjectAttribute attribute, float fallback) {
+    static float number(MapProperties properties, TileObjectAttribute attribute, float fallback) {
         Object value = properties.get(attribute.getValue());
         if (value instanceof Number number) {
             return number.floatValue();

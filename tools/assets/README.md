@@ -56,11 +56,13 @@ tool again.
    - `collision`: cells with any tile here can't be walked on (the layer is never drawn: keep it hidden);
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
-   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
+   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
    property `favouriteDish`: the crops it wishes for, comma-separated, e.g. `CARROT,CUCUMBER` (one of `CORN`,
    `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`); without it, any of them. Each time it gets hungry it picks one at
    random. A `CHEST` holds one crop, picked at random. A `FIELD` grows one crop, its string property `cropType` (one
-   of the names above; `CARROT` without it).
+   of the names above; `CARROT` without it). A `GRASS` puts grass on its tile, grown as far as its property `phase`
+   says: `1` a tuft, `2` two tufts, `3` a bush, `4` a big bush (`1` without it); it blocks nothing and grows on from
+   there, and there is none while growing grass is switched off (`FeatureFlag.GROWING_GRASS`).
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 

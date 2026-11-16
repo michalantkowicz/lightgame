@@ -29,6 +29,8 @@ public enum UiImage {
     HOLD_CIRCLE("stamina_black"),
     /** The stars that pop out of a chest when it opens. */
     SPARKLE("stars/small"),
+    /** A big gold star: on a chest's button, there is treasure inside. */
+    TREASURE("stars/treasure"),
     /** A segment of the stamina bar: what is left, and what is used. */
     BAR_FULL("bar/full"),
     BAR_EMPTY("bar/empty"),

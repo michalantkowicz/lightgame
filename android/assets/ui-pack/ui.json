@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "15ca1890cc9efa48dafbafa8a5ff99c8314fc5b3",
+  "uiJsonSha1": "172a11b49c21c1c62ec1283c7c8f09b56707ff76",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -182,6 +182,9 @@
       "playMode": "NORMAL"
     },
     "stars/small": {
+      "frames": 1
+    },
+    "stars/treasure": {
       "frames": 1
     },
     "tiny_emotes/happy": {

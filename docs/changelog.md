@@ -926,3 +926,33 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
 - Owner's request: the **scythe icon redrawn after the owner's picture**: a straight handle standing on the right, a
   dark collar at its top and a long blade sweeping left from it, thick at the collar and narrowing to a point that
   curves down (it was a diagonal handle like the axe's with a crescent across the top). Same palette and outline.
+
+## 2026‑11‑16, play-test fixes (branch `playtest-fixes`)
+
+The owner went through the Haiku testers' list from PR #67 and picked these; the rest stays as it is (tall grass
+hiding characters and the chickens' hard-to-get corn are on purpose; the hint, the texts kids can't read and the grass
+tufts looking a bit like hearts wait for later work).
+
+- **Grass spreads 10× more slowly:** `GrassFeature.CHANCE` 1 % → 0.1 %, `CHANCE_NEXT_TO_GRASS` 10 % → 1 % (a test
+  island had 6 tufts after 2 minutes). Growing stays a phase every 30 s. On `GrassTest`'s 140-tile meadow: about 2
+  tufts after 10 minutes, 17 after 30 (the spreading test now waits 30 minutes).
+- **Grass from Tiled:** an object with `objectClass` `GRASS` and a `phase` property (1 a tuft … 4 a big bush; 1
+  without it, kept within 1–4) puts grass on its tile (`map.TileGrass`, only a mark: `GrassFeature` plants it at the
+  start, so with the feature flag off there is none). `Grass.growTo` sets its phase (also used when it grows by
+  itself); `BoardService.getTiles`. `GrassTest.theMapPutsGrassOnTiles`, `withTheFlagOffTheMapsGrassIsntThere`;
+  tools/assets/README.md lists the object.
+- **The face answers taps:** a tap on the face or the stamina bar (both keep their taps from the map) makes it play
+  a gesture once: happy, cheering, an ear twitch or a blink, at random and never the same twice in a row; a reaction
+  already playing (the weed's sweat) isn't cut short (`FaceReactions.tapped`). Its dice are a copy of the game's,
+  like the grass's (moved to `util.Dice.copyOfTheGames`), so the animals do the same as before. `HudTest`.
+- **The chest's button is a gold star** (the UI pack's stars, piece 12, `UiImage.TREASURE`: treasure inside) instead
+  of the open chest; opened, the chest stays open and its button goes for good (no closing, no opening it empty:
+  the fields are for crops now). The open-chest picture and `Collectible.canBeClosed` on the chest went with it.
+  Golden `collect` re-recorded: once the crop has landed there is no button line any more (the only change).
+  `CollectTest.theOpenedChestStaysOpenWithoutAButton` replaces the test of closing and opening it again;
+  `MouseButtonsTest` follows. Looked at the star in a hidden window.
+- **Wish bubbles 25 % smaller and a little closer:** `PictureBubble` at 3 pack pixels per pixel (was 4), its picture
+  shrunk as much; 4 px between the animal and the bubble (was 8; the smaller frame's empty bottom rows bring it closer
+  too). Closer still, it covered the hand button over the cow. Looked at with the cow and a chicken.
+- **Level 1 (the owner's edit in Tiled):** a few GRASS objects (phases 1–3) near the chickens, and the chicken and the
+  chick moved up to (15,7) and (16,6); `ChickenTest.levelOneHasAChickenAndAChick` follows.

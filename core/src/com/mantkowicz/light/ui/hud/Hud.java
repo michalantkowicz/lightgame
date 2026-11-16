@@ -34,8 +34,8 @@ import java.util.function.IntPredicate;
  * with the things on the map is on the small <b>action buttons</b> over them ({@link ActionButton}). Top right: the settings gear, which opens the
  * settings only after a 3-second hold. Nothing else; the world gets the rest of the screen.
  * <p>
- * The face reacts to the field: picking a crop makes it happy, pulling out a weed makes it sweat and say so
- * ({@link FaceReactions}).
+ * The face reacts to the field: picking a crop makes it happy, pulling out a weed makes it sweat and say so; tapped
+ * (or the stamina bar under it), it plays a gesture ({@link FaceReactions}).
  * <p>
  * Unlike the design, the action isn't on the face but on its own round button beside it (the tool button); the day picture is left out
  * for now.
@@ -116,9 +116,9 @@ public class Hud extends Group {
         addActor(row);
 
         face = new Portrait(resources, "teemo", AWAKE);
-        keepTaps(face);
-        row.addActor(face);
         reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
+        keepTaps(face, reactions::tapped);
+        row.addActor(face);
 
         for (int i = 0; i < BACKPACK_SLOTS; i++) {
             Image slot = new Image(UiStyle.stretching(resources, UiImage.SLOT));
@@ -144,7 +144,7 @@ public class Hud extends Group {
         }
 
         stamina = new StaminaBar(resources, player.getStamina());
-        keepTaps(stamina);
+        keepTaps(stamina, reactions::tapped);
         row.addActor(stamina);
 
         gear = new HoldButton(resources, UiImage.GEAR_BUTTON, SCALE, this::openSettings);
@@ -154,12 +154,13 @@ public class Hud extends Group {
         addActor(toolButton);
     }
 
-    /** Taps on this piece stay in the HUD: they don't reach the map behind it. */
-    private static void keepTaps(com.badlogic.gdx.scenes.scene2d.Actor piece) {
+    /** Taps on this piece stay in the HUD (they don't reach the map behind it) and do this (the face answers). */
+    private static void keepTaps(com.badlogic.gdx.scenes.scene2d.Actor piece, Runnable onTap) {
         piece.setTouchable(Touchable.enabled);
         piece.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                onTap.run();
                 return true;
             }
         });
