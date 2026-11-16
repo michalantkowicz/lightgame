@@ -58,7 +58,17 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "emotes_premium/row_10": {
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "emotes_premium/row_15": {
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_16": {
       "frames": 7,
       "frameDuration": 0.12,
       "playMode": "LOOP"

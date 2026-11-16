@@ -110,6 +110,14 @@ public abstract class SpriteActor extends GameBoardActor {
      * @return false (nothing happens) when no tile next to it is free
      */
     protected boolean walkToFreeNeighbour(float seconds) {
+        return walkToFreeNeighbour(seconds, false);
+    }
+
+    /**
+     * Like {@link #walkToFreeNeighbour(float)}; with {@code keepFacing} it still looks the way it walked once it has
+     * arrived (a chicken), instead of turning back to look right (the cow).
+     */
+    protected boolean walkToFreeNeighbour(float seconds, boolean keepFacing) {
         Tile from = getTile();
         List<Tile> free = new ArrayList<>();
         for (Tile tile : from.getSideNeighbours()) {
@@ -123,12 +131,17 @@ public abstract class SpriteActor extends GameBoardActor {
         Tile target = free.get(MathUtils.random(free.size() - 1));
         boardService.setAccessible(target, false);
         enterTile(target);
-        setMirrored(target.getCenter().x < from.getCenter().x - 1);
+        float dx = target.getCenter().x - from.getCenter().x;
+        if (!keepFacing || Math.abs(dx) > 1) { // walking up or down, a chicken keeps facing the way it did
+            setMirrored(dx < -1);
+        }
         setStatus(Status.MOVEMENT);
         Vector2 position = target.calculatePositionForActorAt(this, TilePoint.CENTER);
         addAction(Actions.sequence(Actions.moveTo(position.x, position.y, seconds), Actions.run(() -> {
             boardService.setAccessible(from, true);
-            setMirrored(false);
+            if (!keepFacing) {
+                setMirrored(false);
+            }
             setStatus(Status.IDLE);
         })));
         return true;

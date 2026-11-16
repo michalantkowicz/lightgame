@@ -48,6 +48,7 @@ public class Player extends GameBoardActor implements Collecting {
     private final Inventory inventory;
     private final Stamina stamina = new Stamina();
     private final AnimationPlugin animationPlugin;
+    private final BoardMovementPlugin boardMovementPlugin;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
@@ -59,7 +60,7 @@ public class Player extends GameBoardActor implements Collecting {
         createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),
                 resourcesService.getSpriteSheet(SPRITE));
 
-        BoardMovementPlugin boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
+        boardMovementPlugin = new BoardMovementPlugin(this, context, SECONDS_PER_TILE);
         addPlugin(boardMovementPlugin);
         addPlugin(new HopPlugin(this, HOP_HEIGHT, HOP_DURATION));
         animationPlugin = new AnimationPlugin(this, resourcesService, SPRITE);
@@ -122,6 +123,23 @@ public class Player extends GameBoardActor implements Collecting {
         float dy = target.y - from.y;
         boolean above = dy > 0 && Math.abs(dy) >= Math.abs(dx);
         animationPlugin.playOnce(Action.WATER, above ? Direction.UP : Direction.DOWN);
+    }
+
+    /**
+     * Swings its scythe once, facing down (the only direction it has: 8 frames, 0.8 s); walking off stops it.
+     */
+    public void scythe() {
+        animationPlugin.playOnce(Action.SCYTHE, Direction.DOWN);
+    }
+
+    /** Is it swinging its scythe right now? */
+    public boolean isScything() {
+        return animationPlugin.isPlayingOnce(Action.SCYTHE);
+    }
+
+    /** The tile the player walks to, or null while it stands (written out: the class is at PMD's import limit). */
+    public com.mantkowicz.light.board.Tile getWalkTarget() {
+        return boardMovementPlugin.getTarget();
     }
 
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */

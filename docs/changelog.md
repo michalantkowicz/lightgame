@@ -719,3 +719,210 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
 - Tests: `FieldTest` (picking, watering three times back to ripe and picking again, corn's five stages, the rabbit
   watering facing down beside the field, walking away while watering). No golden changed. `GameDriver`: `Kind.FIELD`, `field()`,
   `fieldButton()`.
+
+## 2026‑11‑15, a field grows over time (branch `field-grows-over-time`)
+
+- The owner found fields too generous: picking and three quick waterings gave a crop every ~15 s. Now **one
+  watering** is enough: once the water has fallen, the crop grows a phase at once (instant reward) and then by itself,
+  a phase every **30 s** (`Field.SECONDS_PER_PHASE`; 15 s felt too fast to the owner) until it is ripe (for how
+  long, see the sprout below). While it grows the field has nothing to do, so its button fades out (`needsWater` is false and it holds nothing) and comes back with the crop once it is ripe. It grows also with
+  nobody next to it.
+- Each new phase the plant **bounces** (scales to 1.15 from its bottom and back, 0.3 s), so a child sees something
+  happened. Looked at it in a hidden LWJGL3 window.
+- While it grows the plant slowly **squashes and stretches** (5 % shorter and wider and back, 0.75 s each way, from
+  its bottom), so a field visibly lives without looking like a crop to pick up (those bob up and down). It stops when
+  the crop is ripe.
+- The other options (the can runs dry and is refilled at water; seed bags to plant again) are in `docs/ideas.md`
+  (PR #63), to do together with the owner.
+- Tests: `FieldTest` rewritten for one watering and the 30 s phases (no button while growing, the button back when
+  ripe, corn's four timed phases, growing with nobody next to it). `GameDriver.field()` says "growing". No golden
+  changed.
+- Growth **stages are called phases** now (`Field.getGrowthPhase()`, `SECONDS_PER_PHASE`, ...): the owner noted that
+  "stage" already means scene2d's `Stage`.
+- A field just picked is **empty but for a tiny sprout**, the same for every crop (the first picture of the blue
+  flower's row in `Farming Plants.png`, sheet `plant_seedling`), drawn as its own picture since the plant sheets are
+  trimmed differently. The crop's own pictures follow from phase 1, so every crop has one phase more (a carrot field
+  ripens 1.5 min after its watering, corn 2 min). The owner wanted the field to look empty before it's watered.
+- An empty field's **sign shows a question mark** instead of the crop: the pack's blank sign (`sign_blank`) with the UI
+  pack's question icon (`UiImage.HINT_ICON`, the hint button's "?") on its board, 7 sign pixels tall. Once watered the
+  sign shows the crop again. With seeds (`docs/ideas.md`) the player will choose what grows there, so the default
+  shouldn't be given away.
+- **Weeds.** Nobody chooses what grows on a field yet (seeds are an idea), so when the water has fallen on an empty
+  field a **weed** may grow instead of the crop: 40 % (`Field.DEFAULT_WEED_CHANCE`), or Tiled's new `weedChance`
+  property (0..1; tests use 0 and 1 so the dice don't decide). The weed is the rest of the sprout's row (the blue
+  flower, sheet `plant_weed`, three phases after the sprout) and the sign keeps its question mark. Ripe, its button
+  (showing the weed; `Weedable`) pulls it out: it disappears, nothing is gained, the field is empty again, and the
+  HUD's face plays the premium emotes' sweat row (`TEEMO_SWEAT`, row 10) while saying "Beautiful weed but unusable!"
+  for 3 s (`SpeechBubble` can now stay longer). Picking a real crop plays the happy row 3 times (`TEEMO_HAPPY`, row 16; once was easy to miss).
+  The field tells the HUD through `FieldHarvestedEvent`. The owner's idea; looked at it in a hidden LWJGL3 window.
+  Vanishing at once looked odd to the owner, so the pulled weed rises a little (4 art pixels) and fades out in 0.5 s
+  while the sprout shows under it.
+- An empty corn field's watering button sat as high as over ripe corn (the plant's picture box is two tiles tall in
+  every phase). `Field.getTopY` now gives the tile's top for an empty field and the shown plant's top otherwise, so
+  the can's button is as high as on any field; ripe corn's button stays over the plant.
+- PMD then called `Field` and `Hud` possible God Classes, so parts moved out rather than adding exceptions: the sign
+  and its question mark (`FieldSign`), the falling water (`WaterSplash`) and the face's reactions to a harvest
+  (`FaceReactions`, first `HarvestReactions`); later also the weed's picture and fade-out (`WeedPlant`, now `WeedGrowth`) and the
+  bounce and squash (`PlantMoves`).
+- Review (owner): what grows after the sprout is now a `Growth`, the crop (`CropGrowth`: its pictures, ripe it puts
+  the crop into the field) or a weed (`WeedGrowth`, formerly `WeedPlant`: its pictures, gives nothing, fades out when
+  pulled); the field picks one when the water has fallen on it (the weed chance), so `Field` has no weed branches.
+  Swapping the whole actor for a weed field was considered and left: the board, the buttons and the state would all
+  have to move over. With seeds, planting would pick the crop without the dice. The HUD's `HarvestReactions` became `FaceReactions`
+  (`reactions.react()`: it read as if the HUD updated the harvests), kept plain with a note to rework it once the
+  face reacts to more things (no reaction framework yet). The happy face plays 3 times.
+- **Bug: the right mouse button** (found by the owner in the HTML build) walked the rabbit but didn't press any
+  button: the board took any mouse button, while scene2d's `ClickListener` (behind every button) listens to the left
+  one only. Wanted: the right button behaves exactly like the left; fixed on this branch at the owner's request (too
+  small for its own). `GameScreen` hands input to the stages through `AnyButtonInput` (an `InputMultiplexer`) that
+  reports every mouse button as the left one; a second button pressed while one is held does nothing more, so
+  pressing both is one click. The browser's right-click menu was already kept away by `html/webapp/index.html`.
+  `MouseButtonsTest` (right click walks to the chest, opens it with its button, taps the hint; both buttons at once
+  open the chest once) failed before the fix. `GameDriver`: `rightClick`, `rightClickButton`, `rightClickHint`,
+  `clickButtonWithBothButtons`; `tap` takes the button.
+- On this branch too, at the owner's request: their own level1 edits in Tiled (new tilesets: darker soil, mushrooms and
+  flowers, trees and bushes, barn, fences, water objects, chicken houses; a new layer `graound0` with decorations), with
+  the tiles atlas regenerated by `build_assets.py`.
+
+## 2026‑11‑15, chickens (branch `chickens`)
+
+- The owner's request: chickens like the cow, for now with a few differences; eating from the ground and eggs come
+  later. Two kinds (`ChickenType`, Tiled's objectClass `CHICKEN` and `CHICKEN_BABY`): a chicken and a chick.
+- **Restless.** They stand shorter (chicken 1.5–3 s, chick 0.8–2 s; the cow 3–6 s), walk faster (1 s and 0.7 s per
+  tile; the cow 1.5 s) and walk more often; the chick most. In a seeded 10-minute run on open grass the chick takes the
+  most steps, then the chicken, then the cow (`ChickenTest.chickensAreRestless`).
+- **Pecking.** Standing, they often peck at the ground (`PECKING`, the peck row), looking for something: chicken 2 in
+  6 choices, chick 2 in 7, besides walking and sitting down.
+- **Wishes only for corn, bored soon.** Hungry 20 s after their last meal (the cow at first too) they wish for corn;
+  after 15 s without it (the cow: 90 s) they peck at the ground three times instead (`FORAGING`) and are no longer
+  hungry. Fed corn they eat (the eat row: pecking at it) and are happy.
+- **Hearts.** The pack draws a chicken's hearts on the row above its love row, so `Chicken.playLove` plays the love
+  row and the hearts row as a picture of its own one frame (16 art pixels) higher (`PlayOnceImage`).
+- **Shared with the cow.** What both do (hunger, wishes and the bubble, being fed and stroked, waiting, feeding
+  themselves) moved from `Cow` into `FarmAnimal`; `Cow` keeps its `CowState` and draws its random numbers in the same
+  order, so the cow behaves exactly as before (every golden unchanged). `ChickenState` is the chickens' own state
+  machine, as `CLAUDE.md` asks (one enum per creature).
+- Assets: the `chicken` and `chicken_baby` sheets got row names (idle, walk, settle, rise, rest, sleep, peck, eat,
+  hearts, love; duplicate rows keep `row_NN` names so they show in the preview but make no actions); `Sprite.CHICKEN`
+  and `CHICKEN_BABY`; `Action` gained `HEARTS`, `PECK`, `RISE`.
+- **Bugs found by test agents** (Haiku, five per round, each in its own worktree; owner's request), both in
+  `CreatureFeature` and likely only now that animals move about: (1) only the first animal found next to the rabbit
+  got buttons, so with a chicken on each side the second one, still wishing, could not be fed; (2) a button stayed
+  over the animal it came for after that one walked away, while tapping it stroked or fed whichever animal was next
+  to the rabbit now. Now each button is for one animal and stays with it (it fades once that animal is out of reach
+  or done): the wish button for one wishing for something the rabbit carries (else any wishing one), the hand for
+  that one too if it can be stroked. `ChickenTest.bothWishingNeighboursCanBeFed` and `aButtonStaysWithItsAnimal`
+  failed before the fix; `ActionButton.getOver`, `GameDriver.buttonOver`.
+  Round two (two agents: a stress run with 2 cows, 3 chickens and 2 chicks for 30 minutes, 608 taps; the button fix
+  with a cow and chickens) found no bugs, and one case to improve: with the wish button over one animal, getting
+  what another one next to the rabbit wants didn't move the button there (it shook "find"). Now a wish button stays
+  only while its animal is still the one to give to (`ChickenTest.theGiveButtonGoesToTheAnimalTheRabbitCanFeed`,
+  failed before).
+- Owner's review of the open questions: the small heart over the player after a stroke is **smaller and starts
+  higher** (1.5× instead of 2×, from just over its ears instead of over its face; looked at 2×, 1.5× and 1× side by
+  side); the rest stays as it is.
+- Owner's request: a stroke plays **once the hand has faded out**, so the button never covers the hearts. The tap
+  strokes the animal at once, but it first stands still in the new state `BEING_STROKED` for as long as the hand
+  fades (`RemoveWhenUnavailablePlugin.DURATION`, 0.75 s; no dice drawn, so the cow's other choices stay the same),
+  then `STROKED` shows its hearts and the small heart floats up over the rabbit. For every animal, the cow too.
+  (A first version only remembered the tap and stroked after the fade: the owner found strokes lost when the animal
+  started walking meanwhile.) Chickens can now also be stroked while sitting down or getting up: next to the rabbit
+  they never walk, so those were the moments a tap could still miss (`ChickenTest.everyStrokeIsPlayed`).
+- **Bug (owner): the chick couldn't be tapped from far away.** Two causes, found with throwaway probes on level 1 on a
+  big screen: (1) when none of the cells an animal is used from can be reached (in the bottom right corner the chick
+  is used only from its left, and the chicken shut that cell in), a tap did nothing at all; now the rabbit walks as
+  close as it can get, to the nearest reachable cell next to it (`BoardMovementPlugin.walkTarget`, for chests too;
+  `ChickenTest.tappingAChickNobodyCanGetToWalksAsCloseAsPossible`). (2) With the rabbit far up the map, the bottom of
+  the map is behind the HUD's bottom row, which caught every tap inside its whole box, also in the gaps between the
+  slots, the face and the stamina bar where the map shows; now only its pieces keep their taps
+  (`HudTest.aTapBetweenTheHudsPiecesReachesTheMap`). Both tests failed before. A first guess (chickens keeping still
+  for a rabbit above them blocking a corridor) was wrong and reverted.
+- Owner's request: **20 s between strokes** (`FarmAnimal.SECONDS_BETWEEN_STROKES`): once stroked, an animal can't be
+  stroked again for 20 s and the hand doesn't come back meanwhile (`FarmAnimal.canBeStroked` = what it does allows
+  it, `isStrokable` from its state, and the pause is over). For every animal; the first stroke works at once.
+  `CowTest.strokingTheCow` checks the hand is back only after 20 s.
+- Owner's request: **the cow walks a little more and wishes about once a minute**: it gets hungry 60 s after its last
+  meal (was 20 s), stands 2–4 s between choices (was 3–6 s) and walks 3 times in 4 (was 2 in 3) rather than lying
+  down. `CowTest` waits up to 63 s for the first wish; two tests checking the bubble "far away" now use a longer row
+  and step the rabbit away, since the busier cow may wander next to it first. No golden changed.
+- A wish is chosen **once per hunger** (`FarmAnimal.chooseWish`): stroked while wishing, an animal comes back wishing
+  for the same crop. `CowState.STANDING` meant this already, but it chose again; `CowTest` passed only by the luck of
+  the seeded dice, and the new state's timing showed it.
+- Owner's request: a chicken **never walks away from the rabbit** next to it (diagonally too) or walking to a tile
+  next to it (`Chicken.isPlayerNear`, the player's walk target from `BoardMovementPlugin.getTarget`): it pecks
+  instead. It may still be hard to catch while the rabbit isn't coming. And it **keeps looking the way it walked**
+  (`SpriteActor.walkToFreeNeighbour(seconds, keepFacing)`; the cow still turns back), the hearts mirrored with it.
+  `ChickenTest`: `theyDontWalkAwayFromTheRabbitNextToThem`, `aChickWaitsForTheRabbitComingToIt` (both fail without
+  the rule), `aChickenKeepsLookingTheWayItWent`. `Player.getWalkTarget` names `Tile` in
+  full: `Player` is at PMD's import limit.
+- Left as they are (owner): sleeping stays 4–8 s, though the chickens' rest and sleep rows look much alike; in level 1
+  the chickens are off screen at the start; chickens look hungry about 39 % of the time (20 s hunger, 15 s wish); a
+  wish bubble near the map's top edge can be cut off (no walkable ground planned there).
+- `level1` (owner's request): a chicken and a chick at the bottom right, cells (17, 13) and (19, 13) from the top.
+- Tests: `ChickenTest` (corn only, restless, bored soon, fed corn with hearts one frame up, stroking a chick, every
+  state's animation for both, level 1). `GameDriver`: `Kind.CHICKEN` and `CHICKEN_BABY` and per-animal helpers
+  (`animalState`, `animalAnimation`, `animalWish`, `animalWants`, `animalFavouriteDishes`, `chickenShowsHearts`,
+  `chickenHeartsOffset`, `strokeAnimal`); wish bubbles are found per character, since several can wish at once
+  (`PictureBubble.getCharacter`). Looked at both in a hidden LWJGL3 window.
+
+## 2026‑11‑15 and 16, cutting grass: a scythe swing, its icon, growing grass (branch `cutting-grass`)
+
+- The owner's request: an 8-frame scything animation for the player, facing down only, to be used next (cutting
+  grass). The pack has no scythe, so `tools/assets/scythe_animation.py` (Pillow, run once per pack copy) makes it from
+  the rabbit's `chop_down` row: the axe is taken out (its two greys and two browns appear nowhere else on the rabbit)
+  and a scythe is drawn along where the axe was held, a 10 px handle and an 8 px curved blade with a light cutting
+  edge, hooking the way each frame needs: held low on the left, raised up and left (the blade curving down, as a
+  raised scythe), swept down past the rabbit with the pack's white arc, and ending low in front of its feet, the blade
+  along the grass. Tried on the till row too, which swings straight up and down: no good for a scythe.
+- The game draws the rabbit from one sheet (one trim box and anchor for all its rows), so the frames go into a copy of
+  `Characters/Premium Charakter Spritesheet.png` with one more row, `scythe_down` (row 24), saved as `... with
+  scythe.png` in the pack folder (owner's choice: a file next to the pack's, git-ignored like the pack). `pack.json`
+  reads the rabbit from it and ignores the original; `Action` gained `SCYTHE`; the atlas is regenerated. README.md and
+  tools/assets/README.md say to run the script once after copying the pack. Not used by the game yet.
+- The owner's request: a **scythe item icon** in the style of the pack's `Objects/Items/tools and meterials.png`. The
+  same script draws it pixel by pixel (16x16): the handle from the bottom left up to the right as the axe icon's (its
+  three browns), a crescent blade across the top curving down at its tip (the icons' four greys), all in their 1 px
+  light outline. Saved as `Objects/Items/scythe icon.png` in the pack folder; the sheet `scythe_icon` (row `icon`,
+  like `watering_can`) and `Sprite.SCYTHE_ICON` put it into the atlas. Looked at it 16x and at game size next to the
+  pack's axe and pickaxe.
+- The owner's request: **growing grass, cut with the scythe** (feature flag `GROWING_GRASS`, a new `debug.FeatureFlag`
+  enum for whole features, on as the game ships; the feature isn't even created when it is off).
+  `feature.GrassFeature` holds the settings as constants: every 30 s (`SECONDS_BETWEEN_SPROUTS`) each tile the rabbit
+  can get to (from its start; a tile only animals stand on counts, a chest's or a field's never does) without grass
+  sprouts some with 1 % (`CHANCE`), 10 % next to grass, diagonally too (`CHANCE_NEXT_TO_GRASS`), all decided on the
+  grass there was before. It grows a phase every 30 s like the crops (`Field.SECONDS_PER_PHASE`, now public), a still
+  picture each from `Objects/Mushrooms, Flowers, Stones.png` row 2 (sheet `grass_tuft`, `Sprite.GRASS_TUFT`): a tuft
+  and two tufts in a layer right over the board (under everyone), a bush and a big bush in a layer kept in front of
+  the map, 90 % opaque (`TALL_ALPHA`), under only the wish bubbles (kept in front so wishes stay readable), the HUD and
+  the action buttons. `actor.Grass` blocks nothing and taps go through it.
+- Owner's review: grass **stands on its tile's bottom edge** (it was centred on the tile, like the sprites, so its
+  blades floated 1–3 px above it): the packed box's bottom on the edge, and the single tuft (2 empty rows under it,
+  `Grass.EMPTY_ROWS_BELOW`, measured from the pack) 2 px lower. `GrassTest` checks it (`grassBelowTileBottom`).
+- Cutting: standing still on grass the HUD's **tool button** shows the scythe icon instead of the hint (owner: not an
+  action button over the grass); tapped, the rabbit swings the scythe once (`Player.scythe`, 8 frames of 100 ms = 0.8 s, under the owner's 1 s, so once) and then the
+  grass fades out in 0.5 s; walking off mid-swing (which stops the swing) leaves it. `AnimationPlugin.isPlayingOnce`.
+- The grass has its own dice: a copy of the game's at the start (`RandomXS128` state, no roll taken), so the animals'
+  random choices are the same with or without grass and no golden changed.
+- Tests: `GrassTest` (sprouting and spreading only where the rabbit can go, none with the flag off, the phases and the
+  tall layer, cutting, walking off mid-swing, blocking nothing). `GameDriver`: `growingGrass`, `grass`,
+  `sproutGrass`, `grassDrawn`, `grassFadingOut`. Looked at the phases, the button and the swing in a hidden window.
+- **Naming (owner):** the big round HUD button right of the face is the **tool button** (`ui.hud.ToolButton`, actor
+  name "TOOL"; it was the hint button, `Hud.getHint`): it shows a tool for where the player stands (`setTool`, the
+  scythe on grass) or, without one, the hint (question mark). The small round buttons over things on the map stay
+  **action buttons**. `Hud.ACTION_RIGHT`/`ACTION_Y` (they placed the round HUD button) became `TOOL_RIGHT`/`TOOL_Y`;
+  `GameDriver.tapToolButton`, `toolButton`. The tool's logic moved out of `Hud` into `ToolButton` (PMD: Hud a possible
+  God Class otherwise). The goldens `hud` and `hud-hint` were re-recorded for the rename only: their HUD line says
+  "tool button: hint" instead of "hint:" (nothing else changed); CLAUDE.md, hud-design.md and e2e/README.md say so too.
+- Owner's request after the play-test: **one swing cuts all around**: the grass on the rabbit's tile and on all eight
+  tiles around it (diagonally too) fades out. The scythe still comes only when the rabbit stands on grass (just next
+  to it: the hint). Walking off mid-swing still leaves it all. `GrassTest.oneSwingCutsAllAround`,
+  `grassOnlyNextToTheRabbitBringsNoScythe`.
+- Owner's request: cut grass **gets smaller while it fades out** (`Grass.cutDown`): to a fifth of its size over the
+  fade, which the owner then made 30 % quicker (`GrassFeature.FADE_SECONDS` 0.5 s → 0.35 s), towards its base (the blades' bottom stays on the tile's bottom edge). A first try squashed it flat as if
+  mown; the owner found that weird. Clippings flying off could be added later from `GrassFeature` at the cut, without
+  changing this. `GrassTest` checks it is smaller partway (`fadingGrassHeights`). Looked at frame by frame.
+- Owner's request (small, on this branch): the **FPS label** (`Debug.Tool.FPS_LABEL`) has a black box behind its text
+  (`LabelFactory.createLabel`'s background: a stretched black pixel with 6x2 px padding), sized to the text each frame.
+- Owner's request: the **scythe icon redrawn after the owner's picture**: a straight handle standing on the right, a
+  dark collar at its top and a long blade sweeping left from it, thick at the collar and narrowing to a point that
+  curves down (it was a diagonal handle like the axe's with a crescent across the top). Same palette and outline.

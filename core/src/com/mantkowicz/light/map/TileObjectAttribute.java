@@ -10,7 +10,9 @@ public enum TileObjectAttribute {
     /** A cow's crops to wish for, e.g. "CARROT,CUCUMBER"; any crop without it. */
     FAVOURITE_DISH("favouriteDish"),
     /** What grows on a field, e.g. "CORN"; a carrot without it. */
-    CROP_TYPE("cropType");
+    CROP_TYPE("cropType"),
+    /** How likely a field grows a weed instead of its crop after watering, 0..1, e.g. "0" for never; 0.4 without it. */
+    WEED_CHANCE("weedChance");
 
     private final String value;
 

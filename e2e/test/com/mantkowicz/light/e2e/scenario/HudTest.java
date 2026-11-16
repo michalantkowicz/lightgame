@@ -17,6 +17,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the bottom row don't walk the player.
  */
 class HudTest {
+    /** Grass all around the rabbit, also far below it (behind the HUD's bottom row). */
+    private static final TestMap FIELD = TestMap.of(
+            "~~~~~~~~~~~",
+            "~.........~",
+            "~.........~",
+            "~....P....~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~.........~",
+            "~~~~~~~~~~~");
+
     private static final TestMap MAP = TestMap.of(
             "~~~~~~~",
             "~.....~",
@@ -103,8 +117,8 @@ class HudTest {
         // the chest's cell (3,4) is 384..512 x 512..640 on the map, the camera's middle (448,320) is the screen's (400,640):
         // centred over the chest (400 - 90 / 2 = 355), 16 px over its top (640 + 16 - 320 + 640 = 976)
         assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(355.0,976.0) alpha=1.0"), next);
-        assertTrue(game.describeHud().contains("hint: at=(628.0,74.0) size=108.0x120.0"),
-                "the hint stays right of the face");
+        assertTrue(game.describeHud().contains("tool button: hint at=(628.0,74.0) size=108.0x120.0"),
+                "the tool button (the hint) stays right of the face");
     }
 
     @Test
@@ -212,6 +226,20 @@ class HudTest {
         game.tapFace();
         game.seconds(2);
         assertEquals(start, game.playerCell(), "the face is in front of the map: the tap stays in the HUD");
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Was a bug (found by the owner: a chick near the bottom of the screen couldn't be tapped): the bottom row caught
+     * every tap inside its whole box, also between its pieces where the map shows. Now a tap there reaches the map.
+     */
+    @Test
+    void aTapBetweenTheHudsPiecesReachesTheMap() {
+        GameDriver game = GameDriver.start(FIELD.write("hud-field"));
+        Cell start = game.playerCell();
+        game.tapBetweenBackpackAndFace();
+        game.seconds(3);
+        assertTrue(!start.equals(game.playerCell()), "the rabbit walked to the cell tapped there");
         assertFalse(game.crashed());
     }
 

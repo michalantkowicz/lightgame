@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "e9095d36d21e60dd33cd022b27aa083dc26e79bd",
+  "packJsonSha1": "5a3e1d52646119fac5288d4ddc69f828e63e4776",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -11,6 +11,26 @@
       "height": 21,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "chicken": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "chicken_baby": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "cow_brown": {
       "frameWidth": 32,
@@ -29,6 +49,16 @@
       "trimY": 0,
       "width": 16,
       "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "grass_tuft": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 13,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -82,6 +112,16 @@
       "anchorX": 8,
       "anchorY": 8
     },
+    "plant_seedling": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 5,
+      "trimY": 1,
+      "width": 6,
+      "height": 4,
+      "anchorX": 8,
+      "anchorY": 8
+    },
     "plant_tomato": {
       "frameWidth": 16,
       "frameHeight": 16,
@@ -92,15 +132,45 @@
       "anchorX": 8,
       "anchorY": 8
     },
+    "plant_weed": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 2,
+      "trimY": 1,
+      "width": 12,
+      "height": 12,
+      "anchorX": 8,
+      "anchorY": 8
+    },
     "rabbit": {
       "frameWidth": 48,
       "frameHeight": 48,
-      "trimX": 3,
-      "trimY": 10,
-      "width": 42,
-      "height": 31,
+      "trimX": 2,
+      "trimY": 7,
+      "width": 43,
+      "height": 34,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "scythe_icon": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 14,
+      "height": 15,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "sign_blank": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "sign_carrot": {
       "frameWidth": 16,
@@ -185,6 +255,210 @@
       "frames": 5,
       "frameDuration": 0.1,
       "playMode": "NORMAL"
+    },
+    "chicken/eat": {
+      "sheet": "chicken",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/hearts": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/idle": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/love": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/peck": {
+      "sheet": "chicken",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/rest": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/rise": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_01": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_05": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_06": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_09": {
+      "sheet": "chicken",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/row_10": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/settle": {
+      "sheet": "chicken",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/sleep": {
+      "sheet": "chicken",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken/walk": {
+      "sheet": "chicken",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/eat": {
+      "sheet": "chicken_baby",
+      "frames": 2,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/hearts": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/idle": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/love": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/peck": {
+      "sheet": "chicken_baby",
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/rest": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/rise": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_01": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_05": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_06": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_09": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_10": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_15": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_16": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_17": {
+      "sheet": "chicken_baby",
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/row_18": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/settle": {
+      "sheet": "chicken_baby",
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/sleep": {
+      "sheet": "chicken_baby",
+      "frames": 4,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "chicken_baby/walk": {
+      "sheet": "chicken_baby",
+      "frames": 8,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
     },
     "cow_brown/eat": {
       "sheet": "cow_brown",
@@ -318,6 +592,12 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "grass_tuft/grow": {
+      "sheet": "grass_tuft",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "item_shadow/row_00": {
       "sheet": "item_shadow",
       "frames": 1,
@@ -348,9 +628,21 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "plant_seedling/grow": {
+      "sheet": "plant_seedling",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "plant_tomato/grow": {
       "sheet": "plant_tomato",
       "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "plant_weed/grow": {
+      "sheet": "plant_weed",
+      "frames": 3,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
@@ -426,6 +718,12 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "rabbit/scythe_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "rabbit/till_down": {
       "sheet": "rabbit",
       "frames": 8,
@@ -495,6 +793,18 @@
     "rabbit/water_up": {
       "sheet": "rabbit",
       "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "scythe_icon/icon": {
+      "sheet": "scythe_icon",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "sign_blank/sign": {
+      "sheet": "sign_blank",
+      "frames": 1,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },

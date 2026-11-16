@@ -37,12 +37,19 @@ public class BoardMovementPlugin implements Plugin {
     private final BoardService boardService;
     private final float secondsPerTile;
     private Tile tileToEnter;
+    /** Where the walk goes, or null while the player stands. */
+    private Tile target;
 
     public BoardMovementPlugin(GameBoardActor player, GameContext context, float secondsPerTile) {
         this.player = player;
         this.gameEventService = context.getGameEventService();
         this.boardService = context.getBoardService();
         this.secondsPerTile = secondsPerTile;
+    }
+
+    /** The tile the player walks to (next to a creature it was tapped on), or null while it stands. */
+    public Tile getTarget() {
+        return MOVEMENT.equals(player.getStatus()) ? target : null; // stopped some other way (a tap on it): no target
     }
 
     @Override
@@ -57,20 +64,31 @@ public class BoardMovementPlugin implements Plugin {
     /**
      * The clicked tile, or for something used from a neighbouring tile (a chest) the free tile it is used from
      * ({@link Tile#getUsedFromNeighbours()}) with the shortest walk (where the player stands if it's already there).
+     * When none of those can be reached (shut in by others, e.g. chickens in a corner), the closest tile next to it
+     * that can be (above it, diagonally): a tap always gets the player as close as it can.
      */
     private Tile walkTarget(Tile clicked, Tile current) {
         if (clicked.isAccessible() || !boardService.isUsedFromNeighbour(clicked)) {
             return clicked;
         }
-        if (clicked.getUsedFromNeighbours().contains(current)) {
+        Tile best = closest(clicked.getUsedFromNeighbours(), current);
+        if (best == null) {
+            best = closest(clicked.getNeighbours(), current);
+        }
+        return best == null ? clicked : best;
+    }
+
+    /** Of these tiles, where the player stands, else the free one with the shortest walk; null when none can be reached. */
+    private Tile closest(List<Tile> tiles, Tile current) {
+        if (tiles.contains(current)) {
             return current;
         }
-        Tile best = clicked;
+        Tile best = null;
         int shortest = Integer.MAX_VALUE;
-        for (Tile neighbour : clicked.getUsedFromNeighbours()) {
-            int length = neighbour.isAccessible() ? boardService.getPath(current, neighbour).getPathNodes().size() : 0;
+        for (Tile tile : tiles) {
+            int length = tile.isAccessible() ? boardService.getPath(current, tile).getPathNodes().size() : 0;
             if (length > 0 && length < shortest) {
-                best = neighbour;
+                best = tile;
                 shortest = length;
             }
         }
@@ -104,6 +122,7 @@ public class BoardMovementPlugin implements Plugin {
 
         player.clearActions();
         player.setStatus(MOVEMENT);
+        this.target = target;
         player.addAction(Actions.sequence(
                 new FollowPathAction(positions, secondsPerTile * length / tileSize),
                 Actions.run(this::arrive)));
@@ -143,6 +162,7 @@ public class BoardMovementPlugin implements Plugin {
     }
 
     private void arrive() {
+        target = null;
         if (enterPendingTile()) {
             player.setStatus(IDLE);
         }

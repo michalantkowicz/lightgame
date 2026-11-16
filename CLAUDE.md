@@ -47,14 +47,19 @@ design, change the rule on purpose in its own PR.
 - `GameScreen` builds everything and hands a `GameContext` (services, plain `Stage`s) to game objects.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
-- A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`), all its
-  transitions in that one file, no framework on top. `Debug.Tool.STATE_LABELS` shows the states while playing.
+- A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
+  `ChickenState` for `Chicken`), all its transitions in that one file, no framework on top. What farm animals share
+  (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. `Debug.Tool.STATE_LABELS` shows the states while playing.
+- Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`); a feature checks its flag where it
+  is created.
 - Events go through `GameEventService`; an event class lives next to what it is about (one that carries nothing of the
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).
 - The board tracks `TileOccupant`s and `TileContent`s and knows nothing of actors or the map.
-- HUD (`ui.hud`): the face (`Portrait`, idle and reactions), backpack slots, stamina bar, the round action/hint button
-  (also strokes or feeds a `Creature` next to the player: `CreatureFeature`), the hold-to-open settings gear. Collecting: a chest's button throws its items onto free tiles (`ItemThrower`), the
-  player picks them up by walking onto them.
+- HUD (`ui.hud`): the face (`Portrait`, idle and reactions), backpack slots, stamina bar, the **tool button** (the big
+  round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, else the
+  hint), the hold-to-open settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
+  the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`). Collecting: a
+  chest's button throws its items onto free tiles (`ItemThrower`), the player picks them up by walking onto them.
 
 ## Gotchas
 

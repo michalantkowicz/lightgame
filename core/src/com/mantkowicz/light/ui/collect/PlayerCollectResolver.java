@@ -7,6 +7,7 @@ import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Waterable;
+import com.mantkowicz.light.actor.Weedable;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.board.TileTouchedEvent;
@@ -33,7 +34,9 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * free tiles around it; with nowhere for them to land, it stays shut and its button shakes. A chest then keeps its
  * button, showing the closed chest: it closes the lid, and the next tap opens it again (with nothing left inside: no
  * stars, nothing comes out). Something that can't be closed loses its button once it is empty. Something that needs
- * water (a field with a growing crop) keeps its button, the watering can: the player waters it, and it grows.
+ * water (a field just picked) keeps its button, the watering can: the player waters it. Watered, a field grows by
+ * itself without a button, which comes back once the crop is ripe. A ripe weed instead keeps the button too, the weed:
+ * the player pulls it out and it disappears.
  * <p>
  * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
  * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
@@ -140,11 +143,16 @@ public class PlayerCollectResolver implements CollectResolver {
         }
     }
 
-    /** Waters it when it needs water (a growing field), closes it when it is open (a chest's lid), opens it otherwise. */
+    /**
+     * Waters it when it needs water (a field just picked), pulls out a ripe weed, closes it when it is open (a chest's
+     * lid), opens it otherwise.
+     */
     private void use(Collectible collectible) {
         if (needsWater(collectible)) {
             player.water(collectible.getTile().getCenter());
             ((Waterable) collectible).water();
+        } else if (hasWeed(collectible)) {
+            ((Weedable) collectible).pullWeed();
         } else if (collectible.isOpen()) {
             collectible.afterCollect();
         } else {
@@ -215,9 +223,17 @@ public class PlayerCollectResolver implements CollectResolver {
         return isInReach(collectible) && isUsable(collectible) && !collectible.isBusy();
     }
 
-    /** It holds something, it can be closed and opened again (a chest, even empty), or it needs water (a field). */
+    /**
+     * It holds something, it can be closed and opened again (a chest, even empty), it needs water or a ripe weed
+     * grows on it (a field).
+     */
     private static boolean isUsable(Collectible collectible) {
-        return holdsSomething(collectible) || collectible.canBeClosed() || needsWater(collectible);
+        return holdsSomething(collectible) || collectible.canBeClosed() || needsWater(collectible)
+                || hasWeed(collectible);
+    }
+
+    private static boolean hasWeed(Collectible collectible) {
+        return collectible instanceof Weedable weedable && weedable.hasWeed();
     }
 
     private static boolean needsWater(Collectible collectible) {

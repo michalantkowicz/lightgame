@@ -4,6 +4,7 @@ import box2dLight.Light;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -32,6 +33,7 @@ import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.GameBoardActor;
+import com.mantkowicz.light.actor.Grass;
 import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
@@ -41,13 +43,19 @@ import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.WallTile;
 import com.mantkowicz.light.character.Chest;
+import com.mantkowicz.light.character.Chicken;
+import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Dog;
+import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileLight;
@@ -87,7 +95,7 @@ public final class GameDriver {
     private static final int FRAMES_PER_SECOND = 60;
 
     public enum Kind {
-        PLAYER, DOG, CHEST, COW, FIELD
+        PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY
     }
 
     private final HeadlessGame game;
@@ -154,6 +162,50 @@ public final class GameDriver {
         tap(gameScreenPosition(cellCenter(cell)));
     }
 
+    /** Short click with the right mouse button (libGDX's {@code Buttons}) on the centre of a cell. */
+    public void rightClick(Cell cell) {
+        tap(gameScreenPosition(cellCenter(cell)), Buttons.RIGHT);
+    }
+
+    /** Short click with the right mouse button on a UI button by its text (see {@link #clickButton}). */
+    public void rightClickButton(String text) {
+        for (Actor actor : uiActors()) {
+            if (isButton(actor, text)) {
+                tap(uiScreenPosition(actor), Buttons.RIGHT);
+                return;
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
+    /** Short click with the right mouse button on the tool button (the hint). */
+    public void rightClickHint() {
+        tap(uiScreenPosition(hud().getToolButton()), Buttons.RIGHT);
+    }
+
+    /**
+     * Presses the left mouse button on a UI button, presses the right one too, then lets go of the left one and the
+     * right one: one press, which should give one click.
+     */
+    public void clickButtonWithBothButtons(String text) {
+        for (Actor actor : uiActors()) {
+            if (isButton(actor, text)) {
+                movePointer(uiScreenPosition(actor));
+                int x = (int) pointer.x, y = (int) pointer.y;
+                inputProcessor().touchDown(x, y, 0, Buttons.LEFT);
+                frames(1);
+                inputProcessor().touchDown(x, y, 0, Buttons.RIGHT);
+                frames(1);
+                inputProcessor().touchUp(x, y, 0, Buttons.LEFT);
+                frames(1);
+                inputProcessor().touchUp(x, y, 0, Buttons.RIGHT);
+                frames(1);
+                return;
+            }
+        }
+        throw new IllegalStateException("No \"" + text + "\" button on screen");
+    }
+
     /** Short click on the centre of an actor. */
     public void click(Kind kind) {
         tap(gameScreenPosition(actor(kind).getCenter()));
@@ -196,7 +248,7 @@ public final class GameDriver {
 
     /**
      * What the HUD shows, one line each, positions in UI pixels (800 wide, y up): the face, the backpack, the
-     * stamina bar, the hint button, the bubble over the face, the gear and how full its hold circle is, whether the
+     * stamina bar, the tool button, the bubble over the face, the gear and how full its hold circle is, whether the
      * settings window is open.
      */
     public String describeHud() {
@@ -213,7 +265,7 @@ public final class GameDriver {
         StaminaBar stamina = hud.getStamina();
         snapshot.line("stamina: %d of %d segments, face %s %s", stamina.getFullSegments(), stamina.getSegments(),
                 stamina.getMood(), uiBox(stamina));
-        snapshot.line("hint: %s", uiBox(hud.getHint()));
+        snapshot.line("tool button: %s %s", hud.getToolButton().getToolName(), uiBox(hud.getToolButton()));
         SpeechBubble bubble = hud.getBubble();
         snapshot.line("bubble: %s", bubble == null
                 ? "none"
@@ -260,9 +312,31 @@ public final class GameDriver {
         ((Player) actor(Kind.PLAYER)).getStamina().fill();
     }
 
-    /** Short tap on the hint button (the question mark right of the face). */
+    /** Short tap on the tool button (the big round button right of the face): its tool, or the hint without one. */
+    public void tapToolButton() {
+        tap(uiScreenPosition(hud().getToolButton()));
+    }
+
+    /** What the tool button shows: its tool, e.g. "scythe", or "hint" (the question mark). */
+    public String toolButton() {
+        return hud().getToolButton().getToolName();
+    }
+
+    /** Short tap on the tool button while it shows the hint (the question mark right of the face). */
     public void tapHint() {
-        tap(uiScreenPosition(hud().getHint()));
+        tap(uiScreenPosition(hud().getToolButton()));
+    }
+
+    /**
+     * Short tap on the screen between the right backpack slot and the face, at the face's middle height: on the map
+     * behind the HUD's bottom row, not on one of its pieces.
+     */
+    public void tapBetweenBackpackAndFace() {
+        Actor slot = hud().getSlots().get(hud().getSlots().size() - 1);
+        Actor face = hud().getFace();
+        Vector2 right = slot.localToStageCoordinates(new Vector2(slot.getWidth(), 0));
+        Vector2 left = face.localToStageCoordinates(new Vector2(0, face.getHeight() / 2f));
+        tap(uiStage().stageToScreenCoordinates(new Vector2((right.x + left.x) / 2f, left.y)));
     }
 
     /** Short tap on the player's face in the HUD. */
@@ -358,10 +432,14 @@ public final class GameDriver {
     }
 
     private void tap(Vector2 screenPosition) {
+        tap(screenPosition, Buttons.LEFT);
+    }
+
+    private void tap(Vector2 screenPosition, int button) {
         movePointer(screenPosition);
-        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, 0);
+        inputProcessor().touchDown((int) pointer.x, (int) pointer.y, 0, button);
         frames(1);
-        inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, 0);
+        inputProcessor().touchUp((int) pointer.x, (int) pointer.y, 0, button);
         frames(1);
     }
 
@@ -518,11 +596,49 @@ public final class GameDriver {
         throw new IllegalStateException("No chest button on screen");
     }
 
-    /** The field: its crop and how far it has grown, e.g. "carrot 1/3" (3/3 is ripe), "+ water" while watered. */
+    /**
+     * The field: its crop (or "weed" while one grows instead) and how far it has grown, e.g. "carrot 1/4" (4/4 is
+     * ripe), "+ water" while water falls, "growing" while it grows by itself.
+     */
     public String field() {
         com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
-        return field.getCrop().getName() + " " + field.getGrowthStage() + "/" + field.getRipeStage()
-                + (field.isBeingWatered() ? " + water" : "");
+        return (field.isWeed() ? "weed" : field.getCrop().getName()) + " " + field.getGrowthPhase() + "/"
+                + field.getRipePhase()
+                + (field.isBeingWatered() ? " + water" : "") + (field.isGrowing() ? " growing" : "");
+    }
+
+    /** How likely the field grows a weed instead of its crop (Tiled's weedChance, 0.4 without it). */
+    public float fieldWeedChance() {
+        return ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).getWeedChance();
+    }
+
+    /** Is a weed pulled out of the field still fading out? */
+    public boolean fieldWeedFadingOut() {
+        return ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).isWeedFadingOut();
+    }
+
+    /** How high the field's button sits: the top it is placed over, in tiles (1 = the tile's top, ripe corn higher). */
+    public float fieldTopInTiles() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        return field.getTopY() / field.getHeight();
+    }
+
+    /** What the bubble over the HUD's face says, or null when there is none. */
+    public String faceSays() {
+        SpeechBubble bubble = hud().getBubble();
+        return bubble == null || bubble.getStage() == null ? null : bubble.getText();
+    }
+
+    /** What the field's sign shows: its crop's name, or "?" while the field is empty. */
+    public String fieldSign() {
+        com.mantkowicz.light.character.Field field = (com.mantkowicz.light.character.Field) actor(Kind.FIELD);
+        return field.isCropOnSign() ? field.getCrop().getName() : "?";
+    }
+
+    /** The field's plant scale "x/y" rounded to hundredths, e.g. "1.0/1.0" standing still, "1.03/0.97" squashed. */
+    public String fieldPlantScale() {
+        Actor plant = ((com.mantkowicz.light.character.Field) actor(Kind.FIELD)).getAvatar();
+        return Math.round(plant.getScaleX() * 100) / 100f + "/" + Math.round(plant.getScaleY() * 100) / 100f;
     }
 
     /** What the field's button shows: "crop" (picks it), "water" (the watering can), or "none" (no button). */
@@ -794,18 +910,98 @@ public final class GameDriver {
         return names;
     }
 
-    /** The picture bubbles on the map are drawn in front of every other actor (only the cow has one). */
+    /** The picture bubble over a character; the bubbles on the map are drawn in front of every other actor. */
     private String bubbleOver(Group character) {
         Array<Actor> actors = gameStage().getActors();
-        for (Actor actor : actors) {
-            if (actor instanceof PictureBubble bubble) {
-                if (actor != actors.peek()) {
-                    throw new IllegalStateException("The bubble isn't in front of everything on the map");
-                }
-                return bubble.isVisible() ? bubble.getPictureName() : "hidden";
+        boolean bubblesSoFar = true; // from the front: only bubbles until the first other actor
+        String found = "none";
+        for (int i = actors.size - 1; i >= 0; i--) {
+            Actor actor = actors.get(i);
+            if (!(actor instanceof PictureBubble bubble)) {
+                bubblesSoFar = false;
+                continue;
+            }
+            if (!bubblesSoFar) {
+                throw new IllegalStateException("A bubble isn't in front of everything on the map");
+            }
+            if (bubble.getCharacter() == character) {
+                found = bubble.isVisible() ? bubble.getPictureName() : "hidden";
             }
         }
-        return "none";
+        return found;
+    }
+
+    // farm animals by kind: COW, CHICKEN, CHICKEN_BABY
+
+    /** What the animal is doing (its state machine's state), e.g. "STANDING", "PECKING", "WISHING". */
+    public String animalState(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getStateName();
+    }
+
+    /** The animal's animation right now, e.g. "chicken/peck". */
+    public String animalAnimation(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getCurrentAnimation();
+    }
+
+    /** What the bubble over the animal shows, e.g. "corn", "hidden" (the button is there), or "none". */
+    public String animalWish(Kind kind) {
+        return bubbleOver(actor(kind));
+    }
+
+    /** What the animal wishes for right now, bubble or not, e.g. "corn", or "none" when it isn't wishing. */
+    public String animalWants(Kind kind) {
+        Item wish = ((FarmAnimal) actor(kind)).getWish();
+        return wish == null ? "none" : ((Crop) wish).getType().getName();
+    }
+
+    /** The crops the animal may wish for, e.g. ["corn"]. */
+    public List<String> animalFavouriteDishes(Kind kind) {
+        List<String> names = new ArrayList<>();
+        for (CropType type : ((FarmAnimal) actor(kind)).getFavouriteDishes()) {
+            names.add(type.getName());
+        }
+        return names;
+    }
+
+    /** Is the animal's picture mirrored (its sheet looks right; it looks left)? */
+    public boolean animalLooksLeft(Kind kind) {
+        return ((FarmAnimal) actor(kind)).isMirrored();
+    }
+
+    /** Are hearts over the chicken (or chick) right now? */
+    public boolean chickenShowsHearts(Kind kind) {
+        return ((Chicken) actor(kind)).showsHearts();
+    }
+
+    /** Where the hearts over the chicken (or chick) are drawn relative to its picture: {dx, dy} in screen pixels. */
+    public float[] chickenHeartsOffset(Kind kind) {
+        Chicken chicken = (Chicken) actor(kind);
+        for (Actor child : chicken.getChildren()) {
+            if (child.getClass().getSimpleName().equals("PlayOnceImage")) {
+                return new float[]{child.getX() - chicken.getAvatar().getX(),
+                        child.getY() - chicken.getAvatar().getY()};
+            }
+        }
+        throw new IllegalStateException("No hearts over the " + kind);
+    }
+
+    /** Which animal a shown action button (e.g. "STROKE", "GIVE") stands over, or null when there is none. */
+    public Kind buttonOver(String name) {
+        for (Actor actor : uiActors()) {
+            if (actor instanceof ActionButton button && name.equals(button.getName()) && button.getOver() != null) {
+                for (Kind kind : List.of(Kind.COW, Kind.CHICKEN, Kind.CHICKEN_BABY)) {
+                    if (has(kind) && actor(kind) == button.getOver()) {
+                        return kind;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    /** Strokes the animal as the round button would (the player needn't be next to it). */
+    public void strokeAnimal(Kind kind) {
+        ((FarmAnimal) actor(kind)).stroke();
     }
 
     /** The small pictures floating up on the map right now, e.g. ["heart"] over the player after stroking the cow. */
@@ -836,6 +1032,90 @@ public final class GameDriver {
         } else {
             Debug.switchOff(Debug.Tool.STATE_LABELS);
         }
+    }
+
+    // grass (feature.GrassFeature)
+
+    /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
+    public static void growingGrass(boolean on) {
+        if (on) {
+            FeatureFlag.GROWING_GRASS.switchOn();
+        } else {
+            FeatureFlag.GROWING_GRASS.switchOff();
+        }
+    }
+
+    private GrassFeature grassFeature() {
+        List<Feature> features = screenField("features");
+        for (Feature feature : features) {
+            if (feature instanceof GrassFeature grass) {
+                return grass;
+            }
+        }
+        return null;
+    }
+
+    /** The grass on the map by cell, with its phase (0 a tuft ... 3 a big bush); empty without the feature. */
+    public Map<Cell, Integer> grass() {
+        Map<Cell, Integer> cells = new TreeMap<>();
+        GrassFeature feature = grassFeature();
+        if (feature != null) {
+            for (Map.Entry<Tile, Grass> entry : feature.getGrass().entrySet()) {
+                cells.put(cellOf(entry.getKey()), entry.getValue().getPhase());
+            }
+        }
+        return cells;
+    }
+
+    /** Grass sprouts on this cell now (a tuft), as if the dice said so. */
+    public void sproutGrass(Cell cell) {
+        grassFeature().sprout(tile(cell));
+    }
+
+    /** How the grass on this cell is drawn: "under" (behind whoever stands there) or "over alpha=0.9". */
+    public String grassDrawn(Cell cell) {
+        GrassFeature feature = grassFeature();
+        Grass tuft = feature.getGrass().get(tile(cell));
+        return feature.isDrawnOverEveryone(tuft) ? "over alpha=" + Snapshot.number(tuft.getColor().a) : "under";
+    }
+
+    /**
+     * How far the grass picture on this cell starts below the cell's bottom edge, in art pixels (its packed box; the
+     * single tuft has 2 empty rows under it, so it starts 2 lower and its blades stand on the edge).
+     */
+    public float grassBelowTileBottom(Cell cell) {
+        Grass tuft = grassFeature().getGrass().get(tile(cell));
+        Tile tile = tile(cell);
+        float bottom = tile.getCenter().y - tile.getHeight() / 2f;
+        return (bottom - tuft.getY()) / com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
+    }
+
+    /** How big the cut tufts still fading out are drawn, 1 = full size (they get smaller as they go). */
+    public List<Float> fadingGrassHeights() {
+        List<Float> heights = new ArrayList<>();
+        for (Actor actor : gameStageActorsDeep()) {
+            if (actor instanceof Grass tuft && tuft.isCut()) {
+                heights.add(tuft.getScaleY());
+            }
+        }
+        return heights;
+    }
+
+    /** How many cut tufts are still fading out on the map. */
+    public int grassFadingOut() {
+        int fading = 0;
+        for (Actor actor : gameStageActorsDeep()) {
+            if (actor instanceof Grass tuft && tuft.isCut()) {
+                fading++;
+            }
+        }
+        return fading;
+    }
+
+    private List<Actor> gameStageActorsDeep() {
+        List<Actor> actors = new ArrayList<>();
+        collectActors(gameStage().getRoot(), actors);
+        return actors;
     }
 
     /** Does the hint button's bubble show a picture after its text right now ("find" and a carrot)? */
@@ -1075,9 +1355,11 @@ public final class GameDriver {
             case CHEST -> Chest.class;
             case COW -> Cow.class;
             case FIELD -> com.mantkowicz.light.character.Field.class;
+            case CHICKEN, CHICKEN_BABY -> Chicken.class;
         };
         for (Actor actor : gameStage().getActors()) {
-            if (type.isInstance(actor)) {
+            if (type.isInstance(actor) && (!(actor instanceof Chicken chicken)
+                    || chicken.getType() == ChickenType.valueOf(kind.name()))) {
                 return type.cast(actor);
             }
         }
@@ -1207,6 +1489,12 @@ public final class GameDriver {
         Vector2 right = gameStage()
                 .stageToScreenCoordinates(new Vector2((cell.col() + 1) * CELL_SIZE, cell.row() * CELL_SIZE));
         return right.x - left.x;
+    }
+
+    /** Where the centre of an actor on the map is on the screen: "x,y" in screen pixels (y down). */
+    public String onScreen(Kind kind) {
+        Vector2 screen = gameStage().stageToScreenCoordinates(actor(kind).getCenter().cpy());
+        return Snapshot.number(screen.x) + "," + Snapshot.number(screen.y);
     }
 
     /** Where a button is on the screen and how big: "x,y wxh" in screen pixels (bottom-left corner, y down). */
