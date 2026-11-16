@@ -956,3 +956,51 @@ tufts looking a bit like hearts wait for later work).
   too). Closer still, it covered the hand button over the cow. Looked at with the cow and a chicken.
 - **Level 1 (the owner's edit in Tiled):** a few GRASS objects (phases 1–3) near the chickens, and the chicken and the
   chick moved up to (15,7) and (16,6); `ChickenTest.levelOneHasAChickenAndAChick` follows.
+
+## 2026‑11‑16, chickens eat crops on the ground (branch `chickens-eat-crops`)
+
+Owner's request: a crop the player left lying on the ground (e.g. a cucumber that jumped out of a field) gets eaten
+by a chicken, slowly enough that the player can still save it.
+
+- **Noticing:** standing or wishing, a chicken notices a crop up to 6 tiles away (diagonally too: within a 13×13
+  square) that no other chicken goes for and that it can get next to; the nearest one by steps
+  (`character.CropHunt`). A crop on the ground beats wishing for corn.
+- **Going for it:** it stands looking for 5 s, then takes one step (up, down, left or right, never onto the crop's
+  tile or anyone's), and again, until it stands beside the crop, left or right of it (first above and below too: the
+  owner found pecking from below looked really bad).
+- **The player first:** before each step it checks the player could still walk to the crop if it stood there
+  (`BoardService.findSteps`, a breadth-first search that may pretend tiles are blocked or free, with the player's
+  no-corner-cutting rule). If not, it gives that crop up for good (as if eaten: it doesn't go for it again) and goes
+  back.
+- **Pecking:** beside it, it turns to the crop (right of it it looks left, left of it right) and pecks (the peck row, looping) for 10 s; the crop pulses meanwhile, a little bigger and
+  back (`ItemOnGround.setPecked`, up to 1.12×, 0.5 s), and lies as before once nobody pecks it. Then it is eaten
+  (gone) and the chicken isn't hungry any more.
+- **Going back:** eaten, or picked up by the player meanwhile, the chicken walks back at its usual pace to where it
+  started, or, taken or out of reach, to the reachable tile nearest to it; then it goes on as before (also looking
+  for more crops).
+- New chicken states `GOING_FOR_CROP`, `STEPPING_TO_CROP`, `PECKING_CROP`, `GOING_BACK` (not strokable meanwhile).
+  `SpriteActor.stepOnto` (a step onto a given tile, split out of `walkToFreeNeighbour`), `FarmAnimal.stayExactly`
+  (a wait without dice, so the animals' other random choices stay as they were: no golden changed).
+- Tests: `ChickenEatsCropsTest` (slow steps, never on the crop's tile, facing, the pulse, eaten after 10 s, back
+  home, picked up first, never shutting the player out of a corridor or of another crop (also going back), already
+  beside: looks first and never pecks in the player's way, a long way round: doesn't go, 6 tiles yes and 7 no, one
+  chicken per crop).
+- **Play-tested by Haiku agents** (owner's request; 4 rounds, 11 testers, each in its own copy of the repo, playing
+  through `GameDriver` scenarios and hidden-window screenshots; level 1 for 20–30 minutes, stress runs with 5
+  chickens and 155 crops). Fixed from their findings:
+  - already beside the crop in a corridor between the player and the crop, it pecked at once and shut the player out
+    for 10 s: the "never in the way" check now also runs where it stands while it looks and pecks;
+  - already beside the crop it pecked at once: it looks 5 s first, as from further away;
+  - on level 1 it waited 5 s in the only gap between two fields leading to *another* crop: the check now protects
+    every crop on the ground the player could otherwise reach, not only its own (two flood fills from the player,
+    with and without the chicken there);
+  - pecking, it stood a whole tile from the crop: it leans 0.3 of a tile towards it (`Chicken.lean`, 0.2 s), and eases
+    back when it stops (`standStraight`; a step it takes meanwhile carries on from where it is);
+  - on level 1 a crop's near side got taken and it set off on a 15-step detour round a wall (110 s): it walks at
+    most 12 steps to a crop (`CropHunt.MOST_STEPS`, twice the noticing distance), when noticing it and on every step;
+  - done or giving up, it went back home even when home was the only way to another crop, and stayed there: going
+    back it picks the tile nearest home where it isn't in the way (with none, a dead-end corridor, the nearest),
+    again before every step (a crop dropped while it walks back counts too);
+  - the eaten crop vanished in one frame: it shrinks and fades out in 0.35 s (`ItemOnGround.eatUp`; nobody can pick it
+    up meanwhile); the pulse was hard to see: up to 1.2× (was 1.12×).
+  `GameDriver`: `dropCrop`, `cropOnGround`, `cropOnGroundScale`. Looked at the pecking and the pulse in a hidden window.

@@ -3,6 +3,8 @@ package com.mantkowicz.light.actor;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -31,9 +33,19 @@ public class ItemOnGround extends GameBoardActor {
     static final float FLIGHT_SECONDS = 0.6f;
     private static final float FLIGHT_HEIGHT = 110;
     private static final String SHADOW = "item_shadow/row_00";
+    /** Pecked at, it pulses: this much bigger at most, and a grow and shrink take this long. */
+    private static final float PULSE_SIZE = 1.2f, PULSE_SECONDS = 0.5f;
+    /** Eaten, it shrinks to this size while it fades out, in this long (as cut grass does). */
+    private static final float EATEN_SIZE = 0.2f, EATEN_SECONDS = 0.35f;
 
     private final Item item;
     private final Image picture;
+    /** Who goes for it to eat it (a chicken), or null: nobody else goes for it meanwhile. */
+    private Actor eater;
+    /** The pulse while it is pecked at, or null. */
+    private Action pulse;
+    /** Eaten: it is going (shrinking, fading out), nobody can pick it up any more. */
+    private boolean eaten;
 
     public ItemOnGround(GameContext context, Item item) {
         super(ITEM_ON_GROUND, context, "item");
@@ -76,9 +88,59 @@ public class ItemOnGround extends GameBoardActor {
                 Actions.moveBy(0, -BOB_HEIGHT, BOB_SECONDS, Interpolation.sine))));
     }
 
-    /** On its tile: it has landed and can be picked up. */
+    /**
+     * Pecked at (a chicken eats it) it pulses, getting a fifth bigger and smaller again; then it bobs as before.
+     */
+    public void setPecked(boolean pecked) {
+        if (pecked == isPecked()) {
+            return;
+        }
+        if (pecked) {
+            picture.setOrigin(picture.getWidth() / 2f, picture.getHeight() / 2f);
+            pulse = forever(sequence(Actions.scaleTo(PULSE_SIZE, PULSE_SIZE, PULSE_SECONDS / 2, Interpolation.sine),
+                    Actions.scaleTo(1, 1, PULSE_SECONDS / 2, Interpolation.sine)));
+            picture.addAction(pulse);
+        } else {
+            picture.removeAction(pulse);
+            pulse = null;
+            picture.setScale(1);
+        }
+    }
+
+    public boolean isPecked() {
+        return pulse != null;
+    }
+
+    /** How big its picture is drawn now (1 its size; more while it pulses). */
+    public float getPictureScale() {
+        return picture.getScaleX();
+    }
+
+    /** Who goes for it to eat it (a chicken), or null. */
+    public Actor getEater() {
+        return eater;
+    }
+
+    public void setEater(Actor eater) {
+        this.eater = eater;
+    }
+
+    /**
+     * Eaten (by a chicken): it stops pulsing, shrinks while it fades out and is gone; meanwhile nobody can pick it up.
+     */
+    public void eatUp() {
+        setPecked(false);
+        eaten = true;
+        picture.clearActions();
+        picture.setOrigin(picture.getWidth() / 2f, 0);
+        addAction(sequence(Actions.parallel(Actions.run(() -> picture.addAction(Actions.parallel(
+                Actions.scaleTo(EATEN_SIZE, EATEN_SIZE, EATEN_SECONDS), Actions.fadeOut(EATEN_SECONDS)))),
+                Actions.delay(EATEN_SECONDS)), Actions.removeActor()));
+    }
+
+    /** On its tile: it has landed and can be picked up (not once it is being eaten up). */
     public boolean isLanded() {
-        return getTile() != null;
+        return getTile() != null && !eaten;
     }
 
     public Item getItem() {

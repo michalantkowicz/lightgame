@@ -128,7 +128,19 @@ public abstract class SpriteActor extends GameBoardActor {
         if (free.isEmpty()) {
             return false;
         }
-        Tile target = free.get(MathUtils.random(free.size() - 1));
+        stepOnto(free.get(MathUtils.random(free.size() - 1)), seconds, keepFacing);
+        return true;
+    }
+
+    /**
+     * Takes one step, onto {@code target}: a free tile right next to it (up, down, left or right; the caller checks
+     * both, nothing is checked here). It takes {@code seconds}; the target is blocked at once, the tile it leaves is
+     * freed on arrival, and meanwhile its status is MOVEMENT. Going somewhere further is many steps, each its own call
+     * (e.g. a chicken going for a crop, {@code CropHunt}). {@link #walkToFreeNeighbour(float, boolean)} picks a random
+     * free tile and takes this step onto it.
+     */
+    protected void stepOnto(Tile target, float seconds, boolean keepFacing) {
+        Tile from = getTile();
         boardService.setAccessible(target, false);
         enterTile(target);
         float dx = target.getCenter().x - from.getCenter().x;
@@ -144,7 +156,6 @@ public abstract class SpriteActor extends GameBoardActor {
             }
             setStatus(Status.IDLE);
         })));
-        return true;
     }
 
     /**

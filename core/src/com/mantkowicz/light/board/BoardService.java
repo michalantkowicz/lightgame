@@ -5,8 +5,13 @@ import com.badlogic.gdx.ai.pfa.indexed.IndexedAStarPathFinder;
 import com.badlogic.gdx.math.Vector2;
 import com.mantkowicz.light.event.GameEventService;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
 
 public class BoardService {
     private static final float LINE_SAMPLE_STEP = 4f;
@@ -127,5 +132,57 @@ public class BoardService {
             }
         }
         return new BoardPath(result);
+    }
+
+    /**
+     * The fewest steps from a tile to the nearest goal tile, over the tiles {@code passable} allows (whatever is
+     * accessible right now: it may pretend a tile is blocked or free, e.g. "if the chicken stood there, could the
+     * player still get to the carrot?"). Diagonally too: a diagonal step only between two passable side tiles, as the
+     * player's paths (no cutting corners). The steps without the start; empty when the start is a goal; null when no
+     * goal can be reached.
+     */
+    public List<Tile> findSteps(Tile from, Predicate<Tile> isGoal, Predicate<Tile> passable, boolean diagonally) {
+        Map<Tile, Tile> cameFrom = new HashMap<>();
+        Deque<Tile> next = new ArrayDeque<>();
+        cameFrom.put(from, from);
+        next.add(from);
+        while (!next.isEmpty()) {
+            Tile tile = next.poll();
+            if (isGoal.test(tile)) {
+                return stepsTo(tile, from, cameFrom);
+            }
+            for (Tile neighbour : diagonally ? tile.getNeighbours() : tile.getSideNeighbours()) {
+                if (!cameFrom.containsKey(neighbour) && canStep(tile, neighbour, passable)) {
+                    cameFrom.put(neighbour, tile);
+                    next.add(neighbour);
+                }
+            }
+        }
+        return null;
+    }
+
+    /** The steps from {@code from} to {@code to} (without {@code from}), following where each tile was reached from. */
+    private static List<Tile> stepsTo(Tile to, Tile from, Map<Tile, Tile> cameFrom) {
+        List<Tile> steps = new ArrayList<>();
+        for (Tile at = to; at != from; at = cameFrom.get(at)) {
+            steps.add(0, at);
+        }
+        return steps;
+    }
+
+    /** Onto a passable neighbour; a diagonal one only between two passable side tiles. */
+    private static boolean canStep(Tile from, Tile to, Predicate<Tile> passable) {
+        return passable.test(to) && (from.getSideNeighbours().contains(to) || bothSidesPassable(from, to, passable));
+    }
+
+    /** A diagonal step passes between the two side tiles touching both ends: both must be passable. */
+    private static boolean bothSidesPassable(Tile from, Tile to, Predicate<Tile> passable) {
+        int open = 0;
+        for (Tile side : from.getSideNeighbours()) {
+            if (to.getSideNeighbours().contains(side) && passable.test(side)) {
+                open++;
+            }
+        }
+        return open >= 2;
     }
 }

@@ -2,9 +2,14 @@ package com.mantkowicz.light.character;
 
 import com.badlogic.gdx.ai.fsm.DefaultStateMachine;
 import com.badlogic.gdx.ai.msg.Telegraph;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveByAction;
+import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.board.TilePoint;
 import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
@@ -17,7 +22,8 @@ import static com.mantkowicz.light.actor.GameActorType.CHICKEN;
 /**
  * A chicken or a chick ({@link ChickenType}). Like a {@link Cow} it gets hungry, wishes for a crop, eats what it is
  * given, enjoys a stroke and rests, but it is restless: it walks more, pecks at the ground often (looking for
- * something), and it wishes only for corn and gives up soon, bored. What it does and when is all in
+ * something), and it wishes only for corn and gives up soon, bored. A crop lying on the ground nearby it goes for,
+ * slowly, and eats ({@link CropHunt}), unless the player picks it up first. What it does and when is all in
  * {@link ChickenState}.
  */
 public class Chicken extends FarmAnimal {
@@ -26,14 +32,23 @@ public class Chicken extends FarmAnimal {
     /** Wishing this long without getting its corn, it is bored: it pecks at the ground instead, this many times. */
     static final float GIVE_UP_WISHING_AFTER_SECONDS = 15;
     static final int PECKS_INSTEAD = 3;
+    /** How long leaning towards a crop, and back, takes. */
+    private static final float LEAN_SECONDS = 0.2f;
 
     private final ChickenType type;
     private final DefaultStateMachine<Chicken, ChickenState> stateMachine = new DefaultStateMachine<>(this);
+    /** Going for a crop lying on the ground, to eat it. */
+    private final CropHunt hunt;
+    /** Leaning towards a crop it pecks at, or null. */
+    private MoveByAction lean;
+    /** Going back to the middle of its tile after leaning, or null. */
+    private MoveToAction straighten;
 
     public Chicken(GameContext context, ChickenType type) {
         super(CHICKEN, context, type.getSprite(), type.getDescription(), List.of(CropType.CORN), HUNGRY_AFTER_SECONDS,
                 GIVE_UP_WISHING_AFTER_SECONDS);
         this.type = type;
+        this.hunt = new CropHunt(this, context.getBoardService());
         setName(type.getName());
         stateMachine.changeState(ChickenState.STANDING);
         startLiving();
@@ -74,6 +89,46 @@ public class Chicken extends FarmAnimal {
 
     void changeState(ChickenState state) {
         stateMachine.changeState(state);
+    }
+
+    /** Leans sideways (to peck at what is beside it), quickly; {@link #standStraight()} undoes it. */
+    void lean(float dx) {
+        standStraight();
+        lean = Actions.moveBy(dx, 0, LEAN_SECONDS);
+        addAction(lean);
+    }
+
+    /**
+     * Back in the middle of its tile after {@link #lean}, quickly but not in one frame ({@link #LEAN_SECONDS}); a step
+     * it takes meanwhile carries it on from where it is.
+     */
+    void standStraight() {
+        if (lean != null) {
+            removeAction(lean);
+            lean = null;
+            Vector2 position = getTile().calculatePositionForActorAt(this, TilePoint.CENTER);
+            straighten = Actions.moveTo(position.x, position.y, LEAN_SECONDS);
+            addAction(straighten);
+        }
+    }
+
+    @Override
+    protected void stepOnto(Tile target, float seconds, boolean keepFacing) {
+        if (straighten != null) {
+            removeAction(straighten); // the step goes on from where it is
+            straighten = null;
+        }
+        super.stepOnto(target, seconds, keepFacing);
+    }
+
+    /** Going for a crop on the ground: what it goes for, where it started, its steps. */
+    CropHunt getHunt() {
+        return hunt;
+    }
+
+    /** The crop on the ground it goes for or pecks at, or null (for tests and descriptions). */
+    public com.mantkowicz.light.actor.ItemOnGround getCropItGoesFor() {
+        return hunt.getCrop();
     }
 
     /** Stands for a while, how long depends on how restless it is. */

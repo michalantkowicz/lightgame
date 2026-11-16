@@ -50,10 +50,12 @@ import com.mantkowicz.light.character.Dog;
 import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
+import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
@@ -512,6 +514,46 @@ public final class GameDriver {
             }
         }
         return items;
+    }
+
+    /**
+     * A crop, e.g. "carrot", lands on a cell as if it was thrown there (it drops from the cell's middle: it lies there
+     * after {@code ItemOnGround}'s short flight, 0.6 s).
+     */
+    public void dropCrop(String crop, Cell cell) {
+        GameContext context = null;
+        for (Feature feature : this.<List<Feature>>screenField("features")) {
+            if (feature instanceof CreatureFeature creatures) {
+                context = field(creatures, CreatureFeature.class, "context");
+            }
+        }
+        if (context == null) {
+            throw new IllegalStateException("No game context (no player on the map?)");
+        }
+        ItemOnGround lying = new ItemOnGround(context, new Crop(cropType(crop), context.getResourcesService()));
+        context.getGameStage().addActor(lying);
+        lying.flyOnto(tile(cell).getCenter(), tile(cell), () -> {
+        });
+    }
+
+    /** The first crop lying on the ground: "pecked" while a chicken pecks at it (it pulses), else "lying". */
+    public String cropOnGround() {
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying && lying.isLanded()) {
+                return lying.isPecked() ? "pecked" : "lying";
+            }
+        }
+        return "none";
+    }
+
+    /** How big the first crop lying on the ground is drawn (1 its size; it pulses while pecked at). */
+    public float cropOnGroundScale() {
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying && lying.isLanded()) {
+                return lying.getPictureScale();
+            }
+        }
+        throw new IllegalStateException("No crop lying on the ground");
     }
 
     /** Puts a new carrot into the player's backpack (its first free slot), as if picked up somewhere. */
