@@ -45,6 +45,15 @@ class ChickenEatsCropsTest {
             "~~~~~~~~~~")
             .with('H', "CHICKEN", Map.of());
 
+    /** The player right next to the chicken, a crop further on. */
+    private static final TestMap NEXT_TO_IT = TestMap.of(
+            "~~~~~~~~~",
+            "~.......~",
+            "~PH...a.~",
+            "~.......~",
+            "~~~~~~~~~")
+            .with('H', "CHICKEN", Map.of());
+
     /** The crop left of the chicken. */
     private static final TestMap LEFT = TestMap.of(
             "~~~~~~~~~~~~",
@@ -314,6 +323,64 @@ class ChickenEatsCropsTest {
         }
         assertFalse(HUNTING.contains(game.animalState(Kind.CHICKEN)), "done with the tomato");
         assertNotEquals(home, game.cellOf(Kind.CHICKEN), "not back in the only way to the carrot");
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Going for a crop, the chicken has its stroke button (a child tapping it gets an answer); stroked, it shows its
+     * hearts, gives the crop up for good and goes back where it started.
+     */
+    @Test
+    void strokedWhileItGoesForTheCropItGivesItUp() {
+        GameDriver game = GameDriver.start(PICK_UP.write("chicken-crop-pick-up"));
+        Cell start = game.cellOf(Kind.CHICKEN);
+        game.dropCrop("cucumber", PICK_UP.cell('a'));
+        waitFor(game, "GOING_FOR_CROP", 30);
+        game.strokeAnimal(Kind.CHICKEN);
+        game.frames(1);
+        assertEquals("BEING_STROKED", game.animalState(Kind.CHICKEN));
+        waitFor(game, "STROKED", 5);
+        assertTrue(game.chickenShowsHearts(Kind.CHICKEN));
+        for (int frame = 0; frame < 30 * 60 && !"STANDING".equals(game.animalState(Kind.CHICKEN)); frame++) {
+            game.frames(1);
+        }
+        assertEquals(start, game.cellOf(Kind.CHICKEN), "back where it started");
+        for (int frame = 0; frame < 30 * 60; frame++) {
+            game.frames(1);
+            assertFalse(HUNTING.contains(game.animalState(Kind.CHICKEN)), "it gave that crop up");
+        }
+        assertEquals("lying", game.cropOnGround());
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void goingForACropItHasItsStrokeButton() {
+        GameDriver game = GameDriver.start(NEXT_TO_IT.write("chicken-crop-next-to-it"));
+        game.dropCrop("carrot", NEXT_TO_IT.cell('a'));
+        waitFor(game, "GOING_FOR_CROP", 30);
+        game.frames(30);
+        assertEquals(Kind.CHICKEN, game.buttonOver("STROKE"), "a tap on it gets an answer");
+        game.clickButton("STROKE");
+        game.frames(1);
+        assertEquals("BEING_STROKED", game.animalState(Kind.CHICKEN));
+        assertFalse(game.crashed());
+    }
+
+    /** Stroked while it pecks, it stops (the crop lies still again), shows its hearts and goes back. */
+    @Test
+    void strokedWhileItPecksItStops() {
+        GameDriver game = GameDriver.start(RIGHT.write("chicken-crop-right"));
+        game.dropCrop("cucumber", RIGHT.cell('a'));
+        waitFor(game, "PECKING_CROP", 120);
+        game.strokeAnimal(Kind.CHICKEN);
+        game.frames(1);
+        assertEquals("BEING_STROKED", game.animalState(Kind.CHICKEN));
+        assertEquals("lying", game.cropOnGround(), "not pecked any more");
+        assertEquals(1f, game.cropOnGroundScale());
+        waitFor(game, "STROKED", 5);
+        waitFor(game, "GOING_BACK", 5);
+        game.seconds(12);
+        assertEquals("lying", game.cropOnGround(), "not eaten");
         assertFalse(game.crashed());
     }
 

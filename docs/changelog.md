@@ -1010,3 +1010,17 @@ by a chicken, slowly enough that the player can still save it.
 - `docs/ideas.md`: a `ShippedMapsTest` check that the shipped levels have no one-tile chokepoints, where a wandering
   chicken can shut the player out (found by the play-testers of the chickens eating crops; the owner wants it handled
   by level design).
+
+## 2026‑11‑16, stroking a chicken that goes for a crop (branch `stroke-hunting-chicken`)
+
+- Owner's decision after the play-tests: a chicken going for a crop (looking at it, `GOING_FOR_CROP`) or pecking at
+  it (`PECKING_CROP`) had no stroke button, so a child tapping it got no answer. Now both states can be stroked (the
+  usual 20 s between strokes still holds; not mid-step nor going back). Stroked, it gives the crop up for good
+  (`CropHunt.giveUpForAStroke`: the crop lies still again, for anyone to take, and this chicken doesn't go for it
+  again), stands still for the hand, shows its hearts (`STROKED`) and then goes back where it started (`GOING_BACK`
+  instead of `STANDING`).
+- The other play-test points the owner looked at stay as they are (walking out of a gate, the corn wish's 15 s, the
+  pace, still hungry after losing the crop, grass over the chicken, the field button over the tile above the field,
+  the peck pose); one-tile corridors are left to level design (idea in PR #70).
+- Tests: `ChickenEatsCropsTest` (`goingForACropItHasItsStrokeButton`, `strokedWhileItGoesForTheCropItGivesItUp`,
+  `strokedWhileItPecksItStops`).
