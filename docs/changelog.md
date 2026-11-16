@@ -1004,3 +1004,9 @@ by a chicken, slowly enough that the player can still save it.
   - the eaten crop vanished in one frame: it shrinks and fades out in 0.35 s (`ItemOnGround.eatUp`; nobody can pick it
     up meanwhile); the pulse was hard to see: up to 1.2× (was 1.12×).
   `GameDriver`: `dropCrop`, `cropOnGround`, `cropOnGroundScale`. Looked at the pecking and the pulse in a hidden window.
+
+## 2026‑11‑16, idea: no one-tile corridors (branch `idea-no-chokepoints`)
+
+- `docs/ideas.md`: a `ShippedMapsTest` check that the shipped levels have no one-tile chokepoints, where a wandering
+  chicken can shut the player out (found by the play-testers of the chickens eating crops; the owner wants it handled
+  by level design).
