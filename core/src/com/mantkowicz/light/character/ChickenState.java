@@ -20,8 +20,9 @@ import com.mantkowicz.light.resources.Action;
  *     GOING_FOR_CROP, PECKING_CROP ──(the crop gone, or it (or its next step) would block the player)──▶ GOING_BACK
  * STANDING ──(after a moment)──▶ SITTING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                                 RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * all but WALKING, EATING, FORAGING, going for a crop and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING
- *                                                                        (still hungry: WISHING again, the same corn)
+ * all but WALKING, EATING, FORAGING, STEPPING_TO_CROP, GOING_BACK and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED
+ *     ──▶ STANDING (still hungry: WISHING again, the same corn); stroked going for a crop or pecking it: it gives the
+ *     crop up for good, and after STROKED goes GOING_BACK
  * </pre>
  */
 public enum ChickenState implements State<Chicken> {
@@ -272,6 +273,11 @@ public enum ChickenState implements State<Chicken> {
                 chicken.changeState(hunt.stepTowardsCrop() ? STEPPING_TO_CROP : GOING_BACK);
             }
         }
+
+        @Override
+        boolean canBeStroked() {
+            return true; // and then it gives the crop up (onMessage)
+        }
     },
 
     /** One step closer to the crop; next to it, it starts pecking at once. */
@@ -314,6 +320,11 @@ public enum ChickenState implements State<Chicken> {
         public void exit(Chicken chicken) {
             chicken.getHunt().setPecking(false);
             chicken.standStraight();
+        }
+
+        @Override
+        boolean canBeStroked() {
+            return true; // and then it gives the crop up (onMessage)
         }
     },
 
@@ -377,7 +388,8 @@ public enum ChickenState implements State<Chicken> {
         @Override
         public void update(Chicken chicken) {
             if (chicken.isAnimationFinished()) {
-                chicken.changeState(STANDING);
+                // stroked while it went for a crop: it gave the crop up and goes back where it started
+                chicken.changeState(chicken.getHunt().isGoingBackAfterTheStroke() ? GOING_BACK : STANDING);
             }
         }
     };
@@ -399,6 +411,7 @@ public enum ChickenState implements State<Chicken> {
     @Override
     public boolean onMessage(Chicken chicken, Telegram telegram) {
         if (telegram.message == FarmAnimal.MESSAGE_STROKE && canBeStroked()) {
+            chicken.getHunt().giveUpForAStroke(); // going for a crop, it gives it up
             chicken.changeState(BEING_STROKED);
             return true;
         }

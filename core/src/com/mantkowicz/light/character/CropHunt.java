@@ -25,6 +25,8 @@ import java.util.function.Predicate;
  * the player no way to a crop on the ground (to pick it up before it is eaten; its own or any other), it gives its
  * crop up (as if it had eaten it: it doesn't go for it again) and goes back.</li>
  * <li>Next to the crop it pecks at it, {@link #SECONDS_TO_EAT}, and the crop pulses meanwhile; then it is eaten.</li>
+ * <li>Stroked while it goes for the crop or pecks at it, it gives the crop up for good and, after the hearts, goes
+ * back.</li>
  * <li>Then, or when the crop is gone (picked up), it goes back where it started, or as near as it can get without
  * standing in the player's way to a crop, and goes on with what it did before.</li>
  * </ul>
@@ -52,6 +54,8 @@ class CropHunt {
     private ItemOnGround crop;
     /** Where it started from; on its way back, where it goes (as near as it can get). */
     private Tile home, backTo;
+    /** Stroked while it went for a crop: it goes back once the stroke is over. */
+    private boolean goBackAfterTheStroke;
 
     CropHunt(Chicken chicken, BoardService board) {
         this.chicken = chicken;
@@ -240,6 +244,13 @@ class CropHunt {
      * the free tile nearest to it that it can get to.
      */
     void startGoingBack() {
+        letGo();
+        goBackAfterTheStroke = false;
+        backTo = nearestReachableTo(home == null ? chicken.getTile() : home);
+    }
+
+    /** Done with the crop: it lies as before, for anyone to take. */
+    private void letGo() {
         if (crop != null) {
             crop.setPecked(false);
             if (crop.getEater() == chicken) {
@@ -247,7 +258,23 @@ class CropHunt {
             }
             crop = null;
         }
-        backTo = nearestReachableTo(home == null ? chicken.getTile() : home);
+    }
+
+    /**
+     * Stroked while it goes for a crop or pecks at it (nothing happens otherwise): it gives that crop up for good, and
+     * after the stroke it goes back where it started ({@link #isGoingBackAfterTheStroke()}).
+     */
+    void giveUpForAStroke() {
+        if (crop != null) {
+            givenUp.add(crop);
+            letGo();
+            goBackAfterTheStroke = true;
+        }
+    }
+
+    /** It was stroked while it went for a crop: after the stroke it goes back where it started. */
+    boolean isGoingBackAfterTheStroke() {
+        return goBackAfterTheStroke;
     }
 
     /**
