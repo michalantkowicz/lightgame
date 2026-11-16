@@ -46,7 +46,7 @@ public class Field extends SpriteActor implements Collectible, Waterable, Weedab
     /** How likely a weed grows instead of the crop, when Tiled's weedChance doesn't say. */
     public static final float DEFAULT_WEED_CHANCE = 0.4f;
     /** Watered, it grows a phase at once and then one every this many seconds until it is ripe. */
-    static final float SECONDS_PER_PHASE = 30;
+    public static final float SECONDS_PER_PHASE = 30;
 
     private final CropType crop;
     private final ResourcesService resources;

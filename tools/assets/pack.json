@@ -13,7 +13,10 @@
     "  character isn't in the middle of its frame (default: the frame's middle).",
     "ignore: files that are neither (previews, duplicates). Paths are relative to the pack directory.",
     "'door animation sprites.png' is a tileset only, not a sprite sheet: its frames overlap (a 3px pillar + the door",
-    "  leaf every 16px), so no grid cuts them right. Animating doors needs frames given as rectangles (not supported yet)."
+    "  leaf every 16px), so no grid cuts them right. Animating doors needs frames given as rectangles (not supported yet).",
+    "'Premium Charakter Spritesheet with scythe.png' and 'scythe icon.png' aren't in the pack:",
+    "  tools/assets/scythe_animation.py makes them (the rabbit's sheet plus a 'scythe_down' row, and the scythe's item",
+    "  icon); run it once after copying the pack. The rabbit reads the first instead of the original, which is ignored."
   ],
   "tileSize": 16,
   "starterMap": {"water": "water", "grass": "grass_tiles_v2"},
@@ -106,13 +109,15 @@
   ],
 
   "sprites": [
-    {"name": "rabbit", "file": "Characters/Premium Charakter Spritesheet.png", "frame": [48, 48], "duration": 100,
+    {"name": "rabbit", "file": "Characters/Premium Charakter Spritesheet with scythe.png", "frame": [48, 48],
+     "duration": 100,
      "rows": ["idle_down", "idle_up", "idle_right", "idle_left",
               "walk_down", "walk_up", "walk_right", "walk_left",
               "run_down", "run_up", "run_right", "run_left",
               "till_down", "till_up", "till_right", "till_left",
               "chop_down", "chop_up", "chop_right", "chop_left",
-              "water_down", "water_up", "water_right", "water_left"]},
+              "water_down", "water_up", "water_right", "water_left",
+              "scythe_down"]},
     {"name": "rabbit_basic", "file": "Characters/Basic Charakter Spritesheet.png", "frame": [48, 48], "duration": 100,
      "rows": ["walk_down", "walk_up", "walk_right", "walk_left"]},
     {"name": "rabbit_basic_actions", "file": "Characters/Basic Charakter Actions.png", "frame": [48, 48], "duration": 100,
@@ -191,6 +196,9 @@
     {"name": "farm_items", "file": "Objects/Items/Farming Plants items.png", "frame": [16, 16], "offset": [16, 0],
      "columns": 1},
     {"name": "item_shadow", "file": "Objects/Items/item shadow.png", "frame": [16, 16]},
+    {"name": "grass_tuft", "file": "Objects/Mushrooms, Flowers, Stones.png", "frame": [16, 16], "offset": [0, 32],
+     "columns": 4, "rowCount": 1, "rows": {"0": "grow"}},
+    {"name": "scythe_icon", "file": "Objects/Items/scythe icon.png", "frame": [16, 16], "rows": {"0": "icon"}},
     {"name": "watering_can", "file": "Objects/Items/tools and meterials.png", "frame": [16, 16], "columns": 1,
      "rowCount": 1, "rows": {"0": "icon"}},
 
@@ -227,6 +235,7 @@
   ],
 
   "ignore": [
+    "Characters/Premium Charakter Spritesheet.png",
     "Sprout Lands color pallet/",
     "Tilesets/ground tiles/Bitmask references 1.png",
     "Tilesets/ground tiles/Bitmask references 2.png",

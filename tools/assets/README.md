@@ -5,6 +5,7 @@ changes, or after editing a level in Tiled.
 
 ```sh
 pip3 install pillow                                   # once
+python3 tools/assets/scythe_animation.py               # once per pack copy: the rabbit's scythe swing (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -12,6 +13,15 @@ python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Pre
 
 The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
 Python.
+
+**The scythe swing** isn't in the pack. `scythe_animation.py` makes it from the rabbit's `chop_down` row: the axe taken
+out (its four colours appear nowhere else on the rabbit) and a scythe drawn where it was held, a longer handle and a
+curved blade hooking the way each frame needs. It saves a copy of `Characters/Premium Charakter Spritesheet.png` with
+that row added (`scythe_down`, row 24) as `... with scythe.png` in the pack folder, which `pack.json` reads for the
+rabbit (the original is ignored). It also draws the scythe's item icon, `Objects/Items/scythe icon.png` (16x16, the
+upright handle on the right and a long blade sweeping left and down from its top, in the palette and light outline of
+`tools and meterials.png`), read as
+the sheet `scythe_icon`. Like the pack, neither file is committed: only the atlas made from them.
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
 (`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.

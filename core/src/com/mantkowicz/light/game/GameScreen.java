@@ -20,12 +20,14 @@ import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.PlayerCreatedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.feature.CameraTrackingFeature;
 import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.StageFeature;
@@ -131,6 +133,9 @@ public class GameScreen extends ScreenAdapter {
             Hud hud = new Hud(context, player, collecting::throwOut);
             uiStage.addActor(hud);
             addFeature(new CreatureFeature(context, player, hud));
+            if (FeatureFlag.GROWING_GRASS.isOn()) {
+                addFeature(new GrassFeature(context, player, hud));
+            }
         }
         addFeature(new MenuFeature(context, menuStage));
         addFeature(new NoPathFeature(context));

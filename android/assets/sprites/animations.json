@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "26f4d31a9c85354f57e911396f7e013a80dc70a1",
+  "packJsonSha1": "5a3e1d52646119fac5288d4ddc69f828e63e4776",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -49,6 +49,16 @@
       "trimY": 0,
       "width": 16,
       "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "grass_tuft": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 1,
+      "width": 16,
+      "height": 13,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -135,12 +145,22 @@
     "rabbit": {
       "frameWidth": 48,
       "frameHeight": 48,
-      "trimX": 3,
-      "trimY": 10,
-      "width": 42,
-      "height": 31,
+      "trimX": 2,
+      "trimY": 7,
+      "width": 43,
+      "height": 34,
       "anchorX": 24,
       "anchorY": 24
+    },
+    "scythe_icon": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 14,
+      "height": 15,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "sign_blank": {
       "frameWidth": 16,
@@ -572,6 +592,12 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "grass_tuft/grow": {
+      "sheet": "grass_tuft",
+      "frames": 4,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "item_shadow/row_00": {
       "sheet": "item_shadow",
       "frames": 1,
@@ -692,6 +718,12 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "rabbit/scythe_down": {
+      "sheet": "rabbit",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "rabbit/till_down": {
       "sheet": "rabbit",
       "frames": 8,
@@ -761,6 +793,12 @@
     "rabbit/water_up": {
       "sheet": "rabbit",
       "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "scythe_icon/icon": {
+      "sheet": "scythe_icon",
+      "frames": 1,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },

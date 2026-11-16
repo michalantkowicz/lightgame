@@ -16,6 +16,10 @@ public enum Sprite {
     FARM_ITEMS("farm_items"),
     /** The shadow under an item lying on the ground. */
     ITEM_SHADOW("item_shadow"),
+    /** Grass growing on the map, one frame per phase: a tuft, two tufts, a bush, a big bush. */
+    GRASS_TUFT("grass_tuft"),
+    /** The scythe's item icon (made by tools/assets/scythe_animation.py in the style of the pack's tool icons). */
+    SCYTHE_ICON("scythe_icon"),
     /** The watering can (the picture on a field's button while it needs water). */
     WATERING_CAN("watering_can"),
     /** Water falling from the can onto a field. */

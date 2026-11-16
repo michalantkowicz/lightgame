@@ -2,7 +2,7 @@
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
-hint: at=(628.0,74.0) size=108.0x120.0
+tool button: hint at=(628.0,74.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
@@ -10,7 +10,7 @@ settings: closed
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
-hint: at=(628.0,74.0) size=108.0x120.0
+tool button: hint at=(628.0,74.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=67%
 settings: closed
@@ -18,7 +18,7 @@ settings: closed
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
-hint: at=(628.0,74.0) size=108.0x120.0
+tool button: hint at=(628.0,74.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
@@ -26,7 +26,7 @@ settings: closed
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
-hint: at=(628.0,74.0) size=108.0x120.0
+tool button: hint at=(628.0,74.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: open
@@ -34,7 +34,7 @@ settings: open
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -] at=(64.0,74.0) size=96.0x104.0
 stamina: 14 of 14 segments, face MOOD_HAPPY at=(316.0,40.0) size=168.0x24.0
-hint: at=(628.0,74.0) size=108.0x120.0
+tool button: hint at=(628.0,74.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
