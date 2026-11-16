@@ -913,3 +913,16 @@ The owner's picks from the bug hunt's polish list (the rest was judged fine as i
   `GameDriver.tapToolButton`, `toolButton`. The tool's logic moved out of `Hud` into `ToolButton` (PMD: Hud a possible
   God Class otherwise). The goldens `hud` and `hud-hint` were re-recorded for the rename only: their HUD line says
   "tool button: hint" instead of "hint:" (nothing else changed); CLAUDE.md, hud-design.md and e2e/README.md say so too.
+- Owner's request after the play-test: **one swing cuts all around**: the grass on the rabbit's tile and on all eight
+  tiles around it (diagonally too) fades out. The scythe still comes only when the rabbit stands on grass (just next
+  to it: the hint). Walking off mid-swing still leaves it all. `GrassTest.oneSwingCutsAllAround`,
+  `grassOnlyNextToTheRabbitBringsNoScythe`.
+- Owner's request: cut grass **gets smaller while it fades out** (`Grass.cutDown`): to a fifth of its size over the
+  fade, which the owner then made 30 % quicker (`GrassFeature.FADE_SECONDS` 0.5 s → 0.35 s), towards its base (the blades' bottom stays on the tile's bottom edge). A first try squashed it flat as if
+  mown; the owner found that weird. Clippings flying off could be added later from `GrassFeature` at the cut, without
+  changing this. `GrassTest` checks it is smaller partway (`fadingGrassHeights`). Looked at frame by frame.
+- Owner's request (small, on this branch): the **FPS label** (`Debug.Tool.FPS_LABEL`) has a black box behind its text
+  (`LabelFactory.createLabel`'s background: a stretched black pixel with 6x2 px padding), sized to the text each frame.
+- Owner's request: the **scythe icon redrawn after the owner's picture**: a straight handle standing on the right, a
+  dark collar at its top and a long blade sweeping left from it, thick at the collar and narrowing to a point that
+  curves down (it was a diagonal handle like the axe's with a crescent across the top). Same palette and outline.

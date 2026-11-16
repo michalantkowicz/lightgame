@@ -88,33 +88,35 @@ ICON_BLADE_DARK, ICON_BLADE, ICON_BLADE_MID, ICON_BLADE_LIGHT = ((107, 116, 112,
 
 
 def scythe_icon():
-    """A 16x16 item icon in the pack's style: the handle from the bottom left up to the right (as the axe's), the
-    blade curving from its top to the left and down, everything in a 1 px light outline."""
+    """A 16x16 item icon in the pack's style, after the owner's picture: a straight handle standing on the right, a
+    dark collar at its top, and from there a long blade sweeping to the left, thick at the collar and narrowing to a
+    point that curves down; everything in the icons' 1 px light outline."""
     icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     px = icon.load()
-    # the handle: two pixels wide, dark below and light above, like the axe's
-    for i in range(10):
-        x, y = 3 + i, 13 - i
-        px[x, y] = ICON_HANDLE
-        px[x, y + 1] = ICON_HANDLE_DARK
-        if i > 0:
-            px[x - 1, y] = ICON_HANDLE_LIGHT
-    # the blade: a crescent from the handle's top, thick there and thin at its tip, curving left and down
-    blade = [
-        # its back (the top edge), light near the handle
-        ((12, 2), ICON_BLADE_LIGHT), ((11, 2), ICON_BLADE_LIGHT), ((10, 2), ICON_BLADE_MID), ((9, 2), ICON_BLADE_MID),
-        ((8, 2), ICON_BLADE_MID), ((7, 2), ICON_BLADE),
-        # its body, where it meets the handle and along the middle
-        ((13, 3), ICON_BLADE_DARK), ((12, 3), ICON_BLADE_MID), ((11, 3), ICON_BLADE), ((10, 3), ICON_BLADE),
-        ((9, 3), ICON_BLADE), ((8, 3), ICON_BLADE_DARK), ((7, 3), ICON_BLADE_DARK), ((6, 3), ICON_BLADE),
-        ((5, 3), ICON_BLADE_MID),
-        # the tip, curving down
-        ((5, 4), ICON_BLADE_DARK), ((4, 4), ICON_BLADE), ((3, 4), ICON_BLADE_MID),
-        ((3, 5), ICON_BLADE_DARK), ((2, 5), ICON_BLADE),
-        ((2, 6), ICON_BLADE_DARK),
-    ]
-    for (x, y), colour in blade:
-        px[x, y] = colour
+    # the handle: two pixels wide, light on its left, from under the collar down to the bottom
+    for y in range(4, 15):
+        px[11, y] = ICON_HANDLE_LIGHT
+        px[12, y] = ICON_HANDLE
+    px[12, 14] = ICON_HANDLE_DARK
+    # the collar holding the blade
+    for x, y in ((11, 2), (12, 2), (11, 3), (12, 3)):
+        px[x, y] = ICON_BLADE_DARK
+    # the blade, column by column from the collar to its tip: its back (light), its body, its edge (dark)
+    blade = {
+        10: [(2, ICON_BLADE_LIGHT), (3, ICON_BLADE_MID), (4, ICON_BLADE_DARK)],
+        9: [(2, ICON_BLADE_LIGHT), (3, ICON_BLADE_MID), (4, ICON_BLADE_DARK)],
+        8: [(2, ICON_BLADE_LIGHT), (3, ICON_BLADE_MID), (4, ICON_BLADE_DARK)],
+        7: [(2, ICON_BLADE_LIGHT), (3, ICON_BLADE_DARK)],
+        6: [(2, ICON_BLADE_LIGHT), (3, ICON_BLADE_DARK)],
+        5: [(2, ICON_BLADE_MID), (3, ICON_BLADE_DARK)],
+        4: [(3, ICON_BLADE_MID), (4, ICON_BLADE_DARK)],
+        3: [(4, ICON_BLADE_MID), (5, ICON_BLADE_DARK)],
+        2: [(5, ICON_BLADE), (6, ICON_BLADE_DARK)],
+        1: [(7, ICON_BLADE_DARK)],
+    }
+    for x, column in blade.items():
+        for y, colour in column:
+            px[x, y] = colour
     # the outline: every empty pixel next to the drawing
     filled = {(x, y) for x in range(16) for y in range(16) if px[x, y][3]}
     for x in range(16):

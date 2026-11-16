@@ -26,6 +26,8 @@ public class Grass extends Image {
      * stands on the tile's bottom edge.
      */
     private static final int[] EMPTY_ROWS_BELOW = {2, 0, 0, 0};
+    /** Cut, it shrinks to this size (towards its base) while it fades out. */
+    private static final float CUT_SIZE = 0.2f;
 
     private final Tile tile;
     private final TextureRegion[] phases;
@@ -102,10 +104,17 @@ public class Grass extends Image {
         return phase >= 2;
     }
 
-    /** Cut down: it fades out and is gone. */
+    /**
+     * Cut down: it gets smaller while it fades out (towards its base: its blades' bottom stays on the tile's bottom
+     * edge), and is gone. (Clippings flying off, if added, would come from whoever cuts it.)
+     */
     public void cutDown(float fadeSeconds) {
         cut = true;
-        addAction(Actions.sequence(Actions.fadeOut(fadeSeconds), Actions.removeActor()));
+        setOrigin(getWidth() / 2f,
+                EMPTY_ROWS_BELOW[Math.min(phase, EMPTY_ROWS_BELOW.length - 1)] * WorldScale.PIXEL_SCALE);
+        addAction(Actions.sequence(
+                Actions.parallel(Actions.scaleTo(CUT_SIZE, CUT_SIZE, fadeSeconds), Actions.fadeOut(fadeSeconds)),
+                Actions.removeActor()));
     }
 
     public boolean isCut() {

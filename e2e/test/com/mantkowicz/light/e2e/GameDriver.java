@@ -1090,6 +1090,17 @@ public final class GameDriver {
         return (bottom - tuft.getY()) / com.mantkowicz.light.board.WorldScale.PIXEL_SCALE;
     }
 
+    /** How big the cut tufts still fading out are drawn, 1 = full size (they get smaller as they go). */
+    public List<Float> fadingGrassHeights() {
+        List<Float> heights = new ArrayList<>();
+        for (Actor actor : gameStageActorsDeep()) {
+            if (actor instanceof Grass tuft && tuft.isCut()) {
+                heights.add(tuft.getScaleY());
+            }
+        }
+        return heights;
+    }
+
     /** How many cut tufts are still fading out on the map. */
     public int grassFadingOut() {
         int fading = 0;

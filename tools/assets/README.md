@@ -19,7 +19,8 @@ out (its four colours appear nowhere else on the rabbit) and a scythe drawn wher
 curved blade hooking the way each frame needs. It saves a copy of `Characters/Premium Charakter Spritesheet.png` with
 that row added (`scythe_down`, row 24) as `... with scythe.png` in the pack folder, which `pack.json` reads for the
 rabbit (the original is ignored). It also draws the scythe's item icon, `Objects/Items/scythe icon.png` (16x16, the
-handle like the axe's in `tools and meterials.png`, a crescent blade, the icons' palette and light outline), read as
+upright handle on the right and a long blade sweeping left and down from its top, in the palette and light outline of
+`tools and meterials.png`), read as
 the sheet `scythe_icon`. Like the pack, neither file is committed: only the atlas made from them.
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails

@@ -16,8 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Grass (FeatureFlag.GROWING_GRASS, on as the game ships): every 30 s each tile the rabbit can get to may sprout grass
  * (1 %, 10 % next to grass), never a chest's or a field's. It grows a phase every 30 s: a tuft and two tufts under
  * whoever stands there, a bush and a big bush over them, a little see-through. It blocks nothing. Standing still on
- * grass, the HUD's tool button (the big round one right of the face) has the scythe instead of the hint: tapped, the
- * rabbit swings once and the grass fades out; walking off meanwhile, it stays. No action button over the grass.
+ * grass, the HUD's tool button (the big round one right of the face) has the scythe instead of the hint (just next to
+ * grass: the hint): tapped, the rabbit swings once and the grass on its tile and all eight around fades out; walking
+ * off meanwhile, it stays. No action button over the grass.
  */
 class GrassTest {
     /** Open grass with a chest and a field. */
@@ -118,11 +119,47 @@ class GrassTest {
         assertEquals(List.of(), game.buttonAlphas("CUT"), "no action button over the grass");
         game.seconds(0.8f);
         assertFalse(game.grass().containsKey(here), "swung once (0.8 s): the grass is cut...");
-        assertEquals(1, game.grassFadingOut(), "...and fades out");
+        assertEquals(1, game.grassFadingOut(), "...and fades out...");
+        game.seconds(0.15f);
+        float size = game.fadingGrassHeights().get(0);
+        assertTrue(size < 0.8f && size > 0.4f, "...getting smaller meanwhile: " + size);
         assertEquals("rabbit/idle_down", game.playerAnimation());
-        game.seconds(0.6f);
-        assertEquals(0, game.grassFadingOut(), "gone");
+        game.seconds(0.25f);
+        assertEquals(0, game.grassFadingOut(), "gone (0.35 s after the cut)");
         assertEquals("hint", game.toolButton(), "nothing left to cut: the hint again");
+        assertFalse(game.crashed());
+    }
+
+    /** One swing cuts the grass on the rabbit's tile and on all eight around it; grass two tiles away stays. */
+    @Test
+    void oneSwingCutsAllAround() {
+        GameDriver game = GameDriver.start(YARD.write("grass-yard"));
+        Cell here = game.playerCell();
+        for (int col = 1; col <= 5; col++) {
+            for (int row = 1; row <= 3; row++) {
+                game.sproutGrass(new Cell(col, row));
+            }
+        }
+        game.seconds(0.5f);
+        game.tapToolButton();
+        game.seconds(0.9f);
+        for (Cell cell : game.grass().keySet()) {
+            assertEquals(2, Math.abs(cell.col() - here.col()), "only grass two tiles away is left: " + cell);
+        }
+        assertEquals(6, game.grass().size(), "the two columns two tiles away: " + game.grass());
+        assertEquals(9, game.grassFadingOut(), "the rabbit's tile and the eight around it fade out");
+        assertFalse(game.crashed());
+    }
+
+    /** Grass only next to the rabbit doesn't bring the scythe: the rabbit has to stand on grass. */
+    @Test
+    void grassOnlyNextToTheRabbitBringsNoScythe() {
+        GameDriver game = GameDriver.start(YARD.write("grass-yard"));
+        Cell here = game.playerCell();
+        game.sproutGrass(new Cell(here.col() + 1, here.row() + 1));
+        game.sproutGrass(new Cell(here.col() - 1, here.row()));
+        game.seconds(0.5f);
+        assertEquals("hint", game.toolButton(), "grass around, none under the rabbit: the hint");
         assertFalse(game.crashed());
     }
 
