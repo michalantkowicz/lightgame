@@ -954,3 +954,5 @@ tufts looking a bit like hearts wait for later work).
 - **Wish bubbles 25 % smaller and a little closer:** `PictureBubble` at 3 pack pixels per pixel (was 4), its picture
   shrunk as much; 4 px between the animal and the bubble (was 8; the smaller frame's empty bottom rows bring it closer
   too). Closer still, it covered the hand button over the cow. Looked at with the cow and a chicken.
+- **Level 1 (the owner's edit in Tiled):** a few GRASS objects (phases 1–3) near the chickens, and the chicken and the
+  chick moved up to (15,7) and (16,6); `ChickenTest.levelOneHasAChickenAndAChick` follows.
