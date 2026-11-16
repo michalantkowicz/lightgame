@@ -15,9 +15,12 @@ import com.mantkowicz.light.resources.Action;
  *                        WISHING ──(bored soon)──▶ FORAGING ──(3 pecks)──▶ STANDING
  * STANDING ──(after a moment)──▶ WALKING ──(arrived)──▶ STANDING
  * STANDING ──(after a moment)──▶ PECKING ──▶ STANDING
+ * STANDING, WISHING ──(a crop on the ground nearby)──▶ GOING_FOR_CROP ──(5 s)──▶ STEPPING_TO_CROP ──▶ GOING_FOR_CROP ...
+ *     GOING_FOR_CROP, STEPPING_TO_CROP ──(next to it)──▶ PECKING_CROP ──(10 s: eaten)──▶ GOING_BACK ──(there)──▶ STANDING
+ *     GOING_FOR_CROP, PECKING_CROP ──(the crop gone, or it (or its next step) would block the player)──▶ GOING_BACK
  * STANDING ──(after a moment)──▶ SITTING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                                 RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * all but WALKING, EATING, FORAGING and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING
+ * all but WALKING, EATING, FORAGING, going for a crop and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING
  *                                                                        (still hungry: WISHING again, the same corn)
  * </pre>
  */
@@ -32,7 +35,9 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.isHungry()) {
+            if (chicken.getHunt().spotCrop()) {
+                chicken.changeState(GOING_FOR_CROP);
+            } else if (chicken.isHungry()) {
                 chicken.chooseWish();
                 chicken.changeState(WISHING);
             } else if (chicken.isTimeUp()) {
@@ -193,7 +198,9 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.hasWishedTooLong()) { // bored: it looks for something on the ground instead
+            if (chicken.getHunt().spotCrop()) { // a crop on the ground will do too
+                chicken.changeState(GOING_FOR_CROP);
+            } else if (chicken.hasWishedTooLong()) { // bored: it looks for something on the ground instead
                 chicken.startFeedingItself(Chicken.PECKS_INSTEAD);
                 chicken.changeState(FORAGING);
             }
@@ -239,6 +246,91 @@ public enum ChickenState implements State<Chicken> {
                 chicken.changeState(FORAGING); // enter again: the next peck
             } else {
                 chicken.stopBeingHungry();
+                chicken.changeState(STANDING);
+            }
+        }
+    },
+
+    /** A crop lies on the ground nearby: it stands looking at it a while ({@link CropHunt#SECONDS_PER_STEP}), then steps closer. */
+    GOING_FOR_CROP {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.IDLE);
+            chicken.stayExactly(CropHunt.SECONDS_PER_STEP);
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            CropHunt hunt = chicken.getHunt();
+            if (!hunt.isCropThere() || hunt.blocksThePlayerHere()) {
+                chicken.changeState(GOING_BACK); // picked up meanwhile, or in the player's way
+            } else if (!chicken.isTimeUp()) {
+                return; // it looks a while first, also when it is beside the crop already
+            } else if (hunt.isNextToCrop()) {
+                chicken.changeState(PECKING_CROP);
+            } else {
+                chicken.changeState(hunt.stepTowardsCrop() ? STEPPING_TO_CROP : GOING_BACK);
+            }
+        }
+    },
+
+    /** One step closer to the crop; next to it, it starts pecking at once. */
+    STEPPING_TO_CROP {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.WALK);
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (!chicken.isWalking()) {
+                chicken.changeState(chicken.getHunt().isNextToCrop() ? PECKING_CROP : GOING_FOR_CROP);
+            }
+        }
+    },
+
+    /** Next to the crop, turned to it, it pecks at it (the crop pulses) until it has eaten it, or the crop is gone. */
+    PECKING_CROP {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.getHunt().faceCrop();
+            chicken.playAnimation(Action.PECK);
+            chicken.getHunt().setPecking(true);
+            chicken.stayExactly(CropHunt.SECONDS_TO_EAT);
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (!chicken.getHunt().isCropThere() || chicken.getHunt().blocksThePlayerHere()) {
+                chicken.changeState(GOING_BACK); // picked up from under its beak, or in the player's way
+            } else if (chicken.isTimeUp()) {
+                chicken.getHunt().eatCrop();
+                chicken.stopBeingHungry();
+                chicken.changeState(GOING_BACK);
+            }
+        }
+
+        @Override
+        public void exit(Chicken chicken) {
+            chicken.getHunt().setPecking(false);
+            chicken.standStraight();
+        }
+    },
+
+    /** Back where it started, or as near as it can get, at its usual pace; then it goes on as before. */
+    GOING_BACK {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.WALK);
+            chicken.getHunt().startGoingBack();
+            if (!chicken.getHunt().stepBack()) {
+                chicken.changeState(STANDING);
+            }
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (!chicken.isWalking() && !chicken.getHunt().stepBack()) {
                 chicken.changeState(STANDING);
             }
         }

@@ -128,7 +128,16 @@ public abstract class SpriteActor extends GameBoardActor {
         if (free.isEmpty()) {
             return false;
         }
-        Tile target = free.get(MathUtils.random(free.size() - 1));
+        walkOnto(free.get(MathUtils.random(free.size() - 1)), seconds, keepFacing);
+        return true;
+    }
+
+    /**
+     * Walks onto a tile next to it (up, down, left or right), which must be free, as
+     * {@link #walkToFreeNeighbour(float, boolean)} does once it has picked one.
+     */
+    protected void walkOnto(Tile target, float seconds, boolean keepFacing) {
+        Tile from = getTile();
         boardService.setAccessible(target, false);
         enterTile(target);
         float dx = target.getCenter().x - from.getCenter().x;
@@ -144,7 +153,6 @@ public abstract class SpriteActor extends GameBoardActor {
             }
             setStatus(Status.IDLE);
         })));
-        return true;
     }
 
     /**

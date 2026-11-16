@@ -160,6 +160,11 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         timeLeft = MathUtils.random(minSeconds, maxSeconds);
     }
 
+    /** Starts a wait of just this long (no dice: the other random choices stay as they were). */
+    void stayExactly(float seconds) {
+        timeLeft = seconds;
+    }
+
     boolean isTimeUp() {
         return timeLeft <= 0;
     }
