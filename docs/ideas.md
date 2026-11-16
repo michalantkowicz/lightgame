@@ -151,3 +151,13 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   shakes and the face says "find" with the bag). It ties fields to exploring the map. Open: one bag per crop kind or
   any bag fits any field; whether a bag could choose what grows (a field without `cropType`); what a chest holds then.
   Bigger than the can: a new item kind and chest contents. Worth doing together with the owner.
+- **No one-tile corridors on the levels** (2026‑11‑16). Found by the play-testers of the chickens eating crops: a
+  chicken that isn't going for a crop wanders as it likes, and when it stands in a one-tile corridor or gap (between
+  water, fences or fields) the player can't get past it, sometimes for most of a minute (on level 1 one sat 50 s in the
+  gap beside a field). The owner's view: it is a matter of level design, the levels shouldn't have such places. Suggested
+  fix: a check in `ShippedMapsTest` that every shipped map has no chokepoint on the walkable cells, i.e. no single
+  walkable cell whose blocking cuts the walkable area in two (a "cut vertex" of the grid, found by trying each cell or
+  with Tarjan's algorithm), maybe allowing dead ends of one cell; it fails with the cells to widen. Worth doing when
+  the next level is drawn, or when level 1 gets its next change (it has such gaps today, e.g. between the fields).
+  Open: whether fields, chests and fences count as blocking (yes: they never move), and whether a gap an animal can't
+  reach matters.
