@@ -108,16 +108,27 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
     are used by hand or automatically, and the presentation (item in the paws with auto-pickup, or the backpack window).
     Builds on "Interactable objects" above: using an item automatically is an action that runs without a button when the
     player is in reach.
-- **UI pictures drawn on the game stage** (2026‑11‑13). The stars popping out of an opened chest (`Sparkles`, PR #33)
-  are game stage actors, but their picture (`UiImage.SPARKLE`) comes from the UI atlas: the star exists only in the UI
-  pack, and `sprites.atlas` is built from the sprites pack only. Each switch between atlas textures while drawing makes
-  `SpriteBatch` send what it collected (one more draw call). For the stars that is at most 2 more draw calls per frame
-  for under a second, nothing to notice; it would matter if many map objects each drew a UI picture next to their
-  sprite (e.g. an icon over each of 50 animals: ~100 draw calls instead of a few), on weak phones and in the browser.
-  First check how often it happens: count draw calls per frame (libGDX `GLProfiler`, or `SpriteBatch.renderCalls`) on
-  a busy map and see which UI pictures the game stage draws. If it matters, either draw those pictures together (one
-  switch each way) or let the tool copy chosen UI pack pieces into `sprites.atlas` (e.g. a list in `pack.json`) and load
-  them as sprites; that would also keep `UiImage` for the UI only.
+- **UI pictures drawn on the game stage** (2026‑11‑13, extended 2026‑11‑15). Some pictures drawn on the map (game
+  stage actors) come from the UI atlas, because they exist only in the UI pack and `sprites.atlas` is built from the
+  sprites pack only. Each switch between atlas textures while drawing makes `SpriteBatch` send what it collected (one
+  more draw call). Found by searching the code for `UiImage` on the game stage (2026‑11‑15):
+  - the stars popping out of an opened chest (`Sparkles`, `UiImage.SPARKLE`): up to 2 more draw calls, for under a
+    second;
+  - the question mark on an empty field's sign (`Field`, `UiImage.HINT_ICON`, branch `field-grows-over-time`): about
+    2 more per empty field (sign, "?", sprout), for as long as it stays empty;
+  - the cow's wish bubble (`PictureBubble`, `UiImage.PICTURE_BUBBLE`, with the crop from `sprites.atlas` inside):
+    about 2 more per wishing cow, for as long as it wishes;
+  - the heart floating over the player after a stroke (`CreatureFeature`, `UiImage.HEART`): up to 2 more for a moment;
+  - the cow's emotes (`Cow.showEmote`, tiny emotes): not called right now.
+
+  (The hand on the stroke button and the whole HUD are on the UI stage: they stay with the UI atlas.) Nothing to notice
+  now; it would matter with many such objects at once (e.g. 50 wishing animals: ~100 draw calls instead of a few), on
+  weak phones and in the browser. **The owner's choice of fix:** duplicate the UI pack pieces the game stage uses into
+  the game sprites, so the map draws from `sprites.atlas` only. The tool would copy chosen UI pack pieces into
+  `sprites.atlas` (e.g. a list in `pack.json` naming the UI pack file and piece) and the game loads them as `Sprite`s;
+  the places above use those, and `UiImage` stays for the UI only (`HINT_ICON` back to the hint button alone). Before
+  doing it, count draw calls per frame (libGDX `GLProfiler`, or `SpriteBatch.renderCalls`) on a busy map to see the
+  gain, and search again for `UiImage` on the game stage in case more came meanwhile.
 - **All texts in one place** (2026‑11‑14). The words the game shows are spread over the code: `Hud.HINT` ("play
   around!"), `CreatureFeature.FIND` ("find"), `PhraseGroup.NO_PATH` ("no path"), the "SETTINGS" title
   (`SettingsPanel`), the radial menu's "button" caption (`MenuButton`), and the descriptions in the characters
