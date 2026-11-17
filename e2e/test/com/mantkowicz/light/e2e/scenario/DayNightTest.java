@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -49,6 +50,29 @@ class DayNightTest {
         assertTrue(dawn > 0.1f && dawn < 1f, "getting brighter: " + dawn);
         game.seconds(5); // 62 s
         assertEquals(1f, brightness(game), "day again");
+        assertFalse(game.crashed());
+    }
+
+    /** A light shining only at night (Tiled's nightOnly) and a usual one (the house's torch). */
+    private static final TestMap LIGHTS = TestMap.of(
+            "~~~~~~~",
+            "~.P.n*~",
+            "~~~~~~~")
+            .with('n', "LIGHT", Map.of("lightType", "TORCH", "nightOnly", "true"));
+
+    @Test
+    void nightOnlyLightsShineFromDuskToDawn() {
+        GameDriver game = GameDriver.start(LevelVariant.of(LIGHTS).mapProperty("ambientLight", "1")
+                .write("daylight-lights.tmx"));
+        assertEquals(List.of(false), game.nightLightsShining(), "off by day");
+        game.seconds(20);
+        assertEquals(List.of(false), game.nightLightsShining());
+        game.seconds(6); // 26 s: the light dims
+        assertEquals(List.of(true), game.nightLightsShining(), "on as soon as it gets darker");
+        game.seconds(30); // 56 s: dawn
+        assertEquals(List.of(true), game.nightLightsShining(), "still on while it gets brighter");
+        game.seconds(6); // 62 s
+        assertEquals(List.of(false), game.nightLightsShining(), "off again in full daylight");
         assertFalse(game.crashed());
     }
 

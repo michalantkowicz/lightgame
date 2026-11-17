@@ -9,6 +9,8 @@ public abstract class GameLight extends Group {
     private final LightType lightType;
     protected Light light;
     private Tile tile;
+    /** It shines only at night: whoever runs day and night switches it ({@link #setShining}). */
+    private boolean nightOnly;
 
     protected GameLight(LightType lightType) {
         this.lightType = lightType;
@@ -41,6 +43,23 @@ public abstract class GameLight extends Group {
 
     public void setLightColor(Color color) {
         light.setColor(color);
+    }
+
+    public boolean isNightOnly() {
+        return nightOnly;
+    }
+
+    public void setNightOnly(boolean nightOnly) {
+        this.nightOnly = nightOnly;
+    }
+
+    /** Switches the light on or off (it keeps blinking either way, unseen while off). */
+    public void setShining(boolean shining) {
+        light.setActive(shining);
+    }
+
+    public boolean isShining() {
+        return light.isActive();
     }
 
     public LightType getLightType() {

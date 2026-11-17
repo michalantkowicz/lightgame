@@ -59,6 +59,7 @@ import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
+import com.mantkowicz.light.light.GameLight;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.map.TileLight;
@@ -1106,6 +1107,17 @@ public final class GameDriver {
         } else {
             FeatureFlag.DAY_AND_NIGHT.switchOff();
         }
+    }
+
+    /** For each light on the map that shines only at night (Tiled's nightOnly), whether it shines right now. */
+    public List<Boolean> nightLightsShining() {
+        List<Boolean> shining = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof GameLight light && light.isNightOnly()) {
+                shining.add(light.isShining());
+            }
+        }
+        return shining;
     }
 
     // grass (feature.GrassFeature)

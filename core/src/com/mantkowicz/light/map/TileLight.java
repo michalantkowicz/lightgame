@@ -12,6 +12,7 @@ import com.mantkowicz.light.light.LightType;
 import static com.mantkowicz.light.map.TileObjectAttribute.BORDER_LIGHT_POSITION;
 import static com.mantkowicz.light.map.TileObjectAttribute.LIGHT_COLOR_HEX;
 import static com.mantkowicz.light.map.TileObjectAttribute.LIGHT_TYPE;
+import static com.mantkowicz.light.map.TileObjectAttribute.NIGHT_ONLY;
 import static com.mantkowicz.light.map.TileObjectType.LIGHT;
 
 public class TileLight extends TileObject {
@@ -23,6 +24,7 @@ public class TileLight extends TileObject {
     private final Color color;
     /** {@code null} when the light stands in the middle of the tile */
     private final BorderLightPosition borderPosition;
+    private final boolean nightOnly;
     private GameLight light;
 
     public TileLight(MapProperties objectProperties) {
@@ -34,6 +36,8 @@ public class TileLight extends TileObject {
         type = LightType.valueOf(typeLiteral);
         color = Color.valueOf(colorLiteral);
         borderPosition = (borderPositionLiteral != null) ? BorderLightPosition.valueOf(borderPositionLiteral) : null;
+        // Tiled writes a bool property as a Boolean, a plain one as a String
+        nightOnly = Boolean.parseBoolean(String.valueOf(objectProperties.get(NIGHT_ONLY.getValue())));
     }
 
     @Override
@@ -41,6 +45,7 @@ public class TileLight extends TileObject {
         light = LightFactory.createLight(context.getRayHandler(), type);
         light.setColor(color);
         light.setTile(tile);
+        light.setNightOnly(nightOnly);
         context.getGameStage().addActor(light);
 
         if (isLightBorder()) {

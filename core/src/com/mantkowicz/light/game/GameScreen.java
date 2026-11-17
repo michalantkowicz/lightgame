@@ -143,7 +143,7 @@ public class GameScreen extends ScreenAdapter {
             }
         }
         if (daylight != null && FeatureFlag.DAY_AND_NIGHT.isOn()) {
-            addFeature(new DayNightFeature(rayHandler, daylight));
+            addFeature(new DayNightFeature(context, daylight));
         }
         addFeature(new MenuFeature(context, menuStage));
         addFeature(new NoPathFeature(context));

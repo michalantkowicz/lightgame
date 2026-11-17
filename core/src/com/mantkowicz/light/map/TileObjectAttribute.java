@@ -7,6 +7,8 @@ public enum TileObjectAttribute {
     LIGHT_TYPE("lightType"),
     LIGHT_COLOR_HEX("lightColorHex"),
     BORDER_LIGHT_POSITION("borderLightPosition"),
+    /** "true": the light shines only at night (it is off by day, see {@code feature.DayNightFeature}); always without it. */
+    NIGHT_ONLY("nightOnly"),
     /** A cow's crops to wish for, e.g. "CARROT,CUCUMBER"; any crop without it. */
     FAVOURITE_DISH("favouriteDish"),
     /** What grows on a field, e.g. "CORN"; a carrot without it. */

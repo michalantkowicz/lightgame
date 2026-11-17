@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="20">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="24">
  <properties>
   <property name="ambientLight" type="float" value="1"/>
  </properties>
@@ -225,6 +225,42 @@
    <properties>
     <property name="objectClass" value="GRASS"/>
     <property name="phase" type="int" value="1"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="20" name="LIGHT" x="148" y="148" width="8" height="8">
+   <properties>
+    <property name="lightColorHex" value="ffb347"/>
+    <property name="lightType" value="TORCH"/>
+    <property name="nightOnly" type="bool" value="true"/>
+    <property name="objectClass" value="LIGHT"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="21" name="LIGHT" x="212" y="52" width="8" height="8">
+   <properties>
+    <property name="lightColorHex" value="ffb347"/>
+    <property name="lightType" value="TORCH"/>
+    <property name="nightOnly" type="bool" value="true"/>
+    <property name="objectClass" value="LIGHT"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="22" name="LIGHT" x="276" y="164" width="8" height="8">
+   <properties>
+    <property name="lightColorHex" value="ffb347"/>
+    <property name="lightType" value="TORCH"/>
+    <property name="nightOnly" type="bool" value="true"/>
+    <property name="objectClass" value="LIGHT"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="23" name="LIGHT" x="116" y="180" width="8" height="8">
+   <properties>
+    <property name="lightColorHex" value="ffb347"/>
+    <property name="lightType" value="TORCH"/>
+    <property name="nightOnly" type="bool" value="true"/>
+    <property name="objectClass" value="LIGHT"/>
    </properties>
    <ellipse/>
   </object>

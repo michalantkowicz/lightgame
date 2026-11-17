@@ -1047,5 +1047,11 @@ by a chicken, slowly enough that the player can still save it.
 - Decided: only maps with daylight have it (those setting Tiled's `ambientLight`, e.g. level 1); the house (no
   `ambientLight`, dark and lit by its lamps) stays as it is. Lights on the map are untouched. The HUD and the action
   buttons (UI stage) stay bright at night; the wish bubbles are on the map, so they darken with it.
-- Tests: `DayNightTest` (the cycle, a tenth of the map's own daylight, the house, the flag off); `GameDriver.dayAndNight`.
-  No golden changed (no golden records the ambient light).
+- **Night-only lights** (owner's request, to see how it looks): a map light (`LIGHT`) with Tiled's bool property
+  `nightOnly` is off in full daylight and shines from when the light starts dimming until the day is back
+  (`GameLight.setShining`, switched by `DayNightFeature`). Level 1 got four of them: warm `TORCH`es (`ffb347`, the
+  usual blinking) left of the start, on the fence over the fields, by the chicken house and towards the chest. They
+  are only light, no lamp is drawn under them. The game copy of level 1 was written by the tool's own `game_map` step
+  (the pack isn't needed for objects; the tiles atlas is unchanged).
+- Tests: `DayNightTest` (the cycle, a tenth of the map's own daylight, the house, the flag off, night-only lights);
+  `GameDriver.dayAndNight`, `GameDriver.nightLightsShining`. No golden changed (no golden records the ambient light).
