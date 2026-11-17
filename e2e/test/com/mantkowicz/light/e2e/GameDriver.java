@@ -961,6 +961,20 @@ public final class GameDriver {
         return names;
     }
 
+    /** Short tap on the picture in the wish bubble over the animal (the bubble must be shown). */
+    public void tapWishBubble(Kind kind) {
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof PictureBubble bubble && bubble.getCharacter() == actor(kind) && bubble.isVisible()) {
+                Actor picture = bubble.getChildren().peek();
+                tap(gameScreenPosition(
+                        picture.localToStageCoordinates(
+                                new Vector2(picture.getWidth() / 2f, picture.getHeight() / 2f))));
+                return;
+            }
+        }
+        throw new IllegalStateException("No wish bubble shown over " + kind);
+    }
+
     /** The picture bubble over a character; the bubbles on the map are drawn in front of every other actor. */
     private String bubbleOver(Group character) {
         Array<Actor> actors = gameStage().getActors();

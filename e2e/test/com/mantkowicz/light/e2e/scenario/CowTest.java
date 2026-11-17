@@ -14,6 +14,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -173,6 +175,54 @@ class CowTest {
         assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "still hungry: the crop again");
         assertEquals(wish, game.cowWants(), "the same crop as before");
         assertEquals(List.of(), game.buttonAlphas("STROKE"), "but no hand: it was just stroked");
+        assertFalse(game.crashed());
+    }
+
+    /** Far from the cow, tapping the bubble with its wish walks the rabbit next to it, as tapping the cow does. */
+    @Test
+    void tappingTheWishBubbleWalksNextToTheCow() {
+        GameDriver game = GameDriver.start(LONG_ROW.write("cow-long-row"));
+        waitFor(game, "WISHING", 63);
+        stepAway(game);
+        Cell far = game.playerCell();
+        game.tapWishBubble(GameDriver.Kind.COW);
+        game.seconds(2);
+        assertNotEquals(far, game.playerCell());
+        assertTrue(game.usedFromNeighbours(game.cellOf(GameDriver.Kind.COW)).contains(game.playerCell()),
+                "the rabbit stands next to the cow");
+        assertEquals("hidden", game.cowWish(), "next to it: the button instead of the bubble");
+        assertEquals(List.of(1f), game.buttonAlphas("GIVE"));
+        assertFalse(game.crashed());
+    }
+
+    /**
+     * Next to the wishing cow, tapping the slot with what it wishes for gives it, as its button does; a slot with
+     * something else (or an empty one) throws its item out as usual.
+     */
+    @Test
+    void tappingTheSlotWithTheWishGivesItToTheCow() {
+        GameDriver game = GameDriver.start(PICKY.write("cow-picky"));
+        waitFor(game, "WISHING", 63);
+        game.seconds(1);
+        String wish = game.cowWants();
+        String other = "carrot".equals(wish) ? "cucumber" : "carrot";
+        game.putIntoBackpack(other);
+        game.putIntoBackpack(wish);
+        game.seconds(1);
+
+        game.tapBackpackSlot(0);
+        game.frames(2);
+        assertEquals("WISHING", game.cowState(), "not what it wishes for: it stays hungry");
+        assertNull(game.backpackItems().get(0), "the item jumped out, as usual");
+        assertNotNull(game.backpackItems().get(1));
+        assertEquals(1, game.itemsOnGround().size(), game.itemsOnGround().toString());
+
+        game.tapBackpackSlot(1);
+        game.frames(2);
+        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
+        assertTrue(game.backpackSlotShaking(1), "the slot it came from shakes");
+        assertEquals("EATING", game.cowState(), "the cow got it");
+        assertEquals(1, game.itemsOnGround().size(), "nothing more on the ground");
         assertFalse(game.crashed());
     }
 

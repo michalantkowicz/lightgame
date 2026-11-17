@@ -28,7 +28,8 @@ import java.util.function.BooleanSupplier;
  * <li>it wishes for something: a button with that item (on the right) instead of the bubble with the wish. Tapping it
  * takes the item out of the backpack (its slot shakes) and gives it to the creature; when the player doesn't carry
  * one, the button shakes and the face says "find" with the item's picture, as the HUD's hint button (the question
- * mark) does next to it.</li>
+ * mark) does next to it. Tapping the backpack slot with the wished item does the same as the button
+ * ({@link #giveFrom}).</li>
  * </ul>
  * The buttons fade out when what they do is no longer possible (the player walks away, the creature walks or eats);
  * once the button with the wish is gone, the bubble is back. With several creatures next to the player (restless
@@ -154,13 +155,33 @@ public class CreatureFeature implements Feature {
             hud.showHint();
             return;
         }
+        handOver(slot, creature);
+    }
+
+    /**
+     * A tap on a backpack slot works as the wish button when what is in it is what the creature with that button (next
+     * to the player) wishes for: the creature gets it from this slot (it shakes).
+     *
+     * @return false when it isn't (an empty slot, something else, nobody wishing): the slot does what it usually does
+     */
+    public boolean giveFrom(int slot) {
+        Creature wishing = wishingCreature(creaturesNextToPlayer());
+        if (wishing == null || !wishing.getWish().isSameKindAs(player.getInventory().getItems().get(slot))) {
+            return false;
+        }
+        handOver(slot, wishing);
+        return true;
+    }
+
+    /** Takes the item out of the backpack slot (the HUD shakes it) and gives it to the creature. */
+    private void handOver(int slot, Creature creature) {
         Item item = player.getInventory().take(slot);
-        context.getGameEventService().post(new BackpackItemEjectedEvent(slot)); // the HUD shakes its slot
+        context.getGameEventService().post(new BackpackItemEjectedEvent(slot));
         creature.give(item);
     }
 
     private boolean canStroke(Creature creature) {
-        return isNextToPlayer(creature) && creature.canBeStroked();
+        return creaturesNextToPlayer().contains(creature) && creature.canBeStroked();
     }
 
     /**
@@ -180,10 +201,6 @@ public class CreatureFeature implements Feature {
             heartAfterTheHand = false;
             new FloatingPicture("heart", heart, HEART_SCALE).showOver(player, HEART_GAP);
         }
-    }
-
-    private boolean isNextToPlayer(Creature creature) {
-        return creaturesNextToPlayer().contains(creature);
     }
 
     /** The creatures used from the player's tile (next to it, on a side it is used from). */

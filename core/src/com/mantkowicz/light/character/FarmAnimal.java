@@ -16,6 +16,7 @@ import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.actor.WalkNextToOnTapListener;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
+import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
 import com.mantkowicz.light.plugin.StateLabelPlugin;
 import com.mantkowicz.light.resources.Action;
@@ -44,6 +45,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     private static final float EMOTE_SCALE = 6, EMOTE_GAP = 60;
 
     private final ResourcesService resources;
+    private final GameEventService events;
     /** The crops it may wish for when hungry. */
     private final List<CropType> favouriteDishes;
     private final float hungryAfterSeconds, giveUpWishingAfterSeconds;
@@ -71,6 +73,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
             List<CropType> favouriteDishes, float hungryAfterSeconds, float giveUpWishingAfterSeconds) {
         super(type, context, sprite, Action.IDLE, description);
         resources = context.getResourcesService();
+        events = context.getGameEventService();
         this.favouriteDishes = favouriteDishes == null || favouriteDishes.isEmpty()
                 ? CropType.all()
                 : new ArrayList<>(favouriteDishes);
@@ -78,7 +81,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
         favouriteFood = new Crop(this.favouriteDishes.get(0), resources);
         setTouchable(Touchable.enabled);
-        addListener(new WalkNextToOnTapListener(this, context.getGameEventService()));
+        addListener(new WalkNextToOnTapListener(this, events));
     }
 
     /**
@@ -216,9 +219,10 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         return bitesLeft > 0;
     }
 
-    /** A bubble over it with what it wishes for. */
+    /** A bubble over it with what it wishes for; tapping the bubble walks the player next to it, as tapping it does. */
     void showWish() {
         wishBubble = new PictureBubble(resources, favouriteFood.getType().getName(), favouriteFood.getPicture());
+        wishBubble.onTap(new WalkNextToOnTapListener(this, events));
         wishBubble.showOver(this);
         wishBubble.setVisible(wishShown);
     }

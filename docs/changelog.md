@@ -1024,3 +1024,16 @@ by a chicken, slowly enough that the player can still save it.
   the peck pose); one-tile corridors are left to level design (idea in PR #70).
 - Tests: `ChickenEatsCropsTest` (`goingForACropItHasItsStrokeButton`, `strokedWhileItGoesForTheCropItGivesItUp`,
   `strokedWhileItPecksItStops`).
+
+## 2026‑11‑17, tapping the wish bubble and giving from a slot (branch `ccr-f4ec0085-lf63hs`)
+
+- Owner's request: a child sees the wish and taps it, or taps the wished crop in the backpack, and expects it to work.
+- **The wish bubble is tappable** (`PictureBubble.onTap`): a tap on it walks the player next to the animal, the same
+  `WalkNextToOnTapListener` as a tap on the animal itself. A hold does nothing (the animal's menu stays on the animal).
+- **A backpack slot gives its item to a wishing animal next to the player** (`CreatureFeature.giveFrom`, asked first by
+  the HUD's slot tap through `Hud.setGiveAway`): when the animal the wish button is for wishes for what is in the
+  slot, it gets it exactly as from that button, from this slot (the slot shakes, the animal eats). An empty slot, or
+  one with something else, throws its item out as before. To keep `CreatureFeature` under PMD's God Class limit, the
+  one-line `isNextToPlayer` was inlined into `canStroke`.
+- Tests: `CowTest.tappingTheWishBubbleWalksNextToTheCow`, `CowTest.tappingTheSlotWithTheWishGivesItToTheCow`;
+  `GameDriver.tapWishBubble`. No golden changed.

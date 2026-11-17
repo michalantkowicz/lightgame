@@ -2,6 +2,7 @@ package com.mantkowicz.light.actor;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -18,7 +19,8 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
  * A small bubble with a picture in it over a character on the map: what it wishes for (a carrot over the cow).
  * Pictures, not words: the players can't read. It pops up (the pack's bubble
  * animation), then shows the picture. It follows its character around and is drawn over everyone else on the map
- * (someone standing behind the character doesn't cover it); the HUD is on its own stage, above it.
+ * (someone standing behind the character doesn't cover it); the HUD is on its own stage, above it. It ignores taps
+ * unless told what to do with them ({@link #onTap}).
  */
 public class PictureBubble extends Group {
     /** Screen pixels per pack pixel: the bubble (3: 25 % smaller than the 4 it was at first). */
@@ -66,6 +68,12 @@ public class PictureBubble extends Group {
         // the picture comes once the bubble has popped up
         inside.addAction(sequence(alpha(0), delay(pop.getAnimationDuration()), fadeIn(FADE_SECONDS)));
         addActor(inside);
+    }
+
+    /** Taps on it (anywhere on its frame) go to this listener, e.g. one walking the player to its character. */
+    public void onTap(EventListener listener) {
+        setTouchable(Touchable.enabled);
+        addListener(listener);
     }
 
     /** Shows it over the character until it is removed ({@link #remove()}). */
