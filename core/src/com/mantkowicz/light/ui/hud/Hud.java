@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
@@ -78,10 +77,9 @@ public class Hud extends Group {
     private static final float GEAR_MARGIN = 48;
 
     private final ResourcesService resources;
-    private GameEventService events;
     private final Player player;
     /** Throws the item in a backpack slot out next to the player. */
-    private IntPredicate throwOut;
+    private final IntPredicate throwOut;
     private final Group row = new Group();
     private final Portrait face;
     private final List<Image> slots = new ArrayList<>();
@@ -108,7 +106,6 @@ public class Hud extends Group {
     public Hud(GameContext context, Player player, IntPredicate throwOut) {
         this.throwOut = throwOut;
         this.resources = context.getResourcesService();
-        this.events = context.getGameEventService();
         this.player = player;
         setTouchable(Touchable.childrenOnly);
 
@@ -118,7 +115,8 @@ public class Hud extends Group {
         addActor(row);
 
         face = new Portrait(resources, "teemo", AWAKE);
-        reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
+        reactions = new FaceReactions(context.getGameEventService(), resources, face,
+                (text, seconds) -> say(text, null, seconds), this::shake);
         keepTaps(face, reactions::tapped);
         row.addActor(face);
 
@@ -132,7 +130,7 @@ public class Hud extends Group {
                     if (giveAway.test(index)) {
                         return; // given to an animal next to the player wishing for it (as its button would)
                     }
-                    if (!Hud.this.throwOut.test(index)) { // what is in it jumps out next to the player...
+                    if (!throwOut.test(index)) { // what is in it jumps out next to the player...
                         shake(index); // ...or, with nowhere to land, the slot shakes
                     }
                 }
@@ -160,20 +158,19 @@ public class Hud extends Group {
     }
 
     /**
-     * The map the player is in (the first one, or another one through a door): from now on the HUD listens to what
-     * happens there and the backpack slots throw out and give away there. What it shows (the backpack, the stamina)
-     * goes with the player.
-     *
-     * @param throwOut as in the constructor
-     * @param giveAway asked first when a backpack slot is tapped: gives its item away, e.g. to a cow next to the player
-     *                 wishing for it (true), instead of throwing it out (only when this says false does the item jump
-     *                 out next to the player)
+     * The map the player is in (the first one, or another one through a door): from now on the HUD reacts to what
+     * happens there. What it shows (the backpack, the stamina) goes with the player.
      */
-    public void enter(GameEventService events, IntPredicate throwOut, IntPredicate giveAway) {
-        this.events = events;
-        this.throwOut = throwOut;
-        this.giveAway = giveAway;
+    public void listenTo(GameEventService events) {
         reactions.listenTo(events);
+    }
+
+    /**
+     * A tap on a backpack slot first offers its item here (0 = the left slot), e.g. to a cow next to the player wishing
+     * for it; only when this says false does the item jump out next to the player.
+     */
+    public void setGiveAway(IntPredicate giveAway) {
+        this.giveAway = giveAway;
     }
 
     /** Taps on this piece stay in the HUD (they don't reach the map behind it) and do this (the face answers). */
@@ -198,12 +195,7 @@ public class Hud extends Group {
     public void act(float delta) {
         followCamera();
         showBackpack();
-        for (BackpackItemEjectedEvent ejected = events
-                .poll(BackpackItemEjectedEvent.class); ejected != null; ejected = events
-                        .poll(BackpackItemEjectedEvent.class)) {
-            shake(ejected.getSlot());
-        }
-        reactions.react();
+        reactions.react(); // a slot an item was taken out of shakes, the face reacts
         UiImage mood = stamina.getMood();
         face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);

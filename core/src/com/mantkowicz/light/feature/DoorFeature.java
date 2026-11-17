@@ -11,8 +11,10 @@ import com.mantkowicz.light.map.TileDoor;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * The doors of a map (Tiled's DOOR objects, {@link TileDoor}). Whoever ends its walk on a door's tile and may go
@@ -65,6 +67,15 @@ public class DoorFeature implements Feature {
 
     public boolean isDoor(Tile tile) {
         return doors.containsKey(tile);
+    }
+
+    /** The maps this map's doors lead to, e.g. "maps/coop.tmx", each once. */
+    public Set<String> targetMaps() {
+        Set<String> maps = new LinkedHashSet<>();
+        for (TileDoor door : doors.values()) {
+            maps.add(door.getTargetMap());
+        }
+        return maps;
     }
 
     /** The tile of the door with this name, or null when the map has none. */

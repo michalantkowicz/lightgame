@@ -17,7 +17,6 @@ import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileContent;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.PlayerCreatedEvent;
-import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.event.GameEventService;
@@ -26,9 +25,11 @@ import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.DoorFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.GrassCuttingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
+import com.mantkowicz.light.feature.PlayerFeature;
 import com.mantkowicz.light.feature.StageFeature;
 import com.mantkowicz.light.feature.Travel;
 import com.mantkowicz.light.map.Maps;
@@ -45,18 +46,18 @@ import com.mantkowicz.light.ui.menu.MenuStage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntPredicate;
+import java.util.Set;
 
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 /**
  * One map of the game (the farm, the chicken coop) with everything on it: its board, its stages, its lights, its own
- * event bus and its features. The game screen keeps every map the player (or an animal) has been to: each frame all of
- * them act, so a field keeps growing and the animals get hungry while the player is elsewhere, but only the one the
- * player is in is drawn (with its lights) and gets the taps.
+ * event bus and its features. The game screen keeps every map: each frame all of them act, so a field keeps growing and
+ * the animals get hungry while the player is elsewhere, but only the one the player is in is drawn (with its lights),
+ * gets the taps and runs the player's features ({@link PlayerFeature}).
  * <p>
- * Each map has a rabbit of its own, on the map only while the player is there; they all carry the same backpack and
+ * Each map has a rabbit of its own, on the map only while the player is there; they all share the same backpack and
  * stamina ({@link Player#Player(GameContext, Player)}), so the features of a map keep their rabbit.
  */
 // baseline (docs/code-quality-plan.md): what GameScreen built for its one map, moved here with its PMD exception
@@ -74,7 +75,8 @@ final class Area {
     private final RayHandler rayHandler;
     private final Board board;
     private final GameContext context;
-    private final boolean growingGrass;
+    /** The map's own settings, e.g. features it switches off. */
+    private final TileSet.TilesetProperties mapProperties;
     private final List<Feature> features = new ArrayList<>();
     private Player player;
     private CameraTrackingFeature camera;
@@ -84,7 +86,7 @@ final class Area {
 
     /** Something that gives the features their HUD (one for the whole game, created with the first map's player). */
     interface HudProvider {
-        Hud hud(GameContext context, Player player, IntPredicate throwOut);
+        Hud hud(GameContext context, Player player);
     }
 
     /**
@@ -106,8 +108,8 @@ final class Area {
         gameEventService = new GameEventService();
 
         TileSet tileSet = Maps.loadTileSet(resourcesService, mapName);
-        growingGrass = tileSet.getProperties().isGrowingGrass();
-        rayHandler = prepareLights(tileSet.getProperties().getAmbientLight());
+        mapProperties = tileSet.getProperties();
+        rayHandler = prepareLights(mapProperties.getAmbientLight());
 
         List<Tile> tiles = tileSet.getTiles();
         BoardService boardService = new BoardService(gameEventService, tiles);
@@ -154,8 +156,8 @@ final class Area {
     }
 
     /**
-     * Features run every frame, in this order. Those of the player only on a map with a player: camera tracking needs
-     * it.
+     * Features run every frame, in this order: those of the player ({@link PlayerFeature}) only while the player is on
+     * this map, the others always. The player's and the grass only on a map with a player: they need it.
      */
     void startFeatures(HudProvider hudProvider, Travel travel) {
         if (player != null) {
@@ -163,11 +165,13 @@ final class Area {
             features.add(camera);
             collecting = new CollectFeature(context, player);
             features.add(collecting);
-            Hud hud = hudProvider.hud(context, player, collecting::throwOut);
+            Hud hud = hudProvider.hud(context, player);
             creatures = new CreatureFeature(context, player, hud);
             features.add(creatures);
-            if (FeatureFlag.GROWING_GRASS.isOn() && growingGrass) {
-                features.add(new GrassFeature(context, player, hud));
+            if (mapProperties.isOn(FeatureFlag.GROWING_GRASS)) {
+                GrassFeature grass = new GrassFeature(context, player);
+                features.add(grass);
+                features.add(new GrassCuttingFeature(context, player, hud, grass));
             }
         }
         features.add(new MenuFeature(context, menuStage));
@@ -194,18 +198,22 @@ final class Area {
     }
 
     /**
-     * A map the player isn't in: everything on it acts (crops grow, animals live) and its features run, but nothing is
-     * drawn and its lights aren't worked out (nothing in the game asks them).
+     * A map the player isn't in: everything on it acts (crops grow, animals live) and the features of the map run (not
+     * those of the player, {@link PlayerFeature}). Only what is needed: nothing is drawn, its lights aren't worked out
+     * and its physics doesn't step (only walls are in it, for the lights' shadows); its notifications and menu are
+     * the player's, cleared when the player left ({@link #letGo}).
      */
     void actBehindTheScenes(float delta) {
-        world.step(1 / 60f, 6, 2);
         gameStage.act(delta);
-        notificationStage.act(delta);
-        menuStage.act(delta);
-        runFeatures(delta);
+        for (Feature feature : features) {
+            if (!(feature instanceof PlayerFeature)) {
+                feature.run(delta);
+            }
+        }
+        gameEventService.updateEventsLivesAndClean();
     }
 
-    /** The features, then the events of the frame are done. */
+    /** The player is here: all the features, then the events of the frame are done. */
     void runFeatures(float delta) {
         for (Feature feature : features) {
             feature.run(delta);
@@ -237,11 +245,7 @@ final class Area {
 
     /** It comes onto this map on this tile, out of a door (the player: the camera is over it at once). */
     void welcome(GameBoardActor actor, Tile tile) {
-        if (actor instanceof SpriteActor animal) {
-            animal.comeOnto(tile); // it blocks its tile, as when it walks
-        } else {
-            actor.setTile(tile);
-        }
+        actor.comeOnto(tile);
         gameStage.addActor(actor);
         if (doors.isDoor(tile)) {
             doors.cameOut(actor);
@@ -253,7 +257,9 @@ final class Area {
 
     /**
      * It goes through a door to another map: off this one. When the player goes, the action buttons over things here
-     * go at once (on the UI stage, they would show over the other map while fading).
+     * go at once (on the UI stage, they would show over the other map while fading), the player's features take away
+     * what they show ({@link PlayerFeature#playerLeft}) and stop running here, and its notifications and an open menu
+     * go (they would wait half-faded until the player is back).
      */
     void letGo(GameBoardActor actor, Stage uiStage) {
         actor.leaveBoard();
@@ -264,7 +270,27 @@ final class Area {
                     button.remove();
                 }
             }
+            for (Feature feature : features) {
+                if (feature instanceof PlayerFeature playerFeature) {
+                    playerFeature.playerLeft();
+                }
+            }
+            notificationStage.clear();
+            menuStage.clear();
         }
+    }
+
+    /**
+     * It stays on the door it stands on without going through, until it has walked off (the player, when there is no
+     * room on the other side: else the curtain would come down again and again).
+     */
+    void stayOnDoor(GameBoardActor actor) {
+        doors.cameOut(actor);
+    }
+
+    /** The maps this map's doors lead to, e.g. "maps/coop.tmx". */
+    Set<String> doorTargets() {
+        return doors.targetMaps();
     }
 
     /** Is it on this map now? */

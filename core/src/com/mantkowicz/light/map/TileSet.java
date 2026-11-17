@@ -1,8 +1,10 @@
 package com.mantkowicz.light.map;
 
 import com.mantkowicz.light.board.Tile;
+import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.util.Tuple;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TileSet {
@@ -13,8 +15,11 @@ public class TileSet {
         private Tuple<Float, Float> tileSize;
         /** The map's 'ambientLight' property (0 dark .. 1 daylight), or {@code null} when the map doesn't set it. */
         private Float ambientLight;
-        /** The map's 'growingGrass' property: does grass sprout and grow there (not inside a coop)? Yes without it. */
-        private boolean growingGrass = true;
+        /**
+         * The map's 'featuresOff' property: the features switched off on this map, e.g. GROWING_GRASS inside the coop
+         * (names of {@link FeatureFlag}s, comma-separated); none without it.
+         */
+        private final List<FeatureFlag> featuresOff = new ArrayList<>();
 
         public void setTileSize(Tuple<Float, Float> tileSize) {
             this.tileSize = tileSize;
@@ -28,12 +33,13 @@ public class TileSet {
             this.ambientLight = ambientLight;
         }
 
-        public boolean isGrowingGrass() {
-            return growingGrass;
+        /** Is this feature on for this map: switched on for the game and not switched off by the map? */
+        public boolean isOn(FeatureFlag feature) {
+            return feature.isOn() && !featuresOff.contains(feature);
         }
 
-        public void setGrowingGrass(boolean growingGrass) {
-            this.growingGrass = growingGrass;
+        public void switchOff(FeatureFlag feature) {
+            featuresOff.add(feature);
         }
     }
 

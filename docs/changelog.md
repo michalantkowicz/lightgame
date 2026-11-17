@@ -1085,3 +1085,31 @@ by a chicken, slowly enough that the player can still save it.
   `animalStateOnAnyMap`, `fieldsNotCarriedThroughADoor`); `TestMap.pathOf`. No golden changed.
 - CLAUDE.md: what to mind when adding a feature (it runs while the player is on another map; the shared HUD) or a
   character that goes through doors.
+- **After the owner's review** (same day; the owner picked each point):
+  - **No room behind the door**: the curtain came down again and again (taps open one frame in each round). Now
+    `GameScreen` checks for room first: without, no curtain, and the rabbit stays on the door until it has walked
+    off (`Area.stayOnDoor`); the same if a hen takes the last tile while the curtain is coming down.
+  - A door leading to its own map fails `ShippedMapsTest`.
+  - Kept what the branch had removed without asking: `GameScreen.addFeature` (the FPS label uses it again) and
+    `Hud.setGiveAway`. `Hud.enter` is now just `Hud.listenTo(events)`: the HUD is given, once, a throw-out and a
+    give-away that ask the player's map (`GameScreen`), so they need no rebinding; a backpack slot's shake moved to
+    `FaceReactions`, which reads those events anyway (keeps `Hud` under PMD's God Class limit).
+  - `GameBoardActor.comeOnto` (overridden by `SpriteActor`, which blocks its tile) replaces the `instanceof` in
+    `Area.welcome`.
+  - **Player and map features**: `PlayerFeature` (camera, collecting, creatures, the new `GrassCuttingFeature`) runs
+    only on the player's map; `playerLeft()` (nothing by default) takes away what it shows once on the shared HUD:
+    the scythe (the hint is set by the new map every frame; a wish bubble hidden under a button comes back when the
+    player is back). `GrassFeature` only grows grass now, on every map. The other maps no longer have to act before
+    the player's one for the HUD to be right.
+  - **What goes through doors in one object**: `FarmAnimal.Needs` (wish, hunger, last stroke, bites left) is handed to
+    the animal on the other side; `Player.Shared` (backpack, stamina) is what every map's rabbit shares. The reflection
+    test listing an animal's fields not carried over (`GameDriver.fieldsNotCarriedThroughADoor`) went with it.
+  - Map property `featuresOff` (`FeatureFlag` names, e.g. `GROWING_GRASS` in the coop) replaces `growingGrass`.
+  - **Every map a chain of doors leads to is built at the start** (`GameScreen.buildTheMapsBehindDoors`): no hitch
+    mid-game when a hen first walks into the coop; they all live from the first frame. `GameDriver.visitedMaps` is
+    `maps` now. No golden changed.
+  - **Cheaper maps the player isn't on**: no physics step (only static walls, for the lights' shadows), their
+    notification and menu stages don't act; both are cleared when the player leaves.
+  - The FPS label needed nothing: it is on the shared UI stage already.
+  - Tests: `TravelTest` (no room behind the door; the scythe goes when the rabbit goes; a chain of doors builds every
+    map at the start).

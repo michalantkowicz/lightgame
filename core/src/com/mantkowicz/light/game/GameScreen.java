@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.IntPredicate;
 
 import static com.mantkowicz.light.debug.Debug.Tool.FPS_LABEL;
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
@@ -31,10 +30,10 @@ import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
 /**
  * The game: the maps ({@link Area}: the farm, the chicken coop...) and the UI over them. It starts on one map; a door
- * (Tiled's DOOR object) leads to another, which is built the first time someone goes through and lives on from then
- * on: every map acts each frame, the one the player is in is also drawn and gets the taps. The player goes through a
- * door behind a short curtain (the screen darkens and lightens again, {@link #CURTAIN_SECONDS} each way); an animal just
- * comes out on the other side.
+ * (Tiled's DOOR object) leads to another. Every map a chain of doors leads to is built at the start and lives on: every
+ * map acts each frame, the one the player is in is also drawn and gets the taps. The player goes through a door behind
+ * a short curtain (the screen darkens and lightens again, {@link #CURTAIN_SECONDS} each way); an animal just comes out
+ * on the other side.
  */
 public class GameScreen extends ScreenAdapter {
     /** How long the screen takes to darken, and then to lighten again, when the player goes through a door. */
@@ -43,7 +42,7 @@ public class GameScreen extends ScreenAdapter {
     private final String mapName;
     private final float cameraZoom;
     private final ResourcesService resourcesService;
-    /** Every map someone has been to, by its file name; the first is the one the game starts on. */
+    /** Every map, by its file name; the first is the one the game starts on. */
     private final Map<String, Area> areas = new LinkedHashMap<>();
     /** Screen-wide, whatever the map (the FPS label). */
     private final List<Feature> features = new ArrayList<>();
@@ -70,18 +69,39 @@ public class GameScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
 
         active = area(mapName);
+        buildTheMapsBehindDoors();
         listenTo(active);
         if (hud != null) {
-            hud.enter(active.getGameEventService(), active::throwOut, active::giveFrom);
+            hud.listenTo(active.getGameEventService());
         }
 
         if (Debug.isOn(FPS_LABEL)) {
-            features.add(new FPSFeature(active.getContext(), new Vector2(300, 520)));
+            addFeature(new FPSFeature(active.getContext(), new Vector2(300, 520)));
         }
         curtain = Curtain.create();
     }
 
-    /** The map with this file name: built (and brought to life) the first time someone goes there. */
+    /**
+     * Every map the doors lead to, and the maps their doors lead to, and so on: all built now, so none is built in the
+     * middle of the game (a hitch) and all of them live from the start.
+     */
+    private void buildTheMapsBehindDoors() {
+        List<Area> toLookAt = new ArrayList<>(areas.values());
+        for (int i = 0; i < toLookAt.size(); i++) {
+            for (String target : toLookAt.get(i).doorTargets()) {
+                if (!areas.containsKey(target)) {
+                    toLookAt.add(area(target));
+                }
+            }
+        }
+    }
+
+    /** Screen-wide: runs every frame after the maps, whatever map the player is in. */
+    protected void addFeature(Feature feature) {
+        features.add(feature);
+    }
+
+    /** The map with this file name, built (and brought to life) if it isn't yet. */
     private Area area(String name) {
         Area area = areas.get(name);
         if (area == null) {
@@ -94,10 +114,14 @@ public class GameScreen extends ScreenAdapter {
         return area;
     }
 
-    /** The HUD, made with the first map's player; every map's features share it. */
-    private Hud hud(GameContext context, Player player, IntPredicate throwOut) {
+    /**
+     * The HUD, made with the first map's player; every map's features share it. A backpack slot throws out and gives
+     * away on the map the player is in.
+     */
+    private Hud hud(GameContext context, Player player) {
         if (hud == null) {
-            hud = new Hud(context, player, throwOut);
+            hud = new Hud(context, player, slot -> active.throwOut(slot));
+            hud.setGiveAway(slot -> active.giveFrom(slot));
             uiStage.addActor(hud);
         }
         return hud;
@@ -145,9 +169,17 @@ public class GameScreen extends ScreenAdapter {
         return null;
     }
 
+    /**
+     * The curtain comes down; with no room on the other side, it doesn't, and the player stays on the door until it has
+     * walked off (and may try again).
+     */
     private boolean startJourney(TileDoor door) {
         if (curtain.isDrawn()) {
             return false; // on its way already
+        }
+        if (area(door.getTargetMap()).arrivalTile(door.getName()) == null) {
+            active.stayOnDoor(active.getPlayer());
+            return false;
         }
         multiplexer.clear(); // no taps until the player is through
         curtain.fall(uiStage, CURTAIN_SECONDS, () -> arrivingThrough = door, () -> listenTo(active));
@@ -156,18 +188,20 @@ public class GameScreen extends ScreenAdapter {
 
     /**
      * Behind the curtain: the player leaves this map and comes out of the door with the same name on the other one,
-     * which is drawn from now on. With no room there, it stays where it is.
+     * which is drawn from now on. With no room there (taken while the curtain came down), it stays on the door until it
+     * has walked off.
      */
     private void arrive(TileDoor door) {
         Area to = area(door.getTargetMap());
         Tile tile = to.arrivalTile(door.getName());
         if (tile == null || to == active) {
+            active.stayOnDoor(active.getPlayer());
             return;
         }
         active.letGo(active.getPlayer(), uiStage);
         to.welcome(to.getPlayer(), tile);
         active = to;
-        hud.enter(to.getGameEventService(), to::throwOut, to::giveFrom);
+        hud.listenTo(to.getGameEventService());
     }
 
     @Override
@@ -189,9 +223,7 @@ public class GameScreen extends ScreenAdapter {
         uiStage.act(delta);
         uiStage.draw();
 
-        // the other maps before this one's features: what they tell the shared HUD (e.g. no hint next to an animal,
-        // as their rabbit isn't there) is overridden by what this map tells it
-        for (Area area : new ArrayList<>(areas.values())) { // a copy: an animal may open a new map meanwhile
+        for (Area area : areas.values()) {
             if (area != active) {
                 area.actBehindTheScenes(delta);
             }

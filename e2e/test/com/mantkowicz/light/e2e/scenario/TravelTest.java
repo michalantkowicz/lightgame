@@ -23,21 +23,29 @@ class TravelTest {
     private static final String FARM_NAME = "travel-farm", COOP_NAME = "travel-coop";
 
     /** The farm: a field, the rabbit, a door to the coop on the right. */
-    private static final TestMap FARM = TestMap.of(
-            "~~~~~~~~",
-            "~.....O~",
-            "~.FP...~",
-            "~~~~~~~~")
-            .with('F', "FIELD", Map.of("weedChance", "0"))
-            .with('O', "DOOR", door(COOP_NAME));
+    private static final TestMap FARM = farm(COOP_NAME);
+
+    private static TestMap farm(String coop) {
+        return TestMap.of(
+                "~~~~~~~~",
+                "~.....O~",
+                "~.FP...~",
+                "~~~~~~~~")
+                .with('F', "FIELD", Map.of("weedChance", "0"))
+                .with('O', "DOOR", door(coop));
+    }
 
     /** The coop: its door to the farm, a corner to walk to. */
-    private static final TestMap COOP = TestMap.of(
-            "~~~~~",
-            "~O..~",
-            "~..a~",
-            "~~~~~")
-            .with('O', "DOOR", door(FARM_NAME));
+    private static final TestMap COOP = coop(FARM_NAME);
+
+    private static TestMap coop(String farm) {
+        return TestMap.of(
+                "~~~~~",
+                "~O..~",
+                "~..a~",
+                "~~~~~")
+                .with('O', "DOOR", door(farm));
+    }
 
     private static Map<String, String> door(String to) {
         return Map.of("door", "coop", "targetMap", TestMap.pathOf(to), "passes", "PLAYER,CHICKEN");
@@ -48,7 +56,8 @@ class TravelTest {
         COOP.write(COOP_NAME);
         String farm = FARM.write(FARM_NAME);
         GameDriver game = GameDriver.start(farm);
-        assertEquals(List.of(farm), game.visitedMaps(), "only the map the game starts on is there");
+        assertEquals(List.of(farm, TestMap.pathOf(COOP_NAME)), game.maps(),
+                "the coop is built at the start: the farm's door leads there");
 
         game.click(FARM.cell('F'));
         game.seconds(2);
@@ -68,7 +77,6 @@ class TravelTest {
         game.seconds(0.4f);
         assertEquals(TestMap.pathOf(COOP_NAME), game.currentMap(), "behind the curtain: in the coop");
         assertEquals(COOP.cell('O'), game.playerCell(), "out of the coop's door");
-        assertEquals(List.of(farm, TestMap.pathOf(COOP_NAME)), game.visitedMaps(), "the coop is built on the way");
         game.seconds(0.5f);
         assertEquals(0, game.curtain(), "and the screen is light again");
         assertTrue(game.backpackItems().toString().contains("CARROT"),
@@ -89,12 +97,16 @@ class TravelTest {
     }
 
     /** A chicken in a dead end whose only way is the door. */
-    private static final TestMap CHICKEN_FARM = TestMap.of(
-            "~~~~~~~",
-            "~KO..P~",
-            "~~~~~~~")
-            .with('K', "CHICKEN", Map.of())
-            .with('O', "DOOR", door(COOP_NAME + "-k"));
+    private static final TestMap CHICKEN_FARM = chickenFarm(COOP_NAME + "-k");
+
+    private static TestMap chickenFarm(String coop) {
+        return TestMap.of(
+                "~~~~~~~",
+                "~KO..P~",
+                "~~~~~~~")
+                .with('K', "CHICKEN", Map.of())
+                .with('O', "DOOR", door(coop));
+    }
 
     private static final TestMap CHICKEN_COOP = TestMap.of(
             "~~~~~~",
@@ -154,29 +166,77 @@ class TravelTest {
         }
         assertTrue(steppedOnTheDoor, "the cow did walk onto the door");
         assertEquals(farm, game.whereIs(Kind.COW), "but the door doesn't let cows through");
-        assertEquals(List.of(farm), game.visitedMaps(), "nobody went to the coop");
         assertFalse(game.crashed());
     }
 
-    /** A chicken and a cow standing still, to look at what they carry through a door. */
-    private static final TestMap ANIMALS = TestMap.of(
-            "~~~~~~~",
-            "~K~M~P~",
-            "~~~~~~~")
-            .with('K', "CHICKEN", Map.of());
+    /** A coop of one cell: once a hen has come in, there is no room for the rabbit. */
+    private static final TestMap TINY_COOP = TestMap.of(
+            "~~~",
+            "~O~",
+            "~~~")
+            .with('O', "DOOR", door(FARM_NAME + "-full"));
 
-    /**
-     * What an animal carries through a door is copied field by field ({@code FarmAnimal.moveTo}). A field added to an
-     * animal later fails this test until it is carried over, or named here as one that starts again on the other side.
-     */
     @Test
-    void anAnimalCarriesEverythingButWhatItIsDoingThroughADoor() {
-        GameDriver game = GameDriver.start(ANIMALS.write("travel-animals"));
-        // starting again on the other side: what it does (its state machine and the wait it is in), whether its wish
-        // bubble is hidden under a button, a chicken's hunt for a crop on the ground
-        assertEquals(List.of("hunt", "stateMachine", "timeLeft", "wishShown"),
-                game.fieldsNotCarriedThroughADoor(Kind.CHICKEN));
-        assertEquals(List.of("stateMachine", "timeLeft", "wishShown"), game.fieldsNotCarriedThroughADoor(Kind.COW));
+    void withNoRoomBehindTheDoorTheRabbitStaysAndCanWalkOff() {
+        TINY_COOP.write(COOP_NAME + "-full");
+        String farm = chickenFarm(COOP_NAME + "-full").write(FARM_NAME + "-full");
+        String coop = TestMap.pathOf(COOP_NAME + "-full");
+        GameDriver game = GameDriver.start(farm);
+        for (int frames = 0; frames < 60 * 60 && !coop.equals(game.whereIs(Kind.CHICKEN)); frames++) {
+            game.frames(1);
+        }
+        assertEquals(coop, game.whereIs(Kind.CHICKEN), "the hen took the coop's only cell");
+
+        game.click(CHICKEN_FARM.cell('O'));
+        game.seconds(2);
+        assertEquals(CHICKEN_FARM.cell('O'), game.playerCell(), "on the door");
+        assertEquals(0, game.curtain(), "no room in the coop: the curtain doesn't come down");
+        game.seconds(3);
+        assertEquals(farm, game.currentMap(), "and the rabbit stays on the farm");
+        assertEquals(0, game.curtain(), "not again and again either");
+
+        game.click(CHICKEN_FARM.cell('P'));
+        game.seconds(2);
+        assertEquals(CHICKEN_FARM.cell('P'), game.playerCell(), "taps work: it walks off the door");
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void theScytheGoesFromTheToolButtonWhenTheRabbitGoes() {
+        coop(FARM_NAME + "-s").write(COOP_NAME + "-s");
+        String farm = farm(COOP_NAME + "-s").write(FARM_NAME + "-s");
+        GameDriver game = GameDriver.start(farm);
+        game.sproutGrass(FARM.cell('O'));
+        game.click(FARM.cell('O'));
+        game.seconds(1.5f);
+        assertEquals("scythe", game.toolButton(), "standing on grass on the door: the scythe");
+        game.seconds(1);
+        assertEquals(TestMap.pathOf(COOP_NAME + "-s"), game.currentMap());
+        assertEquals("hint", game.toolButton(), "in the coop the farm's scythe is gone");
+        assertFalse(game.crashed());
+    }
+
+    /** The farm leads to the coop, the coop to a cellar too: the doors' chain. */
+    private static final TestMap CHAIN_COOP = TestMap.of(
+            "~~~~~",
+            "~O.L~",
+            "~~~~~")
+            .with('O', "DOOR", door(FARM_NAME + "-c"))
+            .with('L', "DOOR", Map.of("door", "cellar", "targetMap", TestMap.pathOf("travel-cellar")));
+
+    private static final TestMap CELLAR = TestMap.of(
+            "~~~~",
+            "~L.~",
+            "~~~~")
+            .with('L', "DOOR", Map.of("door", "cellar", "targetMap", TestMap.pathOf(COOP_NAME + "-c")));
+
+    @Test
+    void everyMapAChainOfDoorsLeadsToIsBuiltAtTheStart() {
+        CELLAR.write("travel-cellar");
+        CHAIN_COOP.write(COOP_NAME + "-c");
+        String farm = farm(COOP_NAME + "-c").write(FARM_NAME + "-c");
+        GameDriver game = GameDriver.start(farm);
+        assertEquals(List.of(farm, TestMap.pathOf(COOP_NAME + "-c"), TestMap.pathOf("travel-cellar")), game.maps());
         assertFalse(game.crashed());
     }
 }

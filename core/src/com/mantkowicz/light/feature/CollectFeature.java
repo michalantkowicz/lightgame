@@ -10,7 +10,7 @@ import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
  * ({@link PlayerCollectResolver}), run every frame. Kept out of {@link Player}, so the actor knows nothing about the
  * collecting UI.
  */
-public class CollectFeature implements Feature {
+public class CollectFeature implements PlayerFeature {
     private final PlayerCollectResolver resolver;
     private final CollectPlugin plugin;
 

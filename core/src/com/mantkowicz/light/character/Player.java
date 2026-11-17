@@ -45,29 +45,36 @@ public class Player extends GameBoardActor implements Collecting {
     private static final int INVENTORY_SIZE = 2;
 
     private final GameEventService gameEventService;
-    private final Inventory inventory;
-    private final Stamina stamina;
+    private final Shared shared;
     private final AnimationPlugin animationPlugin;
     private final BoardMovementPlugin boardMovementPlugin;
     private Long lastIdleChange;
 
+    /**
+     * What every map's rabbit shares (each map has a rabbit of its own, on the map only while the player is there; see
+     * the game screen's areas): whatever the player has to keep when it goes through a door belongs here. What lives in
+     * the rabbit itself (where it walks, its animation) starts again on the other map.
+     */
+    private static final class Shared {
+        final Inventory inventory = new Inventory(INVENTORY_SIZE, new ArrayList<Item>());
+        final Stamina stamina = new Stamina();
+    }
+
     public Player(GameContext context) {
-        this(context, new Inventory(INVENTORY_SIZE, new ArrayList<Item>()), new Stamina());
+        this(context, new Shared());
     }
 
     /**
-     * The rabbit on another map: it carries the same backpack and is as tired as the one it was there (each map has a
-     * rabbit of its own, on the map only while the player is there; see the game screen's areas).
+     * The rabbit on another map: it shares what the one there has ({@link Shared}: the same backpack, as tired).
      */
     public Player(GameContext context, Player elsewhere) {
-        this(context, elsewhere.getInventory(), elsewhere.getStamina());
+        this(context, elsewhere.shared);
     }
 
-    private Player(GameContext context, Inventory inventory, Stamina stamina) {
+    private Player(GameContext context, Shared shared) {
         super(PLAYER, context, DESCRIPTION);
         gameEventService = context.getGameEventService();
-        this.inventory = inventory;
-        this.stamina = stamina;
+        this.shared = shared;
         lastIdleChange = TimeUtils.millis();
         ResourcesService resourcesService = context.getResourcesService();
         createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),
@@ -163,11 +170,11 @@ public class Player extends GameBoardActor implements Collecting {
 
     /** How much strength the player has left: lower it as time passes or for hard work, fill it after sleeping. */
     public Stamina getStamina() {
-        return stamina;
+        return shared.stamina;
     }
 
     @Override
     public Inventory getInventory() {
-        return inventory;
+        return shared.inventory;
     }
 }

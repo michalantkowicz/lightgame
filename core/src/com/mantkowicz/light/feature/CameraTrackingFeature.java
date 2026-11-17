@@ -10,7 +10,7 @@ import com.mantkowicz.light.event.GameEventService;
 
 import static com.mantkowicz.light.debug.Debug.Tool.CAMERA_TRACKING_BOX;
 
-public class CameraTrackingFeature implements Feature {
+public class CameraTrackingFeature implements PlayerFeature {
     private static final float DISTANCE_LEFT_RIGHT = 420;
     private static final float DISTANCE_TOP_BOTTOM = 420;
 

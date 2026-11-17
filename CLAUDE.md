@@ -46,16 +46,18 @@ design, change the rule on purpose in its own PR.
 
 - `GameScreen` holds the maps: each one an `Area` (board, stages, lights, its own event bus and features), which hands
   a `GameContext` (services, plain `Stage`s) to its game objects. A `DOOR` tile leads to another map (`DoorFeature`);
-  a map is built the first time someone goes there. Every map acts each frame (fields grow, animals live), only the
-  player's one is drawn. Each map has its own `Player`, sharing the backpack and stamina.
-  - **A feature also runs while the player is on another map**: its `Player` is then off the board
-    (`getTile()` is null), so skip what needs the player. The HUD and the UI stage are shared: the player's map runs
-    its features last, so what is set every frame (a hint) is right, but what a feature shows once (the scythe on the
-    tool button, something on the UI stage) it must take away itself when the player goes (action buttons go by
-    themselves).
+  every map a chain of doors leads to is built at the start. Every map acts each frame (fields grow, animals live),
+  only the player's one is drawn. Each map has its own `Player`, sharing `Player.Shared` (backpack, stamina): what
+  must go along through a door belongs there.
+  - **Two kinds of feature**: one about the map (grass growing, doors) is a plain `Feature` and runs on every map; one
+    about the player (camera, collecting, creatures next to it, the scythe) is a `PlayerFeature`, runs only on the
+    player's map, and in `playerLeft()` takes away what it shows once on the shared HUD (a tool). Action buttons
+    over the map left go by themselves; the hint is set by the new map every frame.
+  - A map can switch features off for itself: map property `featuresOff`, `FeatureFlag` names (e.g. `GROWING_GRASS`
+    in the coop); check `TilesetProperties.isOn(flag)` where the feature is created.
   - **A character goes through doors** when it says so (`GameBoardActor.goesThroughDoors` and `moveTo`, as
-    `FarmAnimal` does). `moveTo` copies its state field by field: a new field in `FarmAnimal` or an animal fails
-    `TravelTest` until it is copied or named there as one that starts again.
+    `FarmAnimal` does): a new animal on the other map, carrying `FarmAnimal.Needs` (hunger, wish...). What must
+    stay as it was through a door belongs there; the rest starts again.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,

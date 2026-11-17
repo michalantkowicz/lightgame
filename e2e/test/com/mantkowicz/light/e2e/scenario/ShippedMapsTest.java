@@ -15,13 +15,14 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Checks every map the game ships (android/assets), whatever its layout: it loads, the rabbit stands on a free cell (on
  * a map it starts on; one behind a door has no PLAYER: the rabbit comes out of the door), every chest can be used: a
- * free cell next to it that the rabbit can walk to, and every door leads to a shipped map with a door of the same name
- * and can be walked to. No cells or goldens here, so editing a level only fails when the level itself is broken.
+ * free cell next to it that the rabbit can walk to, and every door leads to another shipped map with a door of the same
+ * name and can be walked to. No cells or goldens here, so editing a level only fails when the level itself is broken.
  */
 class ShippedMapsTest {
     @Test
@@ -70,6 +71,7 @@ class ShippedMapsTest {
             String target = entry.getValue().split(" -> ")[1];
             assertTrue(shipped.contains(target), map + ": the door on " + door + " leads to " + target
                     + ", which isn't shipped");
+            assertNotEquals(map, target, map + ": the door on " + door + " leads to its own map");
             assertTrue(GameDriver.start(target).doors().values().stream()
                     .anyMatch(other -> other.startsWith(name + " -> ")),
                     target + " has no door named " + name + " to come out of");

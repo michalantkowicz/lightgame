@@ -1293,8 +1293,8 @@ public final class GameDriver {
         return field(area, area.getClass(), "mapName");
     }
 
-    /** The maps someone (the player, an animal) has been to, in the order they were first visited. */
-    public List<String> visitedMaps() {
+    /** The maps of the game (the one it started on, then those its doors lead to), in the order they were built. */
+    public List<String> maps() {
         return new ArrayList<>(areas().keySet());
     }
 
@@ -1318,63 +1318,6 @@ public final class GameDriver {
             }
         }
         return null;
-    }
-
-    /**
-     * What of an animal doesn't go with it through a door: each field of its class and of the classes up to
-     * {@code FarmAnimal} is set to something unusual (a number, a flipped yes/no, another crop), the animal is moved
-     * ({@code FarmAnimal.moveTo}, onto the same map) and the fields that differ on the new one are named, sorted.
-     * Objects it makes for itself (its state machine...) count as not carried over.
-     */
-    public List<String> fieldsNotCarriedThroughADoor(Kind kind) {
-        FarmAnimal animal = (FarmAnimal) actor(kind);
-        ResourcesService resources = screenField("resourcesService");
-        List<Field> fields = new ArrayList<>();
-        for (Class<?> type = animal.getClass(); type != SpriteActor.class; type = type.getSuperclass()) {
-            for (Field field : type.getDeclaredFields()) {
-                if (!java.lang.reflect.Modifier.isStatic(field.getModifiers())) {
-                    field.setAccessible(true);
-                    fields.add(field);
-                }
-            }
-        }
-        try {
-            int unusual = 7;
-            for (Field field : fields) {
-                if (java.lang.reflect.Modifier.isFinal(field.getModifiers())) {
-                    continue;
-                }
-                if (field.getType() == float.class) {
-                    field.setFloat(animal, unusual++ + 0.5f);
-                } else if (field.getType() == int.class) {
-                    field.setInt(animal, unusual++);
-                } else if (field.getType() == boolean.class) {
-                    field.setBoolean(animal, !field.getBoolean(animal));
-                } else if (field.getType() == Crop.class) {
-                    CropType now = ((Crop) field.get(animal)).getType();
-                    field.set(animal,
-                            new Crop(now == CropType.PUMPKIN ? CropType.TOMATO : CropType.PUMPKIN, resources));
-                }
-            }
-            Object screen = ((Game) game.game()).getScreen();
-            Object area = field(screen, screen.getClass(), "active");
-            FarmAnimal there = animal.moveTo(field(area, area.getClass(), "context"));
-            List<String> lost = new ArrayList<>();
-            for (Field field : fields) {
-                Object here = field.get(animal);
-                Object moved = field.get(there);
-                boolean same = here instanceof Crop crop && moved instanceof Crop other
-                        ? crop.getType() == other.getType()
-                        : java.util.Objects.equals(here, moved);
-                if (!same) {
-                    lost.add(field.getName());
-                }
-            }
-            lost.sort(null);
-            return lost;
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     /** How dark the curtain over the screen is while the player goes through a door: 0 (none) to 1 (black). */
@@ -1558,7 +1501,7 @@ public final class GameDriver {
         return null;
     }
 
-    /** The maps someone has been to (each a {@code game.Area}), by file name, the first the game started on. */
+    /** The maps of the game (each a {@code game.Area}), by file name, the first the game started on. */
     private Map<String, Object> areas() {
         return screenField("areas");
     }

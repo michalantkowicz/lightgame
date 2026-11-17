@@ -161,6 +161,7 @@ public abstract class SpriteActor extends GameBoardActor {
     /**
      * Comes onto the map on this tile (out of a door), which it blocks from now on, as when it walks.
      */
+    @Override
     public void comeOnto(Tile tile) {
         boardService.setAccessible(tile, false);
         setTile(tile);

@@ -49,19 +49,33 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     /** The crops it may wish for when hungry. */
     private final List<CropType> favouriteDishes;
     private final float hungryAfterSeconds, giveUpWishingAfterSeconds;
-    /** What it wishes for this time it is hungry (picked when it gets hungry). */
+    /** How hungry it is, what it wishes for...: what goes with it through a door. */
+    private Needs needs = new Needs();
+    /** What it wishes for this time it is hungry, as an item ({@link Needs#wish}). */
     private Crop favouriteFood;
     private PictureBubble wishBubble;
     /** False while the action button with its wish is over it: the bubble is hidden. */
     private boolean wishShown = true;
-    /** Seconds left of what {@link #stayFor} set, and since the start or its last meal. */
-    private float timeLeft, sinceFed;
-    /** Seconds since it was last stroked (from the start: long enough, it can be stroked at once). */
-    private float sinceStroked = SECONDS_BETWEEN_STROKES;
-    /** Bites still to take when it feeds itself (grazing, pecking) after giving up its wish. */
-    private int bitesLeft;
-    /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
-    private boolean wishChosen;
+    /** Seconds left of what {@link #stayFor} set. */
+    private float timeLeft;
+
+    /**
+     * What an animal carries through a door to another map ({@link #moveTo}): everything about it that has to stay as
+     * it was. What lives in the animal itself (what it is doing, its wait, its bubble) starts again on the other side,
+     * so a new field that must not start again belongs here.
+     */
+    private static final class Needs {
+        /** What it wishes for this time it is hungry (picked when it gets hungry). */
+        CropType wish;
+        /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
+        boolean wishChosen;
+        /** Seconds since the start or its last meal. */
+        float sinceFed;
+        /** Seconds since it was last stroked (from the start: long enough, it can be stroked at once). */
+        float sinceStroked = SECONDS_BETWEEN_STROKES;
+        /** Bites still to take when it feeds itself (grazing, pecking) after giving up its wish. */
+        int bitesLeft;
+    }
 
     /**
      * @param favouriteDishes           the crops it wishes for (one at random each time it gets hungry); any crop when
@@ -79,7 +93,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
                 : new ArrayList<>(favouriteDishes);
         this.hungryAfterSeconds = hungryAfterSeconds;
         this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
-        favouriteFood = new Crop(this.favouriteDishes.get(0), resources);
+        needs.wish = this.favouriteDishes.get(0);
+        favouriteFood = new Crop(needs.wish, resources);
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, events));
     }
@@ -91,8 +106,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     protected void startLiving() {
         addPlugin(delta -> {
             timeLeft -= delta;
-            sinceFed += delta;
-            sinceStroked += delta;
+            needs.sinceFed += delta;
+            needs.sinceStroked += delta;
             think();
         });
         if (Debug.isOn(STATE_LABELS)) {
@@ -100,24 +115,22 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         }
     }
 
-    /**
-     * The same animal on another map, where it came out of a door: as hungry as here, wishing for the same, as long
-     * since its last stroke. What it was doing starts again from its state machine's first state (on the other side it
-     * looks around first), so a wish comes back in a moment. Take it off this map with {@link #leaveBoard()}.
-     */
     @Override
     public boolean goesThroughDoors() {
         return true;
     }
 
+    /**
+     * The same animal on another map, where it came out of a door: it carries its {@link Needs} (as hungry as here,
+     * wishing for the same, as long since its last stroke). What it was doing starts again from its state machine's
+     * first state (on the other side it looks around first), so a wish comes back in a moment. Take it off this map
+     * with {@link #leaveBoard()}.
+     */
     @Override
     public FarmAnimal moveTo(GameContext context) {
         FarmAnimal there = createAnother(context);
-        there.favouriteFood = new Crop(favouriteFood.getType(), there.resources);
-        there.wishChosen = wishChosen;
-        there.sinceFed = sinceFed;
-        there.sinceStroked = sinceStroked;
-        there.bitesLeft = bitesLeft;
+        there.needs = needs;
+        there.favouriteFood = new Crop(needs.wish, there.resources);
         return there;
     }
 
@@ -154,7 +167,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      */
     @Override
     public boolean canBeStroked() {
-        return isStrokable() && sinceStroked >= SECONDS_BETWEEN_STROKES;
+        return isStrokable() && needs.sinceStroked >= SECONDS_BETWEEN_STROKES;
     }
 
     // what the player does with it (a tap on it, the round buttons)
@@ -188,7 +201,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      */
     void waitForTheHand() {
         timeLeft = RemoveWhenUnavailablePlugin.DURATION; // no dice: the cow's other random choices stay as they were
-        sinceStroked = 0; // the next stroke only after a while
+        needs.sinceStroked = 0; // the next stroke only after a while
     }
 
     /** Starts a wait of a random length between the two; {@link #isTimeUp()} says when it is over. */
@@ -210,12 +223,12 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     }
 
     boolean isHungry() {
-        return sinceFed >= hungryAfterSeconds;
+        return needs.sinceFed >= hungryAfterSeconds;
     }
 
     void stopBeingHungry() {
-        sinceFed = 0;
-        wishChosen = false;
+        needs.sinceFed = 0;
+        needs.wishChosen = false;
     }
 
     /**
@@ -223,9 +236,10 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * after a stroke it wishes for the same again.
      */
     void chooseWish() {
-        if (!wishChosen) {
-            favouriteFood = new Crop(CropType.randomOf(favouriteDishes), resources);
-            wishChosen = true;
+        if (!needs.wishChosen) {
+            needs.wish = CropType.randomOf(favouriteDishes);
+            favouriteFood = new Crop(needs.wish, resources);
+            needs.wishChosen = true;
         }
     }
 
@@ -236,20 +250,20 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
 
     /** It has wished for its crop too long without getting it. */
     boolean hasWishedTooLong() {
-        return sinceFed >= hungryAfterSeconds + giveUpWishingAfterSeconds;
+        return needs.sinceFed >= hungryAfterSeconds + giveUpWishingAfterSeconds;
     }
 
     /** It gives up its wish and feeds itself: this many bites (of grass, of what it finds on the ground). */
     void startFeedingItself(int bites) {
-        bitesLeft = bites;
+        needs.bitesLeft = bites;
     }
 
     void takeBite() {
-        bitesLeft--;
+        needs.bitesLeft--;
     }
 
     boolean hasBitesLeft() {
-        return bitesLeft > 0;
+        return needs.bitesLeft > 0;
     }
 
     /** A bubble over it with what it wishes for; tapping the bubble walks the player next to it, as tapping it does. */

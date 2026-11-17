@@ -81,6 +81,11 @@ public abstract class GameBoardActor extends GameActor implements Interactive, T
         throw new UnsupportedOperationException(getClass().getSimpleName() + " doesn't go through doors");
     }
 
+    /** Comes onto the map on this tile, out of a door. */
+    public void comeOnto(Tile tile) {
+        setTile(tile);
+    }
+
     /**
      * Leaves the map: off its tile (it is on none until {@link #setTile} puts it back) and off the stage, its actions
      * dropped. For whoever goes through a door to another map.

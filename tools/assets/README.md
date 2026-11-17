@@ -69,7 +69,8 @@ tool again.
    out of the door with the same name on the other map. Only the map the game starts on has a `PLAYER`: on the others
    the rabbit comes out of a door. Draw the door itself on the map (e.g. the coop's ramp); the object draws nothing.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
-   Map property `growingGrass` (bool): `false` where no grass grows (inside the coop); it grows without it.
+   Map property `featuresOff` (string): features switched off on this map, comma-separated names of
+   `FeatureFlag`s, e.g. `GROWING_GRASS` inside the coop (no grass grows there); none without it.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 
 Mirrored (X, Y) and rotated (Z) tiles, layer opacity and layer offsets look in the game as in Tiled. Maps must have a
