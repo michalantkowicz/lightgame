@@ -1037,3 +1037,11 @@ by a chicken, slowly enough that the player can still save it.
   one-line `isNextToPlayer` was inlined into `canStroke`.
 - Tests: `CowTest.tappingTheWishBubbleWalksNextToTheCow`, `CowTest.tappingTheSlotWithTheWishGivesItToTheCow`;
   `GameDriver.tapWishBubble`. No golden changed.
+
+## 2026‑11‑17, HUD back under PMD's God Class limit (branch `ccr-f4ec0085-lf63hs`)
+
+- Fix after PR #73: master and the `fishing` branch (PR #72) each passed PMD, but merged together `Hud` reached
+  WMC 47, over PMD's God Class limit (#73 added `Hud.setGiveAway`). It is gone again: `Hud` is as before #73 and
+  `GameScreen` hands it one predicate for a tapped slot, `creatures.giveFrom(slot) || collecting.throwOut(slot)`
+  (give the item to a wishing animal next to the player, else throw it out). Same behaviour; no test or golden
+  changed.

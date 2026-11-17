@@ -67,6 +67,8 @@ public class GameScreen extends ScreenAdapter {
     private Board board;
     private RayHandler rayHandler;
     private final List<Feature> features = new ArrayList<>();
+    /** Asked first when a backpack slot is tapped; made after the HUD, which it talks to. */
+    private CreatureFeature creatures;
 
     public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService,
             GameEventService gameEventService,
@@ -130,10 +132,10 @@ public class GameScreen extends ScreenAdapter {
             addFeature(new CameraTrackingFeature(context, player));
             CollectFeature collecting = new CollectFeature(context, player);
             addFeature(collecting);
-            Hud hud = new Hud(context, player, collecting::throwOut);
+            // a tapped slot gives its item to an animal next to the player wishing for it, else throws it out
+            Hud hud = new Hud(context, player, slot -> creatures.giveFrom(slot) || collecting.throwOut(slot));
             uiStage.addActor(hud);
-            CreatureFeature creatures = new CreatureFeature(context, player, hud);
-            hud.setGiveAway(creatures::giveFrom);
+            creatures = new CreatureFeature(context, player, hud);
             addFeature(creatures);
             if (FeatureFlag.GROWING_GRASS.isOn()) {
                 addFeature(new GrassFeature(context, player, hud));
