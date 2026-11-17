@@ -25,6 +25,7 @@ import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.feature.CameraTrackingFeature;
 import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.CreatureFeature;
+import com.mantkowicz.light.feature.DayNightFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassFeature;
@@ -117,13 +118,15 @@ public class GameScreen extends ScreenAdapter {
 
         gameStage.getRoot().addActorAt(0, board); // drawn below everything else
 
-        createFeatures(context);
+        createFeatures(context, tileSet.getProperties().getAmbientLight());
     }
 
     /**
      * Features run every frame, in this order. Camera tracking needs the player, so it is only created once the player exists.
+     *
+     * @param daylight the map's ambient light, or null (the house: no day and night there)
      */
-    private void createFeatures(GameContext context) {
+    private void createFeatures(GameContext context, Float daylight) {
         PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
         if (playerCreatedEvent != null) {
             Player player = playerCreatedEvent.getPlayer();
@@ -138,6 +141,9 @@ public class GameScreen extends ScreenAdapter {
             if (FeatureFlag.GROWING_GRASS.isOn()) {
                 addFeature(new GrassFeature(context, player, hud));
             }
+        }
+        if (daylight != null && FeatureFlag.DAY_AND_NIGHT.isOn()) {
+            addFeature(new DayNightFeature(rayHandler, daylight));
         }
         addFeature(new MenuFeature(context, menuStage));
         addFeature(new NoPathFeature(context));

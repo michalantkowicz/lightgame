@@ -1037,3 +1037,15 @@ by a chicken, slowly enough that the player can still save it.
   one-line `isNextToPlayer` was inlined into `canStroke`.
 - Tests: `CowTest.tappingTheWishBubbleWalksNextToTheCow`, `CowTest.tappingTheSlotWithTheWishGivesItToTheCow`;
   `GameDriver.tapWishBubble`. No golden changed.
+
+## 2026‑11‑17, day and night (branch `day-and-night`)
+
+- Owner's experiment: outdoors, day and night take turns (`feature.DayNightFeature`, flag `FeatureFlag.DAY_AND_NIGHT`,
+  on). 30 s of day, then 30 s of night, again and again; the game starts in the day. The map's ambient light dims in
+  the last 5 s of the day and brightens in the last 5 s of the night (`Interpolation.smooth`, gentler than a straight
+  line). The night is 10 % of the map's daylight, not black.
+- Decided: only maps with daylight have it (those setting Tiled's `ambientLight`, e.g. level 1); the house (no
+  `ambientLight`, dark and lit by its lamps) stays as it is. Lights on the map are untouched. The HUD and the action
+  buttons (UI stage) stay bright at night; the wish bubbles are on the map, so they darken with it.
+- Tests: `DayNightTest` (the cycle, a tenth of the map's own daylight, the house, the flag off); `GameDriver.dayAndNight`.
+  No golden changed (no golden records the ambient light).

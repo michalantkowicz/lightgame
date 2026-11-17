@@ -6,7 +6,9 @@ package com.mantkowicz.light.debug;
  */
 public enum FeatureFlag {
     /** Grass grows on the map and the rabbit cuts it with a scythe ({@code feature.GrassFeature}). */
-    GROWING_GRASS(true);
+    GROWING_GRASS(true),
+    /** Outdoors, day and night take turns: the map's daylight dims to night and back ({@code feature.DayNightFeature}). */
+    DAY_AND_NIGHT(true);
 
     private final boolean byDefault;
     private boolean on;

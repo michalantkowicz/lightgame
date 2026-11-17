@@ -50,7 +50,7 @@ design, change the rule on purpose in its own PR.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
   `ChickenState` for `Chicken`), all its transitions in that one file, no framework on top. What farm animals share
   (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. `Debug.Tool.STATE_LABELS` shows the states while playing.
-- Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`); a feature checks its flag where it
+- Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`, `DAY_AND_NIGHT`); a feature checks its flag where it
   is created.
 - Events go through `GameEventService`; an event class lives next to what it is about (one that carries nothing of the
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).

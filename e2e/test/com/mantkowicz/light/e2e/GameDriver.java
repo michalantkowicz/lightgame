@@ -1099,6 +1099,15 @@ public final class GameDriver {
         }
     }
 
+    /** Switches day and night (FeatureFlag.DAY_AND_NIGHT, on as the game ships) on or off, for games started from now on. */
+    public static void dayAndNight(boolean on) {
+        if (on) {
+            FeatureFlag.DAY_AND_NIGHT.switchOn();
+        } else {
+            FeatureFlag.DAY_AND_NIGHT.switchOff();
+        }
+    }
+
     // grass (feature.GrassFeature)
 
     /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
