@@ -105,6 +105,12 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * since its last stroke. What it was doing starts again from its state machine's first state (on the other side it
      * looks around first), so a wish comes back in a moment. Take it off this map with {@link #leaveBoard()}.
      */
+    @Override
+    public boolean goesThroughDoors() {
+        return true;
+    }
+
+    @Override
     public FarmAnimal moveTo(GameContext context) {
         FarmAnimal there = createAnother(context);
         there.favouriteFood = new Crop(favouriteFood.getType(), there.resources);

@@ -89,6 +89,12 @@ public class Player extends GameBoardActor implements Collecting {
         setTouchable(Touchable.enabled);
     }
 
+    /** Through doors, yes; but it isn't moved: each map has a rabbit of its own, with the same backpack. */
+    @Override
+    public boolean goesThroughDoors() {
+        return true;
+    }
+
     @Override
     public void draw(Batch batch, float parentAlpha) {
         // The player is drawn with the batch's default shader, not the game stage's custom one.

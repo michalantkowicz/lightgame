@@ -48,6 +48,14 @@ design, change the rule on purpose in its own PR.
   a `GameContext` (services, plain `Stage`s) to its game objects. A `DOOR` tile leads to another map (`DoorFeature`);
   a map is built the first time someone goes there. Every map acts each frame (fields grow, animals live), only the
   player's one is drawn. Each map has its own `Player`, sharing the backpack and stamina.
+  - **A feature also runs while the player is on another map**: its `Player` is then off the board
+    (`getTile()` is null), so skip what needs the player. The HUD and the UI stage are shared: the player's map runs
+    its features last, so what is set every frame (a hint) is right, but what a feature shows once (the scythe on the
+    tool button, something on the UI stage) it must take away itself when the player goes (action buttons go by
+    themselves).
+  - **A character goes through doors** when it says so (`GameBoardActor.goesThroughDoors` and `moveTo`, as
+    `FarmAnimal` does). `moveTo` copies its state field by field: a new field in `FarmAnimal` or an animal fails
+    `TravelTest` until it is copied or named there as one that starts again.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,

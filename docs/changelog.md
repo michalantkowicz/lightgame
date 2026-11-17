@@ -1066,7 +1066,9 @@ by a chicken, slowly enough that the player can still save it.
 - **Animals**: a farm animal on a door comes out on the other side at once, as a new animal of the same kind
   (`FarmAnimal.moveTo`): as hungry, wishing for the same, as long since a stroke; its state machine starts again
   (it looks around first, then wishes again if hungry). Its tile is freed and the arrival tile blocked
-  (`SpriteActor.leaveBoard`, `comeOnto`). The dog doesn't go through doors (not a farm animal).
+  (`SpriteActor.leaveBoard`, `comeOnto`). Who goes through doors is the character's own say
+  (`GameBoardActor.goesThroughDoors`, `moveTo`; the player and the farm animals), so a new one needs no change in
+  `DoorFeature` or `GameScreen`. The dog doesn't (yet).
 - `GrassFeature` kept an empty list of the tiles the rabbit can reach when it was first asked before the rabbit was on
   the map (its comment said "try again next time"); now it does try again, as a map entered later needs.
 - **The coop** (`assets-src/maps/coop.tmx`, a simple version to be redrawn in Tiled): a dirt floor between two
@@ -1075,7 +1077,11 @@ by a chicken, slowly enough that the player can still save it.
   walkable now and is its door. Made from tiles the atlas already had (the pack isn't in the build machine): the game
   copies were written with `build_assets.py`'s own functions, `tiles.atlas` is unchanged.
 - Tests: `TravelTest` (the field grows while the rabbit is in the coop, the backpack goes along, the curtain, staying
-  on the door; a chicken goes through by itself and wishes as hungry as it was; the cow stays out),
+  on the door; a chicken goes through by itself and wishes as hungry as it was; the cow stays out; every field of a
+  chicken and a cow is carried through a door or named as starting again, so a field added later and forgotten in
+  `moveTo` fails it),
   `ShippedMapsTest` (maps behind a door have no PLAYER; every door leads to a shipped map with its pair and can be
   walked to). `GameDriver` reads the player's area (`currentMap`, `visitedMaps`, `whereIs`, `doors`, `curtain`,
-  `animalStateOnAnyMap`); `TestMap.pathOf`. No golden changed.
+  `animalStateOnAnyMap`, `fieldsNotCarriedThroughADoor`); `TestMap.pathOf`. No golden changed.
+- CLAUDE.md: what to mind when adding a feature (it runs while the player is on another map; the shared HUD) or a
+  character that goes through doors.

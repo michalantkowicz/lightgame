@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
@@ -127,17 +126,14 @@ public class GameScreen extends ScreenAdapter {
         if (traveller instanceof Player) {
             return from == active && startJourney(door);
         }
-        if (traveller instanceof FarmAnimal animal) {
-            Area to = area(door.getTargetMap());
-            Tile tile = to.arrivalTile(door.getName());
-            if (tile == null) {
-                return false; // no room on the other side: it stays (and may try again)
-            }
-            from.letGo(animal, uiStage);
-            to.welcome(animal.moveTo(to.getContext()), tile);
-            return true;
+        Area to = area(door.getTargetMap());
+        Tile tile = to.arrivalTile(door.getName());
+        if (tile == null) {
+            return false; // no room on the other side: it stays (and may try again)
         }
-        return false;
+        from.letGo(traveller, uiStage);
+        to.welcome(traveller.moveTo(to.getContext()), tile);
+        return true;
     }
 
     private Area areaOf(GameBoardActor actor) {

@@ -6,8 +6,6 @@ import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileContent;
 import com.mantkowicz.light.board.TileOccupant;
-import com.mantkowicz.light.character.FarmAnimal;
-import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.map.TileDoor;
 
@@ -18,7 +16,8 @@ import java.util.Map;
 
 /**
  * The doors of a map (Tiled's DOOR objects, {@link TileDoor}). Whoever ends its walk on a door's tile and may go
- * through it (the rabbit, a farm animal of a kind the door lets through) goes to the other map ({@link Travel}); just
+ * through it (one that {@link GameBoardActor#goesThroughDoors()}, the rabbit and the farm animals, of a kind the door
+ * lets through) goes to the other map ({@link Travel}); just
  * walking over the tile on the way somewhere else takes nobody through. Whoever has just come out of a door stands on
  * it without going back: it goes through again only after it has walked off and back on.
  */
@@ -55,7 +54,7 @@ public class DoorFeature implements Feature {
 
     /** Stopped on the door (didn't just come out of it), and the door lets its kind through. */
     private boolean goesThrough(GameBoardActor actor, TileDoor door) {
-        return (actor instanceof Player || actor instanceof FarmAnimal) && !cameOut.contains(actor)
+        return actor.goesThroughDoors() && !cameOut.contains(actor)
                 && Status.IDLE.equals(actor.getStatus()) && door.lets(actor.getGameActorType());
     }
 

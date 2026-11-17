@@ -63,6 +63,25 @@ public abstract class GameBoardActor extends GameActor implements Interactive, T
     }
 
     /**
+     * Does it go through doors to other maps (Tiled's DOOR, see {@code feature.DoorFeature})? Not by default. The
+     * player does (each map has a rabbit of its own, so it isn't moved), and so does what overrides
+     * {@link #moveTo} (the farm animals): to let a new character through doors, override both.
+     */
+    public boolean goesThroughDoors() {
+        return false;
+    }
+
+    /**
+     * The same one on another map, where it came out of a door: a new one there, with whatever it carries over (how
+     * hungry it is...). This one is taken off its map with {@link #leaveBoard()}.
+     *
+     * @throws UnsupportedOperationException for one that doesn't go through doors ({@link #goesThroughDoors()})
+     */
+    public GameBoardActor moveTo(GameContext context) {
+        throw new UnsupportedOperationException(getClass().getSimpleName() + " doesn't go through doors");
+    }
+
+    /**
      * Leaves the map: off its tile (it is on none until {@link #setTile} puts it back) and off the stage, its actions
      * dropped. For whoever goes through a door to another map.
      */

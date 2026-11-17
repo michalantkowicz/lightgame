@@ -157,4 +157,26 @@ class TravelTest {
         assertEquals(List.of(farm), game.visitedMaps(), "nobody went to the coop");
         assertFalse(game.crashed());
     }
+
+    /** A chicken and a cow standing still, to look at what they carry through a door. */
+    private static final TestMap ANIMALS = TestMap.of(
+            "~~~~~~~",
+            "~K~M~P~",
+            "~~~~~~~")
+            .with('K', "CHICKEN", Map.of());
+
+    /**
+     * What an animal carries through a door is copied field by field ({@code FarmAnimal.moveTo}). A field added to an
+     * animal later fails this test until it is carried over, or named here as one that starts again on the other side.
+     */
+    @Test
+    void anAnimalCarriesEverythingButWhatItIsDoingThroughADoor() {
+        GameDriver game = GameDriver.start(ANIMALS.write("travel-animals"));
+        // starting again on the other side: what it does (its state machine and the wait it is in), whether its wish
+        // bubble is hidden under a button, a chicken's hunt for a crop on the ground
+        assertEquals(List.of("hunt", "stateMachine", "timeLeft", "wishShown"),
+                game.fieldsNotCarriedThroughADoor(Kind.CHICKEN));
+        assertEquals(List.of("stateMachine", "timeLeft", "wishShown"), game.fieldsNotCarriedThroughADoor(Kind.COW));
+        assertFalse(game.crashed());
+    }
 }
