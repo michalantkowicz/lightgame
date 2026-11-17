@@ -58,7 +58,7 @@ design, change the rule on purpose in its own PR.
 - HUD (`ui.hud`): the face (`Portrait`, idle and reactions), backpack slots, stamina bar, the **tool button** (the big
   round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, else the
   hint), the hold-to-open settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
-  the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`). Collecting: a
+  the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`; tapping the backpack slot with its wish feeds it too, tapping its wish bubble walks the player to it). Collecting: a
   chest's button throws its items onto free tiles (`ItemThrower`), the player picks them up by walking onto them.
 
 ## Gotchas

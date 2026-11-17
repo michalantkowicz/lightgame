@@ -132,7 +132,9 @@ public class GameScreen extends ScreenAdapter {
             addFeature(collecting);
             Hud hud = new Hud(context, player, collecting::throwOut);
             uiStage.addActor(hud);
-            addFeature(new CreatureFeature(context, player, hud));
+            CreatureFeature creatures = new CreatureFeature(context, player, hud);
+            hud.setGiveAway(creatures::giveFrom);
+            addFeature(creatures);
             if (FeatureFlag.GROWING_GRASS.isOn()) {
                 addFeature(new GrassFeature(context, player, hud));
             }

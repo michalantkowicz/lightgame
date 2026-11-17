@@ -97,6 +97,8 @@ public class Hud extends Group {
     private String hintText = HINT;
     private TextureRegion hintPicture;
     private SettingsPanel settings;
+    /** Asked first when a backpack slot is tapped: gives its item away (true) instead of throwing it out. */
+    private IntPredicate giveAway = slot -> false;
     private float laidOutWidth, laidOutHeight;
 
     /**
@@ -127,6 +129,9 @@ public class Hud extends Group {
             slot.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    if (giveAway.test(index)) {
+                        return; // given to an animal next to the player wishing for it (as its button would)
+                    }
                     if (!throwOut.test(index)) { // what is in it jumps out next to the player...
                         shake(index); // ...or, with nowhere to land, the slot shakes
                     }
@@ -152,6 +157,14 @@ public class Hud extends Group {
 
         toolButton = new ToolButton(resources, this::showHint);
         addActor(toolButton);
+    }
+
+    /**
+     * A tap on a backpack slot first offers its item here (0 = the left slot), e.g. to a cow next to the player wishing
+     * for it; only when this says false does the item jump out next to the player.
+     */
+    public void setGiveAway(IntPredicate giveAway) {
+        this.giveAway = giveAway;
     }
 
     /** Taps on this piece stay in the HUD (they don't reach the map behind it) and do this (the face answers). */
