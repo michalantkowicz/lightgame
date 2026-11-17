@@ -3,10 +3,7 @@ package com.mantkowicz.light.game;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
-import com.badlogic.gdx.physics.box2d.World;
-import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ResourcesService;
 
 public class Main extends Game {
@@ -23,7 +20,6 @@ public class Main extends Game {
     private final float cameraZoom;
 
     private ResourcesService resourcesService;
-    private World world;
 
     public Main() {
         this(DEFAULT_MAP);
@@ -51,12 +47,8 @@ public class Main extends Game {
     @Override
     public void create() {
         resourcesService = new ResourcesService();
-        GameEventService gameEventService = new GameEventService();
-
-        Box2D.init();
-        world = new World(new Vector2(0, 0), true);
-
-        setScreen(new GameScreen(mapName, cameraZoom, resourcesService, gameEventService, world));
+        Box2D.init(); // each map has its own physics world (its walls cast the lights' shadows)
+        setScreen(new GameScreen(mapName, cameraZoom, resourcesService));
     }
 
     @Override
@@ -71,7 +63,6 @@ public class Main extends Game {
         if (getScreen() != null) {
             getScreen().dispose();
         }
-        world.dispose();
         resourcesService.dispose();
     }
 }

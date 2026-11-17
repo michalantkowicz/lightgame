@@ -35,7 +35,7 @@ class FaceReactions {
         void say(String text, float seconds);
     }
 
-    private final GameEventService events;
+    private GameEventService events;
     private final ResourcesService resources;
     private final Portrait face;
     private final Speaker speaker;
@@ -49,6 +49,11 @@ class FaceReactions {
         this.resources = resources;
         this.face = face;
         this.speaker = speaker;
+    }
+
+    /** From now on reacts to what happens on this map (the player went through a door). */
+    void listenTo(GameEventService events) {
+        this.events = events;
     }
 
     /** Reacts to what happened since the last frame. */

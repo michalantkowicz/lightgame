@@ -13,6 +13,8 @@ public class TileSet {
         private Tuple<Float, Float> tileSize;
         /** The map's 'ambientLight' property (0 dark .. 1 daylight), or {@code null} when the map doesn't set it. */
         private Float ambientLight;
+        /** The map's 'growingGrass' property: does grass sprout and grow there (not inside a coop)? Yes without it. */
+        private boolean growingGrass = true;
 
         public void setTileSize(Tuple<Float, Float> tileSize) {
             this.tileSize = tileSize;
@@ -24,6 +26,14 @@ public class TileSet {
 
         public void setAmbientLight(Float ambientLight) {
             this.ambientLight = ambientLight;
+        }
+
+        public boolean isGrowingGrass() {
+            return growingGrass;
+        }
+
+        public void setGrowingGrass(boolean growingGrass) {
+            this.growingGrass = growingGrass;
         }
     }
 

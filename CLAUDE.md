@@ -44,7 +44,10 @@ Layers, each using only those below: leaves (`util`, `debug`, `resources`, `stag
 `ui.hud`, `ui.menu`, `ui.collect`) → application (`feature`, `game`). No package cycles. If a rule blocks a sensible
 design, change the rule on purpose in its own PR.
 
-- `GameScreen` builds everything and hands a `GameContext` (services, plain `Stage`s) to game objects.
+- `GameScreen` holds the maps: each one an `Area` (board, stages, lights, its own event bus and features), which hands
+  a `GameContext` (services, plain `Stage`s) to its game objects. A `DOOR` tile leads to another map (`DoorFeature`);
+  a map is built the first time someone goes there. Every map acts each frame (fields grow, animals live), only the
+  player's one is drawn. Each map has its own `Player`, sharing the backpack and stamina.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,

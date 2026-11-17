@@ -177,11 +177,11 @@ public class GrassFeature implements Feature {
         if (reachable != null) {
             return reachable;
         }
-        reachable = new ArrayList<>();
         Tile start = player.getTile();
         if (start == null) {
-            return reachable; // no player on the map yet: try again next time
+            return List.of(); // no player on the map yet (it comes through a door later): try again next time
         }
+        reachable = new ArrayList<>();
         Set<Tile> seen = new HashSet<>();
         Deque<Tile> next = new ArrayDeque<>();
         next.add(start);
@@ -223,6 +223,9 @@ public class GrassFeature implements Feature {
      * the rabbit walked off meanwhile, it all stays.
      */
     private void cut() {
+        if (player.getTile() == null) {
+            cuttingAt = null; // the rabbit went to another map: no swing here any more
+        }
         if (cuttingAt == null || player.isScything()) {
             return;
         }

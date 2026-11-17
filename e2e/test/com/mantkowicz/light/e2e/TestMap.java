@@ -143,12 +143,20 @@ public final class TestMap {
         tmx.append("</map>\n");
         try {
             Files.createDirectories(OUTPUT);
-            Path file = OUTPUT.resolve(name + ".tmx");
-            Files.writeString(file, tmx);
-            return file.toString();
+            String file = pathOf(name);
+            Files.writeString(Path.of(file), tmx);
+            return file;
         } catch (IOException e) {
             throw new IllegalStateException("Can't write " + name, e);
         }
+    }
+
+    /**
+     * Where {@link #write} writes the map with this name, also before it is written: a door on one test map leads to
+     * another one by this path (Tiled's targetMap), e.g. {@code Map.of("door", "coop", "targetMap", pathOf("coop"))}.
+     */
+    public static String pathOf(String name) {
+        return OUTPUT.resolve(name + ".tmx").toString();
     }
 
     private interface Gid {

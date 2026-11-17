@@ -144,6 +144,11 @@ public class ActionButton extends GameActor {
         return button.hasActions();
     }
 
+    /** Is it over something on this map (its game stage)? */
+    public boolean isOver(Stage map) {
+        return gameStage == map;
+    }
+
     /** Not removed yet (possibly fading out). */
     public boolean isOnStage() {
         return getStage() != null;

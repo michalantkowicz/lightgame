@@ -159,6 +159,24 @@ public abstract class SpriteActor extends GameBoardActor {
     }
 
     /**
+     * Comes onto the map on this tile (out of a door), which it blocks from now on, as when it walks.
+     */
+    public void comeOnto(Tile tile) {
+        boardService.setAccessible(tile, false);
+        setTile(tile);
+    }
+
+    /** Leaves the map (through a door): the tile it stood on is free again. */
+    @Override
+    public void leaveBoard() {
+        Tile tile = getTile();
+        super.leaveBoard();
+        if (tile != null) {
+            boardService.setAccessible(tile, true);
+        }
+    }
+
+    /**
      * Jumps to the end of the current animation (e.g. a chest that starts closed shows its closed frame at once).
      */
     protected void finishAnimation() {

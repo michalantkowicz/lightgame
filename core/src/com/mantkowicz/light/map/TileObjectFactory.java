@@ -3,6 +3,8 @@ package com.mantkowicz.light.map;
 import com.badlogic.gdx.maps.MapProperties;
 
 import static com.mantkowicz.light.map.TileObjectAttribute.LIGHT_TYPE;
+import static com.mantkowicz.light.map.TileObjectAttribute.PASSES;
+import static com.mantkowicz.light.map.TileObjectAttribute.TARGET_MAP;
 import static com.mantkowicz.light.map.TileObjectAttribute.TEXTURE_NAME;
 
 public class TileObjectFactory {
@@ -21,6 +23,11 @@ public class TileObjectFactory {
                 return new TilePlayer();
             case DOG :
                 return new TileDog();
+            case DOOR :
+                assertMandatoryProperties(objectProperties, TileObjectAttribute.DOOR, TARGET_MAP);
+                return new TileDoor(objectProperties.get(TileObjectAttribute.DOOR.getValue(), String.class),
+                        objectProperties.get(TARGET_MAP.getValue(), String.class),
+                        objectProperties.get(PASSES.getValue(), String.class));
             case GRASS :
                 return new TileGrass((int) TileObjectType.number(objectProperties, TileObjectAttribute.PHASE,
                         TileGrass.FIRST_PHASE));

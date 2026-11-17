@@ -44,6 +44,11 @@ public class Cow extends FarmAnimal {
         startLiving();
     }
 
+    @Override
+    protected FarmAnimal createAnother(GameContext context) {
+        return new Cow(context, getFavouriteDishes());
+    }
+
     public CowState getState() {
         return stateMachine.getCurrentState();
     }

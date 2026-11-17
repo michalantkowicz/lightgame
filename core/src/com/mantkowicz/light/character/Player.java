@@ -46,15 +46,28 @@ public class Player extends GameBoardActor implements Collecting {
 
     private final GameEventService gameEventService;
     private final Inventory inventory;
-    private final Stamina stamina = new Stamina();
+    private final Stamina stamina;
     private final AnimationPlugin animationPlugin;
     private final BoardMovementPlugin boardMovementPlugin;
     private Long lastIdleChange;
 
     public Player(GameContext context) {
+        this(context, new Inventory(INVENTORY_SIZE, new ArrayList<Item>()), new Stamina());
+    }
+
+    /**
+     * The rabbit on another map: it carries the same backpack and is as tired as the one it was there (each map has a
+     * rabbit of its own, on the map only while the player is there; see the game screen's areas).
+     */
+    public Player(GameContext context, Player elsewhere) {
+        this(context, elsewhere.getInventory(), elsewhere.getStamina());
+    }
+
+    private Player(GameContext context, Inventory inventory, Stamina stamina) {
         super(PLAYER, context, DESCRIPTION);
         gameEventService = context.getGameEventService();
-        inventory = new Inventory(INVENTORY_SIZE, new ArrayList<Item>());
+        this.inventory = inventory;
+        this.stamina = stamina;
         lastIdleChange = TimeUtils.millis();
         ResourcesService resourcesService = context.getResourcesService();
         createAvatar(resourcesService.getAnimation(SPRITE, Action.IDLE, Direction.DOWN).getKeyFrame(0),

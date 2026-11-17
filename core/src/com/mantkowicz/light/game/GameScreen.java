@@ -1,233 +1,225 @@
 package com.mantkowicz.light.game;
 
-import box2dLight.RayHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import com.mantkowicz.light.actor.CollectibleFinder;
-import com.mantkowicz.light.board.Board;
-import com.mantkowicz.light.board.BoardService;
+import com.mantkowicz.light.actor.GameBoardActor;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.board.TileContent;
+import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Player;
-import com.mantkowicz.light.character.PlayerCreatedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
-import com.mantkowicz.light.debug.FeatureFlag;
-import com.mantkowicz.light.event.GameEventService;
-import com.mantkowicz.light.feature.CameraTrackingFeature;
-import com.mantkowicz.light.feature.CollectFeature;
-import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
-import com.mantkowicz.light.feature.GrassFeature;
-import com.mantkowicz.light.feature.MenuFeature;
-import com.mantkowicz.light.feature.NoPathFeature;
-import com.mantkowicz.light.feature.StageFeature;
-import com.mantkowicz.light.map.Maps;
-import com.mantkowicz.light.map.TileObject;
-import com.mantkowicz.light.map.TileSet;
-import com.mantkowicz.light.resources.PhraseService;
+import com.mantkowicz.light.map.TileDoor;
 import com.mantkowicz.light.resources.ResourcesService;
-import com.mantkowicz.light.ui.GameStage;
-import com.mantkowicz.light.ui.NotificationStage;
 import com.mantkowicz.light.ui.UiStage;
 import com.mantkowicz.light.ui.hud.Hud;
-import com.mantkowicz.light.ui.menu.MenuStage;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.IntPredicate;
 
 import static com.mantkowicz.light.debug.Debug.Tool.FPS_LABEL;
 import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
 import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
 
-// baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
-
-@SuppressWarnings({"PMD.ExcessiveImports", "PMD.CouplingBetweenObjects"})
+/**
+ * The game: the maps ({@link Area}: the farm, the chicken coop...) and the UI over them. It starts on one map; a door
+ * (Tiled's DOOR object) leads to another, which is built the first time someone goes through and lives on from then
+ * on: every map acts each frame, the one the player is in is also drawn and gets the taps. The player goes through a
+ * door behind a short curtain (the screen darkens and lightens again, {@link #CURTAIN_SECONDS} each way); an animal just
+ * comes out on the other side.
+ */
 public class GameScreen extends ScreenAdapter {
-    private static final float DEFAULT_AMBIENT_LIGHT = 0.02f;
+    /** How long the screen takes to darken, and then to lighten again, when the player goes through a door. */
+    public static final float CURTAIN_SECONDS = 0.3f;
 
     private final String mapName;
     private final float cameraZoom;
     private final ResourcesService resourcesService;
-    private final GameEventService gameEventService;
-    private final World world;
-    private GameStage gameStage;
-    private MenuStage menuStage;
-    private NotificationStage notificationStage;
-    private UiStage uiStage;
-    private Board board;
-    private RayHandler rayHandler;
+    /** Every map someone has been to, by its file name; the first is the one the game starts on. */
+    private final Map<String, Area> areas = new LinkedHashMap<>();
+    /** Screen-wide, whatever the map (the FPS label). */
     private final List<Feature> features = new ArrayList<>();
+    private InputMultiplexer multiplexer;
+    private UiStage uiStage;
+    private Hud hud;
+    /** The map the player is in. */
+    private Area active;
+    /** Over the screen while the player goes through a door. */
+    private Curtain curtain;
+    /** The door the player goes through, once the screen is dark (the next frame takes it there); else null. */
+    private TileDoor arrivingThrough;
 
-    public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService,
-            GameEventService gameEventService,
-            World world) {
+    public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService) {
         this.mapName = mapName;
         this.cameraZoom = cameraZoom;
         this.resourcesService = resourcesService;
-        this.gameEventService = gameEventService;
-        this.world = world;
     }
 
     @Override
     public void show() {
-        // the world (board, actors, menus and notifications next to them) moves and zooms with the camera;
-        // the UI (buttons, windows) has its own fixed camera, so it stays in place and keeps its size
-        Viewport worldViewport = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT);
-        ((OrthographicCamera) worldViewport.getCamera()).zoom = cameraZoom;
-        Viewport uiViewport = new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT);
-        gameStage = new GameStage(worldViewport, resourcesService);
-        menuStage = new MenuStage(worldViewport);
-        notificationStage = new NotificationStage(worldViewport);
-        uiStage = new UiStage(uiViewport);
-
-        InputMultiplexer multiplexer = new AnyButtonInput(); // the right mouse button does what the left does
-        multiplexer.addProcessor(uiStage);
-        multiplexer.addProcessor(menuStage);
-        multiplexer.addProcessor(gameStage);
+        uiStage = new UiStage(new ExtendViewport(SCREEN_WIDTH, SCREEN_HEIGHT));
+        multiplexer = new AnyButtonInput(); // the right mouse button does what the left does
         Gdx.input.setInputProcessor(multiplexer);
 
-        TileSet tileSet = Maps.loadTileSet(resourcesService, mapName);
-        rayHandler = prepareLights(tileSet.getProperties().getAmbientLight());
-
-        List<Tile> tiles = tileSet.getTiles();
-        BoardService boardService = new BoardService(gameEventService, tiles);
-        // before anything is on the board: what steps onto a tile finds the collectibles there
-        boardService.setOccupantListener(new CollectibleFinder(boardService, gameEventService));
-        GameContext context = createContext(boardService);
-        board = new Board(boardService, gameEventService, tiles);
-
-        for (Tile tile : tiles) {
-            for (TileContent content : tile.getTileObjects()) {
-                if (content instanceof TileObject object) {
-                    object.prepare(tile, context); // characters, lights... come to life
-                }
-            }
-            tile.prepare(world);
+        active = area(mapName);
+        listenTo(active);
+        if (hud != null) {
+            hud.enter(active.getGameEventService(), active::throwOut, active::giveFrom);
         }
 
-        gameStage.getRoot().addActorAt(0, board); // drawn below everything else
-
-        createFeatures(context);
-    }
-
-    /**
-     * Features run every frame, in this order. Camera tracking needs the player, so it is only created once the player exists.
-     */
-    private void createFeatures(GameContext context) {
-        PlayerCreatedEvent playerCreatedEvent = gameEventService.poll(PlayerCreatedEvent.class);
-        if (playerCreatedEvent != null) {
-            Player player = playerCreatedEvent.getPlayer();
-            addFeature(new CameraTrackingFeature(context, player));
-            CollectFeature collecting = new CollectFeature(context, player);
-            addFeature(collecting);
-            Hud hud = new Hud(context, player, collecting::throwOut);
-            uiStage.addActor(hud);
-            CreatureFeature creatures = new CreatureFeature(context, player, hud);
-            hud.setGiveAway(creatures::giveFrom);
-            addFeature(creatures);
-            if (FeatureFlag.GROWING_GRASS.isOn()) {
-                addFeature(new GrassFeature(context, player, hud));
-            }
-        }
-        addFeature(new MenuFeature(context, menuStage));
-        addFeature(new NoPathFeature(context));
-        addFeature(new StageFeature(context));
         if (Debug.isOn(FPS_LABEL)) {
-            addFeature(new FPSFeature(context, new Vector2(300, 520)));
+            features.add(new FPSFeature(active.getContext(), new Vector2(300, 520)));
         }
+        curtain = Curtain.create();
+    }
+
+    /** The map with this file name: built (and brought to life) the first time someone goes there. */
+    private Area area(String name) {
+        Area area = areas.get(name);
+        if (area == null) {
+            Player elsewhere = active == null ? null : active.getPlayer();
+            area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere);
+            areas.put(name, area);
+            area.startFeatures(this::hud, this::travel);
+            area.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
+        return area;
+    }
+
+    /** The HUD, made with the first map's player; every map's features share it. */
+    private Hud hud(GameContext context, Player player, IntPredicate throwOut) {
+        if (hud == null) {
+            hud = new Hud(context, player, throwOut);
+            uiStage.addActor(hud);
+        }
+        return hud;
+    }
+
+    /** Taps go to the UI, then to this map's menu and the map itself. */
+    private void listenTo(Area area) {
+        multiplexer.clear();
+        multiplexer.addProcessor(uiStage);
+        multiplexer.addProcessor(area.getMenuStage());
+        multiplexer.addProcessor(area.getGameStage());
+    }
+
+    // going through doors
+
+    /**
+     * Someone ended its walk on a door that lets it through (see {@code DoorFeature}). An animal comes out on the other
+     * map at once (that map is built if nobody has been there yet). The player goes behind the curtain: the screen
+     * darkens, the player comes out on the other map, the screen lightens; taps wait meanwhile.
+     */
+    private boolean travel(GameBoardActor traveller, TileDoor door) {
+        Area from = areaOf(traveller);
+        if (from == null) {
+            return false;
+        }
+        if (traveller instanceof Player) {
+            return from == active && startJourney(door);
+        }
+        if (traveller instanceof FarmAnimal animal) {
+            Area to = area(door.getTargetMap());
+            Tile tile = to.arrivalTile(door.getName());
+            if (tile == null) {
+                return false; // no room on the other side: it stays (and may try again)
+            }
+            from.letGo(animal, uiStage);
+            to.welcome(animal.moveTo(to.getContext()), tile);
+            return true;
+        }
+        return false;
+    }
+
+    private Area areaOf(GameBoardActor actor) {
+        for (Area area : areas.values()) {
+            if (area.has(actor)) {
+                return area;
+            }
+        }
+        return null;
+    }
+
+    private boolean startJourney(TileDoor door) {
+        if (curtain.isDrawn()) {
+            return false; // on its way already
+        }
+        multiplexer.clear(); // no taps until the player is through
+        curtain.fall(uiStage, CURTAIN_SECONDS, () -> arrivingThrough = door, () -> listenTo(active));
+        return true;
     }
 
     /**
-     * box2dlights (without diffuse light) takes the brightness of unlit places from the ambient alpha and adds the
-     * ambient colour on top, so a daylight map gets no colour and full alpha (a colour of 1 would paint everything white).
-     *
-     * @param ambientLight how bright the map is without lights (0 dark .. 1 daylight), {@code null} for the house's setting
+     * Behind the curtain: the player leaves this map and comes out of the door with the same name on the other one,
+     * which is drawn from now on. With no room there, it stays where it is.
      */
-    private RayHandler prepareLights(Float ambientLight) {
-        RayHandler rayHandler = new RayHandler(world);
-        if (ambientLight == null) {
-            rayHandler.setAmbientLight(DEFAULT_AMBIENT_LIGHT, DEFAULT_AMBIENT_LIGHT, DEFAULT_AMBIENT_LIGHT, 2 * 0.5f);
-        } else {
-            rayHandler.setAmbientLight(0, 0, 0, ambientLight);
+    private void arrive(TileDoor door) {
+        Area to = area(door.getTargetMap());
+        Tile tile = to.arrivalTile(door.getName());
+        if (tile == null || to == active) {
+            return;
         }
-        return rayHandler;
-    }
-
-    private GameContext createContext(BoardService boardService) {
-        PhraseService phraseService = new PhraseService();
-        OrthographicCamera camera = (OrthographicCamera) gameStage.getCamera();
-
-        return new GameContext(resourcesService,
-                gameEventService,
-                phraseService,
-                world,
-                rayHandler,
-                camera,
-                gameStage,
-                notificationStage,
-                menuStage,
-                uiStage,
-                boardService);
+        active.letGo(active.getPlayer(), uiStage);
+        to.welcome(to.getPlayer(), tile);
+        active = to;
+        hud.enter(to.getGameEventService(), to::throwOut, to::giveFrom);
     }
 
     @Override
     public void render(float delta) {
+        if (arrivingThrough != null) {
+            TileDoor door = arrivingThrough;
+            arrivingThrough = null;
+            arrive(door);
+        }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            gameStage.fadeOut();
+            active.getGameStage().fadeOut();
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            gameStage.fadeIn();
+            active.getGameStage().fadeIn();
         }
 
         AnimatedTiledMapTile.updateAnimationBaseTime(); // animated map tiles (water)
-        world.step(1 / 60f, 6, 2);
-        gameStage.act(delta);
-        gameStage.draw();
-
-        rayHandler.setCombinedMatrix((OrthographicCamera) gameStage.getCamera());
-        rayHandler.updateAndRender();
-
-        notificationStage.act(delta);
-        notificationStage.draw();
-
-        menuStage.act(delta);
-        menuStage.draw();
+        active.actAndDraw(delta);
 
         uiStage.act(delta);
         uiStage.draw();
 
+        // the other maps before this one's features: what they tell the shared HUD (e.g. no hint next to an animal,
+        // as their rabbit isn't there) is overridden by what this map tells it
+        for (Area area : new ArrayList<>(areas.values())) { // a copy: an animal may open a new map meanwhile
+            if (area != active) {
+                area.actBehindTheScenes(delta);
+            }
+        }
+        active.runFeatures(delta);
         for (Feature feature : features) {
             feature.run(delta);
         }
-
-        gameEventService.updateEventsLivesAndClean();
-    }
-
-    protected void addFeature(Feature feature) {
-        features.add(feature);
     }
 
     @Override
     public void resize(int width, int height) {
-        gameStage.getViewport().update(width, height, true);
+        for (Area area : areas.values()) {
+            area.resize(width, height);
+        }
         uiStage.getViewport().update(width, height, true);
     }
 
     @Override
     public void dispose() {
-        gameStage.dispose();
-        notificationStage.dispose();
-        menuStage.dispose();
+        for (Area area : areas.values()) {
+            area.dispose();
+        }
         uiStage.dispose();
-        rayHandler.dispose();
+        curtain.dispose();
     }
 }

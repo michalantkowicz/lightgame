@@ -1037,3 +1037,45 @@ by a chicken, slowly enough that the player can still save it.
   one-line `isNextToPlayer` was inlined into `canStroke`.
 - Tests: `CowTest.tappingTheWishBubbleWalksNextToTheCow`, `CowTest.tappingTheSlotWithTheWishGivesItToTheCow`;
   `GameDriver.tapWishBubble`. No golden changed.
+
+## 2026‑11‑17, doors to other maps: the chicken coop (branch `ccr-7d84cbcc-88svyo`)
+
+- Owner's request: the player can go into the chicken coop and out again, and both maps keep living (a watered field
+  grows while the player is in the coop). Animals live on in full and go through doors too; a door can say who may
+  pass. Options discussed first: one big map with regions vs. separate maps all acting each frame (measured on
+  desktop: a second farm-sized map acting unseen costs ~50 µs a frame, drawing it as part of one big map without
+  culling ~150 µs plus twice the vertices); the owner chose separate maps.
+- **`game.Area`**: what `GameScreen` built for its one map (board, game/notification/menu stages, its own physics world
+  and lights, its own `GameEventService`, its features) is now one area per map, with its `GameContext`. `GameScreen`
+  keeps the areas by file name, the UI stage and the HUD; each frame every area acts, the player's one is also drawn
+  (with its lights) and gets the taps; the others act behind the scenes before its features (so what they tell the
+  shared HUD, e.g. "no hint", is overridden by the player's map). Its PMD baseline exception moved with that code
+  to `Area`. `Main` no longer makes the physics world or the event bus (each area has its own).
+- **Doors**: Tiled's `DOOR` object (`TileDoor`: `door` name, `targetMap`, optional `passes`, e.g. `PLAYER,CHICKEN`),
+  run by `DoorFeature`: whoever *ends its walk* on a door (walking over it takes nobody through) and is let through
+  goes to the door with the same name on the other map (`Travel`, implemented by `GameScreen`). Whoever came out of a
+  door stays until it has walked off and back on. A map is built the first time someone goes there (so a level's
+  goldens don't change until then; building a farm-sized map takes ~12–15 ms, hidden behind the curtain).
+- **The player** goes behind a `Curtain` (the screen darkens 0.3 s, the player comes out on the other map, the camera
+  is over it at once, the screen lightens 0.3 s; taps wait meanwhile). Each map has its own `Player`, on the map only
+  while the player is there (`GameBoardActor.leaveBoard`); they share the backpack and stamina
+  (`Player(context, elsewhere)`), so each map's features keep their rabbit. The HUD follows the player:
+  `Hud.enter(events, throwOut, giveAway)` replaces `Hud.setGiveAway` (it also rebinds the events and the slot's throw
+  out). Action buttons over things on the map left go at once. With no free tile at the door, one comes out on the
+  nearest free tile.
+- **Animals**: a farm animal on a door comes out on the other side at once, as a new animal of the same kind
+  (`FarmAnimal.moveTo`): as hungry, wishing for the same, as long since a stroke; its state machine starts again
+  (it looks around first, then wishes again if hungry). Its tile is freed and the arrival tile blocked
+  (`SpriteActor.leaveBoard`, `comeOnto`). The dog doesn't go through doors (not a farm animal).
+- `GrassFeature` kept an empty list of the tiles the rabbit can reach when it was first asked before the rabbit was on
+  the map (its comment said "try again next time"); now it does try again, as a map entered later needs.
+- **The coop** (`assets-src/maps/coop.tmx`, a simple version to be redrawn in Tiled): a dirt floor between two
+  fences, a water trough, a torch (`ambientLight` 0.55), one chicken, its door (the ramp) letting in only the rabbit
+  and chickens. Map property `growingGrass=false`: no grass grows inside. On level 1 the coop's ramp (17, 8) is
+  walkable now and is its door. Made from tiles the atlas already had (the pack isn't in the build machine): the game
+  copies were written with `build_assets.py`'s own functions, `tiles.atlas` is unchanged.
+- Tests: `TravelTest` (the field grows while the rabbit is in the coop, the backpack goes along, the curtain, staying
+  on the door; a chicken goes through by itself and wishes as hungry as it was; the cow stays out),
+  `ShippedMapsTest` (maps behind a door have no PLAYER; every door leads to a shipped map with its pair and can be
+  walked to). `GameDriver` reads the player's area (`currentMap`, `visitedMaps`, `whereIs`, `doors`, `curtain`,
+  `animalStateOnAnyMap`); `TestMap.pathOf`. No golden changed.

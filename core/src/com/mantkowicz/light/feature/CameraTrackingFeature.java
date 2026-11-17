@@ -45,6 +45,14 @@ public class CameraTrackingFeature implements Feature {
         }
     }
 
+    /** The camera is over this actor at once and follows it from now on (it came out of a door onto this map). */
+    public void jumpTo(GameBoardActor actor) {
+        this.actor = actor;
+        cameraActor.clearActions();
+        cameraActor.setPosition(actor.getCenter());
+        interval.setZero();
+    }
+
     private void handleLookAtMeEvent() {
         LookAtMeEvent event = gameEventService.poll(LookAtMeEvent.class);
         GameBoardActor lookedAtActor = event.getActor();

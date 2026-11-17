@@ -60,6 +60,7 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
+import com.mantkowicz.light.map.TileDoor;
 import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
@@ -83,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -100,6 +102,10 @@ public final class GameDriver {
     public enum Kind {
         PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY
     }
+
+    /** What each map has of its own ({@code game.Area}); the rest is the game screen's. */
+    private static final Set<String> AREA_FIELDS = Set.of("board", "gameStage", "menuStage", "notificationStage",
+            "rayHandler", "world", "gameEventService", "features");
 
     private final HeadlessGame game;
     private final StringBuilder timeline = new StringBuilder();
@@ -1265,6 +1271,61 @@ public final class GameDriver {
         return objects;
     }
 
+    /** The doors placed on the map, by cell: "name -> target map", e.g. "coop -> maps/coop.tmx". */
+    public Map<Cell, String> doors() {
+        Map<Cell, String> doors = new TreeMap<>(Comparator.comparing(Cell::toString));
+        for (Map.Entry<Cell, Tile> entry : tilesByCell().entrySet()) {
+            for (TileObject object : tileObjects(entry.getValue())) {
+                if (object instanceof TileDoor door) {
+                    doors.put(entry.getKey(), door.getName() + " -> " + door.getTargetMap());
+                }
+            }
+        }
+        return doors;
+    }
+
+    // maps and doors
+
+    /** The map the player is in (what is drawn and what the other observations look at), e.g. "maps/level1.tmx". */
+    public String currentMap() {
+        Object screen = ((Game) game.game()).getScreen();
+        Object area = field(screen, screen.getClass(), "active");
+        return field(area, area.getClass(), "mapName");
+    }
+
+    /** The maps someone (the player, an animal) has been to, in the order they were first visited. */
+    public List<String> visitedMaps() {
+        return new ArrayList<>(areas().keySet());
+    }
+
+    /** Which map the first of this kind is on now, or null when there is none anywhere. */
+    public String whereIs(Kind kind) {
+        for (Map.Entry<String, Object> entry : areas().entrySet()) {
+            Object area = entry.getValue();
+            if (actorOn(field(area, area.getClass(), "gameStage"), kind) != null) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    /** The state of the first animal of this kind on whatever map it is (also one the player isn't in), or null. */
+    public String animalStateOnAnyMap(Kind kind) {
+        for (Object area : areas().values()) {
+            GameBoardActor animal = actorOn(field(area, area.getClass(), "gameStage"), kind);
+            if (animal != null) {
+                return ((com.mantkowicz.light.character.FarmAnimal) animal).getStateName();
+            }
+        }
+        return null;
+    }
+
+    /** How dark the curtain over the screen is while the player goes through a door: 0 (none) to 1 (black). */
+    public float curtain() {
+        Actor curtain = screenField("curtain");
+        return curtain.getStage() == null ? 0 : curtain.getColor().a;
+    }
+
     /** The path the game would walk from one cell to another (start excluded), or an empty list. */
     public List<Cell> path(Cell from, Cell to) {
         List<Cell> cells = new ArrayList<>();
@@ -1414,6 +1475,15 @@ public final class GameDriver {
     }
 
     private GameBoardActor actor(Kind kind) {
+        GameBoardActor found = actorOn(gameStage(), kind);
+        if (found == null) {
+            throw new IllegalStateException("No " + kind + " on the game stage");
+        }
+        return found;
+    }
+
+    /** The first actor of this kind on a map's stage, or null. */
+    private static GameBoardActor actorOn(Stage stage, Kind kind) {
         Class<? extends GameBoardActor> type = switch (kind) {
             case PLAYER -> Player.class;
             case DOG -> Dog.class;
@@ -1422,13 +1492,18 @@ public final class GameDriver {
             case FIELD -> com.mantkowicz.light.character.Field.class;
             case CHICKEN, CHICKEN_BABY -> Chicken.class;
         };
-        for (Actor actor : gameStage().getActors()) {
+        for (Actor actor : stage.getActors()) {
             if (type.isInstance(actor) && (!(actor instanceof Chicken chicken)
                     || chicken.getType() == ChickenType.valueOf(kind.name()))) {
                 return type.cast(actor);
             }
         }
-        throw new IllegalStateException("No " + kind + " on the game stage");
+        return null;
+    }
+
+    /** The maps someone has been to (each a {@code game.Area}), by file name, the first the game started on. */
+    private Map<String, Object> areas() {
+        return screenField("areas");
     }
 
     private static String kindOf(TileObject object) {
@@ -1444,6 +1519,8 @@ public final class GameDriver {
             return "LIGHT";
         if (object instanceof TileGrass)
             return "GRASS";
+        if (object instanceof TileDoor)
+            return "DOOR";
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 
@@ -1630,8 +1707,15 @@ public final class GameDriver {
         return screen;
     }
 
+    /**
+     * A field of the game screen, or of the map the player is in (its area: board, stages, lights, events, features).
+     */
     private <T> T screenField(String name) {
         Object screen = ((Game) game.game()).getScreen();
+        if (AREA_FIELDS.contains(name)) {
+            Object area = field(screen, screen.getClass(), "active");
+            return field(area, area.getClass(), name);
+        }
         return field(screen, screen.getClass(), name);
     }
 

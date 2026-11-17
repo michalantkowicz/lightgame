@@ -62,6 +62,16 @@ public abstract class GameBoardActor extends GameActor implements Interactive, T
         boardService.registerOccupant(tile, this);
     }
 
+    /**
+     * Leaves the map: off its tile (it is on none until {@link #setTile} puts it back) and off the stage, its actions
+     * dropped. For whoever goes through a door to another map.
+     */
+    public void leaveBoard() {
+        clearActions();
+        remove();
+        tile = null;
+    }
+
     @Override
     public boolean remove() {
         if (this.tile != null) {

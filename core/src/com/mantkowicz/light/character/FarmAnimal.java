@@ -100,6 +100,33 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         }
     }
 
+    /**
+     * The same animal on another map, where it came out of a door: as hungry as here, wishing for the same, as long
+     * since its last stroke. What it was doing starts again from its state machine's first state (on the other side it
+     * looks around first), so a wish comes back in a moment. Take it off this map with {@link #leaveBoard()}.
+     */
+    public FarmAnimal moveTo(GameContext context) {
+        FarmAnimal there = createAnother(context);
+        there.favouriteFood = new Crop(favouriteFood.getType(), there.resources);
+        there.wishChosen = wishChosen;
+        there.sinceFed = sinceFed;
+        there.sinceStroked = sinceStroked;
+        there.bitesLeft = bitesLeft;
+        return there;
+    }
+
+    /** A new animal of the same kind (a chick, a cow with the same favourite dishes) on another map. */
+    protected abstract FarmAnimal createAnother(GameContext context);
+
+    /** Leaves the map (through a door): the bubble with its wish goes too. */
+    @Override
+    public void leaveBoard() {
+        if (wishBubble != null) {
+            hideWish();
+        }
+        super.leaveBoard();
+    }
+
     /** Its state machine takes a step. */
     protected abstract void think();
 

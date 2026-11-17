@@ -54,6 +54,11 @@ public class Chicken extends FarmAnimal {
         startLiving();
     }
 
+    @Override
+    protected FarmAnimal createAnother(GameContext context) {
+        return new Chicken(context, type);
+    }
+
     public ChickenType getType() {
         return type;
     }

@@ -14,7 +14,16 @@ public enum TileObjectAttribute {
     /** How likely a field grows a weed instead of its crop after watering, 0..1, e.g. "0" for never; 0.4 without it. */
     WEED_CHANCE("weedChance"),
     /** How far grass (objectClass GRASS) has grown: 1 a tuft, 2 two tufts, 3 a bush, 4 a big bush; 1 without it. */
-    PHASE("phase");
+    PHASE("phase"),
+    /**
+     * A door's name (objectClass DOOR), the same on both of its maps: going through it, one comes out of the door with
+     * this name on the other map.
+     */
+    DOOR("door"),
+    /** The map a door leads to, e.g. "maps/coop.tmx". */
+    TARGET_MAP("targetMap"),
+    /** Who may go through a door, e.g. "PLAYER,CHICKEN" (the player, chickens and chicks); everyone without it. */
+    PASSES("passes");
 
     private final String value;
 

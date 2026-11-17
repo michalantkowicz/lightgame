@@ -78,10 +78,10 @@ public class Hud extends Group {
     private static final float GEAR_MARGIN = 48;
 
     private final ResourcesService resources;
-    private final GameEventService events;
+    private GameEventService events;
     private final Player player;
     /** Throws the item in a backpack slot out next to the player. */
-    private final IntPredicate throwOut;
+    private IntPredicate throwOut;
     private final Group row = new Group();
     private final Portrait face;
     private final List<Image> slots = new ArrayList<>();
@@ -132,7 +132,7 @@ public class Hud extends Group {
                     if (giveAway.test(index)) {
                         return; // given to an animal next to the player wishing for it (as its button would)
                     }
-                    if (!throwOut.test(index)) { // what is in it jumps out next to the player...
+                    if (!Hud.this.throwOut.test(index)) { // what is in it jumps out next to the player...
                         shake(index); // ...or, with nowhere to land, the slot shakes
                     }
                 }
@@ -160,11 +160,20 @@ public class Hud extends Group {
     }
 
     /**
-     * A tap on a backpack slot first offers its item here (0 = the left slot), e.g. to a cow next to the player wishing
-     * for it; only when this says false does the item jump out next to the player.
+     * The map the player is in (the first one, or another one through a door): from now on the HUD listens to what
+     * happens there and the backpack slots throw out and give away there. What it shows (the backpack, the stamina)
+     * goes with the player.
+     *
+     * @param throwOut as in the constructor
+     * @param giveAway asked first when a backpack slot is tapped: gives its item away, e.g. to a cow next to the player
+     *                 wishing for it (true), instead of throwing it out (only when this says false does the item jump
+     *                 out next to the player)
      */
-    public void setGiveAway(IntPredicate giveAway) {
+    public void enter(GameEventService events, IntPredicate throwOut, IntPredicate giveAway) {
+        this.events = events;
+        this.throwOut = throwOut;
         this.giveAway = giveAway;
+        reactions.listenTo(events);
     }
 
     /** Taps on this piece stay in the HUD (they don't reach the map behind it) and do this (the face answers). */
