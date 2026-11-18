@@ -54,8 +54,8 @@ public class RhythmGame extends Group {
     /** A caught fish: how much it grows, how long it takes to go. */
     private static final float CAUGHT_GROW = 1.15f, CAUGHT_SECONDS = 0.3f, SPARKLE = 80;
     private static final Color CAUGHT_GREEN = new Color(0.75f, 1f, 0.65f, 1f);
-    /** How far a fish wiggles (degrees) and how fast; turned so its head (up and right on the sheet) points down. */
-    private static final float WIGGLE = 8, WIGGLE_SPEED = 9, HEAD_DOWN = -135;
+    /** How far a fish wiggles (degrees) and how fast; turned side-on, facing right (on the sheet they face up and right): a fish shape a child knows. */
+    private static final float WIGGLE = 8, WIGGLE_SPEED = 9, SIDE_ON = -45;
     /** After the last catch or miss, the window waits this long (the last mark shows) and closes. */
     private static final float CLOSE_AFTER = 0.8f;
 
@@ -247,7 +247,7 @@ public class RhythmGame extends Group {
         float progress = round.progress(fish);
         image.setVisible(progress >= 0);
         image.setY(topY + progress * (lineY - topY) - FISH / 2f);
-        image.setRotation(HEAD_DOWN + MathUtils.sin(time * WIGGLE_SPEED + i) * WIGGLE);
+        image.setRotation(SIDE_ON + MathUtils.sin(time * WIGGLE_SPEED + i) * WIGGLE);
         if (fish.getState() == RhythmRound.State.COMING) {
             image.getColor().a = MathUtils.clamp(progress * 8, 0, 1);
         }
