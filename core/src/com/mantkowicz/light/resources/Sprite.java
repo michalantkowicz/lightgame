@@ -25,6 +25,8 @@ public enum Sprite {
     /** The bobber in the water: dropping in, bobbing, pulled under, a splash. */
     FISHING_BOBBER("fishing_bobber"),
     FISHING_ROD_ICON("fishing_rod_icon"),
+    /** The fishing net on the fishing game's lane buttons (drawn by tools/assets/net_icon.py, the pack has none). */
+    FISHING_NET_ICON("fishing_net_icon"),
     /** A fish leaping out of the water (the fishing game). */
     FISH_LEAP("fish_leap"),
     /** Caught fish: the first five are pink, orange, yellow, green and blue. */

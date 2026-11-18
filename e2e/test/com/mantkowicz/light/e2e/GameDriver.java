@@ -76,8 +76,8 @@ import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.fishing.BitePrompt;
-import com.mantkowicz.light.ui.fishing.LeapGame;
-import com.mantkowicz.light.ui.fishing.LeapRound;
+import com.mantkowicz.light.ui.fishing.RhythmGame;
+import com.mantkowicz.light.ui.fishing.RhythmRound;
 import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
@@ -1181,33 +1181,42 @@ public final class GameDriver {
     }
 
     /**
-     * The fishing game: "caught 1, missed 0, leaps 3" and, while a fish leaps, "fish at 0.70 (green from 0.62)";
-     * "none" when it isn't open.
+     * The fishing game: "caught 1, missed 0, of 12 fish", "none" when it isn't open.
      */
     public String fishingGame() {
-        LeapGame leapGame = fishingFeature() == null ? null : fishingFeature().getGame();
-        if (leapGame == null || leapGame.getStage() == null) {
+        RhythmGame rhythmGame = fishingFeature() == null ? null : fishingFeature().getGame();
+        if (rhythmGame == null || rhythmGame.getStage() == null) {
             return "none";
         }
-        LeapRound round = leapGame.getRound();
-        return String.format(java.util.Locale.ROOT, "caught %d, missed %d, leaps %d%s", round.getCaught(),
-                round.getMissed(), round.getLeaps(), round.isLeaping()
-                        ? String.format(java.util.Locale.ROOT, ", fish at %.2f (green from %.2f)", round.height(),
-                                round.getGreenFrom())
-                        : "");
+        RhythmRound round = rhythmGame.getRound();
+        return "caught " + round.getCaught() + ", missed " + round.getMissed() + ", of " + round.getFish().size()
+                + " fish";
     }
 
-    /** In the fishing game, is the leaping fish in the green zone right now (a tap catches it)? */
-    public boolean fishInGreen() {
-        LeapGame leapGame = fishingFeature().getGame();
-        return leapGame != null && leapGame.getRound().isLeaping()
-                && leapGame.getRound().height() >= leapGame.getRound().getGreenFrom();
+    /** In the fishing game, the lane with a fish on the line (a tap on its net catches it), or -1 without one. */
+    public int fishOnTheLine() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        for (int lane = 0; rhythmGame != null && lane < rhythmGame.getRound().getRules().lanes(); lane++) {
+            if (rhythmGame.getRound().isCatchable(lane)) {
+                return lane;
+            }
+        }
+        return -1;
     }
 
-    /** In the fishing game, is a fish in the air right now? */
-    public boolean fishLeaping() {
-        LeapGame leapGame = fishingFeature().getGame();
-        return leapGame != null && leapGame.getRound().isLeaping();
+    /** In the fishing game, a short tap on a lane's net (0 the left one). */
+    public void tapNet(int lane) {
+        tap(uiScreenPosition(fishingFeature().getGame().getNet(lane)));
+    }
+
+    /** In the fishing game, is this lane's net tangled now (a tap with no fish on the line: it catches nothing)? */
+    public boolean netTangled(int lane) {
+        return fishingFeature().getGame().getRound().isTangled(lane);
+    }
+
+    /** How often no fish comes to a cast from now on, 0 .. 1 (0.3 as the game ships). */
+    public static void fishingNoFishChance(float chance) {
+        FishingFeature.setNoFishChance(chance);
     }
 
     // grass (feature.GrassFeature)

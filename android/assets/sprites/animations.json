@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "a63713965d78ad1f920cf25c25e61be68966ce76",
+  "packJsonSha1": "fc90c2179f240f4b3c9f96cac050d00d7b7daadd",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -81,6 +81,16 @@
       "height": 13,
       "anchorX": 16,
       "anchorY": 16
+    },
+    "fishing_net_icon": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 0,
+      "width": 15,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "fishing_rod_icon": {
       "frameWidth": 16,
@@ -686,6 +696,12 @@
       "sheet": "fishing_bobber",
       "frames": 5,
       "frameDuration": 0.15,
+      "playMode": "LOOP"
+    },
+    "fishing_net_icon/icon": {
+      "sheet": "fishing_net_icon",
+      "frames": 1,
+      "frameDuration": 0.1,
       "playMode": "LOOP"
     },
     "fishing_rod_icon/icon": {

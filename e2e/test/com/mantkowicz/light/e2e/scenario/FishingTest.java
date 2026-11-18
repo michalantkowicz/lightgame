@@ -3,6 +3,8 @@ package com.mantkowicz.light.e2e.scenario;
 import com.mantkowicz.light.e2e.Cell;
 import com.mantkowicz.light.e2e.GameDriver;
 import com.mantkowicz.light.e2e.TestMap;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,17 +12,27 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Fishing (FeatureFlag.FISHING, on as the game ships) from a fishing spot (Tiled's FISHING_SPOT): standing still on
  * it, the tool button shows the fishing rod; tapped, the rabbit casts to the left, the bobber drops into the water two
- * tiles away and bobs 1-5 times, then a fish pulls it under: the rod shakes, the face says "!!!", and a tap anywhere
- * within 2 s opens the fishing game (catch the leap: three catches win a fish, three misses lose it). No tap in time:
- * the fish is gone and the face is sad.
+ * tiles away and bobs 3-10 s, then a fish pulls it under: the rod shakes, the face says "!!!", and a tap anywhere
+ * within 1.2 s opens the fishing game (fish down three lanes, a tap on a lane's net catches the fish on the line;
+ * three misses lose). No tap in time: the fish is gone and the face is sad. Now and then (30 %) no fish comes at all.
+ * The tests switch that off, but one.
  */
 class FishingTest {
+    @BeforeEach
+    void aFishAlwaysComes() {
+        GameDriver.fishingNoFishChance(0);
+    }
+
+    @AfterEach
+    void asTheGameShips() {
+        GameDriver.fishingNoFishChance(0.3f);
+    }
+
     /** A pond on the left; the fishing spot 'S' two tiles right of the water. */
     private static final TestMap POND = TestMap.of(
             "~~~~~~~~~",
@@ -38,7 +50,7 @@ class FishingTest {
         return game;
     }
 
-    /** Casts and waits for the bite (the bobber bobs at most 5 times). */
+    /** Casts and waits for the bite (the bobber bobs 3 to 10 s). */
     private static void castAndWaitForTheBite(GameDriver game) {
         game.tapToolButton();
         for (int frame = 0; frame < 20 * 60 && !"BITE".equals(game.fishing()); frame++) {
@@ -84,7 +96,7 @@ class FishingTest {
         assertEquals("rabbit_fishing/bite_left", game.playerAnimation(), "the rod shakes");
         assertEquals("!!!", game.faceSays());
         assertEquals("TEEMO_HAPPY", game.faceReaction());
-        assertTrue(game.biteSecondsLeft() > 1.5f, "the paw's circle: " + game.biteSecondsLeft());
+        assertTrue(game.biteSecondsLeft() > 1f, "the paw's circle: " + game.biteSecondsLeft());
         assertFalse(game.crashed());
     }
 
@@ -101,20 +113,26 @@ class FishingTest {
         assertFalse(game.crashed());
     }
 
+    /** Taps each fish's net when it is on the line, until the game is over. */
+    private static void playWell(GameDriver game) {
+        for (int frame = 0; frame < 30 * 60 && "GAME".equals(game.fishing()); frame++) {
+            int lane = game.fishOnTheLine();
+            if (lane >= 0) {
+                game.tapNet(lane);
+            } else {
+                game.frames(1);
+            }
+        }
+    }
+
     @Test
     void hookedAndPlayedWellAFishGoesIntoTheBackpack() {
         GameDriver game = onTheSpot();
         castAndWaitForTheBite(game);
         game.tapAnywhere();
         assertEquals("GAME", game.fishing());
-        assertNotEquals("none", game.fishingGame());
-        for (int frame = 0; frame < 120 * 60 && "GAME".equals(game.fishing()); frame++) {
-            if (game.fishInGreen()) {
-                game.tapAnywhere();
-            } else {
-                game.frames(1);
-            }
-        }
+        assertEquals("caught 0, missed 0, of 12 fish", game.fishingGame());
+        playWell(game);
         assertEquals("LANDING", game.fishing(), "won");
         game.frames(1);
         assertEquals("rabbit_fishing/pull_left", game.playerAnimation());
@@ -130,31 +148,50 @@ class FishingTest {
         GameDriver game = onTheSpot();
         castAndWaitForTheBite(game);
         game.tapAnywhere();
-        for (int frame = 0; frame < 120 * 60 && "GAME".equals(game.fishing()); frame++) {
+        while (game.fishingGame().contains("missed 0")) {
             game.frames(1);
         }
-        assertEquals("READY", game.fishing(), "lost");
+        assertTrue(game.fishingGame().startsWith("caught 0, missed 1"), "a fish past the line: " + game.fishingGame());
+        assertEquals("TEEMO_SAD", game.faceReaction());
+        for (int frame = 0; frame < 30 * 60 && "GAME".equals(game.fishing()); frame++) {
+            game.frames(1);
+        }
+        assertEquals("READY", game.fishing(), "lost at the third miss");
         assertEquals("TEEMO_SAD", game.faceReaction());
         assertTrue(game.backpackItems().stream().allMatch(item -> item == null), "no fish");
         assertFalse(game.crashed());
     }
 
     @Test
-    void aTapWhileTheFishIsBelowTheGreenZoneIsAMiss() {
+    void aTapWithNoFishOnTheLineTanglesTheNet() {
         GameDriver game = onTheSpot();
         castAndWaitForTheBite(game);
         game.tapAnywhere();
-        game.tapAnywhere();
-        assertTrue(game.fishingGame().startsWith("caught 0, missed 0"), "between leaps a tap does nothing: "
-                + game.fishingGame());
-        while (!game.fishLeaping()) {
+        game.tapNet(1);
+        assertTrue(game.netTangled(1), "nothing on the line yet");
+        assertTrue(game.fishingGame().startsWith("caught 0, missed 0"), "not a miss: " + game.fishingGame());
+        game.seconds(0.5f);
+        assertFalse(game.netTangled(1), "only for a moment");
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void sometimesNoFishComes() {
+        GameDriver.fishingNoFishChance(1);
+        GameDriver game = onTheSpot();
+        game.tapToolButton();
+        game.seconds(1.5f);
+        assertEquals("WAITING", game.fishing());
+        game.seconds(9);
+        assertEquals("WAITING", game.fishing(), "it bobs the longest wait");
+        for (int frame = 0; frame < 3 * 60 && "WAITING".equals(game.fishing()); frame++) {
             game.frames(1);
         }
-        game.frames(3);
-        assertFalse(game.fishInGreen());
-        game.tapAnywhere();
-        assertTrue(game.fishingGame().startsWith("caught 0, missed 1"), game.fishingGame());
+        assertEquals("READY", game.fishing(), "nothing came: the line is out");
+        assertEquals("none", game.bobber());
         assertEquals("TEEMO_SAD", game.faceReaction());
+        game.frames(2);
+        assertEquals("fishing rod", game.toolButton(), "it can cast again");
         assertFalse(game.crashed());
     }
 
@@ -198,13 +235,7 @@ class FishingTest {
         game.seconds(1);
         castAndWaitForTheBite(game);
         game.tapAnywhere();
-        for (int frame = 0; frame < 120 * 60 && "GAME".equals(game.fishing()); frame++) {
-            if (game.fishInGreen()) {
-                game.tapAnywhere();
-            } else {
-                game.frames(1);
-            }
-        }
+        playWell(game);
         assertEquals("LANDING", game.fishing(), "won");
         game.seconds(1);
         assertTrue(game.itemsOnGround().stream().noneMatch(item -> item.startsWith("Fish(")), "not on the ground: "

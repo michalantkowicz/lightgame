@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.mantkowicz.light.actor.Bobber;
 import com.mantkowicz.light.actor.Fish;
 import com.mantkowicz.light.actor.FishType;
@@ -23,7 +22,8 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.collect.ItemThrower;
 import com.mantkowicz.light.ui.fishing.BitePrompt;
-import com.mantkowicz.light.ui.fishing.LeapGame;
+import com.mantkowicz.light.ui.fishing.RhythmGame;
+import com.mantkowicz.light.ui.fishing.RhythmRules;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
 import com.mantkowicz.light.ui.hud.ToolButton;
@@ -37,16 +37,19 @@ import java.util.Set;
  * <ol>
  * <li>Standing still on a fishing spot, the rabbit has the fishing rod on the HUD's tool button.</li>
  * <li>Tapped, it casts (to the left, the only way it fishes): the bobber drops into the water {@link #CAST_TILES}
- * tiles away with a splash and bobs a few times (1 .. {@link #MOST_BOBS}, at random).</li>
+ * tiles away with a splash and bobs for a while ({@link #LEAST_WAIT_SECONDS} .. {@link #MOST_WAIT_SECONDS}, at random). Now and then
+ * ({@link #NO_FISH_CHANCE}) no fish comes: it bobs {@link #MOST_WAIT_SECONDS}, the line comes out and the face is
+ * sad, as when a fish gets away.</li>
  * <li>A fish bites: the bobber is pulled under with a splash, the rabbit's rod shakes, the face says "!!!" (happy),
  * and a paw points at the place, pulsing, with a circle emptying next to it ({@link BitePrompt}).</li>
  * <li>A tap anywhere on the screen within {@link #BITE_SECONDS} hooks it and the fishing game opens
- * ({@link LeapGame}): the face is happy at each catch and sad at each miss. Won: the rabbit pulls the fish out, the
+ * ({@link RhythmGame}: fish down three lanes, catch them with the nets on the line): the face is happy at each catch
+ * and sad at each miss. Won: the rabbit pulls the fish out, the
  * face puts its sunglasses on, and a fish (of a random colour) goes into the backpack (or, full, next to the
  * rabbit; with no free tile there either, it isn't collected). Lost, or no tap in time: the face is sad and the rabbit can cast again.</li>
  * </ol>
  * Casting centres the camera on the rabbit (so the bobber and the paw are on the screen). Walking off while casting
- * or waiting takes the line out of the water. How hard the fishing game is: {@link #LEVEL}.
+ * or waiting takes the line out of the water. How hard the fishing game is: {@link #LEVEL} ({@link RhythmRules}).
  * <p>
  * Only on the map the player is in ({@link PlayerFeature}); a map can switch it off (map property {@code featuresOff}
  * with {@code FISHING}). When the player goes to another map, the line comes out of the water and the bite's paw and
@@ -55,22 +58,24 @@ import java.util.Set;
 public class FishingFeature implements PlayerFeature {
     /** How hard the fishing game is, 0 .. 1, unless set ({@link #setLevel}): 0.15 suits a 3-year-old, 0.8 an 8. */
     public static final float LEVEL = 0.15f;
-    /** How hard the fishing game is now (later from the age setting). */
+    /** How hard the fishing game is now (later from the age setting), and its rules from that. */
     private static float level = LEVEL;
+    private static RhythmRules rules = RhythmRules.forLevel(LEVEL);
+    /** How often no fish comes to a cast, 0 .. 1. */
+    public static final float NO_FISH_CHANCE = 0.3f;
+    private static float noFishChance = NO_FISH_CHANCE;
     /** The bobber lands this many tiles to the left of the rabbit. */
     public static final int CAST_TILES = 2;
-    /** The bobber bobs at most this many times before a fish takes it. */
-    public static final int MOST_BOBS = 5;
+    /** The bobber bobs this long at least, and at most, before a fish takes it (whole bobs, at random in between). */
+    public static final float LEAST_WAIT_SECONDS = 3, MOST_WAIT_SECONDS = 10;
     /** After a bite the player has this long to tap. */
-    public static final float BITE_SECONDS = 2;
+    public static final float BITE_SECONDS = 1.2f;
     /** What the face says when a fish bites. */
     public static final String BITE = "!!!";
     /** The rod's name on the tool button. */
     public static final String ROD = "fishing rod";
     /** How long the face is sad, and wears its sunglasses after its put them on. */
     static final float SAD_SECONDS = 2, COOL_SECONDS = 2.5f;
-    /** The fishing game's window waits this long after its last mark before it closes. */
-    static final float CLOSE_AFTER = 0.8f;
 
     /** Where the fishing is at. */
     public enum Phase {
@@ -87,7 +92,7 @@ public class FishingFeature implements PlayerFeature {
     private float timer, coolIn = -1;
     private Bobber bobber;
     private BitePrompt prompt;
-    private LeapGame game;
+    private RhythmGame game;
     private Vector2 bitePlace;
 
     public FishingFeature(GameContext context, Player player, Hud hud) {
@@ -108,6 +113,17 @@ public class FishingFeature implements PlayerFeature {
     /** How hard the fishing game is from now on, 0 .. 1 (for the age setting to come, and tests). */
     public static void setLevel(float newLevel) {
         level = newLevel;
+        rules = RhythmRules.forLevel(newLevel);
+    }
+
+    /** The fishing game's rules from now on, each one set by hand (e.g. more fish, or two lanes). */
+    public static void setRules(RhythmRules newRules) {
+        rules = newRules;
+    }
+
+    /** How often no fish comes to a cast from now on, 0 .. 1 ({@link #NO_FISH_CHANCE} as the game ships). */
+    public static void setNoFishChance(float chance) {
+        noFishChance = chance;
     }
 
     public static float getLevel() {
@@ -198,7 +214,7 @@ public class FishingFeature implements PlayerFeature {
                 .getAnimationDuration();
     }
 
-    /** The cast is over: the bobber drops into the water, bobs a few times, and a fish takes it. */
+    /** The cast is over: the bobber drops into the water, bobs a while, and a fish takes it (or none comes). */
     private void castLanded() {
         Vector2 middle = player.getCenter().sub(CAST_TILES * player.getTile().getWidth(), 0);
         bobber = new Bobber(resources, middle);
@@ -206,7 +222,13 @@ public class FishingFeature implements PlayerFeature {
         context.getGameStage().addActor(bobber);
         player.fish(Action.WAIT);
         phase = Phase.WAITING;
-        int bobs = MathUtils.random(1, MOST_BOBS);
+        float bobSeconds = resources.getAnimation(Sprite.FISHING_BOBBER, Action.BOB).getAnimationDuration();
+        if (MathUtils.random() < noFishChance) {
+            int bobs = Math.max(1, Math.round(MOST_WAIT_SECONDS / bobSeconds));
+            bobber.dropIn(() -> bobber.bob(bobs, this::noFish));
+            return;
+        }
+        int bobs = Math.max(1, Math.round(MathUtils.random(LEAST_WAIT_SECONDS, MOST_WAIT_SECONDS) / bobSeconds));
         bobber.dropIn(() -> bobber.bob(bobs, () -> bobber.pullUnder(this::bitten)));
     }
 
@@ -250,12 +272,21 @@ public class FishingFeature implements PlayerFeature {
         ui.addActor(prompt);
     }
 
+    /** It bobbed the longest wait and no fish came: the line comes out, the face is sad (as when one gets away). */
+    private void noFish() {
+        if (phase != Phase.WAITING) {
+            return;
+        }
+        reelIn();
+        face().play(UiImage.TEEMO_SAD, SAD_SECONDS);
+    }
+
     /** Tapped in time: the fishing game. */
     private void hooked() {
         prompt = null;
         phase = Phase.GAME;
         Stage ui = context.getUiStage();
-        game = new LeapGame(resources, ui, level, new LeapGame.Listener() {
+        game = new RhythmGame(resources, ui, rules, new RhythmGame.Listener() {
             @Override
             public void caught() {
                 face().play(UiImage.TEEMO_HAPPY);
@@ -268,11 +299,7 @@ public class FishingFeature implements PlayerFeature {
 
             @Override
             public void over(boolean won) {
-                LeapGame closing = game;
-                closing.addAction(Actions.sequence(Actions.delay(CLOSE_AFTER), Actions.run(() -> {
-                    closing.remove(); // gone this frame: the next tap reaches the map or the HUD
-                    landed(won);
-                })));
+                landed(won);
             }
         });
         ui.addActor(game);
@@ -338,7 +365,7 @@ public class FishingFeature implements PlayerFeature {
         return prompt;
     }
 
-    public LeapGame getGame() {
+    public RhythmGame getGame() {
         return game;
     }
 

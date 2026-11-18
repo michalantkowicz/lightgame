@@ -1216,3 +1216,27 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   - Level 1 has both the coop's door and the pier with its fishing spot (object 21); the assets were rebuilt with
     `build_assets.py`.
   - Tests: `FishingTest.aMapCanSwitchFishingOff`; `TestMap.withMapProperty`. No golden changed.
+- **Longer wait, quicker bite (2026‑11‑18, owner's playtest)**: the bobber now bobs for 3–10 s at random
+  (`LEAST_WAIT_SECONDS`, `MOST_WAIT_SECONDS`, whole bobs) instead of 1–5 bobs, which was too short; after the bite
+  the player has 1.2 s to tap instead of 2 s, which was too long (`BITE_SECONDS`).
+- **No fish sometimes, and a new fishing game (2026‑11‑18, owner's playtest)**: the leaping game wasn't challenging,
+  funny or configurable.
+  - About 30 % of casts get no fish (`FishingFeature.NO_FISH_CHANCE`): the bobber bobs the whole 10 s, then the line
+    comes out with the sad face, as when a fish gets away. Tests switch it off (`GameDriver.fishingNoFishChance`), but
+    `sometimesNoFishComes`.
+  - The fishing game is now a rhythm game (`ui.fishing.RhythmGame`, rules in `RhythmRound`): in the same window, fish
+    swim down three lanes onto a line, each reaching it on a half-second beat (12 fish in an 8 s run, one beat or a
+    few apart, never three down one lane). A tap on a lane's net button (or anywhere in its lane) while its fish is on
+    the line catches it (it grows, turns a little green and is gone, the line flashes); a fish past the line is a
+    miss (a pink X on the left), three lose at once. The owner asked for exactly this layout and feel.
+  - Decided here: a tap with nothing on the line tangles that net for a moment (it shakes, greys, catches nothing),
+    so tapping all nets all the time doesn't win, without counting as a miss (kinder to a 3-year-old); the line pulses
+    on the beat; a pale band around the line shows where a tap catches.
+  - Configurable: `RhythmRules` holds every number (run, beat, fish, lanes, misses that lose, fall time, catch window,
+    tangle time); `RhythmRules.forLevel` gives them for the levels of 3-, 5- and 8-year-olds, `FishingFeature.setRules`
+    sets them by hand.
+  - The fishing net's icon isn't in the packs: `tools/assets/net_icon.py` draws it (16x16, the item icons' palette),
+    packed as `Sprite.FISHING_NET_ICON`.
+  - `LeapGame` and `LeapRound` are removed (replaced, the owner's call); `Sprite.FISH_LEAP` stays, unused.
+  - Tests: `FishingTest` plays the new game (`GameDriver.fishOnTheLine`, `tapNet`, `netTangled`), new
+    `RhythmRoundTest`. No golden changed.
