@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * The fishing game's rules ({@link RhythmRound}): 12 fish in 8 s, on half-second beats, three lanes; a tap at the line
- * catches, a fish past the line is missed, three misses lose, a tap with nothing at the line tangles the net.
+ * catches, a fish past the line is missed, three misses lose, a tap too early scares the fish off (a miss), with no fish in sight it does nothing.
  */
 class RhythmRoundTest {
     private static final float FRAME = 1 / 60f;
@@ -71,35 +71,22 @@ class RhythmRoundTest {
     }
 
     @Test
-    void aTapWithNothingAtTheLineTanglesThatNetAndTappingAgainKeepsItTangled() {
+    void aTapTooEarlyScaresTheFishOffAndWithNoFishInSightDoesNothing() {
         MathUtils.random.setSeed(7);
-        RhythmRules rules = new RhythmRules(8, 0.5f, 12, 3, 3, 2, 0.2f, 0.4f);
-        RhythmRound round = new RhythmRound(rules);
+        RhythmRound round = new RhythmRound(new RhythmRules(8, 0.5f, 12, 3, 3, 2, 0.2f));
         RhythmRound.Fish first = round.getFish().get(0);
-        runUntil(round, first.getArrival() - 0.7f);
-        assertNull(round.tap(first.getLane()), "too early");
-        assertTrue(round.isTangled(first.getLane()));
-        assertEquals(0, round.getMissed(), "a tangle isn't a miss");
-        runUntil(round, first.getArrival() - 0.4f);
-        assertNull(round.tap(first.getLane()), "tapped again while tangled: tangled from now");
-        runUntil(round, first.getArrival() - 0.1f);
-        assertTrue(round.isTangled(first.getLane()), "still tangled: tapping all the time doesn't win");
-        assertFalse(round.isCatchable(first.getLane()));
-        runUntil(round, first.getArrival() + 0.05f);
-        assertTrue(round.isCatchable(first.getLane()), "untangled, still in the window");
-        assertNotNull(round.tap(first.getLane()));
-    }
-
-    @Test
-    void aDoubleTapAfterACatchDoesNothing() {
-        MathUtils.random.setSeed(7);
-        RhythmRound round = new RhythmRound(new RhythmRules(8, 0.5f, 12, 3, 3, 2, 0.2f, 0.4f));
-        RhythmRound.Fish first = round.getFish().get(0);
+        for (int lane = 0; lane < 3; lane++) {
+            assertNull(round.tap(lane), "nothing in sight yet");
+        }
+        assertEquals(0, round.getMissed());
+        runUntil(round, first.getArrival() - 0.5f);
+        assertTrue(round.isTooEarly(first.getLane()));
+        RhythmRound.Fish scared = round.tap(first.getLane());
+        assertEquals(first, scared, "the fish coming down that lane");
+        assertEquals(RhythmRound.State.MISSED, scared.getState());
+        assertEquals(1, round.getMissed(), "a miss");
         runUntil(round, first.getArrival());
-        assertNotNull(round.tap(first.getLane()));
-        round.update(0.15f);
-        assertNull(round.tap(first.getLane()));
-        assertFalse(round.isTangled(first.getLane()), "a child's double tap doesn't tangle the net");
+        assertFalse(round.isCatchable(first.getLane()), "it is gone");
     }
 
     private static void runUntil(RhythmRound round, float time) {

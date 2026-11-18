@@ -1264,3 +1264,33 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
     fish aren't collected; fish have no use yet; the no-fish cast (about 11 s, then the sad face) and missed fish
     punish without teaching, maybe a gentler face; and, not about fishing, a tap far up the narrow strip north of the
     pier doesn't walk the rabbit (one tile at a time does).
+- **Owner's observations after trying it (2026‑11‑18)**:
+  - the bobber is drawn at three quarters of the pack's size (it was too big next to the rabbit);
+  - casting sends one plain `LookAtMeEvent` for the rabbit: the camera centred on a point kept off the map's left
+    edge, and when that centring ended, tracking pulled it back towards the rabbit, the slight move as the bobber
+    landed (`FishingFeature.cameraPoint` removed, replaced as the owner asked; the event's point stays for others);
+  - the X column shows a shadow for each X there can be (as many as the misses that lose), so it is clear how many
+    mistakes are left;
+  - the nets always work: no tangling any more (a tangled net couldn't catch the next fish, or try again), so
+    `RhythmRules.tangleSeconds`, the double-tap rule and `RoundButton.tint` (only for the dark tangled net) are gone;
+    a tap with nothing on the line only presses the net.
+  - the bite's paw no longer points at the bobber: bigger (12x), in the bottom right of the screen, its finger a little
+    right of and below the screen's middle (the rabbit), the circle under it; it re-centres when the screen is turned.
+  - then: the paw closer to the middle; a tap too early, while a fish of that lane is in sight but not on the line,
+    scares it off: it turns red and jumps out to the side, a miss (so tapping all the time loses again; a tap with no
+    fish of that lane in sight does nothing); a fish passing the line doesn't wait at the water's bottom any more: it
+    swims on, turning red, and is gone there (no jump).
+  - then: no fish at all ends with the face sweating instead of sad; a caught fish no longer just appears in the
+    backpack: it leaps out of the water where the bobber went under and flies to the rabbit in an arc, turning and
+    growing a little (0.7 s, `ui.fishing.CatchFlight`, on the game stage), and goes into the backpack when it gets
+    there.
+  - then: a won game celebrates before its window closes (falling stars were tried first and didn't look good): the
+    fish the player gets (chosen when it is hooked, so the same one then flies to the rabbit) pops up big in the
+    window's upper middle with a little bounce and a wobble, and 14 sparkles (`UiImage.SPARKLE`, 5-10x, about twice a
+    chest's) burst out of it all around, turning, shrinking and fading; the window stays 1.8 s after a win (0.8 s after
+    a loss).
+  - then: a bite with no tap in time shows the fish getting away: it leaps out of the water where the bobber went
+    under almost straight up, head first, turns over at the top and drops back in head down (a fish of the fishing
+    game, yellow, blue or a clownfish, moved by scene2d; the owner didn't want the pack's leaping fish), fading as it
+    goes under, 1.2 s (`ui.fishing.GotAwayLeap`, made through `CatchFlight.gotAway` to keep `FishingFeature` under
+    PMD's import limit).

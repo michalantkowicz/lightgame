@@ -20,7 +20,6 @@ public final class RhythmRules {
     private final int toLose;
     private final float fallSeconds;
     private final float window;
-    private final float tangleSeconds;
 
     /**
      * @param seconds       how long the fish come: the last one reaches the line this long after the first beat
@@ -30,11 +29,8 @@ public final class RhythmRules {
      * @param toLose        this many fish missed lose the game
      * @param fallSeconds   how long a fish takes from the top to the line (shorter: faster)
      * @param window        a tap this close to a fish reaching the line (before or after) catches it
-     * @param tangleSeconds a tap with no fish near the line tangles that net: it catches nothing for this long (so
-     *                      tapping all the nets all the time doesn't win)
      */
-    public RhythmRules(float seconds, float beat, int fishes, int lanes, int toLose, float fallSeconds, float window,
-            float tangleSeconds) {
+    public RhythmRules(float seconds, float beat, int fishes, int lanes, int toLose, float fallSeconds, float window) {
         this.seconds = seconds;
         this.beat = beat;
         this.fishes = fishes;
@@ -42,14 +38,13 @@ public final class RhythmRules {
         this.toLose = toLose;
         this.fallSeconds = fallSeconds;
         this.window = window;
-        this.tangleSeconds = tangleSeconds;
     }
 
     /** The rules for a level, 0 (easiest) .. 1 (hardest): the fish fall faster, the window is shorter. */
     public static RhythmRules forLevel(float level) {
         float l = MathUtils.clamp(level, 0, 1);
         return new RhythmRules(SECONDS, BEAT, FISHES, LANES, TO_LOSE, byAge(l, 2.2f, 1.6f, 1.2f),
-                byAge(l, 0.4f, 0.28f, 0.14f), byAge(l, 1.0f, 0.9f, 0.8f));
+                byAge(l, 0.4f, 0.28f, 0.14f));
     }
 
     /** A value at the age levels ({@link #AGE_3}, ...), straight lines between them, flat beyond. */
@@ -92,9 +87,5 @@ public final class RhythmRules {
 
     public float window() {
         return window;
-    }
-
-    public float tangleSeconds() {
-        return tangleSeconds;
     }
 }

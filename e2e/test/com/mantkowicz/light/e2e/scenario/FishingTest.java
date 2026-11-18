@@ -137,6 +137,8 @@ class FishingTest {
         game.frames(1);
         assertEquals("rabbit_fishing/pull_left", game.playerAnimation());
         assertEquals("TEEMO_COOL_ON", game.faceReaction(), "sunglasses on");
+        assertTrue(game.backpackItems().stream().allMatch(item -> item == null), "not yet: it flies to the rabbit");
+        game.seconds(0.8f);
         assertTrue(game.backpackItems().get(0).toString().endsWith("fish"), "a fish: " + game.backpackItems());
         game.seconds(3);
         assertEquals("READY", game.fishing());
@@ -162,16 +164,22 @@ class FishingTest {
         assertFalse(game.crashed());
     }
 
+    /** A tap before any fish is in sight does nothing; a tap too early in a fish's lane scares it off: a miss. */
     @Test
-    void aTapWithNoFishOnTheLineTanglesTheNet() {
+    void aTapTooEarlyScaresTheFishOff() {
         GameDriver game = onTheSpot();
         castAndWaitForTheBite(game);
         game.tapAnywhere();
+        game.tapNet(0);
         game.tapNet(1);
-        assertTrue(game.netTangled(1), "nothing on the line yet");
-        assertTrue(game.fishingGame().startsWith("caught 0, missed 0"), "not a miss: " + game.fishingGame());
-        game.seconds(1.1f);
-        assertFalse(game.netTangled(1), "only for a moment (1 s at the shipped level)");
+        game.tapNet(2);
+        assertEquals("caught 0, missed 0, of 12 fish", game.fishingGame(), "no fish in sight yet: nothing");
+        while (game.fishTooEarly() < 0) {
+            game.frames(1);
+        }
+        game.tapNet(game.fishTooEarly());
+        assertTrue(game.fishingGame().startsWith("caught 0, missed 1"), "scared off: " + game.fishingGame());
+        assertEquals("TEEMO_SAD", game.faceReaction());
         assertFalse(game.crashed());
     }
 
@@ -189,7 +197,7 @@ class FishingTest {
         }
         assertEquals("READY", game.fishing(), "nothing came: the line is out");
         assertEquals("none", game.bobber());
-        assertEquals("TEEMO_SAD", game.faceReaction());
+        assertEquals("TEEMO_SWEAT", game.faceReaction(), "all that waiting");
         game.frames(2);
         assertEquals("fishing rod", game.toolButton(), "it can cast again");
         assertFalse(game.crashed());

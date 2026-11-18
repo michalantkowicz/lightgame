@@ -1,6 +1,5 @@
 package com.mantkowicz.light.ui;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
@@ -69,15 +68,6 @@ public class RoundButton extends Group {
         icon.setDrawable(new TextureRegionDrawable(picture));
         icon.setSize(picture.getRegionWidth() * iconScale, picture.getRegionHeight() * iconScale);
         showPressed(pressed.isVisualPressed());
-    }
-
-    /**
-     * Tints the button and its picture, e.g. grey while it can't be used (a group's own colour doesn't reach the
-     * pictures in it).
-     */
-    public void tint(Color colour) {
-        background.setColor(colour);
-        icon.setColor(colour);
     }
 
     @Override

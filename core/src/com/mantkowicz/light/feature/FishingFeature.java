@@ -1,6 +1,5 @@
 package com.mantkowicz.light.feature;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,6 +21,7 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.collect.ItemThrower;
 import com.mantkowicz.light.ui.fishing.BitePrompt;
+import com.mantkowicz.light.ui.fishing.CatchFlight;
 import com.mantkowicz.light.ui.fishing.RhythmGame;
 import com.mantkowicz.light.ui.fishing.RhythmRules;
 import com.mantkowicz.light.ui.hud.Hud;
@@ -38,14 +38,15 @@ import java.util.Set;
  * <li>Standing still on a fishing spot, the rabbit has the fishing rod on the HUD's tool button.</li>
  * <li>Tapped, it casts (to the left, the only way it fishes): the bobber drops into the water {@link #CAST_TILES}
  * tiles away with a splash and bobs for a while ({@link #LEAST_WAIT_SECONDS} .. {@link #MOST_WAIT_SECONDS}, at random). Now and then
- * ({@link #NO_FISH_CHANCE}) no fish comes: it bobs {@link #MOST_WAIT_SECONDS}, the line comes out and the face is
- * sad, as when a fish gets away.</li>
+ * ({@link #NO_FISH_CHANCE}) no fish comes: it bobs {@link #MOST_WAIT_SECONDS}, the line comes out and the face
+ * sweats.</li>
  * <li>A fish bites: the bobber is pulled under with a splash, the rabbit's rod shakes, the face says "!!!" (happy),
- * and a paw points at the place, pulsing, with a circle emptying next to it ({@link BitePrompt}).</li>
+ * and a big paw in the bottom right of the screen points at its middle (the rabbit), pulsing, with a circle emptying
+ * under it ({@link BitePrompt}).</li>
  * <li>A tap anywhere on the screen within {@link #BITE_SECONDS} hooks it and the fishing game opens
  * ({@link RhythmGame}: fish down three lanes, catch them with the nets on the line): the face is happy at each catch
- * and sad at each miss. Won: the rabbit pulls the fish out, the
- * face puts its sunglasses on, and a fish (of a random colour) goes into the backpack (or, full, next to the
+ * and sad at each miss. Won: the rabbit pulls the line out, the fish
+ * flies from the water to it ({@link CatchFlight}), the face puts its sunglasses on, and the fish (of a random colour) goes into the backpack (or, full, next to the
  * rabbit; with no free tile there either, it isn't collected). Lost, or no tap in time: the face is sad and the rabbit can cast again.</li>
  * </ol>
  * Casting centres the camera on the rabbit (so the bobber and the paw are on the screen). Walking off while casting
@@ -76,6 +77,10 @@ public class FishingFeature implements PlayerFeature {
     public static final String ROD = "fishing rod";
     /** How long the face is sad, and wears its sunglasses after its put them on. */
     static final float SAD_SECONDS = 2, COOL_SECONDS = 2.5f;
+    /** How long a caught fish flies from the water to the rabbit. */
+    static final float FLIGHT_SECONDS = 0.7f;
+    /** How big the fish that got away is drawn, in tiles. */
+    static final float GOT_AWAY_SIZE = 1.125f;
 
     /** Where the fishing is at. */
     public enum Phase {
@@ -93,7 +98,10 @@ public class FishingFeature implements PlayerFeature {
     private Bobber bobber;
     private BitePrompt prompt;
     private RhythmGame game;
+    /** Where the bobber went under: the caught fish leaps out of the water there. */
     private Vector2 bitePlace;
+    /** The fish of the fishing game now: shown when it is won, then flying to the rabbit and into the backpack. */
+    private Fish prize;
 
     public FishingFeature(GameContext context, Player player, Hud hud) {
         this.context = context;
@@ -206,9 +214,8 @@ public class FishingFeature implements PlayerFeature {
         }
         phase = Phase.CASTING;
         player.fish(Action.CAST);
-        // the camera centres on the rabbit (the bobber, two tiles left, and the paw are on the screen), but not so
-        // far that it shows beyond the map's left edge
-        context.getGameEventService().post(new LookAtMeEvent(player, cameraPoint()));
+        // the camera centres on the rabbit once (the bobber, two tiles left, is on the screen), and stays there
+        context.getGameEventService().post(new LookAtMeEvent(player));
         timer = resources
                 .getAnimation(Sprite.RABBIT_FISHING, Action.CAST, Direction.LEFT)
                 .getAnimationDuration();
@@ -232,28 +239,12 @@ public class FishingFeature implements PlayerFeature {
         bobber.dropIn(() -> bobber.bob(bobs, () -> bobber.pullUnder(this::bitten)));
     }
 
-    /**
-     * The rabbit's middle, moved right as far as needed so the view doesn't reach past the map's left edge (the bobber
-     * two tiles left of it stays on the screen: a view is wider than three tiles).
-     */
-    private Vector2 cameraPoint() {
-        Vector2 point = player.getCenter();
-        float left = Float.MAX_VALUE;
-        for (Tile tile : context.getBoardService().getTiles()) {
-            left = Math.min(left, tile.getCenter().x - tile.getWidth() / 2f);
-        }
-        OrthographicCamera camera = context.getCamera();
-        float halfView = camera.viewportWidth * camera.zoom / 2f;
-        point.x = Math.max(point.x, left + halfView);
-        return point;
-    }
-
     /** Where the rod's tip is while the rabbit waits: 16 art pixels left of its picture's middle, 1 above. */
     private Vector2 rodTip() {
         return player.getCenter().add(-16 * WorldScale.PIXEL_SCALE, WorldScale.PIXEL_SCALE / 2f);
     }
 
-    /** The bobber is gone under: the rod shakes, "!!!", and the paw shows where to tap. */
+    /** The bobber is gone under: the rod shakes, "!!!", and the paw says: tap! */
     private void bitten() {
         if (phase != Phase.WAITING) {
             return;
@@ -266,19 +257,17 @@ public class FishingFeature implements PlayerFeature {
         hud.say(BITE, null, BITE_SECONDS);
         face().play(UiImage.TEEMO_HAPPY, BITE_SECONDS);
         Stage ui = context.getUiStage();
-        Vector2 target = ui.screenToStageCoordinates(context.getGameStage().stageToScreenCoordinates(bitePlace.cpy()));
-        prompt = new BitePrompt(resources, ui, target, BITE_SECONDS,
-                this::hooked, this::gotAway);
+        prompt = new BitePrompt(resources, ui, BITE_SECONDS, this::hooked, this::gotAway);
         ui.addActor(prompt);
     }
 
-    /** It bobbed the longest wait and no fish came: the line comes out, the face is sad (as when one gets away). */
+    /** It bobbed the longest wait and no fish came: the line comes out, the face sweats (all that waiting). */
     private void noFish() {
         if (phase != Phase.WAITING) {
             return;
         }
         reelIn();
-        face().play(UiImage.TEEMO_SAD, SAD_SECONDS);
+        face().play(UiImage.TEEMO_SWEAT, SAD_SECONDS);
     }
 
     /** Tapped in time: the fishing game. */
@@ -286,7 +275,8 @@ public class FishingFeature implements PlayerFeature {
         prompt = null;
         phase = Phase.GAME;
         Stage ui = context.getUiStage();
-        game = new RhythmGame(resources, ui, rules, new RhythmGame.Listener() {
+        prize = new Fish(FishType.values()[MathUtils.random(FishType.values().length - 1)], resources);
+        game = new RhythmGame(resources, ui, rules, prize.getPicture(), new RhythmGame.Listener() {
             @Override
             public void caught() {
                 face().play(UiImage.TEEMO_HAPPY);
@@ -305,15 +295,20 @@ public class FishingFeature implements PlayerFeature {
         ui.addActor(game);
     }
 
-    /** No tap in time: the fish is gone. */
+    /** No tap in time: the fish is gone, leaping out of the water where the bobber was and back in. */
     private void gotAway() {
         prompt = null;
+        context.getGameStage().addActor(
+                CatchFlight.gotAway(resources, bitePlace, player.getTile().getWidth() * GOT_AWAY_SIZE));
         face().play(UiImage.TEEMO_SAD, SAD_SECONDS);
         player.stopFishing();
         phase = Phase.READY;
     }
 
-    /** The fishing game is over: a fish (won) or a sad face. */
+    /**
+     * The fishing game is over: won, the rabbit pulls the line out and the fish flies from where the bobber was to it,
+     * then goes into the backpack; lost, a sad face.
+     */
     private void landed(boolean won) {
         game = null;
         if (!won) {
@@ -329,7 +324,13 @@ public class FishingFeature implements PlayerFeature {
                 .getAnimationDuration() + 0.3f;
         face().play(UiImage.TEEMO_COOL_ON);
         coolIn = resources.getUiAnimation(UiImage.TEEMO_COOL_ON).getAnimationDuration();
-        Fish fish = new Fish(FishType.values()[MathUtils.random(FishType.values().length - 1)], resources);
+        Fish fish = prize;
+        context.getGameStage().addActor(new CatchFlight(fish.getPicture(), bitePlace, player.getCenter(),
+                player.getTile().getWidth(), FLIGHT_SECONDS, () -> collect(fish)));
+    }
+
+    /** The caught fish is at the rabbit: into the backpack. */
+    private void collect(Fish fish) {
         if (!player.getInventory().add(fish)) {
             // the backpack is full: next to the rabbit; with no free tile there either, it isn't collected
             thrower.throwOut(fish, player.getTile(), player.getCenter());

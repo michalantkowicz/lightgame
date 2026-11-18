@@ -22,6 +22,8 @@ import com.mantkowicz.light.resources.Sprite;
 public class Bobber extends Group {
     /** The fishing line: how thick, how see-through. */
     private static final float LINE_WIDTH = 8, LINE_ALPHA = 0.55f;
+    /** Drawn at this part of the pack's size (the owner found it too big next to the rabbit). */
+    private static final float SIZE = 0.75f;
     private final Drawable lineTexture;
     private Image line;
     /** What the bobber does now, e.g. "bob"; "gone" once it is pulled under. */
@@ -41,7 +43,7 @@ public class Bobber extends Group {
         bob = resources.getAnimation(Sprite.FISHING_BOBBER, Action.BOB);
         dip = resources.getAnimation(Sprite.FISHING_BOBBER, Action.DIP);
         splashing = resources.getAnimation(Sprite.FISHING_BOBBER, Action.SPLASH);
-        float size = 32 * WorldScale.PIXEL_SCALE;
+        float size = 32 * WorldScale.PIXEL_SCALE * SIZE;
         setBounds(middle.x - size / 2f, middle.y - size / 2f, size, size);
         splash = picture(splashing.getKeyFrame(0), size);
         splash.setVisible(false);

@@ -3,8 +3,6 @@ package com.mantkowicz.light.ui.fishing;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -17,17 +15,20 @@ import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
 
 /**
- * A fish bites: the paw points at where the bobber went under, pulsing, with a circle next to it that empties (the
- * hold circle of the settings gear, backwards). A tap anywhere on the screen in time hooks the fish; when the circle
+ * A fish bites: a big paw in the bottom right of the screen points at its middle (where the rabbit is: casting centres
+ * the camera on it), a little off it, pulsing, with a circle under it that empties (the hold circle of the settings
+ * gear, backwards). A tap anywhere on the screen in time hooks the fish; when the circle
  * is empty, it is gone. While it is shown, taps don't reach the map or the HUD.
  */
 public class BitePrompt extends Group {
     /** Pixels per pack pixel for the paw and the circle. */
-    private static final float SCALE = 7;
+    private static final float SCALE = 12;
+    /** The paw's finger is this far right of and below the screen's middle (not over the rabbit). */
+    private static final float RIGHT = 50, DOWN = 70;
     private static final float PULSE = 1.2f, PULSE_SECONDS = 0.25f;
 
     private final TextureRegion[] circle;
-    private final Image ring;
+    private final Image ring, paw;
     private final float seconds;
     private final Runnable tapped, tooLate;
     private float left;
@@ -35,27 +36,21 @@ public class BitePrompt extends Group {
 
     /**
      * @param ui      the UI stage: it covers what that shows
-     * @param target  where the paw points, a point on the UI stage (the bobber's last place)
      * @param seconds how long the player has to tap
      * @param tapped  told when the screen is tapped in time
      * @param tooLate told when the time is up
      */
-    public BitePrompt(ResourcesService resources, Stage ui, Vector2 target, float seconds, Runnable tapped,
-            Runnable tooLate) {
+    public BitePrompt(ResourcesService resources, Stage ui, float seconds, Runnable tapped, Runnable tooLate) {
         this.seconds = seconds;
         this.left = seconds;
         this.tapped = tapped;
         this.tooLate = tooLate;
         setName("BITE");
-        Rectangle screen = ScreenArea.of(ui);
-        setBounds(screen.x, screen.y, screen.width, screen.height);
         setTouchable(Touchable.enabled);
 
         TextureRegion pawPicture = resources.getUiImage(UiImage.PAW_POINTING);
-        Image paw = new Image(pawPicture);
+        paw = new Image(pawPicture);
         paw.setSize(pawPicture.getRegionWidth() * SCALE, pawPicture.getRegionHeight() * SCALE);
-        // its finger (the picture's top left) on the target
-        paw.setPosition(target.x - screen.x, target.y - screen.y - paw.getHeight());
         paw.setOrigin(0, paw.getHeight());
         paw.setTouchable(Touchable.disabled);
         paw.addAction(Actions.forever(Actions.sequence(
@@ -66,9 +61,9 @@ public class BitePrompt extends Group {
         circle = resources.getUiAnimation(UiImage.HOLD_CIRCLE).getKeyFrames();
         ring = new Image(new TextureRegionDrawable(circle[circle.length - 1]));
         ring.setSize(circle[0].getRegionWidth() * SCALE, circle[0].getRegionHeight() * SCALE);
-        ring.setPosition(paw.getX() + paw.getWidth() + 8, paw.getY() + paw.getHeight() - ring.getHeight());
         ring.setTouchable(Touchable.disabled);
         addActor(ring);
+        cover(ScreenArea.of(ui));
 
         addListener(new InputListener() {
             @Override
@@ -100,20 +95,19 @@ public class BitePrompt extends Group {
         }
     }
 
-    /**
-     * Still over the whole screen after the window was resized (a phone turned), so any tap hooks; the paw and the
-     * circle stay where they were on the stage.
-     */
+    /** Still over the whole screen after the window was resized (a phone turned), so any tap hooks. */
     private void followTheScreen() {
         Rectangle screen = ScreenArea.of(getStage());
-        float dx = screen.x - getX(), dy = screen.y - getY();
-        if (dx == 0 && dy == 0 && screen.width == getWidth() && screen.height == getHeight()) {
-            return;
+        if (screen.x != getX() || screen.y != getY() || screen.width != getWidth() || screen.height != getHeight()) {
+            cover(screen);
         }
+    }
+
+    /** Over this area; the paw's finger (the picture's top left) a little right of and below its middle. */
+    private void cover(Rectangle screen) {
         setBounds(screen.x, screen.y, screen.width, screen.height);
-        for (Actor child : getChildren()) {
-            child.moveBy(-dx, -dy);
-        }
+        paw.setPosition(screen.width / 2f + RIGHT, screen.height / 2f - DOWN - paw.getHeight());
+        ring.setPosition(paw.getX() + (paw.getWidth() - ring.getWidth()) / 2f, paw.getY() - ring.getHeight() - 16);
     }
 
     /** Seconds left to tap. */

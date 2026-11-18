@@ -1204,14 +1204,20 @@ public final class GameDriver {
         return -1;
     }
 
+    /** In the fishing game, a lane with a fish coming in sight but not on the line yet (a tap scares it), or -1. */
+    public int fishTooEarly() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        for (int lane = 0; rhythmGame != null && lane < rhythmGame.getRound().getRules().lanes(); lane++) {
+            if (rhythmGame.getRound().isTooEarly(lane)) {
+                return lane;
+            }
+        }
+        return -1;
+    }
+
     /** In the fishing game, a short tap on a lane's net (0 the left one). */
     public void tapNet(int lane) {
         tap(uiScreenPosition(fishingFeature().getGame().getNet(lane)));
-    }
-
-    /** In the fishing game, is this lane's net tangled now (a tap with no fish on the line: it catches nothing)? */
-    public boolean netTangled(int lane) {
-        return fishingFeature().getGame().getRound().isTangled(lane);
     }
 
     /** Is the fishing game's window over all the UI stage shows now (also after a resize)? */
