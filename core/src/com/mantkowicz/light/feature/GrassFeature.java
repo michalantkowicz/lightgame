@@ -8,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.Collectible;
 import com.mantkowicz.light.actor.Grass;
 import com.mantkowicz.light.actor.PictureBubble;
-import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileContent;
@@ -17,9 +16,6 @@ import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.map.TileGrass;
-import com.mantkowicz.light.resources.Action;
-import com.mantkowicz.light.resources.Sprite;
-import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.util.Dice;
 
 import java.util.ArrayDeque;
@@ -32,7 +28,8 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Grass grows on the map, and the rabbit cuts it with its scythe ({@link com.mantkowicz.light.debug.FeatureFlag#GROWING_GRASS}).
+ * Grass grows on the map ({@link com.mantkowicz.light.debug.FeatureFlag#GROWING_GRASS}), also while the player is on
+ * another map; the rabbit cuts it with its scythe ({@link GrassCuttingFeature}, only where the player is).
  * <ul>
  * <li>At the start there is the grass the map puts on its tiles (Tiled's GRASS objects, {@link TileGrass}), as far
  * grown as they say.</li>
@@ -43,9 +40,7 @@ import java.util.Set;
  * there, a bush and a big bush are drawn over them ({@link #TALL_ALPHA}), over everything on the map but the wish
  * bubbles (wishes stay readable); only the HUD and the action buttons are in front. It changes nothing else: it blocks nothing, taps go
  * through it.</li>
- * <li>Standing still on grass the rabbit has the scythe on the HUD's tool button (the big round button right of the
- * face, the hint elsewhere): tapped, it swings it once (0.8 s) and the grass on its tile and on every tile around it
- * (diagonally too) fades out ({@link #FADE_SECONDS}). Walking off meanwhile, the grass stays.</li>
+ * <li>Standing still on grass the rabbit has the scythe on the HUD's tool button: see {@link GrassCuttingFeature}.</li>
  * </ul>
  * Its dice are its own (a copy of the game's at the start, which it doesn't draw from), so the animals' choices stay
  * as they are with or without grass.
@@ -67,22 +62,17 @@ public class GrassFeature implements Feature {
 
     private final GameContext context;
     private final Player player;
-    private final Hud hud;
     private final RandomXS128 random;
     /** Short grass: right over the board, under everyone. Tall grass: over everyone. */
     private final Group below = new Group(), above = new Group();
     private final Map<Tile, Grass> grass = new LinkedHashMap<>();
     private List<Tile> reachable;
     private float sinceSprouts;
-    /** Is the scythe on the tool button now? */
-    private boolean scytheShown;
-    /** Where the rabbit stands swinging its scythe, until the grass there and around is cut; null otherwise. */
-    private Tile cuttingAt;
 
-    public GrassFeature(GameContext context, Player player, Hud hud) {
+    /** @param player the map's rabbit: grass sprouts where it can get to */
+    public GrassFeature(GameContext context, Player player) {
         this.context = context;
         this.player = player;
-        this.hud = hud;
         this.random = Dice.copyOfTheGames();
         below.setTouchable(Touchable.disabled);
         above.setTouchable(Touchable.disabled);
@@ -116,8 +106,6 @@ public class GrassFeature implements Feature {
                 above.addActor(tuft);
             }
         }
-        cut();
-        showScythe();
     }
 
     /** Tall grass over whoever was added to the map since, but under the wish bubbles (they stay in front). */
@@ -177,11 +165,11 @@ public class GrassFeature implements Feature {
         if (reachable != null) {
             return reachable;
         }
-        reachable = new ArrayList<>();
         Tile start = player.getTile();
         if (start == null) {
-            return reachable; // no player on the map yet: try again next time
+            return List.of(); // the rabbit hasn't been on this map yet (it comes through a door): try again next time
         }
+        reachable = new ArrayList<>();
         Set<Tile> seen = new HashSet<>();
         Deque<Tile> next = new ArrayDeque<>();
         next.add(start);
@@ -216,57 +204,19 @@ public class GrassFeature implements Feature {
         return true;
     }
 
-    // cutting
+    // what the scythe cuts (GrassCuttingFeature)
 
-    /**
-     * The scythe has swung: the grass on the rabbit's tile and on every tile around it (diagonally too) fades out; if
-     * the rabbit walked off meanwhile, it all stays.
-     */
-    private void cut() {
-        if (cuttingAt == null || player.isScything()) {
-            return;
-        }
-        Tile at = cuttingAt;
-        cuttingAt = null;
-        if (Status.MOVEMENT.equals(player.getStatus()) || player.getTile() != at) {
-            return;
-        }
-        for (Grass tuft : grassAround(at)) {
+    /** Is there grass on this tile? */
+    boolean hasGrass(Tile tile) {
+        return grass.containsKey(tile);
+    }
+
+    /** One swing of the scythe: the grass on this tile and on every tile around it (diagonally too) fades out. */
+    void cutAround(Tile tile) {
+        for (Grass tuft : grassAround(tile)) {
             grass.remove(tuft.getTile());
             tuft.cutDown(FADE_SECONDS);
         }
-    }
-
-    /**
-     * Standing still on grass (or swinging at it) the rabbit has the scythe on the HUD's tool button; elsewhere (also
-     * just next to grass) the button is the hint again.
-     */
-    private void showScythe() {
-        boolean scythe = cuttingAt != null || canCut();
-        if (scythe && !scytheShown) {
-            hud.getToolButton().setTool(SCYTHE,
-                    context.getResourcesService().getAnimation(Sprite.SCYTHE_ICON, Action.ICON)
-                            .getKeyFrame(0),
-                    this::cutHere);
-        } else if (!scythe && scytheShown) {
-            hud.getToolButton().resetTool();
-        }
-        scytheShown = scythe;
-    }
-
-    /** The tool button with the scythe tapped: the rabbit swings it at the grass where it stands and around. */
-    private void cutHere() {
-        if (canCut()) {
-            cuttingAt = player.getTile();
-            player.scythe();
-        }
-    }
-
-    /** The rabbit stands still on grass and isn't swinging already. */
-    private boolean canCut() {
-        Tile tile = player.getTile();
-        return cuttingAt == null && tile != null && Status.IDLE.equals(player.getStatus())
-                && grass.containsKey(tile);
     }
 
     /** The grass on this tile and on every tile around it, diagonally too: what one swing of the scythe cuts. */

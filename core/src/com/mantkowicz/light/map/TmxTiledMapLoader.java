@@ -21,6 +21,7 @@ import com.mantkowicz.light.board.TileFactory;
 import com.mantkowicz.light.board.TileGraphic;
 import com.mantkowicz.light.board.TileType;
 import com.mantkowicz.light.board.WorldScale;
+import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.map.TileSet.TilesetProperties;
 import com.mantkowicz.light.resources.ResourcesService;
 
@@ -50,6 +51,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
     static final String COLLISION_LAYER = "collision";
     static final String WALLS_LAYER = "walls";
     private static final String AMBIENT_LIGHT = "ambientLight";
+    private static final String FEATURES_OFF = "featuresOff";
     private static final String ATLAS = "atlas";
 
     private final ResourcesService resourcesService;
@@ -159,6 +161,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         TilesetProperties tilesetProperties = new TilesetProperties();
         tilesetProperties.setTileSize(of(WorldScale.TILE_SIZE, WorldScale.TILE_SIZE));
         readAmbientLight(tiledMap, fileName, tilesetProperties);
+        readFeaturesOff(tiledMap, tilesetProperties);
 
         TileSet tileSet = new TileSet();
         tileSet.setTiles(tiles);
@@ -252,6 +255,19 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
                     fileName + ": map property " + AMBIENT_LIGHT + " must be a number from 0 "
                             + "(dark) to 1 (daylight), not '" + value + "'",
                     e);
+        }
+    }
+
+    /** The map's 'featuresOff' property, e.g. "GROWING_GRASS": a name that isn't a {@link FeatureFlag} fails here. */
+    private static void readFeaturesOff(TiledMap tiledMap, TilesetProperties tilesetProperties) {
+        Object value = tiledMap.getProperties().get(FEATURES_OFF);
+        if (value == null) {
+            return;
+        }
+        for (String name : String.valueOf(value).split(",")) {
+            if (!name.trim().isEmpty()) {
+                tilesetProperties.switchOff(FeatureFlag.valueOf(name.trim()));
+            }
         }
     }
 

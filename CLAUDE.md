@@ -44,7 +44,20 @@ Layers, each using only those below: leaves (`util`, `debug`, `resources`, `stag
 `ui.hud`, `ui.menu`, `ui.collect`) → application (`feature`, `game`). No package cycles. If a rule blocks a sensible
 design, change the rule on purpose in its own PR.
 
-- `GameScreen` builds everything and hands a `GameContext` (services, plain `Stage`s) to game objects.
+- `GameScreen` holds the maps: each one an `Area` (board, stages, lights, its own event bus and features), which hands
+  a `GameContext` (services, plain `Stage`s) to its game objects. A `DOOR` tile leads to another map (`DoorFeature`);
+  every map a chain of doors leads to is built at the start. Every map acts each frame (fields grow, animals live),
+  only the player's one is drawn. Each map has its own `Player`, sharing `Player.Shared` (backpack, stamina): what
+  must go along through a door belongs there.
+  - **Two kinds of feature**: one about the map (grass growing, doors) is a plain `Feature` and runs on every map; one
+    about the player (camera, collecting, creatures next to it, the scythe) is a `PlayerFeature`, runs only on the
+    player's map, and in `playerLeft()` takes away what it shows once on the shared HUD (a tool). Action buttons
+    over the map left go by themselves; the hint is set by the new map every frame.
+  - A map can switch features off for itself: map property `featuresOff`, `FeatureFlag` names (e.g. `GROWING_GRASS`
+    in the coop); check `TilesetProperties.isOn(flag)` where the feature is created.
+  - **A character goes through doors** when it says so (`GameBoardActor.goesThroughDoors` and `moveTo`, as
+    `FarmAnimal` does): a new animal on the other map, carrying `FarmAnimal.Shared` (hunger, wish...). What must
+    stay as it was through a door belongs there; the rest starts again.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
@@ -56,8 +69,9 @@ design, change the rule on purpose in its own PR.
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).
 - The board tracks `TileOccupant`s and `TileContent`s and knows nothing of actors or the map.
 - HUD (`ui.hud`): the face (`Portrait`, idle and reactions), backpack slots, stamina bar, the **tool button** (the big
-  round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, else the
-  hint), the hold-to-open settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
+  round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, the door on
+  the door it came out of, else the hint; a tool shows only over the hint and resets only itself), the hold-to-open
+  settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
   the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`; tapping the backpack slot with its wish feeds it too, tapping its wish bubble walks the player to it). Collecting: a
   chest's button throws its items onto free tiles (`ItemThrower`), the player picks them up by walking onto them.
 

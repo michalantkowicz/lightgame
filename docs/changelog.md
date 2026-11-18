@@ -1037,3 +1037,93 @@ by a chicken, slowly enough that the player can still save it.
   one-line `isNextToPlayer` was inlined into `canStroke`.
 - Tests: `CowTest.tappingTheWishBubbleWalksNextToTheCow`, `CowTest.tappingTheSlotWithTheWishGivesItToTheCow`;
   `GameDriver.tapWishBubble`. No golden changed.
+
+## 2026‑11‑17, doors to other maps: the chicken coop (branch `ccr-7d84cbcc-88svyo`)
+
+- Owner's request: the player can go into the chicken coop and out again, and both maps keep living (a watered field
+  grows while the player is in the coop). Animals live on in full and go through doors too; a door can say who may
+  pass. Options discussed first: one big map with regions vs. separate maps all acting each frame (measured on
+  desktop: a second farm-sized map acting unseen costs ~50 µs a frame, drawing it as part of one big map without
+  culling ~150 µs plus twice the vertices); the owner chose separate maps.
+- **`game.Area`**: what `GameScreen` built for its one map (board, game/notification/menu stages, its own physics world
+  and lights, its own `GameEventService`, its features) is now one area per map, with its `GameContext`. `GameScreen`
+  keeps the areas by file name, the UI stage and the HUD; each frame every area acts, the player's one is also drawn
+  (with its lights) and gets the taps; the others act behind the scenes before its features (so what they tell the
+  shared HUD, e.g. "no hint", is overridden by the player's map). Its PMD baseline exception moved with that code
+  to `Area`. `Main` no longer makes the physics world or the event bus (each area has its own).
+- **Doors**: Tiled's `DOOR` object (`TileDoor`: `door` name, `targetMap`, optional `passes`, e.g. `PLAYER,CHICKEN`),
+  run by `DoorFeature`: whoever *ends its walk* on a door (walking over it takes nobody through) and is let through
+  goes to the door with the same name on the other map (`Travel`, implemented by `GameScreen`). Whoever came out of a
+  door stays until it has walked off and back on. A map is built the first time someone goes there (so a level's
+  goldens don't change until then; building a farm-sized map takes ~12–15 ms, hidden behind the curtain).
+- **The player** goes behind a `Curtain` (the screen darkens 0.3 s, the player comes out on the other map, the camera
+  is over it at once, the screen lightens 0.3 s; taps wait meanwhile). Each map has its own `Player`, on the map only
+  while the player is there (`GameBoardActor.leaveBoard`); they share the backpack and stamina
+  (`Player(context, elsewhere)`), so each map's features keep their rabbit. The HUD follows the player:
+  `Hud.enter(events, throwOut, giveAway)` replaces `Hud.setGiveAway` (it also rebinds the events and the slot's throw
+  out). Action buttons over things on the map left go at once. With no free tile at the door, one comes out on the
+  nearest free tile.
+- **Animals**: a farm animal on a door comes out on the other side at once, as a new animal of the same kind
+  (`FarmAnimal.moveTo`): as hungry, wishing for the same, as long since a stroke; its state machine starts again
+  (it looks around first, then wishes again if hungry). Its tile is freed and the arrival tile blocked
+  (`SpriteActor.leaveBoard`, `comeOnto`). Who goes through doors is the character's own say
+  (`GameBoardActor.goesThroughDoors`, `moveTo`; the player and the farm animals), so a new one needs no change in
+  `DoorFeature` or `GameScreen`. The dog doesn't (yet).
+- `GrassFeature` kept an empty list of the tiles the rabbit can reach when it was first asked before the rabbit was on
+  the map (its comment said "try again next time"); now it does try again, as a map entered later needs.
+- **The coop** (`assets-src/maps/coop.tmx`, a simple version to be redrawn in Tiled): a dirt floor between two
+  fences, a water trough, a torch (`ambientLight` 0.55), one chicken, its door (the ramp) letting in only the rabbit
+  and chickens. Map property `growingGrass=false`: no grass grows inside. On level 1 the coop's ramp (17, 8) is
+  walkable now and is its door. Made from tiles the atlas already had (the pack isn't in the build machine): the game
+  copies were written with `build_assets.py`'s own functions, `tiles.atlas` is unchanged.
+- Tests: `TravelTest` (the field grows while the rabbit is in the coop, the backpack goes along, the curtain, staying
+  on the door; a chicken goes through by itself and wishes as hungry as it was; the cow stays out; every field of a
+  chicken and a cow is carried through a door or named as starting again, so a field added later and forgotten in
+  `moveTo` fails it),
+  `ShippedMapsTest` (maps behind a door have no PLAYER; every door leads to a shipped map with its pair and can be
+  walked to). `GameDriver` reads the player's area (`currentMap`, `visitedMaps`, `whereIs`, `doors`, `curtain`,
+  `animalStateOnAnyMap`, `fieldsNotCarriedThroughADoor`); `TestMap.pathOf`. No golden changed.
+- CLAUDE.md: what to mind when adding a feature (it runs while the player is on another map; the shared HUD) or a
+  character that goes through doors.
+- **After the owner's review** (same day; the owner picked each point):
+  - **No room behind the door**: the curtain came down again and again (taps open one frame in each round). Now
+    `GameScreen` checks for room first: without, no curtain, and the rabbit stays on the door until it has walked
+    off (`Area.stayOnDoor`); the same if a hen takes the last tile while the curtain is coming down.
+  - A door leading to its own map fails `ShippedMapsTest`.
+  - Kept what the branch had removed without asking: `GameScreen.addFeature` (the FPS label uses it again) and
+    `Hud.setGiveAway`. `Hud.enter` is now just `Hud.listenTo(events)`: the HUD is given, once, a throw-out and a
+    give-away that ask the player's map (`GameScreen`), so they need no rebinding; a backpack slot's shake moved to
+    `FaceReactions`, which reads those events anyway (keeps `Hud` under PMD's God Class limit).
+  - `GameBoardActor.comeOnto` (overridden by `SpriteActor`, which blocks its tile) replaces the `instanceof` in
+    `Area.welcome`.
+  - **Player and map features**: `PlayerFeature` (camera, collecting, creatures, the new `GrassCuttingFeature`) runs
+    only on the player's map; `playerLeft()` (nothing by default) takes away what it shows once on the shared HUD:
+    the scythe (the hint is set by the new map every frame; a wish bubble hidden under a button comes back when the
+    player is back). `GrassFeature` only grows grass now, on every map. The other maps no longer have to act before
+    the player's one for the HUD to be right.
+  - **What goes through doors in one object**: `FarmAnimal.Shared` (wish, hunger, last stroke, bites left) is handed to
+    the animal on the other side; `Player.Shared` (backpack, stamina) is what every map's rabbit shares. The reflection
+    test listing an animal's fields not carried over (`GameDriver.fieldsNotCarriedThroughADoor`) went with it.
+  - Map property `featuresOff` (`FeatureFlag` names, e.g. `GROWING_GRASS` in the coop) replaces `growingGrass`.
+  - **Every map a chain of doors leads to is built at the start** (`GameScreen.buildTheMapsBehindDoors`): no hitch
+    mid-game when a hen first walks into the coop; they all live from the first frame. `GameDriver.visitedMaps` is
+    `maps` now. No golden changed.
+  - **Cheaper maps the player isn't on**: no physics step (only static walls, for the lights' shadows), their
+    notification and menu stages don't act; both are cleared when the player leaves.
+  - The FPS label needed nothing: it is on the shared UI stage already.
+  - Tests: `TravelTest` (no room behind the door; the scythe goes when the rabbit goes; a chain of doors builds every
+    map at the start).
+- **After the owner's PR comments** (2026‑11‑18):
+  - **The door on the tool button**: standing still on the door it came out of (also when there was no room on the
+    other side), the rabbit has a door (`UiImage.DOOR_ICON`, the pack's "enter" icon in the question mark's style) on
+    the tool button; tapped, it goes through again as if it had walked onto the door (`DoorToolFeature`, a
+    `PlayerFeature`). It goes once the rabbit walks off. A tool now shows only over the hint and resets only itself,
+    so on a door with grass the door comes first and the scythe follows once the rabbit is off it.
+  - **Curtain**: in a wide browser window a strip at the right stayed uncovered: the UI's `ExtendViewport` showed
+    more than the fixed bounds (3 × 800 wide). It now covers exactly what its stage shows, every frame.
+  - `FarmAnimal.Needs` is `FarmAnimal.Shared`, as in `Player`.
+  - `GameScreen` builds maps only at the start (`build`); going through a door just looks the map up (`behind`).
+  - The Q/W keys (fade the game stage) are gone, with their test (`ShaderAndLightTest.qFadesAndWRestores`) and golden
+    (`fade-shader`), as the owner asked. `GameStage.fadeOut/fadeIn` and `GameDriver.pressKey` stay (unused now).
+  - Tests: `TravelTest.theDoorOnTheToolButtonTakesTheRabbitBack`; in the scythe test the coop's tool button shows the
+    door now.

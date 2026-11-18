@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="12" height="9" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="5">
+ <properties>
+  <property name="ambientLight" type="float" value="0.55"/>
+  <property name="featuresOff" value="GROWING_GRASS"/>
+ </properties>
+ <tileset firstgid="1" source="../tilesets/darker_soil_ground_tiles.tsx"/>
+ <tileset firstgid="78" source="../tilesets/fences.tsx"/>
+ <tileset firstgid="110" source="../tilesets/chicken_houses.tsx"/>
+ <tileset firstgid="374" source="../tilesets/water_tray.tsx"/>
+ <layer id="1" name="floor" width="12" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="fences" width="12" height="9">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,83,84,84,84,84,84,84,84,84,85,0,
+0,0,0,0,0,0,0,0,374,375,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,83,84,84,85,282,83,84,84,84,85,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="3" name="collision" width="12" height="9" opacity="0.4">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,69,69,69,69,69,69,69,69,69,69,0,
+0,0,0,0,0,0,0,0,69,69,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,
+0,69,69,69,69,0,69,69,69,69,69,0,
+0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <objectgroup id="4" name="objects">
+  <object id="1" name="DOOR" x="84" y="116" width="8" height="8">
+   <properties>
+    <property name="door" value="coop"/>
+    <property name="objectClass" value="DOOR"/>
+    <property name="passes" value="PLAYER,CHICKEN"/>
+    <property name="targetMap" value="maps/level1.tmx"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="2" name="CHICKEN" x="52" y="68" width="8" height="8">
+   <properties>
+    <property name="objectClass" value="CHICKEN"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="3" name="LIGHT" x="100" y="52" width="8" height="8">
+   <properties>
+    <property name="lightType" value="TORCH"/>
+    <property name="objectClass" value="LIGHT"/>
+   </properties>
+   <ellipse/>
+  </object>
+ </objectgroup>
+</map>

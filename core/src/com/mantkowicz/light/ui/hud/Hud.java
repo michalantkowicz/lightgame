@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
@@ -78,7 +77,6 @@ public class Hud extends Group {
     private static final float GEAR_MARGIN = 48;
 
     private final ResourcesService resources;
-    private final GameEventService events;
     private final Player player;
     /** Throws the item in a backpack slot out next to the player. */
     private final IntPredicate throwOut;
@@ -108,7 +106,6 @@ public class Hud extends Group {
     public Hud(GameContext context, Player player, IntPredicate throwOut) {
         this.throwOut = throwOut;
         this.resources = context.getResourcesService();
-        this.events = context.getGameEventService();
         this.player = player;
         setTouchable(Touchable.childrenOnly);
 
@@ -118,7 +115,8 @@ public class Hud extends Group {
         addActor(row);
 
         face = new Portrait(resources, "teemo", AWAKE);
-        reactions = new FaceReactions(events, resources, face, (text, seconds) -> say(text, null, seconds));
+        reactions = new FaceReactions(context.getGameEventService(), resources, face,
+                (text, seconds) -> say(text, null, seconds), this::shake);
         keepTaps(face, reactions::tapped);
         row.addActor(face);
 
@@ -160,6 +158,14 @@ public class Hud extends Group {
     }
 
     /**
+     * The map the player is in (the first one, or another one through a door): from now on the HUD reacts to what
+     * happens there. What it shows (the backpack, the stamina) goes with the player.
+     */
+    public void listenTo(GameEventService events) {
+        reactions.listenTo(events);
+    }
+
+    /**
      * A tap on a backpack slot first offers its item here (0 = the left slot), e.g. to a cow next to the player wishing
      * for it; only when this says false does the item jump out next to the player.
      */
@@ -189,12 +195,7 @@ public class Hud extends Group {
     public void act(float delta) {
         followCamera();
         showBackpack();
-        for (BackpackItemEjectedEvent ejected = events
-                .poll(BackpackItemEjectedEvent.class); ejected != null; ejected = events
-                        .poll(BackpackItemEjectedEvent.class)) {
-            shake(ejected.getSlot());
-        }
-        reactions.react();
+        reactions.react(); // a slot an item was taken out of shakes, the face reacts
         UiImage mood = stamina.getMood();
         face.setIdle(mood == UiImage.MOOD_SAD ? ASLEEP : mood == UiImage.MOOD_NEUTRAL ? TIRED : AWAKE);
         super.act(delta);

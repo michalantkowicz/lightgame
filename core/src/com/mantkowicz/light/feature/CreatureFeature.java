@@ -35,8 +35,11 @@ import java.util.function.BooleanSupplier;
  * once the button with the wish is gone, the bubble is back. With several creatures next to the player (restless
  * chickens) each button is for one of them and stays over it: the wish button for one wishing for something the
  * player carries (else any wishing one), the hand for that one too if it can be stroked (else any that can).
+ * <p>
+ * Only on the map the player is in ({@link PlayerFeature}); nothing to take away when it goes: its buttons go with the
+ * map, the player's new map sets the hint, and a bubble hidden under the wish button comes back when it is back.
  */
-public class CreatureFeature implements Feature {
+public class CreatureFeature implements PlayerFeature {
     /** What the hint says next to a creature wishing for something the player doesn't carry; the item's picture follows. */
     static final String FIND = "find";
     /**

@@ -10,7 +10,7 @@ import com.mantkowicz.light.event.GameEventService;
 
 import static com.mantkowicz.light.debug.Debug.Tool.CAMERA_TRACKING_BOX;
 
-public class CameraTrackingFeature implements Feature {
+public class CameraTrackingFeature implements PlayerFeature {
     private static final float DISTANCE_LEFT_RIGHT = 420;
     private static final float DISTANCE_TOP_BOTTOM = 420;
 
@@ -43,6 +43,14 @@ public class CameraTrackingFeature implements Feature {
                 gentlyStopCameraIfNecessary();
             }
         }
+    }
+
+    /** The camera is over this actor at once and follows it from now on (it came out of a door onto this map). */
+    public void jumpTo(GameBoardActor actor) {
+        this.actor = actor;
+        cameraActor.clearActions();
+        cameraActor.setPosition(actor.getCenter());
+        interval.setZero();
     }
 
     private void handleLookAtMeEvent() {

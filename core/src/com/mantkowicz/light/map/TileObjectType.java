@@ -24,6 +24,8 @@ public enum TileObjectType {
     DOG,
     /** Grass on a tile, grown as far as its phase property says ({@link TileGrass}). */
     GRASS,
+    /** A way to another map: whoever ends its walk on this tile comes out on the other map ({@link TileDoor}). */
+    DOOR,
     // sprite actors
     CHEST((context, properties) -> new Chest(context)),
     COW((context, properties) -> new Cow(context,

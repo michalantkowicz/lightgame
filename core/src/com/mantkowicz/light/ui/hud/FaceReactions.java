@@ -2,6 +2,7 @@ package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.math.RandomXS128;
 import com.mantkowicz.light.character.FieldHarvestedEvent;
+import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
@@ -9,6 +10,7 @@ import com.mantkowicz.light.util.Dice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntConsumer;
 
 /**
  * How the HUD's face reacts to what happens in the game. To the field: picking a crop makes it happy
@@ -35,24 +37,39 @@ class FaceReactions {
         void say(String text, float seconds);
     }
 
-    private final GameEventService events;
+    private GameEventService events;
     private final ResourcesService resources;
     private final Portrait face;
     private final Speaker speaker;
+    /** Shakes a backpack slot (0 = the left one). */
+    private final IntConsumer shakeSlot;
     /** Its own dice: a tap doesn't change what the animals do next. */
     private final RandomXS128 dice = Dice.copyOfTheGames();
     /** What the last tap played (a new tap may replace it), or null. */
     private UiImage tapped;
 
-    FaceReactions(GameEventService events, ResourcesService resources, Portrait face, Speaker speaker) {
+    /** @param shakeSlot shakes a backpack slot an item was taken out of ({@link BackpackItemEjectedEvent}) */
+    FaceReactions(GameEventService events, ResourcesService resources, Portrait face, Speaker speaker,
+            IntConsumer shakeSlot) {
         this.events = events;
         this.resources = resources;
         this.face = face;
         this.speaker = speaker;
+        this.shakeSlot = shakeSlot;
     }
 
-    /** Reacts to what happened since the last frame. */
+    /** From now on reacts to what happens on this map (the player went through a door). */
+    void listenTo(GameEventService events) {
+        this.events = events;
+    }
+
+    /** Reacts to what happened since the last frame: a slot an item was taken out of shakes, the face reacts. */
     void react() {
+        for (BackpackItemEjectedEvent ejected = events
+                .poll(BackpackItemEjectedEvent.class); ejected != null; ejected = events
+                        .poll(BackpackItemEjectedEvent.class)) {
+            shakeSlot.accept(ejected.getSlot());
+        }
         for (FieldHarvestedEvent harvested = events.poll(
                 FieldHarvestedEvent.class); harvested != null; harvested = events.poll(FieldHarvestedEvent.class)) {
             if (harvested.isWeed()) {
