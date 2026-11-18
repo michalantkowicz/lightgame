@@ -20,6 +20,11 @@ public abstract class TileObject implements TileContent {
 
     public abstract void prepare(Tile tile, GameContext context);
 
+    /** Nothing grows on its tile (no grass sprouts there), e.g. a fishing spot. */
+    public boolean keepsClear() {
+        return false;
+    }
+
     @Override
     public abstract boolean isAccessible();
 }

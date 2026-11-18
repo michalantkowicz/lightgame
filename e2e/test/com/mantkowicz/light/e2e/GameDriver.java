@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.mantkowicz.light.actor.Bobber;
 import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.FloatingPicture;
@@ -57,10 +58,12 @@ import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.FishingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileDoor;
+import com.mantkowicz.light.map.TileFishingSpot;
 import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
@@ -72,6 +75,9 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
+import com.mantkowicz.light.ui.fishing.BitePrompt;
+import com.mantkowicz.light.ui.fishing.LeapGame;
+import com.mantkowicz.light.ui.fishing.LeapRound;
 import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
@@ -590,6 +596,9 @@ public final class GameDriver {
             String name = crop.getType().getName();
             return Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
+        if (item instanceof com.mantkowicz.light.actor.Fish fish) {
+            return "Fish(" + fish.getType().name().toLowerCase() + ")";
+        }
         return item.getClass().getSimpleName();
     }
 
@@ -1105,6 +1114,102 @@ public final class GameDriver {
         }
     }
 
+    // fishing (feature.FishingFeature)
+
+    /** Switches fishing (FeatureFlag.FISHING, on as the game ships) on or off, for games started from now on. */
+    public static void fishing(boolean on) {
+        if (on) {
+            FeatureFlag.FISHING.switchOn();
+        } else {
+            FeatureFlag.FISHING.switchOff();
+        }
+    }
+
+    /** How hard the fishing game is from now on, 0 .. 1 (0.15 as the game ships; 0.45 suits a 5-year-old, 0.8 an 8). */
+    public static void fishingLevel(float level) {
+        FishingFeature.setLevel(level);
+    }
+
+    private FishingFeature fishingFeature() {
+        for (Feature feature : this.<List<Feature>>screenField("features")) {
+            if (feature instanceof FishingFeature fishing) {
+                return fishing;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Where the fishing is at: "READY", "CASTING", "WAITING" (the bobber in the water), "BITE" (tap now!), "GAME" (the
+     * fishing game is open), "LANDING" (pulling a caught fish out); "none" without the feature.
+     */
+    public String fishing() {
+        FishingFeature fishing = fishingFeature();
+        return fishing == null ? "none" : fishing.getPhase().name();
+    }
+
+    /** The bobber: what it does ("drop", "bob", "dip") and its cell, e.g. "bob at (2,2)"; "none" without one. */
+    public String bobber() {
+        FishingFeature fishing = fishingFeature();
+        Bobber bobber = fishing == null ? null : fishing.getBobber();
+        if (bobber == null || bobber.getStage() == null) {
+            return "none";
+        }
+        Tile tile = boardService().getTileAt(bobber.getMiddle());
+        return bobber.getDoing() + " at " + (tile == null ? "?" : cellOf(tile));
+    }
+
+    /** The cells of the map's fishing spots. */
+    public List<Cell> fishingSpots() {
+        List<Cell> cells = new ArrayList<>();
+        for (Tile tile : fishingFeature().getSpots()) {
+            cells.add(cellOf(tile));
+        }
+        cells.sort(java.util.Comparator.comparing(Cell::toString));
+        return cells;
+    }
+
+    /** The paw's prompt after a bite: seconds left to tap, or -1 without it. */
+    public float biteSecondsLeft() {
+        BitePrompt prompt = fishingFeature().getPrompt();
+        return prompt == null || prompt.getStage() == null ? -1 : prompt.getSecondsLeft();
+    }
+
+    /** A short tap in the middle of the screen (anywhere: e.g. to hook a fish, or in the fishing game). */
+    public void tapAnywhere() {
+        tap(new Vector2(game.screenWidth() / 2f, game.screenHeight() / 2f));
+    }
+
+    /**
+     * The fishing game: "caught 1, missed 0, leaps 3" and, while a fish leaps, "fish at 0.70 (green from 0.62)";
+     * "none" when it isn't open.
+     */
+    public String fishingGame() {
+        LeapGame leapGame = fishingFeature() == null ? null : fishingFeature().getGame();
+        if (leapGame == null || leapGame.getStage() == null) {
+            return "none";
+        }
+        LeapRound round = leapGame.getRound();
+        return String.format(java.util.Locale.ROOT, "caught %d, missed %d, leaps %d%s", round.getCaught(),
+                round.getMissed(), round.getLeaps(), round.isLeaping()
+                        ? String.format(java.util.Locale.ROOT, ", fish at %.2f (green from %.2f)", round.height(),
+                                round.getGreenFrom())
+                        : "");
+    }
+
+    /** In the fishing game, is the leaping fish in the green zone right now (a tap catches it)? */
+    public boolean fishInGreen() {
+        LeapGame leapGame = fishingFeature().getGame();
+        return leapGame != null && leapGame.getRound().isLeaping()
+                && leapGame.getRound().height() >= leapGame.getRound().getGreenFrom();
+    }
+
+    /** In the fishing game, is a fish in the air right now? */
+    public boolean fishLeaping() {
+        LeapGame leapGame = fishingFeature().getGame();
+        return leapGame != null && leapGame.getRound().isLeaping();
+    }
+
     // grass (feature.GrassFeature)
 
     /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
@@ -1521,6 +1626,8 @@ public final class GameDriver {
             return "GRASS";
         if (object instanceof TileDoor)
             return "DOOR";
+        if (object instanceof TileFishingSpot)
+            return "FISHING_SPOT";
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 

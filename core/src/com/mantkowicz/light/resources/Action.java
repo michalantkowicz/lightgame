@@ -7,7 +7,13 @@ package com.mantkowicz.light.resources;
  * build/assets-preview/index.html.
  */
 public enum Action {
+    BITE("bite"),
+    BOB("bob"),
+    CAST("cast"),
+    CAUGHT("caught"),
     CHOP("chop"),
+    DIP("dip"),
+    DROP("drop"),
     EAT("eat"),
     FALL("fall"),
     GRAZE("graze"),
@@ -15,13 +21,16 @@ public enum Action {
     HEARTS("hearts"),
     ICON("icon"),
     IDLE("idle"),
+    LEAP("leap"),
     LOVE("love"),
     OPEN("open"),
     OPEN_FRONT("open_front"),
     OPEN_HORIZONTAL("open_horizontal"),
     OPEN_SIDE("open_side"),
     PECK("peck"),
+    PULL("pull"),
     REST("rest"),
+    RIPPLE("ripple"),
     RISE("rise"),
     RUN("run"),
     SCYTHE("scythe"),
@@ -30,6 +39,7 @@ public enum Action {
     SLEEP("sleep"),
     SPLASH("splash"),
     TILL("till"),
+    WAIT("wait"),
     WALK("walk"),
     WATER("water");
 

@@ -16,6 +16,7 @@ import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.map.TileGrass;
+import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.util.Dice;
 
 import java.util.ArrayDeque;
@@ -127,7 +128,7 @@ public class GrassFeature implements Feature {
     private void sprout() {
         List<Tile> sprouting = new ArrayList<>();
         for (Tile tile : reachableTiles()) {
-            if (grass.containsKey(tile)) {
+            if (grass.containsKey(tile) || keptClear(tile)) {
                 continue;
             }
             float chance = hasGrassNextTo(tile) ? CHANCE_NEXT_TO_GRASS : CHANCE;
@@ -138,6 +139,16 @@ public class GrassFeature implements Feature {
         for (Tile tile : sprouting) {
             sprout(tile);
         }
+    }
+
+    /** Something on it keeps grass off ({@link TileObject#keepsClear()}, e.g. a fishing spot). */
+    private static boolean keptClear(Tile tile) {
+        for (TileContent content : tile.getTileObjects()) {
+            if (content instanceof TileObject object && object.keepsClear()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /** Grass sprouts on this tile (a tuft). */

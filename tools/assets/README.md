@@ -14,6 +14,12 @@ python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Pre
 The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
 Python.
 
+**Fishing** uses the Ocean Pack, copied into the sprites pack folder as `Ocean Pack/`: the rabbit fishing (`fishing
+animation side.png`, its rows 1-4 as `cast_left`, `wait_left`, `bite_left`, `pull_left`; a sheet of its own,
+`rabbit_fishing`, because its frames are cut to another box than the rabbit's), the bobber and its splashes
+(`fishing_bobber`), the rod's icon (`fishing_rod_2.png`), the leaping fish (`mediuml fish.png`) and the caught fish
+(`Fish Sprites.png`, first row). The other Ocean Pack files are ignored for now.
+
 **The scythe swing** isn't in the pack. `scythe_animation.py` makes it from the rabbit's `chop_down` row: the axe taken
 out (its four colours appear nowhere else on the rabbit) and a scythe drawn where it was held, a longer handle and a
 curved blade hooking the way each frame needs. It saves a copy of `Characters/Premium Charakter Spritesheet.png` with
@@ -56,7 +62,7 @@ tool again.
    - `collision`: cells with any tile here can't be walked on (the layer is never drawn: keep it hidden);
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
-   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `DOOR`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
+   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `DOOR`, `FISHING_SPOT`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
    property `favouriteDish`: the crops it wishes for, comma-separated, e.g. `CARROT,CUCUMBER` (one of `CORN`,
    `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`); without it, any of them. Each time it gets hungry it picks one at
    random. A `CHEST` holds one crop, picked at random. A `FIELD` grows one crop, its string property `cropType` (one
@@ -68,9 +74,11 @@ tool again.
    `CHICKEN` for chickens and chicks), everyone without it. Whoever ends its walk on the door goes through and comes
    out of the door with the same name on the other map. Only the map the game starts on has a `PLAYER`: on the others
    the rabbit comes out of a door. Draw the door itself on the map (e.g. the coop's ramp); the object draws nothing.
+   A `FISHING_SPOT` is a place to fish from: the rabbit casts into the water two tiles to its left, so put water
+   there. No grass grows on it.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
    Map property `featuresOff` (string): features switched off on this map, comma-separated names of
-   `FeatureFlag`s, e.g. `GROWING_GRASS` inside the coop (no grass grows there); none without it.
+   `FeatureFlag`s, e.g. `GROWING_GRASS` inside the coop (no grass grows there) or `FISHING`; none without it.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 
 Mirrored (X, Y) and rotated (Z) tiles, layer opacity and layer offsets look in the game as in Tiled. Maps must have a

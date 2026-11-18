@@ -56,7 +56,7 @@ public class CameraTrackingFeature implements PlayerFeature {
     private void handleLookAtMeEvent() {
         LookAtMeEvent event = gameEventService.poll(LookAtMeEvent.class);
         GameBoardActor lookedAtActor = event.getActor();
-        cameraActor.centerAt(lookedAtActor.getCenter());
+        cameraActor.centerAt(event.getPoint());
 
         this.actor = lookedAtActor;
     }

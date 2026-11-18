@@ -6,7 +6,9 @@ package com.mantkowicz.light.debug;
  */
 public enum FeatureFlag {
     /** Grass grows on the map and the rabbit cuts it with a scythe ({@code feature.GrassFeature}). */
-    GROWING_GRASS(true);
+    GROWING_GRASS(true),
+    /** The rabbit fishes from the map's fishing spots ({@code feature.FishingFeature}). */
+    FISHING(true);
 
     private final boolean byDefault;
     private boolean on;

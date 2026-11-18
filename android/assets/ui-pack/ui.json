@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "9869506ef8e6677176142c95231029de03ec1c02",
+  "uiJsonSha1": "e853bad2c024841f2f86fea034364a3474576a1e",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -73,6 +73,21 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "emotes_premium/row_19": {
+      "frames": 7,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_22": {
+      "frames": 5,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
+    "emotes_premium/row_24": {
+      "frames": 6,
+      "frameDuration": 0.12,
+      "playMode": "LOOP"
+    },
     "emotes_premium/row_29": {
       "frames": 13,
       "frameDuration": 0.12,
@@ -126,7 +141,13 @@
     "inventory/slot_pressed": {
       "frames": 1
     },
+    "marks/miss": {
+      "frames": 1
+    },
     "mouse_catpaw_mouse_icon": {
+      "frames": 1
+    },
+    "mouse_catpaw_pointing_mouse_icon": {
       "frames": 1
     },
     "play_button/blank": {

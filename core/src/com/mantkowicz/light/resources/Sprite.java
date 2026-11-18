@@ -20,6 +20,17 @@ public enum Sprite {
     GRASS_TUFT("grass_tuft"),
     /** The scythe's item icon (made by tools/assets/scythe_animation.py in the style of the pack's tool icons). */
     SCYTHE_ICON("scythe_icon"),
+    /** The rabbit fishing (facing left): casting, waiting, a bite (the rod shakes), pulling the line out. */
+    RABBIT_FISHING("rabbit_fishing"),
+    /** The bobber in the water: dropping in, bobbing, pulled under, a splash. */
+    FISHING_BOBBER("fishing_bobber"),
+    FISHING_ROD_ICON("fishing_rod_icon"),
+    /** A fish leaping out of the water (the fishing game). */
+    FISH_LEAP("fish_leap"),
+    /** Caught fish: the first five are pink, orange, yellow, green and blue. */
+    FISH_CATCH("fish_catch"),
+    /** The pack's water tile, rippling. */
+    WATER_TILE("water_tile"),
     /** The watering can (the picture on a field's button while it needs water). */
     WATERING_CAN("watering_can"),
     /** Water falling from the can onto a field. */

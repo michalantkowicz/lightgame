@@ -1127,3 +1127,92 @@ by a chicken, slowly enough that the player can still save it.
     (`fade-shader`), as the owner asked. `GameStage.fadeOut/fadeIn` and `GameDriver.pressKey` stay (unused now).
   - Tests: `TravelTest.theDoorOnTheToolButtonTakesTheRabbitBack`; in the scythe test the coop's tool button shows the
     door now.
+
+## 2026‑11‑16, fishing (branch `fishing`)
+
+Owner's request, after choosing the minigame with Haiku play-testers on throwaway mock-ups (10 candidates, then
+finalists, then new fights after the bite when the winner, bite-then-keep-the-fish-in-a-box, turned out to be
+Stardew Valley's; the owner picked "bite, then catch the leap").
+
+- **Fishing spots** in Tiled: objectClass `FISHING_SPOT` (`map.TileFishingSpot`, only a mark). Level 1 has one at the end of
+  a little wooden pier on its left shore (the owner's), (2,6), with water two tiles to its left. No grass grows on a fishing spot.
+- **The rod:** standing still on a fishing spot, the HUD's tool button shows the fishing rod (the Ocean Pack's
+  `fishing_rod_2.png`).
+- **Cast and bite** (`feature.FishingFeature`, feature flag `FISHING`): the rabbit casts (always to the left for now)
+  and the camera centres on it (so the bobber and the paw are on screen); the bobber (`actor.Bobber`, the Ocean
+  Pack's bobber and splash frames) drops into the water two tiles away with a splash, bobs 1–5 times at random, and
+  is pulled under with a splash. The rabbit's rod shakes, the face says "!!!" and plays its happy animation, and a
+  paw points at the place, pulsing, next to a circle emptying in 2 s (`ui.fishing.BitePrompt`; the settings gear's
+  hold circle backwards). A tap anywhere in time hooks the fish; otherwise it is gone and the face is sad
+  (`TEEMO_SAD`, the emotes' row 24).
+- **The fishing game** (`ui.fishing.LeapGame` draws `LeapRound`'s rules): a window like the settings panel (no title,
+  no check mark) with a row of water tiles at the bottom and a green zone at the top. The hooked fish (the Ocean
+  Pack's `mediuml fish.png`, turning in the air) leaps again and again, some leaps into the green zone, some below
+  it. A tap while it is in the green zone catches it (a fish on the right: orange, green, blue from the bottom up; the
+  face happy), a tap while it is elsewhere in the air, or a green leap nobody taps, is a miss (a pink X on the left;
+  the face sad); taps between leaps do nothing; one result per leap. Three catches win, three misses lose; at most
+  15 leaps, at least 6 into the green zone, so doing nothing loses. Won: the rabbit pulls the line out, the face puts
+  its sunglasses on (`TEEMO_COOL_ON`, rows 19 and 22), and a fish of a random colour (`actor.Fish`, the Ocean Pack's
+  `Fish Sprites.png`) goes into the backpack, or next to the rabbit when it is full.
+- **One difficulty number** (`FishingFeature.setLevel`, 0..1, 0.15 as it ships, the age-3 level of the mock-ups;
+  later from the age setting): the leaps' speed, the green zone's size, how close the short leaps come to it, the
+  pauses.
+- **The rabbit fishing** is a sheet of its own (`rabbit_fishing`: its frames are cut to another box than the
+  rabbit's sheet): `AnimationPlugin.pose` holds a pose from another sheet of the same character (looping, or once and
+  then still) until it ends or the rabbit walks off, and `GameActor.fitAvatar` sizes and places the picture for that
+  sheet. `Player.fish` / `stopFishing`. `Hud.say(text, picture, seconds)` is public (the "!!!").
+- Assets: `pack.json` (`rabbit_fishing`, `fishing_bobber`, `fishing_rod_icon`, `fish_leap`, `fish_catch`,
+  `water_tile`; the Ocean Pack's other files ignored for now), `ui.json` (`marks/miss`, the pink X), `UiImage`
+  (`PAW_POINTING`, `MISS`, `TEEMO_SAD`, `TEEMO_COOL_ON`, `TEEMO_COOL`). No golden changed.
+- Tests: `FishingTest` (the rod only on the spot, cast, bobber, bite, no tap in time, winning a fish, doing nothing
+  loses, a miss below the green zone and taps between leaps, walking off, the flag off, level 1's spot).
+  `GameDriver`: `fishing`, `bobber`, `fishingSpots`, `biteSecondsLeft`, `tapAnywhere`, `fishingGame`, `fishInGreen`,
+  `fishLeaping`, `fishingLevel`. Looked at every step in a hidden window.
+- **Play-tested by Haiku agents** (owner's request; each in its own copy of the repo, through `GameDriver` scenarios
+  and hidden-window screenshots). Fixed from round 1:
+  - a caught fish vanished when the backpack was full and no tile around was free (75 of 82 catches in a long run):
+    it lands at the rabbit's feet then (`aCaughtFishIsNeverLost`);
+  - the rabbit's rod ended a tile short of the bobber: a thin line goes from the rod's tip to the bobber
+    (`Bobber.lineFrom`), and goes under with it at the bite;
+  - on a phone the bobber could land off screen: casting centres the camera on the rabbit (`LookAtMeEvent`);
+  - a 3-year-old's tap (0.75 s late) landed at the very end of the green zone: green leaps go higher at low levels
+    (`LeapRound`'s lowest green top 0.92 at level 0, down to just above the zone at 1), about 1 s in the green at
+    0.15;
+  - the leaping fish was tiny: drawn at 8× (128 px), the paw at 7×; the dim behind the game is lighter (40 %) so the
+    face's reactions show; the window closes in the same frame as its result (the next tap isn't swallowed).
+  Fixed from round 2:
+  - the difficulty was flat (5- and 8-year-olds won every game, a 1.2 s 3-year-old never): the leap's speed and the
+    green zone go through three points instead of a straight line (`LeapRound.byAge`: at 0.15 / 0.45 / 0.8 a leap of
+    2.2 / 1.4 / 1.1 s, the green zone from 0.58 / 0.75 / 0.82 up). Simulated children: 3-year-olds (0.75–1.2 s
+    reaction) win 100 %, 5-year-olds 87 % (1.1 misses a game), 8-year-olds 77 % (1.5);
+  - the rod left the tool button while fishing: it stays there the whole time (tapped then, nothing happens);
+  - the leaping fish is drawn at 10×, the line 8 px thick.
+  Left to the owner: a child tapping at random in the game loses about half the time (each tap with the fish in the
+  air but not in the green zone is a miss); a tap on the grass while waiting walks off and takes the line out; won
+  fish pile up on the shore when the backpack is full of crops; a cow may stand on the spot for a while.
+- Owner's changes after trying it (2026‑11‑17): the green zone is half as tall (harder: the fish is in it about half
+  as long at every level; `LeapRound` green from 0.79 / 0.875 / 0.91); two rows of rippling water (the tiles now
+  animate); the catches and the Xs a bit higher above the water; while the fish is in the green zone the paw points
+  at it, pulsing, as at the bite; some low leaps are quick (20 / 35 / 50 % of them at 0.15 / 0.45 / 0.8, in 55 % of
+  a leap's time: low leaps aren't always the slow ones); the window is taller (920); with a full backpack and no free
+  tile next to the rabbit the fish isn't collected (no pile at its feet). The owner moved level 1's spot onto a little
+  wooden pier, (2,6): the camera centres on the rabbit only as far as the map's edge allows (`LookAtMeEvent` may
+  carry a point), so no black shows beyond it.
+- **Rebuilt on master after the doors (2026‑11‑18, owner's request)**, as one commit instead of a merge: the game had
+  become several maps with two kinds of feature meanwhile, so fishing now fits that instead of the old `GameScreen`.
+  - `FishingFeature` is a `PlayerFeature`, made in `Area.startFeatures`: only on the player's map, and a map can switch
+    it off (`featuresOff=FISHING`). Gone to another map, `playerLeft()` takes the line out of the water, removes the
+    bite's paw and the fishing game from the shared UI and puts the rod away.
+  - The rod follows the tool button's rule: it shows only over the hint and resets only itself (the door and the
+    scythe do the same).
+  - Grass doesn't know about fishing any more: a `TileObject` can keep its tile clear (`keepsClear()`, the fishing
+    spot does); `GrassFeature` asks that instead of `FishingFeature.isFishingSpot` (removed).
+  - `BitePrompt` and `LeapGame` cover what their stage shows by themselves (`ui.fishing.ScreenArea`), so
+    `FishingFeature` no longer works out the screen (and stays under PMD's import limit).
+  - `Hud.say(text, picture, seconds)` is made public instead of adding an overload: `Hud` stays under PMD's God Class
+    limit, the problem #74 was opened for (closed).
+  - `TileObjectFactory`: objects with no properties (the player's start, the dog's, a fishing spot) are made in
+    `marker` (keeps the switch under PMD's complexity limit with `DOOR` and `FISHING_SPOT`).
+  - Level 1 has both the coop's door and the pier with its fishing spot (object 21); the assets were rebuilt with
+    `build_assets.py`.
+  - Tests: `FishingTest.aMapCanSwitchFishingOff`; `TestMap.withMapProperty`. No golden changed.

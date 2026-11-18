@@ -3,48 +3,48 @@ size:512,512
 filter:Nearest,Nearest
 repeat:none
 backdrops_c1
-  bounds:292,296,30,30
+  bounds:391,330,30,30
   split:7,7,7,7
   index:0
 bar/empty
-  bounds:434,357,4,12
+  bounds:33,409,4,12
   index:0
 bar/full
-  bounds:440,357,4,12
+  bounds:39,409,4,12
   index:0
 continue_indicator
-  bounds:2,373,7,6
+  bounds:109,409,7,6
   index:0
 continue_indicator
-  bounds:11,373,7,6
+  bounds:118,409,7,6
   index:1
 continue_indicator
-  bounds:20,373,7,6
+  bounds:127,409,7,6
   index:2
 continue_indicator
-  bounds:29,373,7,6
+  bounds:136,409,7,6
   index:3
 continue_indicator
-  bounds:38,373,7,6
+  bounds:145,409,7,6
   index:4
 continue_indicator
-  bounds:47,373,7,6
+  bounds:154,409,7,6
   index:5
 continue_indicator
-  bounds:56,373,7,6
+  bounds:163,409,7,6
   index:6
 dialog_box
-  bounds:354,296,30,28
+  bounds:453,330,30,28
   split:9,6,6,6
   index:0
 dialog_box_down
-  bounds:324,296,28,30
+  bounds:423,330,28,30
   index:0
 emojis/apple
-  bounds:262,296,28,31
+  bounds:361,330,28,31
   index:0
 emojis/heart
-  bounds:166,330,26,21
+  bounds:258,364,26,21
   index:0
 emojis/sun
   bounds:432,2,32,32
@@ -136,215 +136,275 @@ emotes_premium/row_16
 emotes_premium/row_16
   bounds:398,160,31,32
   index:6
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:431,160,31,32
   index:0
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:464,160,31,32
   index:1
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:2,194,31,32
   index:2
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:35,194,31,32
   index:3
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:68,194,31,32
   index:4
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:101,194,31,32
   index:5
-emotes_premium/row_29
+emotes_premium/row_19
   bounds:134,194,31,32
   index:6
-emotes_premium/row_29
+emotes_premium/row_22
   bounds:167,194,31,32
-  index:7
-emotes_premium/row_29
+  index:0
+emotes_premium/row_22
   bounds:200,194,31,32
-  index:8
-emotes_premium/row_29
+  index:1
+emotes_premium/row_22
   bounds:233,194,31,32
-  index:9
-emotes_premium/row_29
+  index:2
+emotes_premium/row_22
   bounds:266,194,31,32
-  index:10
-emotes_premium/row_29
+  index:3
+emotes_premium/row_22
   bounds:299,194,31,32
+  index:4
+emotes_premium/row_24
+  bounds:332,194,31,32
+  index:0
+emotes_premium/row_24
+  bounds:365,194,31,32
+  index:1
+emotes_premium/row_24
+  bounds:398,194,31,32
+  index:2
+emotes_premium/row_24
+  bounds:431,194,31,32
+  index:3
+emotes_premium/row_24
+  bounds:464,194,31,32
+  index:4
+emotes_premium/row_24
+  bounds:2,228,31,32
+  index:5
+emotes_premium/row_29
+  bounds:35,228,31,32
+  index:0
+emotes_premium/row_29
+  bounds:68,228,31,32
+  index:1
+emotes_premium/row_29
+  bounds:101,228,31,32
+  index:2
+emotes_premium/row_29
+  bounds:134,228,31,32
+  index:3
+emotes_premium/row_29
+  bounds:167,228,31,32
+  index:4
+emotes_premium/row_29
+  bounds:200,228,31,32
+  index:5
+emotes_premium/row_29
+  bounds:233,228,31,32
+  index:6
+emotes_premium/row_29
+  bounds:266,228,31,32
+  index:7
+emotes_premium/row_29
+  bounds:299,228,31,32
+  index:8
+emotes_premium/row_29
+  bounds:332,228,31,32
+  index:9
+emotes_premium/row_29
+  bounds:365,228,31,32
+  index:10
+emotes_premium/row_29
+  bounds:398,228,31,32
   index:11
 emotes_premium/row_29
-  bounds:332,194,31,32
-  index:12
-emotes_premium/row_41
-  bounds:365,194,31,32
-  index:0
-emotes_premium/row_41
-  bounds:398,194,31,32
-  index:1
-emotes_premium/row_41
-  bounds:431,194,31,32
-  index:2
-emotes_premium/row_41
-  bounds:464,194,31,32
-  index:3
-emotes_premium/row_41
-  bounds:2,228,31,32
-  index:4
-emotes_premium/row_41
-  bounds:35,228,31,32
-  index:5
-emotes_premium/row_41
-  bounds:68,228,31,32
-  index:6
-emotes_premium/row_41
-  bounds:101,228,31,32
-  index:7
-emotes_premium/row_41
-  bounds:134,228,31,32
-  index:8
-emotes_premium/row_41
-  bounds:167,228,31,32
-  index:9
-emotes_premium/row_41
-  bounds:200,228,31,32
-  index:10
-emotes_premium/row_41
-  bounds:233,228,31,32
-  index:11
-emotes_premium/row_42
-  bounds:266,228,31,32
-  index:0
-emotes_premium/row_42
-  bounds:299,228,31,32
-  index:1
-emotes_premium/row_42
-  bounds:332,228,31,32
-  index:2
-emotes_premium/row_42
-  bounds:365,228,31,32
-  index:3
-emotes_premium/row_42
-  bounds:398,228,31,32
-  index:4
-emotes_premium/row_42
   bounds:431,228,31,32
-  index:5
-emotes_premium/row_42
+  index:12
+emotes_premium/row_41
   bounds:464,228,31,32
-  index:6
-emotes_premium/row_42
+  index:0
+emotes_premium/row_41
   bounds:2,262,31,32
-  index:7
-emotes_premium/row_42
+  index:1
+emotes_premium/row_41
   bounds:35,262,31,32
-  index:8
-emotes_premium/row_42
+  index:2
+emotes_premium/row_41
   bounds:68,262,31,32
-  index:9
-emotes_premium/row_42
+  index:3
+emotes_premium/row_41
   bounds:101,262,31,32
-  index:10
-emotes_premium/row_42
+  index:4
+emotes_premium/row_41
   bounds:134,262,31,32
+  index:5
+emotes_premium/row_41
+  bounds:167,262,31,32
+  index:6
+emotes_premium/row_41
+  bounds:200,262,31,32
+  index:7
+emotes_premium/row_41
+  bounds:233,262,31,32
+  index:8
+emotes_premium/row_41
+  bounds:266,262,31,32
+  index:9
+emotes_premium/row_41
+  bounds:299,262,31,32
+  index:10
+emotes_premium/row_41
+  bounds:332,262,31,32
   index:11
 emotes_premium/row_42
-  bounds:167,262,31,32
+  bounds:365,262,31,32
+  index:0
+emotes_premium/row_42
+  bounds:398,262,31,32
+  index:1
+emotes_premium/row_42
+  bounds:431,262,31,32
+  index:2
+emotes_premium/row_42
+  bounds:464,262,31,32
+  index:3
+emotes_premium/row_42
+  bounds:2,296,31,32
+  index:4
+emotes_premium/row_42
+  bounds:35,296,31,32
+  index:5
+emotes_premium/row_42
+  bounds:68,296,31,32
+  index:6
+emotes_premium/row_42
+  bounds:101,296,31,32
+  index:7
+emotes_premium/row_42
+  bounds:134,296,31,32
+  index:8
+emotes_premium/row_42
+  bounds:167,296,31,32
+  index:9
+emotes_premium/row_42
+  bounds:200,296,31,32
+  index:10
+emotes_premium/row_42
+  bounds:233,296,31,32
+  index:11
+emotes_premium/row_42
+  bounds:266,296,31,32
   index:12
 emotes_premium/row_43
-  bounds:200,262,31,32
+  bounds:299,296,31,32
   index:0
 emotes_premium/row_43
-  bounds:233,262,31,32
+  bounds:332,296,31,32
   index:1
 emotes_premium/row_43
-  bounds:266,262,31,32
+  bounds:365,296,31,32
   index:2
 emotes_premium/row_43
-  bounds:299,262,31,32
+  bounds:398,296,31,32
   index:3
 emotes_premium/row_43
-  bounds:332,262,31,32
+  bounds:431,296,31,32
   index:4
 emotes_premium/row_43
-  bounds:365,262,31,32
+  bounds:464,296,31,32
   index:5
 emotes_premium/row_43
-  bounds:398,262,31,32
+  bounds:2,330,31,32
   index:6
 emotes_premium/row_43
-  bounds:431,262,31,32
+  bounds:35,330,31,32
   index:7
 emotes_premium/row_43
-  bounds:464,262,31,32
+  bounds:68,330,31,32
   index:8
 emotes_premium/row_43
-  bounds:2,296,31,32
+  bounds:101,330,31,32
   index:9
 emotes_premium/row_43
-  bounds:35,296,31,32
+  bounds:134,330,31,32
   index:10
 emotes_premium/row_43
-  bounds:68,296,31,32
+  bounds:167,330,31,32
   index:11
 emotes_premium/row_43
-  bounds:101,296,31,32
+  bounds:200,330,31,32
   index:12
 icon_buttons/check
-  bounds:142,330,22,24
+  bounds:234,364,22,24
   index:0
 icon_buttons/gear
-  bounds:94,330,22,24
+  bounds:186,364,22,24
   index:0
 icon_buttons/question
-  bounds:118,330,22,24
+  bounds:210,364,22,24
   index:0
 icons/door
-  bounds:294,330,14,16
+  bounds:386,364,14,16
   index:0
 icons/question
-  bounds:310,330,12,16
+  bounds:402,364,12,16
   index:0
 inventory/slot
-  bounds:134,296,30,32
+  bounds:233,330,30,32
   split:7,7,7,9
   index:0
 inventory/slot_chosen
-  bounds:198,296,30,32
+  bounds:297,330,30,32
   index:0
 inventory/slot_free
-  bounds:230,296,30,32
+  bounds:329,330,30,32
   index:0
 inventory/slot_pressed
-  bounds:166,296,30,32
+  bounds:265,330,30,32
+  index:0
+marks/miss
+  bounds:498,393,12,14
   index:0
 mouse_catpaw_mouse_icon
-  bounds:418,357,14,13
+  bounds:2,409,14,13
+  index:0
+mouse_catpaw_pointing_mouse_icon
+  bounds:18,409,13,13
   index:0
 play_button/blank
-  bounds:386,296,90,27
+  bounds:2,364,90,27
   split:6,6,5,7
   index:0
 play_button/blank_down
-  bounds:2,330,90,25
+  bounds:94,364,90,25
   split:6,6,5,7
   index:0
 round_buttons/brown
-  bounds:194,330,18,20
+  bounds:286,364,18,20
   index:0
 round_buttons/brown_down
-  bounds:254,330,18,17
+  bounds:346,364,18,17
   index:0
 round_buttons/dark_brown
-  bounds:214,330,18,20
+  bounds:306,364,18,20
   index:0
 round_buttons/dark_brown_down
-  bounds:274,330,18,17
+  bounds:366,364,18,17
   index:0
 selector_dot_1
-  bounds:502,357,6,7
+  bounds:101,409,6,7
   index:0
 selector_dot_6
-  bounds:65,373,5,6
+  bounds:172,409,5,6
   index:0
 settings_menu/panel
   bounds:2,2,106,122
@@ -372,128 +432,128 @@ speech_bubble_grey/row_01
   bounds:386,2,44,56
   index:6
 stamina_black
-  bounds:324,330,14,14
+  bounds:416,364,14,14
   index:0
 stamina_black
-  bounds:340,330,14,14
+  bounds:432,364,14,14
   index:1
 stamina_black
-  bounds:356,330,14,14
+  bounds:448,364,14,14
   index:2
 stamina_black
-  bounds:372,330,14,14
+  bounds:464,364,14,14
   index:3
 stamina_black
-  bounds:388,330,14,14
+  bounds:480,364,14,14
   index:4
 stamina_black
-  bounds:404,330,14,14
+  bounds:496,364,14,14
   index:5
 stamina_black
-  bounds:420,330,14,14
+  bounds:2,393,14,14
   index:6
 stamina_black
-  bounds:436,330,14,14
+  bounds:18,393,14,14
   index:7
 stamina_black
-  bounds:452,330,14,14
+  bounds:34,393,14,14
   index:8
 stamina_black
-  bounds:468,330,14,14
+  bounds:50,393,14,14
   index:9
 stamina_black
-  bounds:484,330,14,14
+  bounds:66,393,14,14
   index:10
 stamina_black
-  bounds:2,357,14,14
+  bounds:82,393,14,14
   index:11
 stamina_black
-  bounds:18,357,14,14
+  bounds:98,393,14,14
   index:12
 stamina_black
-  bounds:34,357,14,14
+  bounds:114,393,14,14
   index:13
 stamina_black
-  bounds:50,357,14,14
+  bounds:130,393,14,14
   index:14
 stamina_black
-  bounds:66,357,14,14
+  bounds:146,393,14,14
   index:15
 stamina_black
-  bounds:82,357,14,14
+  bounds:162,393,14,14
   index:16
 stamina_black
-  bounds:98,357,14,14
+  bounds:178,393,14,14
   index:17
 stamina_black
-  bounds:114,357,14,14
+  bounds:194,393,14,14
   index:18
 stamina_black
-  bounds:130,357,14,14
+  bounds:210,393,14,14
   index:19
 stamina_black
-  bounds:146,357,14,14
+  bounds:226,393,14,14
   index:20
 stamina_black
-  bounds:162,357,14,14
+  bounds:242,393,14,14
   index:21
 stamina_black
-  bounds:178,357,14,14
+  bounds:258,393,14,14
   index:22
 stamina_black
-  bounds:194,357,14,14
+  bounds:274,393,14,14
   index:23
 stamina_black
-  bounds:210,357,14,14
+  bounds:290,393,14,14
   index:24
 stamina_black
-  bounds:226,357,14,14
+  bounds:306,393,14,14
   index:25
 stamina_black
-  bounds:242,357,14,14
+  bounds:322,393,14,14
   index:26
 stamina_black
-  bounds:258,357,14,14
+  bounds:338,393,14,14
   index:27
 stamina_black
-  bounds:274,357,14,14
+  bounds:354,393,14,14
   index:28
 stamina_black
-  bounds:290,357,14,14
+  bounds:370,393,14,14
   index:29
 stamina_black
-  bounds:306,357,14,14
+  bounds:386,393,14,14
   index:30
 stamina_black
-  bounds:322,357,14,14
+  bounds:402,393,14,14
   index:31
 stamina_black
-  bounds:338,357,14,14
+  bounds:418,393,14,14
   index:32
 stamina_black
-  bounds:354,357,14,14
+  bounds:434,393,14,14
   index:33
 stamina_black
-  bounds:370,357,14,14
+  bounds:450,393,14,14
   index:34
 stamina_black
-  bounds:386,357,14,14
+  bounds:466,393,14,14
   index:35
 stamina_black
-  bounds:402,357,14,14
+  bounds:482,393,14,14
   index:36
 stars/small
-  bounds:488,357,12,10
+  bounds:87,409,12,10
   index:0
 stars/treasure
-  bounds:234,330,18,17
+  bounds:326,364,18,17
   index:0
 tiny_emotes/happy
-  bounds:446,357,12,11
+  bounds:45,409,12,11
   index:0
 tiny_emotes/neutral
-  bounds:460,357,12,11
+  bounds:59,409,12,11
   index:0
 tiny_emotes/sad
-  bounds:474,357,12,11
+  bounds:73,409,12,11
   index:0

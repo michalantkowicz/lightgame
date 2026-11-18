@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "5a3e1d52646119fac5288d4ddc69f828e63e4776",
+  "packJsonSha1": "a63713965d78ad1f920cf25c25e61be68966ce76",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -49,6 +49,46 @@
       "trimY": 0,
       "width": 16,
       "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "fish_catch": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "fish_leap": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 13,
+      "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "fishing_bobber": {
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "trimX": 7,
+      "trimY": 11,
+      "width": 18,
+      "height": 13,
+      "anchorX": 16,
+      "anchorY": 16
+    },
+    "fishing_rod_icon": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 15,
+      "height": 14,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -152,6 +192,16 @@
       "anchorX": 24,
       "anchorY": 24
     },
+    "rabbit_fishing": {
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "trimX": 3,
+      "trimY": 16,
+      "width": 33,
+      "height": 31,
+      "anchorX": 24,
+      "anchorY": 24
+    },
     "scythe_icon": {
       "frameWidth": 16,
       "frameHeight": 16,
@@ -218,6 +268,16 @@
       "trimX": 1,
       "trimY": 0,
       "width": 14,
+      "height": 16,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "water_tile": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 16,
       "height": 16,
       "anchorX": 8,
       "anchorY": 8
@@ -592,6 +652,48 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "fish_catch/caught": {
+      "sheet": "fish_catch",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fish_leap/leap": {
+      "sheet": "fish_leap",
+      "frames": 15,
+      "frameDuration": 0.08,
+      "playMode": "LOOP"
+    },
+    "fishing_bobber/bob": {
+      "sheet": "fishing_bobber",
+      "frames": 4,
+      "frameDuration": 0.15,
+      "playMode": "LOOP"
+    },
+    "fishing_bobber/dip": {
+      "sheet": "fishing_bobber",
+      "frames": 2,
+      "frameDuration": 0.15,
+      "playMode": "LOOP"
+    },
+    "fishing_bobber/drop": {
+      "sheet": "fishing_bobber",
+      "frames": 3,
+      "frameDuration": 0.15,
+      "playMode": "LOOP"
+    },
+    "fishing_bobber/splash": {
+      "sheet": "fishing_bobber",
+      "frames": 5,
+      "frameDuration": 0.15,
+      "playMode": "LOOP"
+    },
+    "fishing_rod_icon/icon": {
+      "sheet": "fishing_rod_icon",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "grass_tuft/grow": {
       "sheet": "grass_tuft",
       "frames": 4,
@@ -796,6 +898,30 @@
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },
+    "rabbit_fishing/bite_left": {
+      "sheet": "rabbit_fishing",
+      "frames": 11,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_fishing/cast_left": {
+      "sheet": "rabbit_fishing",
+      "frames": 7,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_fishing/pull_left": {
+      "sheet": "rabbit_fishing",
+      "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "rabbit_fishing/wait_left": {
+      "sheet": "rabbit_fishing",
+      "frames": 17,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "scythe_icon/icon": {
       "sheet": "scythe_icon",
       "frames": 1,
@@ -836,6 +962,12 @@
       "sheet": "sign_tomato",
       "frames": 1,
       "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "water_tile/ripple": {
+      "sheet": "water_tile",
+      "frames": 4,
+      "frameDuration": 0.5,
       "playMode": "LOOP"
     },
     "watering/splash": {

@@ -158,6 +158,24 @@ public class Player extends GameBoardActor implements Collecting {
         animationPlugin.playOnce(Action.SCYTHE, Direction.DOWN);
     }
 
+    /**
+     * A fishing pose (facing left, the only way it fishes): CAST once (then still), WAIT, BITE (the rod shakes) or PULL
+     * once; held until {@link #stopFishing()} or walking off.
+     */
+    public void fish(Action pose) {
+        animationPlugin.pose(Sprite.RABBIT_FISHING, pose, Direction.LEFT, pose == Action.WAIT || pose == Action.BITE);
+    }
+
+    /** Puts the rod away: standing as before. */
+    public void stopFishing() {
+        animationPlugin.endPose();
+    }
+
+    /** Its fishing pose now (CAST, WAIT, BITE, PULL), or null when it isn't fishing. */
+    public Action getFishingPose() {
+        return animationPlugin.getPose();
+    }
+
     /** Is it swinging its scythe right now? */
     public boolean isScything() {
         return animationPlugin.isPlayingOnce(Action.SCYTHE);
