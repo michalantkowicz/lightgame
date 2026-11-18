@@ -19,7 +19,8 @@ Python.
 animation side.png`, its rows 1-4 as `cast_left`, `wait_left`, `bite_left`, `pull_left`; a sheet of its own,
 `rabbit_fishing`, because its frames are cut to another box than the rabbit's), the bobber and its splashes
 (`fishing_bobber`), the rod's icon (`fishing_rod_2.png`), the leaping fish (`mediuml fish.png`, unused since the fishing game changed) and the fish
-(`Fish Sprites.png`, first row: in the fishing game and caught). The other Ocean Pack files are ignored for now.
+(`Fish Sprites.png`: its first row, `caught`, the caught fish and some in the fishing game; its fourth, `swim`, for the
+clownfish). The other Ocean Pack files are ignored for now.
 
 **The scythe swing** isn't in the pack. `scythe_animation.py` makes it from the rabbit's `chop_down` row: the axe taken
 out (its four colours appear nowhere else on the rabbit) and a scythe drawn where it was held, a longer handle and a
@@ -31,8 +32,8 @@ upright handle on the right and a long blade sweeping left and down from its top
 the sheet `scythe_icon`. Like the pack, neither file is committed: only the atlas made from them.
 
 **The fishing net's icon** (on the fishing game's lane buttons) isn't in the pack either. `net_icon.py` draws it,
-16x16 in the same palette and outline: a hoop seen a little from above with its handle up to the right, and the net's
-bag hanging from it, its mesh see-through. It saves `Objects/Items/fishing net icon.png` in the pack folder, read as
+16x16 in the same palette and outline: a long handle from the bottom left, the hoop at its top right seen a little
+from the side, and the net's bag hanging from it, its mesh see-through. It saves `Objects/Items/fishing net icon.png` in the pack folder, read as
 the sheet `fishing_net_icon` (not committed either).
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails

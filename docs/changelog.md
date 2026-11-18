@@ -1240,3 +1240,22 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   - `LeapGame` and `LeapRound` are removed (replaced, the owner's call); `Sprite.FISH_LEAP` stays, unused.
   - Tests: `FishingTest` plays the new game (`GameDriver.fishOnTheLine`, `tapNet`, `netTangled`), new
     `RhythmRoundTest`. No golden changed.
+- **Play-tested by Haiku agents** (owner's request; 2 rounds, 7 testers, each in its own copy of the repo: simulated
+  3-, 5- and 8-year-olds and cheaters on `RhythmRound`, `GameDriver` scenarios, hidden-window screenshots). Fixed:
+  - tapping every net all the time won 100 % at the shipped level (a tangle was shorter than the catch window): a tap
+    on a tangled net now tangles it again from then; a tap within 0.25 s after a catch in the same lane does nothing
+    (a child's double tap mustn't cost the next fish);
+  - the ages were off (a simulated 5-year-old won 11 % at its level, an 8-year-old 49 %, a 3-year-old under 10 %):
+    window 0.4 / 0.28 / 0.14 s and tangle 1.0 / 0.9 / 0.8 s at 0.15 / 0.45 / 0.8 (fall unchanged). Simulated (the
+    models are guesses, not children): 3-year-olds win 25-60 %, 5-year-olds 63-74 %, 8-year-olds 84 %; no timing-blind
+    cheat wins over 10 % (the best, tapping the next fish's lane every 0.6 s, needs watching the fish: 17 % at 0.15);
+  - the bite's paw and the game's window stayed where they were when the screen was turned (a part uncovered, a tap
+    there didn't hook): both follow the stage every frame, the panel in its own group in the middle
+    (`aResizedScreenStaysCovered`);
+  - a tap in the dim above or below the panel worked a lane: only taps on the panel count;
+  - looks: clearer fish (yellow, blue and a clownfish from the sheet's fourth row, `Action.SWIM`), head first, bigger;
+    the net redrawn side-on with a long handle (it read as a bucket); a tangled net really goes dark
+    (`RoundButton.tint`: a group's colour doesn't reach its pictures); the line with a dark edge and a deeper pulse, the
+    catch zone a darker band clipped at the water; narrower miss column, wider lanes; a caught fish grows less (1.15)
+    and its sparkle and flash stay in its lane, behind it.
+  - Left as it is: a stray tap costs that lane's next fish (the tangle); landscape windows make the panel small.

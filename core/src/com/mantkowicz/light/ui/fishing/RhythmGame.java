@@ -44,15 +44,15 @@ public class RhythmGame extends Group {
         void over(boolean won);
     }
 
-    private static final float WIDTH = 600, HEIGHT = 1000, MARGIN = 44, GAP = 16;
+    private static final float WIDTH = 600, HEIGHT = 1000, MARGIN = 32, GAP = 12;
     /** A fish and an X mark (16 pack pixels, 5 screen pixels each), the water's tiles. */
-    private static final float ICON = 16 * 5, FISH = 16 * 6, TILE = 16 * 4;
+    private static final float ICON = 16 * 4, FISH = 16 * 7, TILE = 16 * 4;
     /** The line: how thick, how far above the nets. */
     private static final float LINE = 16, LINE_ABOVE_NETS = 56;
     /** The net buttons: screen pixels per pack pixel for the button and for the net on it. */
     private static final int NET_SCALE = 6, NET_ICON_SCALE = 5;
     /** A caught fish: how much it grows, how long it takes to go. */
-    private static final float CAUGHT_GROW = 1.3f, CAUGHT_SECONDS = 0.3f, SPARKLE = 120;
+    private static final float CAUGHT_GROW = 1.15f, CAUGHT_SECONDS = 0.3f, SPARKLE = 80;
     private static final Color CAUGHT_GREEN = new Color(0.75f, 1f, 0.65f, 1f);
     /** How far a fish wiggles (degrees) and how fast; turned so its head (up and right on the sheet) points down. */
     private static final float WIGGLE = 8, WIGGLE_SPEED = 9, HEAD_DOWN = -135;
@@ -67,7 +67,7 @@ public class RhythmGame extends Group {
     private final List<Image> waterTiles = new ArrayList<>();
     private final List<RoundButton> nets = new ArrayList<>();
     private final List<Image> fishImages = new ArrayList<>();
-    /** The fish that come: the clearest fish shapes of the sheet, yellow, blue, a small blue one, a clownfish. */
+    /** The fish that come: the clearest fish shapes of the sheet, yellow, blue, a clownfish. */
     private final TextureRegion[] swimmers;
     private final Image line;
     /** The panel and everything on it, in the middle of the screen (it stays there when the window is resized). */
@@ -103,7 +103,7 @@ public class RhythmGame extends Group {
         green = new TextureRegion(bar, bar.getRegionWidth() / 2, bar.getRegionHeight() / 2, 1, 1);
         ripple = resources.getAnimation(Sprite.WATER_TILE, Action.RIPPLE);
         TextureRegion[] sheet = resources.getAnimation(Sprite.FISH_CATCH, Action.CAUGHT).getKeyFrames();
-        swimmers = new TextureRegion[]{sheet[2], sheet[4], sheet[5],
+        swimmers = new TextureRegion[]{sheet[2], sheet[4],
                 resources.getAnimation(Sprite.FISH_CATCH, Action.SWIM).getKeyFrames()[2]};
 
         lanesX = MARGIN + ICON + GAP;
@@ -133,7 +133,8 @@ public class RhythmGame extends Group {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 int lane = (int) Math.floor((x - window.getX() - lanesX) / laneWidth);
-                if (lane >= 0 && lane < nets.size()) {
+                float up = y - window.getY();
+                if (lane >= 0 && lane < nets.size() && up >= 0 && up <= HEIGHT) { // on the panel only
                     tap(lane);
                 }
                 return true; // the map and the HUD under it don't get it
@@ -178,14 +179,14 @@ public class RhythmGame extends Group {
     private Image addLine(RhythmRules rules, float waterBottom) {
         float width = laneWidth * nets.size();
         float band = rules.window() / rules.fallSeconds() * (topY - lineY);
-        Image zone = new Image(green);
+        Image zone = new Image(resources.getDrawable("black.png")); // the water a little darker there
         float zoneBottom = Math.max(waterBottom, lineY - band); // not over the nets
         zone.setBounds(lanesX, zoneBottom, width, lineY + band - zoneBottom);
-        zone.getColor().a = 0.45f;
+        zone.getColor().a = 0.12f;
         window.addActor(zone);
         Image edge = new Image(resources.getDrawable("black.png")); // a dark edge: the line stands out on the water
-        edge.setBounds(lanesX, lineY - LINE / 2f - 3, width, LINE + 6);
-        edge.getColor().a = 0.45f;
+        edge.setBounds(lanesX, lineY - LINE / 2f - 4, width, LINE + 8);
+        edge.getColor().a = 0.6f;
         window.addActor(edge);
         Image bar = new Image(green);
         bar.setBounds(lanesX, lineY - LINE / 2f, width, LINE);
@@ -220,13 +221,13 @@ public class RhythmGame extends Group {
         }
         // the line beats: bright on each beat (when fish reach it), fading till the next
         float sinceBeat = (round.getTime() - round.getRules().fallSeconds()) / round.getRules().beat();
-        line.getColor().a = 0.55f + 0.45f * (1 - (sinceBeat - MathUtils.floor(sinceBeat)));
+        line.getColor().a = 0.35f + 0.65f * (1 - (sinceBeat - MathUtils.floor(sinceBeat)));
         List<RhythmRound.Fish> all = round.getFish();
         for (int i = 0; i < all.size(); i++) {
             moveFish(all.get(i), fishImages.get(i), i);
         }
         for (int lane = 0; lane < nets.size(); lane++) {
-            nets.get(lane).setColor(round.isTangled(lane) ? Color.GRAY : Color.WHITE);
+            nets.get(lane).tint(round.isTangled(lane) ? Color.GRAY : Color.WHITE);
         }
         if (round.isOver() && !told) {
             told = true;
@@ -277,9 +278,9 @@ public class RhythmGame extends Group {
                 Actions.sequence(Actions.delay(CAUGHT_SECONDS / 2f), Actions.fadeOut(CAUGHT_SECONDS / 2f))),
                 Actions.removeActor()));
         Image flash = new Image(green);
-        flash.setBounds(lanesX + lane * laneWidth, lineY - FISH / 2f, laneWidth, FISH);
+        flash.setBounds(lanesX + lane * laneWidth, lineY - LINE / 2f - 8, laneWidth, LINE + 16);
         flash.setTouchable(Touchable.disabled);
-        flash.addAction(Actions.sequence(Actions.alpha(0.7f), Actions.fadeOut(0.3f), Actions.removeActor()));
+        flash.addAction(Actions.sequence(Actions.alpha(0.5f), Actions.fadeOut(0.3f), Actions.removeActor()));
         window.addActorBefore(image, flash);
         Image sparkle = new Image(resources.getUiImage(UiImage.SPARKLE));
         sparkle.setSize(SPARKLE, SPARKLE);
@@ -287,10 +288,10 @@ public class RhythmGame extends Group {
         sparkle.setPosition(laneMiddle(lane) - SPARKLE / 2f, lineY - SPARKLE / 2f);
         sparkle.setTouchable(Touchable.disabled);
         sparkle.setScale(0.3f);
-        sparkle.addAction(Actions.sequence(Actions.parallel(Actions.scaleTo(1.4f, 1.4f, 0.3f, Interpolation.pow2Out),
-                Actions.rotateBy(90, 0.3f), Actions.sequence(Actions.delay(0.15f), Actions.fadeOut(0.15f))),
+        sparkle.addAction(Actions.sequence(Actions.parallel(Actions.scaleTo(1.2f, 1.2f, 0.2f, Interpolation.pow2Out),
+                Actions.rotateBy(90, 0.2f), Actions.sequence(Actions.delay(0.1f), Actions.fadeOut(0.1f))),
                 Actions.removeActor()));
-        window.addActor(sparkle);
+        window.addActorBefore(image, sparkle); // behind the fish
         listener.caught();
     }
 

@@ -19,37 +19,38 @@ ICON = "Objects/Items/fishing net icon.png"
 # the item icons' palette (as in scythe_animation.py): the light outline, the wood's shades, the mesh's grey
 OUTLINE = (243, 244, 231, 255)
 WOOD_DARK, WOOD, WOOD_LIGHT = (117, 76, 96, 255), (144, 98, 93, 255), (182, 137, 98, 255)
-MESH, INSIDE = (193, 200, 185, 255), (107, 116, 112, 255)
+MESH = (193, 200, 185, 255)
 
-# the picture, row by row from the top: the hoop seen a little from above (H its near, light side, h its far, dark
-# side, i the net's inside seen through it), its handle up to the right (W light, w dark, d its end), and the net's
-# bag hanging from it, narrowing to the bottom (m its strings, o a hole: see-through, the button shows through it);
-# the outline goes only around the outside
+# the picture, row by row from the top: a long handle from the bottom left (W light, w dark, d its end), the hoop at
+# its top right seen a little from the side (H its near, light side, h its far, dark side), and the net's bag hanging
+# from it to the bottom right (m its strings, o a hole: see-through, the button shows through it); the outline goes
+# only around the outside
 PICTURE = [
     "................",
-    ".............dd.",
-    "....hhhhhh..wW..",
-    "...hiiiiiihwW...",
-    "..hiiiiiiiiH....",
-    "..Hiiiiiiiih....",
-    "...HHiiiiHH.....",
-    "...mmHHHHmm.....",
-    "...mmomomom.....",
-    "...momomomm.....",
-    "....momomm......",
-    "....mmomom......",
-    ".....mmom.......",
-    ".....momm.......",
-    "......mm........",
+    "........hhhhh...",
+    "......hh.....hh.",
+    ".....h.momomo.h.",
+    ".....HmomomomoH.",
+    "......HHmomoHHm.",
+    ".....wWmHHHHomm.",
+    "....wW.momomomm.",
+    "...wW...momomm..",
+    "..wW.....momm...",
+    ".wW.......mm....",
+    "dW..............",
+    "dd..............",
+    "................",
+    "................",
     "................",
 ]
-COLOURS = {"H": WOOD_LIGHT, "h": WOOD_DARK, "i": INSIDE, "m": MESH, "W": WOOD_LIGHT, "w": WOOD, "d": WOOD_DARK}
+COLOURS = {"H": WOOD_LIGHT, "h": WOOD_DARK, "m": MESH, "W": WOOD_LIGHT, "w": WOOD, "d": WOOD_DARK}
 
 
 def net_icon():
     icon = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
     px = icon.load()
-    for y, row in enumerate(PICTURE):
+    rows = PICTURE[-2:] + PICTURE[:-2]  # two rows lower: in the middle of the icon
+    for y, row in enumerate(rows):
         for x, c in enumerate(row):
             if c in COLOURS:
                 px[x, y] = COLOURS[c]
