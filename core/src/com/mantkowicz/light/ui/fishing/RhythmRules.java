@@ -49,7 +49,7 @@ public final class RhythmRules {
     public static RhythmRules forLevel(float level) {
         float l = MathUtils.clamp(level, 0, 1);
         return new RhythmRules(SECONDS, BEAT, FISHES, LANES, TO_LOSE, byAge(l, 2.2f, 1.6f, 1.2f),
-                byAge(l, 0.2f, 0.15f, 0.11f), byAge(l, 0.35f, 0.45f, 0.55f));
+                byAge(l, 0.4f, 0.28f, 0.14f), byAge(l, 1.0f, 0.9f, 0.8f));
     }
 
     /** A value at the age levels ({@link #AGE_3}, ...), straight lines between them, flat beyond. */

@@ -48,14 +48,14 @@ public class RhythmGame extends Group {
     /** A fish and an X mark (16 pack pixels, 5 screen pixels each), the water's tiles. */
     private static final float ICON = 16 * 5, FISH = 16 * 6, TILE = 16 * 4;
     /** The line: how thick, how far above the nets. */
-    private static final float LINE = 14, LINE_ABOVE_NETS = 56;
+    private static final float LINE = 16, LINE_ABOVE_NETS = 56;
+    /** The net buttons: screen pixels per pack pixel for the button and for the net on it. */
+    private static final int NET_SCALE = 6, NET_ICON_SCALE = 5;
     /** A caught fish: how much it grows, how long it takes to go. */
-    private static final float CAUGHT_GROW = 1.6f, CAUGHT_SECONDS = 0.3f;
+    private static final float CAUGHT_GROW = 1.3f, CAUGHT_SECONDS = 0.3f, SPARKLE = 120;
     private static final Color CAUGHT_GREEN = new Color(0.75f, 1f, 0.65f, 1f);
-    /** How far a fish wiggles (degrees) and how fast. */
-    private static final float WIGGLE = 12, WIGGLE_SPEED = 9;
-    /** The fish's colours: pink, orange, yellow, green, blue (the first five of the fish sheet). */
-    private static final int COLOURS = 5;
+    /** How far a fish wiggles (degrees) and how fast; turned so its head (up and right on the sheet) points down. */
+    private static final float WIGGLE = 8, WIGGLE_SPEED = 9, HEAD_DOWN = -135;
     /** After the last catch or miss, the window waits this long (the last mark shows) and closes. */
     private static final float CLOSE_AFTER = 0.8f;
 
@@ -67,8 +67,14 @@ public class RhythmGame extends Group {
     private final List<Image> waterTiles = new ArrayList<>();
     private final List<RoundButton> nets = new ArrayList<>();
     private final List<Image> fishImages = new ArrayList<>();
+    /** The fish that come: the clearest fish shapes of the sheet, yellow, blue, a small blue one, a clownfish. */
+    private final TextureRegion[] swimmers;
     private final Image line;
-    private final float left, bottom, lanesX, laneWidth, lineY, topY;
+    /** The panel and everything on it, in the middle of the screen (it stays there when the window is resized). */
+    private final Group window = new Group();
+    private final Stage ui;
+    private final Image dim;
+    private final float lanesX, laneWidth, lineY, topY;
     private float time;
     private int marks;
     private boolean told;
@@ -82,40 +88,42 @@ public class RhythmGame extends Group {
         this.listener = listener;
         this.round = new RhythmRound(rules);
         setName("FISHING_GAME");
-        Rectangle screen = ScreenArea.of(ui);
-        setBounds(screen.x, screen.y, screen.width, screen.height);
-        Image dim = new Image(resources.getDrawable("black.png"));
-        dim.setSize(screen.width, screen.height);
+        this.ui = ui;
+        dim = new Image(resources.getDrawable("black.png"));
         dim.getColor().a = 0.4f; // the face under it still shows how the game goes
         addActor(dim);
-
-        left = (screen.width - WIDTH) / 2f;
-        bottom = (screen.height - HEIGHT) / 2f;
+        window.setSize(WIDTH, HEIGHT);
+        addActor(window);
+        coverTheScreen();
         Image panel = new Image(UiStyle.stretching(resources, UiImage.PANEL));
-        panel.setBounds(left, bottom, WIDTH, HEIGHT);
-        addActor(panel);
+        panel.setSize(WIDTH, HEIGHT);
+        window.addActor(panel);
         // one green pixel from the middle of the stamina bar's piece, stretched (its edges are dark)
         TextureRegion bar = resources.getUiImage(UiImage.BAR_FULL);
         green = new TextureRegion(bar, bar.getRegionWidth() / 2, bar.getRegionHeight() / 2, 1, 1);
         ripple = resources.getAnimation(Sprite.WATER_TILE, Action.RIPPLE);
+        TextureRegion[] sheet = resources.getAnimation(Sprite.FISH_CATCH, Action.CAUGHT).getKeyFrames();
+        swimmers = new TextureRegion[]{sheet[2], sheet[4], sheet[5],
+                resources.getAnimation(Sprite.FISH_CATCH, Action.SWIM).getKeyFrames()[2]};
 
-        lanesX = left + MARGIN + ICON + GAP;
+        lanesX = MARGIN + ICON + GAP;
         laneWidth = (WIDTH - 2 * MARGIN - ICON - GAP) / rules.lanes();
         TextureRegion net = resources.getAnimation(Sprite.FISHING_NET_ICON, Action.ICON).getKeyFrame(0);
-        float netsY = bottom + MARGIN;
+        float netsY = MARGIN;
         for (int lane = 0; lane < rules.lanes(); lane++) {
             RoundButton button = new RoundButton(resources, net, UiImage.ACTION_BUTTON_DARK_BROWN,
-                    UiImage.ACTION_BUTTON_DARK_BROWN_DOWN, 6, 4);
+                    UiImage.ACTION_BUTTON_DARK_BROWN_DOWN, NET_SCALE, NET_ICON_SCALE);
             button.setPosition(laneMiddle(lane) - button.getWidth() / 2f, netsY);
             button.setOrigin(button.getWidth() / 2f, button.getHeight() / 2f);
             button.setTouchable(Touchable.disabled); // the game takes the taps: a lane's net or anywhere in its lane
             nets.add(button);
         }
         lineY = netsY + nets.get(0).getHeight() + LINE_ABOVE_NETS;
-        topY = bottom + HEIGHT - MARGIN - FISH / 2f;
-        addWater(netsY + nets.get(0).getHeight() + GAP);
-        line = addLine(rules);
-        nets.forEach(this::addActor);
+        topY = HEIGHT - MARGIN - FISH / 2f;
+        float waterBottom = netsY + nets.get(0).getHeight() + GAP;
+        addWater(waterBottom);
+        line = addLine(rules, waterBottom);
+        nets.forEach(window::addActor);
         for (RhythmRound.Fish fish : round.getFish()) {
             fishImages.add(fishImage(fish));
         }
@@ -124,7 +132,7 @@ public class RhythmGame extends Group {
         addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                int lane = (int) Math.floor((x - lanesX) / laneWidth);
+                int lane = (int) Math.floor((x - window.getX() - lanesX) / laneWidth);
                 if (lane >= 0 && lane < nets.size()) {
                     tap(lane);
                 }
@@ -133,20 +141,28 @@ public class RhythmGame extends Group {
         });
     }
 
+    /** Over what the UI stage shows now, the panel in its middle. */
+    private void coverTheScreen() {
+        Rectangle screen = ScreenArea.of(getStage() != null ? getStage() : ui);
+        setBounds(screen.x, screen.y, screen.width, screen.height);
+        dim.setSize(screen.width, screen.height);
+        window.setPosition(Math.round((screen.width - WIDTH) / 2f), Math.round((screen.height - HEIGHT) / 2f));
+    }
+
     private float laneMiddle(int lane) {
         return lanesX + (lane + 0.5f) * laneWidth;
     }
 
     /** The lanes' water, from just above the nets to the panel's top, with a thin dark line between lanes. */
     private void addWater(float from) {
-        float width = laneWidth * nets.size(), height = bottom + HEIGHT - MARGIN - from;
+        float width = laneWidth * nets.size(), height = HEIGHT - MARGIN - from;
         int columns = Math.max(1, Math.round(width / TILE)), rows = Math.max(1, Math.round(height / TILE));
         for (int row = 0; row < rows; row++) {
             for (int column = 0; column < columns; column++) {
                 Image tile = new Image(new TextureRegionDrawable(ripple.getKeyFrame(0)));
                 tile.setBounds(lanesX + column * width / columns, from + row * height / rows, width / columns,
                         height / rows);
-                addActor(tile);
+                window.addActor(tile);
                 waterTiles.add(tile);
             }
         }
@@ -154,41 +170,47 @@ public class RhythmGame extends Group {
             Image between = new Image(resources.getDrawable("black.png"));
             between.setBounds(lanesX + lane * laneWidth - 2, from, 4, height);
             between.getColor().a = 0.25f;
-            addActor(between);
+            window.addActor(between);
         }
     }
 
     /** The line, and a pale band around it: where a fish's middle is while a tap catches it. */
-    private Image addLine(RhythmRules rules) {
+    private Image addLine(RhythmRules rules, float waterBottom) {
         float width = laneWidth * nets.size();
         float band = rules.window() / rules.fallSeconds() * (topY - lineY);
         Image zone = new Image(green);
-        zone.setBounds(lanesX, lineY - band, width, 2 * band);
-        zone.getColor().a = 0.3f;
-        addActor(zone);
+        float zoneBottom = Math.max(waterBottom, lineY - band); // not over the nets
+        zone.setBounds(lanesX, zoneBottom, width, lineY + band - zoneBottom);
+        zone.getColor().a = 0.45f;
+        window.addActor(zone);
+        Image edge = new Image(resources.getDrawable("black.png")); // a dark edge: the line stands out on the water
+        edge.setBounds(lanesX, lineY - LINE / 2f - 3, width, LINE + 6);
+        edge.getColor().a = 0.45f;
+        window.addActor(edge);
         Image bar = new Image(green);
         bar.setBounds(lanesX, lineY - LINE / 2f, width, LINE);
-        addActor(bar);
+        window.addActor(bar);
         return bar;
     }
 
     private Image fishImage(RhythmRound.Fish fish) {
-        TextureRegion picture = resources.getAnimation(Sprite.FISH_CATCH, Action.CAUGHT)
-                .getKeyFrames()[MathUtils.random(COLOURS - 1)];
-        Image image = new Image(picture);
+        Image image = new Image(swimmers[MathUtils.random(swimmers.length - 1)]);
         image.setScaling(Scaling.fit);
         image.setSize(FISH, FISH);
         image.setOrigin(FISH / 2f, FISH / 2f);
         image.setTouchable(Touchable.disabled);
         image.setPosition(laneMiddle(fish.getLane()) - FISH / 2f, topY - FISH / 2f);
         image.setVisible(false);
-        addActor(image);
+        window.addActor(image);
         return image;
     }
 
     @Override
     public void act(float delta) {
         super.act(delta);
+        if (getStage() != null) {
+            coverTheScreen(); // the window may have been resized (a phone turned)
+        }
         for (RhythmRound.Fish fish : round.update(delta)) {
             missed(fish);
         }
@@ -224,7 +246,7 @@ public class RhythmGame extends Group {
         float progress = round.progress(fish);
         image.setVisible(progress >= 0);
         image.setY(topY + progress * (lineY - topY) - FISH / 2f);
-        image.setRotation(MathUtils.sin(time * WIGGLE_SPEED + i) * WIGGLE);
+        image.setRotation(HEAD_DOWN + MathUtils.sin(time * WIGGLE_SPEED + i) * WIGGLE);
         if (fish.getState() == RhythmRound.State.COMING) {
             image.getColor().a = MathUtils.clamp(progress * 8, 0, 1);
         }
@@ -258,7 +280,17 @@ public class RhythmGame extends Group {
         flash.setBounds(lanesX + lane * laneWidth, lineY - FISH / 2f, laneWidth, FISH);
         flash.setTouchable(Touchable.disabled);
         flash.addAction(Actions.sequence(Actions.alpha(0.7f), Actions.fadeOut(0.3f), Actions.removeActor()));
-        addActorBefore(image, flash);
+        window.addActorBefore(image, flash);
+        Image sparkle = new Image(resources.getUiImage(UiImage.SPARKLE));
+        sparkle.setSize(SPARKLE, SPARKLE);
+        sparkle.setOrigin(SPARKLE / 2f, SPARKLE / 2f);
+        sparkle.setPosition(laneMiddle(lane) - SPARKLE / 2f, lineY - SPARKLE / 2f);
+        sparkle.setTouchable(Touchable.disabled);
+        sparkle.setScale(0.3f);
+        sparkle.addAction(Actions.sequence(Actions.parallel(Actions.scaleTo(1.4f, 1.4f, 0.3f, Interpolation.pow2Out),
+                Actions.rotateBy(90, 0.3f), Actions.sequence(Actions.delay(0.15f), Actions.fadeOut(0.15f))),
+                Actions.removeActor()));
+        window.addActor(sparkle);
         listener.caught();
     }
 
@@ -268,12 +300,12 @@ public class RhythmGame extends Group {
         image.addAction(Actions.fadeOut(0.3f));
         Image mark = new Image(resources.getUiImage(UiImage.MISS));
         mark.setScaling(Scaling.fit); // its own shape (the X is a bit taller than wide)
-        mark.setBounds(left + MARGIN, lineY - ICON / 2f + marks * (ICON + 24), ICON, ICON);
+        mark.setBounds(MARGIN, lineY - ICON / 2f + marks * (ICON + 24), ICON, ICON);
         mark.setOrigin(ICON / 2f, ICON / 2f);
         mark.setScale(0);
         mark.addAction(Actions.scaleTo(1, 1, 0.25f, Interpolation.swingOut));
         marks++;
-        addActor(mark);
+        window.addActor(mark);
         listener.missed();
     }
 

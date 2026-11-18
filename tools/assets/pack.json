@@ -203,7 +203,7 @@
     {"name": "fishing_bobber", "file": "Ocean Pack/fishing water splash frames and rod.png", "frame": [32, 32], "duration": 150, "rowCount": 5, "rows": {"0": "drop", "1": "bob", "3": "dip", "4": "splash"}},
     {"name": "fishing_rod_icon", "file": "Ocean Pack/fishing_rod_2.png", "frame": [16, 16], "rows": {"0": "icon"}},
     {"name": "fish_leap", "file": "Ocean Pack/mediuml fish.png", "frame": [16, 16], "duration": 80, "rows": {"0": "leap"}},
-    {"name": "fish_catch", "file": "Ocean Pack/Fish Sprites.png", "frame": [16, 16], "rowCount": 1, "rows": {"0": "caught"}},
+    {"name": "fish_catch", "file": "Ocean Pack/Fish Sprites.png", "frame": [16, 16], "rowCount": 4, "rows": {"0": "caught", "3": "swim"}},
     {"name": "water_tile", "file": "Tilesets/ground tiles/Water.png", "frame": [16, 16], "duration": 500, "rows": {"0": "ripple"}},
     {"name": "scythe_icon", "file": "Objects/Items/scythe icon.png", "frame": [16, 16], "rows": {"0": "icon"}},
     {"name": "fishing_net_icon", "file": "Objects/Items/fishing net icon.png", "frame": [16, 16], "rows": {"0": "icon"}},

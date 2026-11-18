@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -88,6 +89,7 @@ public class BitePrompt extends Group {
         if (done) {
             return;
         }
+        followTheScreen();
         left -= delta;
         float full = Math.max(0, left / seconds);
         ((TextureRegionDrawable) ring.getDrawable()).setRegion(circle[Math.round(full * (circle.length - 1))]);
@@ -95,6 +97,22 @@ public class BitePrompt extends Group {
             done = true;
             remove();
             tooLate.run();
+        }
+    }
+
+    /**
+     * Still over the whole screen after the window was resized (a phone turned), so any tap hooks; the paw and the
+     * circle stay where they were on the stage.
+     */
+    private void followTheScreen() {
+        Rectangle screen = ScreenArea.of(getStage());
+        float dx = screen.x - getX(), dy = screen.y - getY();
+        if (dx == 0 && dy == 0 && screen.width == getWidth() && screen.height == getHeight()) {
+            return;
+        }
+        setBounds(screen.x, screen.y, screen.width, screen.height);
+        for (Actor child : getChildren()) {
+            child.moveBy(-dx, -dy);
         }
     }
 

@@ -38,6 +38,7 @@ public enum Action {
     SIGN("sign"),
     SLEEP("sleep"),
     SPLASH("splash"),
+    SWIM("swim"),
     TILL("till"),
     WAIT("wait"),
     WALK("walk"),

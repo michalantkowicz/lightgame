@@ -3,6 +3,7 @@ package com.mantkowicz.light.ui.fishing;
 import com.badlogic.gdx.math.MathUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,7 +11,9 @@ import java.util.List;
  * The rules of the fishing game, without pictures ({@link RhythmGame} draws it): fish come down lanes and reach a line
  * at the bottom, each on a beat ({@link RhythmRules#beat()}, one beat or a few apart, in a random order of lanes). A
  * tap on a lane's net while a fish of that lane is at the line catches it; a fish that passes the line uncaught is
- * missed. A tap with no fish at the line tangles that net for a moment (it catches nothing). Enough misses
+ * missed. A tap with no fish at the line tangles that net for a moment (it catches nothing; tapped again meanwhile, the
+ * moment starts again, so tapping all the time doesn't win); a second tap just after a catch in the same lane (a
+ * child's double tap) does nothing. Enough misses
  * ({@link RhythmRules#toLose()}) lose at once; otherwise the game is won when the last fish is caught or missed.
  * <p>
  * Time starts when the game opens; the first beat comes then, so the first fish are already falling.
@@ -48,13 +51,17 @@ public class RhythmRound {
 
     private final RhythmRules rules;
     private final List<Fish> fish = new ArrayList<>();
-    private final float[] tangledUntil;
+    private final float[] tangledUntil, caughtAt;
+    /** A tap this soon after a catch in the same lane does nothing (a double tap). */
+    static final float DOUBLE_TAP = 0.25f;
     private float time;
     private int caught, missed;
 
     public RhythmRound(RhythmRules rules) {
         this.rules = rules;
         this.tangledUntil = new float[rules.lanes()];
+        this.caughtAt = new float[rules.lanes()];
+        Arrays.fill(caughtAt, -1);
         List<Integer> beats = new ArrayList<>();
         int slots = Math.round(rules.seconds() / rules.beat());
         for (int beat = 1; beat <= slots; beat++) {
@@ -98,20 +105,24 @@ public class RhythmRound {
     }
 
     /**
-     * The player taps a lane's net: catches the fish of that lane at the line (returned), or with none there tangles
-     * the net (null). A tangled net, or a game that is over, does nothing (null).
+     * The player taps a lane's net: catches the fish of that lane at the line (returned), or with none there (or the
+     * net tangled) tangles the net from now (null); just after a catch there, or once the game is over, nothing
+     * happens (null).
      */
     public Fish tap(int lane) {
-        if (isOver() || isTangled(lane)) {
+        if (isOver()) {
             return null;
         }
-        Fish atTheLine = atTheLine(lane);
+        Fish atTheLine = isTangled(lane) ? null : atTheLine(lane);
         if (atTheLine == null) {
-            tangledUntil[lane] = time + rules.tangleSeconds();
+            if (caughtAt[lane] < 0 || time - caughtAt[lane] > DOUBLE_TAP) {
+                tangledUntil[lane] = time + rules.tangleSeconds(); // tangled, or tangled again from now
+            }
             return null;
         }
         atTheLine.state = State.CAUGHT;
         caught++;
+        caughtAt[lane] = time;
         return atTheLine;
     }
 

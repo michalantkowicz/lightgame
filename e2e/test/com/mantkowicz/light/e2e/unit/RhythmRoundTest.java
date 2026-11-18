@@ -71,26 +71,40 @@ class RhythmRoundTest {
     }
 
     @Test
-    void aTapWithNothingAtTheLineTanglesThatNet() {
+    void aTapWithNothingAtTheLineTanglesThatNetAndTappingAgainKeepsItTangled() {
         MathUtils.random.setSeed(7);
         RhythmRules rules = new RhythmRules(8, 0.5f, 12, 3, 3, 2, 0.2f, 0.4f);
         RhythmRound round = new RhythmRound(rules);
         RhythmRound.Fish first = round.getFish().get(0);
-        while (round.getTime() < first.getArrival() - 0.3f) {
-            round.update(FRAME);
-        }
+        runUntil(round, first.getArrival() - 0.7f);
         assertNull(round.tap(first.getLane()), "too early");
         assertTrue(round.isTangled(first.getLane()));
         assertEquals(0, round.getMissed(), "a tangle isn't a miss");
-        while (round.getTime() < first.getArrival()) {
-            round.update(FRAME);
-        }
-        assertFalse(round.isCatchable(first.getLane()), "still tangled at the line");
-        assertNull(round.tap(first.getLane()));
-        while (round.isTangled(first.getLane())) {
-            round.update(FRAME);
-        }
+        runUntil(round, first.getArrival() - 0.4f);
+        assertNull(round.tap(first.getLane()), "tapped again while tangled: tangled from now");
+        runUntil(round, first.getArrival() - 0.1f);
+        assertTrue(round.isTangled(first.getLane()), "still tangled: tapping all the time doesn't win");
+        assertFalse(round.isCatchable(first.getLane()));
+        runUntil(round, first.getArrival() + 0.05f);
         assertTrue(round.isCatchable(first.getLane()), "untangled, still in the window");
         assertNotNull(round.tap(first.getLane()));
+    }
+
+    @Test
+    void aDoubleTapAfterACatchDoesNothing() {
+        MathUtils.random.setSeed(7);
+        RhythmRound round = new RhythmRound(new RhythmRules(8, 0.5f, 12, 3, 3, 2, 0.2f, 0.4f));
+        RhythmRound.Fish first = round.getFish().get(0);
+        runUntil(round, first.getArrival());
+        assertNotNull(round.tap(first.getLane()));
+        round.update(0.15f);
+        assertNull(round.tap(first.getLane()));
+        assertFalse(round.isTangled(first.getLane()), "a child's double tap doesn't tangle the net");
+    }
+
+    private static void runUntil(RhythmRound round, float time) {
+        while (round.getTime() < time) {
+            round.update(FRAME);
+        }
     }
 }

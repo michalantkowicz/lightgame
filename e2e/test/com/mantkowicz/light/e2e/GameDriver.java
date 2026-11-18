@@ -1214,6 +1214,20 @@ public final class GameDriver {
         return fishingFeature().getGame().getRound().isTangled(lane);
     }
 
+    /** Is the fishing game's window over all the UI stage shows now (also after a resize)? */
+    public boolean fishingGameCoversTheScreen() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        if (rhythmGame == null || rhythmGame.getStage() == null) {
+            return false;
+        }
+        com.badlogic.gdx.utils.viewport.Viewport viewport = rhythmGame.getStage().getViewport();
+        com.badlogic.gdx.math.Vector3 centre = viewport.getCamera().position;
+        return rhythmGame.getX() <= centre.x - viewport.getWorldWidth() / 2f + 1
+                && rhythmGame.getY() <= centre.y - viewport.getWorldHeight() / 2f + 1
+                && rhythmGame.getX() + rhythmGame.getWidth() >= centre.x + viewport.getWorldWidth() / 2f - 1
+                && rhythmGame.getY() + rhythmGame.getHeight() >= centre.y + viewport.getWorldHeight() / 2f - 1;
+    }
+
     /** How often no fish comes to a cast from now on, 0 .. 1 (0.3 as the game ships). */
     public static void fishingNoFishChance(float chance) {
         FishingFeature.setNoFishChance(chance);

@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "fc90c2179f240f4b3c9f96cac050d00d7b7daadd",
+  "packJsonSha1": "211f1f826a5bf1528e54db0144a6cf3b818568a0",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -665,6 +665,12 @@
     "fish_catch/caught": {
       "sheet": "fish_catch",
       "frames": 8,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "fish_catch/swim": {
+      "sheet": "fish_catch",
+      "frames": 9,
       "frameDuration": 0.1,
       "playMode": "LOOP"
     },

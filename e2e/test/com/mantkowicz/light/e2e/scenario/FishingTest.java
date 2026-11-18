@@ -170,8 +170,8 @@ class FishingTest {
         game.tapNet(1);
         assertTrue(game.netTangled(1), "nothing on the line yet");
         assertTrue(game.fishingGame().startsWith("caught 0, missed 0"), "not a miss: " + game.fishingGame());
-        game.seconds(0.5f);
-        assertFalse(game.netTangled(1), "only for a moment");
+        game.seconds(1.1f);
+        assertFalse(game.netTangled(1), "only for a moment (1 s at the shipped level)");
         assertFalse(game.crashed());
     }
 
@@ -192,6 +192,22 @@ class FishingTest {
         assertEquals("TEEMO_SAD", game.faceReaction());
         game.frames(2);
         assertEquals("fishing rod", game.toolButton(), "it can cast again");
+        assertFalse(game.crashed());
+    }
+
+    /** A phone turned during the bite and during the game: the paw and the window still cover the screen. */
+    @Test
+    void aResizedScreenStaysCovered() {
+        GameDriver game = onTheSpot();
+        castAndWaitForTheBite(game);
+        game.resize(2000, 600);
+        game.tapAnywhere();
+        assertEquals("GAME", game.fishing(), "a tap anywhere still hooks");
+        assertTrue(game.fishingGameCoversTheScreen());
+        game.resize(400, 900);
+        assertTrue(game.fishingGameCoversTheScreen(), "turned again");
+        playWell(game);
+        assertEquals("LANDING", game.fishing(), "still playable: won");
         assertFalse(game.crashed());
     }
 
