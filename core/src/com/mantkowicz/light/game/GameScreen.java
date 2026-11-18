@@ -1,7 +1,6 @@
 package com.mantkowicz.light.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.maps.tiled.tiles.AnimatedTiledMapTile;
@@ -68,7 +67,7 @@ public class GameScreen extends ScreenAdapter {
         multiplexer = new AnyButtonInput(); // the right mouse button does what the left does
         Gdx.input.setInputProcessor(multiplexer);
 
-        active = area(mapName);
+        active = build(mapName);
         buildTheMapsBehindDoors();
         listenTo(active);
         if (hud != null) {
@@ -90,10 +89,15 @@ public class GameScreen extends ScreenAdapter {
         for (int i = 0; i < toLookAt.size(); i++) {
             for (String target : toLookAt.get(i).doorTargets()) {
                 if (!areas.containsKey(target)) {
-                    toLookAt.add(area(target));
+                    toLookAt.add(build(target));
                 }
             }
         }
+    }
+
+    /** The map a door leads to: built at the start, as every map the doors lead to ({@link #buildTheMapsBehindDoors}). */
+    private Area behind(TileDoor door) {
+        return areas.get(door.getTargetMap());
     }
 
     /** Screen-wide: runs every frame after the maps, whatever map the player is in. */
@@ -101,16 +105,13 @@ public class GameScreen extends ScreenAdapter {
         features.add(feature);
     }
 
-    /** The map with this file name, built (and brought to life) if it isn't yet. */
-    private Area area(String name) {
-        Area area = areas.get(name);
-        if (area == null) {
-            Player elsewhere = active == null ? null : active.getPlayer();
-            area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere);
-            areas.put(name, area);
-            area.startFeatures(this::hud, this::travel);
-            area.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        }
+    /** Builds the map with this file name and brings it to life; only at the start ({@link #show}). */
+    private Area build(String name) {
+        Player elsewhere = active == null ? null : active.getPlayer();
+        Area area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere);
+        areas.put(name, area);
+        area.startFeatures(this::hud, this::travel);
+        area.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         return area;
     }
 
@@ -139,8 +140,8 @@ public class GameScreen extends ScreenAdapter {
 
     /**
      * Someone ended its walk on a door that lets it through (see {@code DoorFeature}). An animal comes out on the other
-     * map at once (that map is built if nobody has been there yet). The player goes behind the curtain: the screen
-     * darkens, the player comes out on the other map, the screen lightens; taps wait meanwhile.
+     * map at once. The player goes behind the curtain: the screen darkens, the player comes out on the other map, the
+     * screen lightens; taps wait meanwhile.
      */
     private boolean travel(GameBoardActor traveller, TileDoor door) {
         Area from = areaOf(traveller);
@@ -150,7 +151,7 @@ public class GameScreen extends ScreenAdapter {
         if (traveller instanceof Player) {
             return from == active && startJourney(door);
         }
-        Area to = area(door.getTargetMap());
+        Area to = behind(door);
         Tile tile = to.arrivalTile(door.getName());
         if (tile == null) {
             return false; // no room on the other side: it stays (and may try again)
@@ -177,7 +178,7 @@ public class GameScreen extends ScreenAdapter {
         if (curtain.isDrawn()) {
             return false; // on its way already
         }
-        if (area(door.getTargetMap()).arrivalTile(door.getName()) == null) {
+        if (behind(door).arrivalTile(door.getName()) == null) {
             active.stayOnDoor(active.getPlayer());
             return false;
         }
@@ -192,7 +193,7 @@ public class GameScreen extends ScreenAdapter {
      * has walked off.
      */
     private void arrive(TileDoor door) {
-        Area to = area(door.getTargetMap());
+        Area to = behind(door);
         Tile tile = to.arrivalTile(door.getName());
         if (tile == null || to == active) {
             active.stayOnDoor(active.getPlayer());
@@ -211,12 +212,6 @@ public class GameScreen extends ScreenAdapter {
             arrivingThrough = null;
             arrive(door);
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
-            active.getGameStage().fadeOut();
-        } else if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
-            active.getGameStage().fadeIn();
-        }
-
         AnimatedTiledMapTile.updateAnimationBaseTime(); // animated map tiles (water)
         active.actAndDraw(delta);
 

@@ -50,8 +50,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     private final List<CropType> favouriteDishes;
     private final float hungryAfterSeconds, giveUpWishingAfterSeconds;
     /** How hungry it is, what it wishes for...: what goes with it through a door. */
-    private Needs needs = new Needs();
-    /** What it wishes for this time it is hungry, as an item ({@link Needs#wish}). */
+    private Shared shared = new Shared();
+    /** What it wishes for this time it is hungry, as an item ({@link Shared#wish}). */
     private Crop favouriteFood;
     private PictureBubble wishBubble;
     /** False while the action button with its wish is over it: the bubble is hidden. */
@@ -64,7 +64,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * it was. What lives in the animal itself (what it is doing, its wait, its bubble) starts again on the other side,
      * so a new field that must not start again belongs here.
      */
-    private static final class Needs {
+    private static final class Shared {
         /** What it wishes for this time it is hungry (picked when it gets hungry). */
         CropType wish;
         /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
@@ -93,8 +93,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
                 : new ArrayList<>(favouriteDishes);
         this.hungryAfterSeconds = hungryAfterSeconds;
         this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
-        needs.wish = this.favouriteDishes.get(0);
-        favouriteFood = new Crop(needs.wish, resources);
+        shared.wish = this.favouriteDishes.get(0);
+        favouriteFood = new Crop(shared.wish, resources);
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, events));
     }
@@ -106,8 +106,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     protected void startLiving() {
         addPlugin(delta -> {
             timeLeft -= delta;
-            needs.sinceFed += delta;
-            needs.sinceStroked += delta;
+            shared.sinceFed += delta;
+            shared.sinceStroked += delta;
             think();
         });
         if (Debug.isOn(STATE_LABELS)) {
@@ -121,7 +121,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     }
 
     /**
-     * The same animal on another map, where it came out of a door: it carries its {@link Needs} (as hungry as here,
+     * The same animal on another map, where it came out of a door: it carries its {@link Shared} (as hungry as here,
      * wishing for the same, as long since its last stroke). What it was doing starts again from its state machine's
      * first state (on the other side it looks around first), so a wish comes back in a moment. Take it off this map
      * with {@link #leaveBoard()}.
@@ -129,8 +129,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     @Override
     public FarmAnimal moveTo(GameContext context) {
         FarmAnimal there = createAnother(context);
-        there.needs = needs;
-        there.favouriteFood = new Crop(needs.wish, there.resources);
+        there.shared = shared;
+        there.favouriteFood = new Crop(shared.wish, there.resources);
         return there;
     }
 
@@ -167,7 +167,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      */
     @Override
     public boolean canBeStroked() {
-        return isStrokable() && needs.sinceStroked >= SECONDS_BETWEEN_STROKES;
+        return isStrokable() && shared.sinceStroked >= SECONDS_BETWEEN_STROKES;
     }
 
     // what the player does with it (a tap on it, the round buttons)
@@ -201,7 +201,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      */
     void waitForTheHand() {
         timeLeft = RemoveWhenUnavailablePlugin.DURATION; // no dice: the cow's other random choices stay as they were
-        needs.sinceStroked = 0; // the next stroke only after a while
+        shared.sinceStroked = 0; // the next stroke only after a while
     }
 
     /** Starts a wait of a random length between the two; {@link #isTimeUp()} says when it is over. */
@@ -223,12 +223,12 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     }
 
     boolean isHungry() {
-        return needs.sinceFed >= hungryAfterSeconds;
+        return shared.sinceFed >= hungryAfterSeconds;
     }
 
     void stopBeingHungry() {
-        needs.sinceFed = 0;
-        needs.wishChosen = false;
+        shared.sinceFed = 0;
+        shared.wishChosen = false;
     }
 
     /**
@@ -236,10 +236,10 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * after a stroke it wishes for the same again.
      */
     void chooseWish() {
-        if (!needs.wishChosen) {
-            needs.wish = CropType.randomOf(favouriteDishes);
-            favouriteFood = new Crop(needs.wish, resources);
-            needs.wishChosen = true;
+        if (!shared.wishChosen) {
+            shared.wish = CropType.randomOf(favouriteDishes);
+            favouriteFood = new Crop(shared.wish, resources);
+            shared.wishChosen = true;
         }
     }
 
@@ -250,20 +250,20 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
 
     /** It has wished for its crop too long without getting it. */
     boolean hasWishedTooLong() {
-        return needs.sinceFed >= hungryAfterSeconds + giveUpWishingAfterSeconds;
+        return shared.sinceFed >= hungryAfterSeconds + giveUpWishingAfterSeconds;
     }
 
     /** It gives up its wish and feeds itself: this many bites (of grass, of what it finds on the ground). */
     void startFeedingItself(int bites) {
-        needs.bitesLeft = bites;
+        shared.bitesLeft = bites;
     }
 
     void takeBite() {
-        needs.bitesLeft--;
+        shared.bitesLeft--;
     }
 
     boolean hasBitesLeft() {
-        return needs.bitesLeft > 0;
+        return shared.bitesLeft > 0;
     }
 
     /** A bubble over it with what it wishes for; tapping the bubble walks the player next to it, as tapping it does. */

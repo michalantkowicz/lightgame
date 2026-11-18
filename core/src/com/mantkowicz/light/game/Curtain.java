@@ -3,13 +3,13 @@ package com.mantkowicz.light.game;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-
-import static com.mantkowicz.light.game.Main.SCREEN_HEIGHT;
-import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
  * Black over the whole screen while the player goes through a door: it darkens the screen, the player goes to the
@@ -44,9 +44,9 @@ final class Curtain extends Image {
      * then does {@code whenLight}.
      */
     void fall(Stage stage, float seconds, Runnable whenDark, Runnable whenLight) {
-        setBounds(-SCREEN_WIDTH, -SCREEN_HEIGHT, 3 * SCREEN_WIDTH, 3 * SCREEN_HEIGHT); // whatever the window
         setColor(0, 0, 0, 0);
         stage.addActor(this);
+        coverTheScreen();
         addAction(Actions.sequence(
                 Actions.alpha(1, seconds),
                 Actions.run(whenDark),
@@ -55,6 +55,25 @@ final class Curtain extends Image {
                     remove(); // in the same step: an actor off the stage doesn't act any more
                     whenLight.run();
                 })));
+    }
+
+    @Override
+    public void act(float delta) {
+        super.act(delta);
+        if (getStage() != null) {
+            coverTheScreen(); // the window may have changed meanwhile
+        }
+    }
+
+    /**
+     * Exactly what the stage shows, whatever the window: a wide one shows much more than the stage's minimum size
+     * (its {@link ExtendViewport} grows), so fixed bounds left a strip at the side uncovered.
+     */
+    private void coverTheScreen() {
+        Viewport viewport = getStage().getViewport();
+        Vector3 centre = viewport.getCamera().position;
+        setBounds(centre.x - viewport.getWorldWidth() / 2 - 1, centre.y - viewport.getWorldHeight() / 2 - 1,
+                viewport.getWorldWidth() + 2, viewport.getWorldHeight() + 2);
     }
 
     void dispose() {

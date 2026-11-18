@@ -1101,7 +1101,7 @@ by a chicken, slowly enough that the player can still save it.
     the scythe (the hint is set by the new map every frame; a wish bubble hidden under a button comes back when the
     player is back). `GrassFeature` only grows grass now, on every map. The other maps no longer have to act before
     the player's one for the HUD to be right.
-  - **What goes through doors in one object**: `FarmAnimal.Needs` (wish, hunger, last stroke, bites left) is handed to
+  - **What goes through doors in one object**: `FarmAnimal.Shared` (wish, hunger, last stroke, bites left) is handed to
     the animal on the other side; `Player.Shared` (backpack, stamina) is what every map's rabbit shares. The reflection
     test listing an animal's fields not carried over (`GameDriver.fieldsNotCarriedThroughADoor`) went with it.
   - Map property `featuresOff` (`FeatureFlag` names, e.g. `GROWING_GRASS` in the coop) replaces `growingGrass`.
@@ -1113,3 +1113,17 @@ by a chicken, slowly enough that the player can still save it.
   - The FPS label needed nothing: it is on the shared UI stage already.
   - Tests: `TravelTest` (no room behind the door; the scythe goes when the rabbit goes; a chain of doors builds every
     map at the start).
+- **After the owner's PR comments** (2026‑11‑18):
+  - **The door on the tool button**: standing still on the door it came out of (also when there was no room on the
+    other side), the rabbit has a door (`UiImage.DOOR_ICON`, the pack's "enter" icon in the question mark's style) on
+    the tool button; tapped, it goes through again as if it had walked onto the door (`DoorToolFeature`, a
+    `PlayerFeature`). It goes once the rabbit walks off. A tool now shows only over the hint and resets only itself,
+    so on a door with grass the door comes first and the scythe follows once the rabbit is off it.
+  - **Curtain**: in a wide browser window a strip at the right stayed uncovered: the UI's `ExtendViewport` showed
+    more than the fixed bounds (3 × 800 wide). It now covers exactly what its stage shows, every frame.
+  - `FarmAnimal.Needs` is `FarmAnimal.Shared`, as in `Player`.
+  - `GameScreen` builds maps only at the start (`build`); going through a door just looks the map up (`behind`).
+  - The Q/W keys (fade the game stage) are gone, with their test (`ShaderAndLightTest.qFadesAndWRestores`) and golden
+    (`fade-shader`), as the owner asked. `GameStage.fadeOut/fadeIn` and `GameDriver.pressKey` stay (unused now).
+  - Tests: `TravelTest.theDoorOnTheToolButtonTakesTheRabbitBack`; in the scythe test the coop's tool button shows the
+    door now.

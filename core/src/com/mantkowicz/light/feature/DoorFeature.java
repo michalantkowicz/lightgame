@@ -65,6 +65,14 @@ public class DoorFeature implements Feature {
         cameOut.add(actor);
     }
 
+    /**
+     * The door it came out of and still stands on, not having walked off yet (also after there was no room on the other
+     * side); null otherwise.
+     */
+    public TileDoor cameOutOnto(GameBoardActor actor) {
+        return cameOut.contains(actor) ? doors.get(actor.getTile()) : null;
+    }
+
     public boolean isDoor(Tile tile) {
         return doors.containsKey(tile);
     }

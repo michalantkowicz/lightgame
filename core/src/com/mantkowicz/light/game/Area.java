@@ -24,6 +24,7 @@ import com.mantkowicz.light.feature.CameraTrackingFeature;
 import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.DoorFeature;
+import com.mantkowicz.light.feature.DoorToolFeature;
 import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.GrassCuttingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
@@ -160,6 +161,7 @@ final class Area {
      * this map, the others always. The player's and the grass only on a map with a player: they need it.
      */
     void startFeatures(HudProvider hudProvider, Travel travel) {
+        doors = new DoorFeature(context, travel);
         if (player != null) {
             camera = new CameraTrackingFeature(context, player);
             features.add(camera);
@@ -168,6 +170,7 @@ final class Area {
             Hud hud = hudProvider.hud(context, player);
             creatures = new CreatureFeature(context, player, hud);
             features.add(creatures);
+            features.add(new DoorToolFeature(context, player, hud, doors, travel)); // before the scythe: it comes first
             if (mapProperties.isOn(FeatureFlag.GROWING_GRASS)) {
                 GrassFeature grass = new GrassFeature(context, player);
                 features.add(grass);
@@ -177,7 +180,6 @@ final class Area {
         features.add(new MenuFeature(context, menuStage));
         features.add(new NoPathFeature(context));
         features.add(new StageFeature(context));
-        doors = new DoorFeature(context, travel);
         features.add(doors);
     }
 

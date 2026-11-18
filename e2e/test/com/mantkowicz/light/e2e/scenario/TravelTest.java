@@ -212,7 +212,32 @@ class TravelTest {
         assertEquals("scythe", game.toolButton(), "standing on grass on the door: the scythe");
         game.seconds(1);
         assertEquals(TestMap.pathOf(COOP_NAME + "-s"), game.currentMap());
-        assertEquals("hint", game.toolButton(), "in the coop the farm's scythe is gone");
+        assertEquals("door", game.toolButton(), "in the coop the farm's scythe is gone (the coop's door is there)");
+        assertFalse(game.crashed());
+    }
+
+    @Test
+    void theDoorOnTheToolButtonTakesTheRabbitBack() {
+        coop(FARM_NAME + "-t").write(COOP_NAME + "-t");
+        String farm = farm(COOP_NAME + "-t").write(FARM_NAME + "-t");
+        String coop = TestMap.pathOf(COOP_NAME + "-t");
+        GameDriver game = GameDriver.start(farm);
+        assertEquals("hint", game.toolButton(), "it didn't come out of a door: no door on the button");
+
+        game.click(FARM.cell('O'));
+        game.seconds(3);
+        assertEquals(coop, game.currentMap());
+        assertEquals("door", game.toolButton(), "standing on the coop's door it came out of: the door on the button");
+
+        game.tapToolButton();
+        game.seconds(1);
+        assertEquals(farm, game.currentMap(), "tapped: back through the door, as if it had walked onto it again");
+        assertEquals(FARM.cell('O'), game.playerCell(), "out of the farm's door");
+        assertEquals("door", game.toolButton(), "on the farm's door it came out of: the door again");
+
+        game.click(FARM.cell('P'));
+        game.seconds(2);
+        assertEquals("hint", game.toolButton(), "walked off the door: the door goes");
         assertFalse(game.crashed());
     }
 

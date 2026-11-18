@@ -7,6 +7,7 @@ import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.hud.ToolButton;
 
 import static com.mantkowicz.light.feature.GrassFeature.SCYTHE;
 
@@ -21,8 +22,6 @@ public class GrassCuttingFeature implements PlayerFeature {
     private final Player player;
     private final Hud hud;
     private final GrassFeature grass;
-    /** Is the scythe on the tool button now? */
-    private boolean scytheShown;
     /** Where the rabbit stands swinging its scythe, until the grass there and around is cut; null otherwise. */
     private Tile cuttingAt;
 
@@ -43,9 +42,8 @@ public class GrassCuttingFeature implements PlayerFeature {
     @Override
     public void playerLeft() {
         cuttingAt = null;
-        if (scytheShown) {
+        if (scytheShown()) {
             hud.getToolButton().resetTool();
-            scytheShown = false;
         }
     }
 
@@ -67,19 +65,23 @@ public class GrassCuttingFeature implements PlayerFeature {
 
     /**
      * Standing still on grass (or swinging at it) the rabbit has the scythe on the HUD's tool button; elsewhere (also
-     * just next to grass) the button is the hint again.
+     * just next to grass) the button is the hint again. Only over the hint: another tool (the door) comes first.
      */
     private void showScythe() {
         boolean scythe = cuttingAt != null || canCut();
-        if (scythe && !scytheShown) {
+        if (scythe && ToolButton.HINT.equals(hud.getToolButton().getToolName())) {
             hud.getToolButton().setTool(SCYTHE,
                     context.getResourcesService().getAnimation(Sprite.SCYTHE_ICON, Action.ICON)
                             .getKeyFrame(0),
                     this::cutHere);
-        } else if (!scythe && scytheShown) {
+        } else if (!scythe && scytheShown()) {
             hud.getToolButton().resetTool();
         }
-        scytheShown = scythe;
+    }
+
+    /** Is the scythe on the tool button now? */
+    private boolean scytheShown() {
+        return SCYTHE.equals(hud.getToolButton().getToolName());
     }
 
     /** The tool button with the scythe tapped: the rabbit swings it at the grass where it stands and around. */
