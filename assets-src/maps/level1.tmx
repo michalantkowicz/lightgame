@@ -231,6 +231,7 @@
   </object>
   <object id="20" name="DOOR" x="276" y="132" width="8" height="8">
    <properties>
+    <property name="bedtime" value="CHICKEN"/>
     <property name="door" value="coop"/>
     <property name="objectClass" value="DOOR"/>
     <property name="passes" value="PLAYER,CHICKEN"/>

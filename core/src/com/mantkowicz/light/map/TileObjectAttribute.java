@@ -23,7 +23,12 @@ public enum TileObjectAttribute {
     /** The map a door leads to, e.g. "maps/coop.tmx". */
     TARGET_MAP("targetMap"),
     /** Who may go through a door, e.g. "PLAYER,CHICKEN" (the player, chickens and chicks); everyone without it. */
-    PASSES("passes");
+    PASSES("passes"),
+    /**
+     * Who goes through a door to sleep, e.g. "CHICKEN" on the farm's door to the coop: at night they walk in, in the
+     * morning back out; nobody without it.
+     */
+    BEDTIME("bedtime");
 
     private final String value;
 

@@ -16,11 +16,16 @@ import com.mantkowicz.light.resources.Action;
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
  * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
+ * at night: WISHING ──▶ STANDING ──▶ LYING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
+ *           SLEEPING ──▶ SLEEPING_THE_NIGHT; the rest ends in STANDING as by day; no stroke all night
  * </pre>
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
 public enum CowState implements State<Cow> {
-    /** On its feet, chewing. Hungry: wishes for one of its favourite crops. Otherwise after a while it walks a step or lies down. */
+    /**
+     * On its feet, chewing. At night it lies down to sleep. Hungry: wishes for one of its favourite crops. Otherwise
+     * after a while it walks a step or lies down.
+     */
     STANDING {
         @Override
         public void enter(Cow cow) {
@@ -30,7 +35,9 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void update(Cow cow) {
-            if (cow.isHungry()) {
+            if (cow.isNight()) {
+                cow.changeState(LYING_DOWN);
+            } else if (cow.isHungry()) {
                 cow.chooseWish(); // here, not in WISHING: stroked, it comes back wishing for the same
                 cow.changeState(WISHING);
             } else if (cow.isTimeUp()) {
@@ -74,7 +81,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Lying awake. After a while it falls asleep or gets up; hunger gets it up at once. */
+    /** Lying awake. At night it falls asleep at once. After a while it falls asleep or gets up; hunger gets it up at once. */
     RESTING {
         @Override
         public void enter(Cow cow) {
@@ -84,7 +91,9 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void update(Cow cow) {
-            if (cow.isHungry()) {
+            if (cow.isNight()) {
+                cow.changeState(SLEEPING_THE_NIGHT);
+            } else if (cow.isHungry()) {
                 cow.changeState(GETTING_UP);
             } else if (cow.isTimeUp()) {
                 cow.changeState(oneOf(SLEEPING, GETTING_UP));
@@ -97,7 +106,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Asleep until it has slept enough or hunger wakes it. */
+    /** A nap: asleep until it has slept enough or hunger wakes it. Night falling, it sleeps on, the night through. */
     SLEEPING {
         @Override
         public void enter(Cow cow) {
@@ -107,7 +116,9 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void update(Cow cow) {
-            if (cow.isTimeUp() || cow.isHungry()) {
+            if (cow.isNight()) {
+                cow.changeState(SLEEPING_THE_NIGHT);
+            } else if (cow.isTimeUp() || cow.isHungry()) {
                 cow.changeState(GETTING_UP);
             }
         }
@@ -115,6 +126,31 @@ public enum CowState implements State<Cow> {
         @Override
         boolean canBeStroked() {
             return true;
+        }
+    },
+
+    /**
+     * Asleep for the night ("zzz" over it): nothing wakes it, not hunger, not the player (no stroke). Up when the day
+     * starts.
+     */
+    SLEEPING_THE_NIGHT {
+        @Override
+        public void enter(Cow cow) {
+            cow.playAnimation(Action.SLEEP);
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (cow.isNight()) {
+                cow.getZzz().keepOver(cow);
+            } else {
+                cow.changeState(GETTING_UP);
+            }
+        }
+
+        @Override
+        public void exit(Cow cow) {
+            cow.getZzz().remove();
         }
     },
 
@@ -132,7 +168,10 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Stands with a bubble showing what it wishes for, until it gets it. It can be stroked meanwhile. */
+    /**
+     * Stands with a bubble showing what it wishes for, until it gets it (or the night comes: it goes to sleep and
+     * wishes again in the morning). It can be stroked meanwhile.
+     */
     WISHING {
         @Override
         public void enter(Cow cow) {
@@ -156,7 +195,9 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void update(Cow cow) {
-            if (cow.hasWishedTooLong()) { // it eats grass instead
+            if (cow.isNight()) {
+                cow.changeState(STANDING); // and lies down from there
+            } else if (cow.hasWishedTooLong()) { // it eats grass instead
                 cow.startGrazing();
                 cow.changeState(GRAZING);
             }

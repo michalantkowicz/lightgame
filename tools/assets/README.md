@@ -85,7 +85,9 @@ tool again.
    there, and there is none while growing grass is switched off (`FeatureFlag.GROWING_GRASS`).
    A `DOOR` (on a walkable tile) leads to another map: string properties `door` (its name, the same on both maps),
    `targetMap` (e.g. `maps/coop.tmx`) and optionally `passes`: who may go through, comma-separated (`PLAYER`, `COW`,
-   `CHICKEN` for chickens and chicks), everyone without it. Whoever ends its walk on the door goes through and comes
+   `CHICKEN` for chickens and chicks), everyone without it, and `bedtime`: who goes through it to sleep (`CHICKEN` on
+   the farm's door to the coop: at night they walk in and sleep at least two tiles from the coop's entrance, in the
+   morning they walk back out and at least two tiles away from the door), nobody without it. Whoever ends its walk on the door goes through and comes
    out of the door with the same name on the other map. Only the map the game starts on has a `PLAYER`: on the others
    the rabbit comes out of a door. Draw the door itself on the map (e.g. the coop's ramp); the object draws nothing.
    A `FISHING_SPOT` is a place to fish from: the rabbit casts into the water two tiles to its left, so put water

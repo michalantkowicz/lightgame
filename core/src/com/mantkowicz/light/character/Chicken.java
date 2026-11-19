@@ -23,8 +23,8 @@ import static com.mantkowicz.light.actor.GameActorType.CHICKEN;
  * A chicken or a chick ({@link ChickenType}). Like a {@link Cow} it gets hungry, wishes for a crop, eats what it is
  * given, enjoys a stroke and rests, but it is restless: it walks more, pecks at the ground often (looking for
  * something), and it wishes only for corn and gives up soon, bored. A crop lying on the ground nearby it goes for,
- * slowly, and eats ({@link CropHunt}), unless the player picks it up first. What it does and when is all in
- * {@link ChickenState}.
+ * slowly, and eats ({@link CropHunt}), unless the player picks it up first. At night it goes to the coop to sleep, and
+ * out again in the morning ({@link CoopTrip}). What it does and when is all in {@link ChickenState}.
  */
 public class Chicken extends FarmAnimal {
     /** This long after the start or its last meal it gets hungry again. */
@@ -39,6 +39,8 @@ public class Chicken extends FarmAnimal {
     private final DefaultStateMachine<Chicken, ChickenState> stateMachine = new DefaultStateMachine<>(this);
     /** Going for a crop lying on the ground, to eat it. */
     private final CropHunt hunt;
+    /** Going to the coop to sleep, and out in the morning. */
+    private final CoopTrip trip;
     /** Leaning towards a crop it pecks at, or null. */
     private MoveByAction lean;
     /** Going back to the middle of its tile after leaning, or null. */
@@ -49,6 +51,7 @@ public class Chicken extends FarmAnimal {
                 GIVE_UP_WISHING_AFTER_SECONDS);
         this.type = type;
         this.hunt = new CropHunt(this, context.getBoardService());
+        this.trip = new CoopTrip(this, context.getBoardService());
         setName(type.getName());
         stateMachine.changeState(ChickenState.STANDING);
         startLiving();
@@ -56,7 +59,14 @@ public class Chicken extends FarmAnimal {
 
     @Override
     protected FarmAnimal createAnother(GameContext context) {
-        return new Chicken(context, type);
+        Chicken there = new Chicken(context, type);
+        there.trip.carryFrom(trip); // in for the night: it goes on to its place to sleep; out: it is home
+        return there;
+    }
+
+    /** Where the chickens of the map it is on sleep ({@code BedtimeFeature} tells it). */
+    public void setRoost(Roost roost) {
+        trip.setRoost(roost);
     }
 
     public ChickenType getType() {
@@ -129,6 +139,16 @@ public class Chicken extends FarmAnimal {
     /** Going for a crop on the ground: what it goes for, where it started, its steps. */
     CropHunt getHunt() {
         return hunt;
+    }
+
+    /** Going to the coop to sleep, and out in the morning. */
+    CoopTrip getTrip() {
+        return trip;
+    }
+
+    /** Did it come into the coop for the night (it goes back out in the morning)? For tests. */
+    public boolean sleepsAway() {
+        return trip.sleepsAway();
     }
 
     /** The crop on the ground it goes for or pecks at, or null (for tests and descriptions). */

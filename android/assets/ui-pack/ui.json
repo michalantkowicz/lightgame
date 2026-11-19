@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "e853bad2c024841f2f86fea034364a3474576a1e",
+  "uiJsonSha1": "35da3b3332f93a256e6a98c0a2a3e4aa5446daa6",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -41,6 +41,9 @@
       "frames": 1
     },
     "emojis/sun": {
+      "frames": 1
+    },
+    "emojis/zzz": {
       "frames": 1
     },
     "emotes_premium/row_02": {

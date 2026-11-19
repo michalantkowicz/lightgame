@@ -14,6 +14,7 @@ import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.PictureBubble;
 import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.actor.WalkNextToOnTapListener;
+import com.mantkowicz.light.actor.Zzz;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
@@ -34,7 +35,7 @@ import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
  * crops (a bubble over it), gives up after a while, can be fed and stroked by the player (the round buttons over it,
  * {@link Creature}), and waits between what it does. What it does and when is its own gdx-ai state machine (an enum
  * next to its class, e.g. {@link CowState}); the states use the helpers here. Tapping it walks the player next to it;
- * holding it shows its description.
+ * holding it shows its description. At night it sleeps ({@link #setNight}): no wish, no stroke, "zzz" over it.
  */
 public abstract class FarmAnimal extends SpriteActor implements Creature {
     /** What the player tells the animal (gdx-ai messages, answered in its states). */
@@ -58,6 +59,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     private boolean wishShown = true;
     /** Seconds left of what {@link #stayFor} set. */
     private float timeLeft;
+    /** Over it while it sleeps the night. */
+    private final Zzz zzz;
 
     /**
      * What an animal carries through a door to another map ({@link #moveTo}): everything about it that has to stay as
@@ -75,6 +78,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         float sinceStroked = SECONDS_BETWEEN_STROKES;
         /** Bites still to take when it feeds itself (grazing, pecking) after giving up its wish. */
         int bitesLeft;
+        /** It is night: it goes to sleep, or sleeps (see {@code BedtimeFeature}). */
+        boolean night;
     }
 
     /**
@@ -95,6 +100,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
         shared.wish = this.favouriteDishes.get(0);
         favouriteFood = new Crop(shared.wish, resources);
+        zzz = new Zzz(resources.getUiImage(UiImage.ZZZ), context.getNotificationStage());
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, events));
     }
@@ -143,6 +149,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         if (wishBubble != null) {
             hideWish();
         }
+        zzz.remove();
         super.leaveBoard();
     }
 
@@ -162,12 +169,24 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     protected abstract boolean isStrokable();
 
     /**
-     * It can be stroked: what it does allows it ({@link #isStrokable()}) and it wasn't stroked in the last
-     * {@link #SECONDS_BETWEEN_STROKES} seconds.
+     * It can be stroked: it is day (at night it goes to sleep or sleeps: nothing wakes it), what it does allows it
+     * ({@link #isStrokable()}) and it wasn't stroked in the last {@link #SECONDS_BETWEEN_STROKES} seconds.
      */
     @Override
     public boolean canBeStroked() {
-        return isStrokable() && shared.sinceStroked >= SECONDS_BETWEEN_STROKES;
+        return !shared.night && isStrokable() && shared.sinceStroked >= SECONDS_BETWEEN_STROKES;
+    }
+
+    /**
+     * Night or day ({@code BedtimeFeature}): at night it goes to sleep once done with what it is doing, by day it wakes
+     * up. Its states look at it ({@link #isNight()}).
+     */
+    public void setNight(boolean night) {
+        shared.night = night;
+    }
+
+    boolean isNight() {
+        return shared.night;
     }
 
     // what the player does with it (a tap on it, the round buttons)
@@ -290,6 +309,11 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     void hideWish() {
         wishBubble.remove();
         wishBubble = null;
+    }
+
+    /** The "zzz" over it while it sleeps the night (shown with {@link Zzz#keepOver}, else not on a stage). */
+    public Zzz getZzz() {
+        return zzz;
     }
 
     /** A small face (the pack's tiny emotes) floats up over it and fades. Not used right now: no state calls it. */

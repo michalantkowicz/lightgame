@@ -23,7 +23,8 @@ public class TileObjectFactory {
                 assertMandatoryProperties(objectProperties, TileObjectAttribute.DOOR, TARGET_MAP);
                 return new TileDoor(objectProperties.get(TileObjectAttribute.DOOR.getValue(), String.class),
                         objectProperties.get(TARGET_MAP.getValue(), String.class),
-                        objectProperties.get(PASSES.getValue(), String.class));
+                        objectProperties.get(PASSES.getValue(), String.class),
+                        objectProperties.get(TileObjectAttribute.BEDTIME.getValue(), String.class));
             case GRASS :
                 return new TileGrass((int) TileObjectType.number(objectProperties, TileObjectAttribute.PHASE,
                         TileGrass.FIRST_PHASE));
