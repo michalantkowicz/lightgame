@@ -1294,3 +1294,14 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
     game, yellow, blue or a clownfish, moved by scene2d; the owner didn't want the pack's leaping fish), fading as it
     goes under, 1.2 s (`ui.fishing.GotAwayLeap`, made through `CatchFlight.gotAway` to keep `FishingFeature` under
     PMD's import limit).
+  - then (2026‑11‑19): the fishing game's window sits in the middle of the screen above the HUD's bottom row (the
+    face, the backpack: `Hud.getRow().getTop()`, passed as the game's `floor`), not over it, and the dim stops there,
+    so the face's reactions show bright; taps on the HUD under it still don't get through. The panel is 960 tall
+    (was 1000) so it has some room above and below on the smallest screen.
+  - then: the bite's "tap now!" is a hand pointer instead of the pack's pointing cat paw (the owner found it weird):
+    the UI pack has no hand, so `tools/assets/hand_pointer.py` draws one in the style of its mouse cursors
+    (`UiImage.HAND_POINTING`, its finger tip `HAND_TIP_X`), the finger up, its tip just under the screen's middle (the
+    rabbit), pulsing from the tip, the emptying circle under it. `UiImage.PAW_POINTING` stays, unused.
+  - then: the hand is the clock too, the emptying circle under it is gone: white at first, it turns grey from its
+    finger's tip down as the 1.2 s pass, a row of its pixels at a time (a grey copy under a white one cut shorter from
+    the top). `UiImage.HOLD_CIRCLE` stays for the settings gear.

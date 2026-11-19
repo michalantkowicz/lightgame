@@ -1,5 +1,6 @@
 package com.mantkowicz.light.ui.fishing;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Rectangle;
@@ -15,20 +16,24 @@ import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
 
 /**
- * A fish bites: a big paw in the bottom right of the screen points at its middle (where the rabbit is: casting centres
- * the camera on it), a little off it, pulsing, with a circle under it that empties (the hold circle of the settings
- * gear, backwards). A tap anywhere on the screen in time hooks the fish; when the circle
- * is empty, it is gone. While it is shown, taps don't reach the map or the HUD.
+ * A fish bites: a big hand pointer just under the screen's middle (where the rabbit is: casting centres the camera on
+ * it) points up at it, pulsing, and is the clock too: white at first, it turns grey from its finger's tip down as the
+ * time passes, row by row of its pixels. A tap anywhere on the screen in time hooks the fish; when it is all grey, the
+ * fish is gone. While it is shown, taps don't reach the map or the HUD.
  */
 public class BitePrompt extends Group {
-    /** Pixels per pack pixel for the paw and the circle. */
+    /** Pixels per pack pixel for the hand. */
     private static final float SCALE = 12;
-    /** The paw's finger is this far right of and below the screen's middle (not over the rabbit). */
-    private static final float RIGHT = 50, DOWN = 70;
+    /** The hand's finger tip is this far right of and below the screen's middle (just under the rabbit). */
+    private static final float RIGHT = 30, DOWN = 80;
     private static final float PULSE = 1.2f, PULSE_SECONDS = 0.25f;
+    /** The hand's part that is used up turns this grey. */
+    private static final Color USED = new Color(0.55f, 0.55f, 0.55f, 1);
 
-    private final TextureRegion[] circle;
-    private final Image ring, paw;
+    /** The hand: a grey one, and over it the white part still left (its bottom, shorter and shorter). */
+    private final Group hand = new Group();
+    private final TextureRegion picture, whitePart;
+    private final Image white;
     private final float seconds;
     private final Runnable tapped, tooLate;
     private float left;
@@ -48,21 +53,22 @@ public class BitePrompt extends Group {
         setName("BITE");
         setTouchable(Touchable.enabled);
 
-        TextureRegion pawPicture = resources.getUiImage(UiImage.PAW_POINTING);
-        paw = new Image(pawPicture);
-        paw.setSize(pawPicture.getRegionWidth() * SCALE, pawPicture.getRegionHeight() * SCALE);
-        paw.setOrigin(0, paw.getHeight());
-        paw.setTouchable(Touchable.disabled);
-        paw.addAction(Actions.forever(Actions.sequence(
+        picture = resources.getUiImage(UiImage.HAND_POINTING);
+        hand.setSize(picture.getRegionWidth() * SCALE, picture.getRegionHeight() * SCALE);
+        Image grey = new Image(picture);
+        grey.setSize(hand.getWidth(), hand.getHeight());
+        grey.setColor(USED);
+        hand.addActor(grey);
+        whitePart = new TextureRegion(picture);
+        white = new Image(new TextureRegionDrawable(whitePart));
+        white.setSize(hand.getWidth(), hand.getHeight());
+        hand.addActor(white);
+        hand.setOrigin(UiImage.HAND_TIP_X * SCALE, hand.getHeight()); // it pulses from its finger's tip
+        hand.setTouchable(Touchable.disabled);
+        hand.addAction(Actions.forever(Actions.sequence(
                 Actions.scaleTo(PULSE, PULSE, PULSE_SECONDS, Interpolation.sine),
                 Actions.scaleTo(1, 1, PULSE_SECONDS, Interpolation.sine))));
-        addActor(paw);
-
-        circle = resources.getUiAnimation(UiImage.HOLD_CIRCLE).getKeyFrames();
-        ring = new Image(new TextureRegionDrawable(circle[circle.length - 1]));
-        ring.setSize(circle[0].getRegionWidth() * SCALE, circle[0].getRegionHeight() * SCALE);
-        ring.setTouchable(Touchable.disabled);
-        addActor(ring);
+        addActor(hand);
         cover(ScreenArea.of(ui));
 
         addListener(new InputListener() {
@@ -86,8 +92,7 @@ public class BitePrompt extends Group {
         }
         followTheScreen();
         left -= delta;
-        float full = Math.max(0, left / seconds);
-        ((TextureRegionDrawable) ring.getDrawable()).setRegion(circle[Math.round(full * (circle.length - 1))]);
+        showTimeLeft(Math.max(0, left / seconds));
         if (left <= 0) {
             done = true;
             remove();
@@ -103,11 +108,20 @@ public class BitePrompt extends Group {
         }
     }
 
-    /** Over this area; the paw's finger (the picture's top left) a little right of and below its middle. */
+    /** Over this area; the hand's finger tip a little right of and below its middle, pointing up at it. */
     private void cover(Rectangle screen) {
         setBounds(screen.x, screen.y, screen.width, screen.height);
-        paw.setPosition(screen.width / 2f + RIGHT, screen.height / 2f - DOWN - paw.getHeight());
-        ring.setPosition(paw.getX() + (paw.getWidth() - ring.getWidth()) / 2f, paw.getY() - ring.getHeight() - 16);
+        hand.setPosition(screen.width / 2f + RIGHT - UiImage.HAND_TIP_X * SCALE,
+                screen.height / 2f - DOWN - hand.getHeight());
+    }
+
+    /** The white part left: this share of the hand's rows from its bottom (whole pixels); grey above it. */
+    private void showTimeLeft(float share) {
+        int rows = picture.getRegionHeight(), whiteRows = Math.round(share * rows);
+        whitePart.setRegion(picture.getRegionX(), picture.getRegionY() + rows - whiteRows, picture.getRegionWidth(),
+                whiteRows);
+        white.setHeight(whiteRows * SCALE);
+        white.setVisible(whiteRows > 0);
     }
 
     /** Seconds left to tap. */

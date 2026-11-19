@@ -7,6 +7,7 @@ changes, or after editing a level in Tiled.
 pip3 install pillow                                   # once
 python3 tools/assets/scythe_animation.py               # once per pack copy: the rabbit's scythe swing (see below)
 python3 tools/assets/net_icon.py                       # once per pack copy: the fishing net's icon (see below)
+python3 tools/assets/hand_pointer.py                   # once per UI pack copy: the hand pointer (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -35,6 +36,12 @@ the sheet `scythe_icon`. Like the pack, neither file is committed: only the atla
 16x16 in the same palette and outline: a long handle from the bottom left, the hoop at its top right seen a little
 from the side, and the net's bag hanging from it, its mesh see-through. It saves `Objects/Items/fishing net icon.png` in the pack folder, read as
 the sheet `fishing_net_icon` (not committed either).
+
+**The hand pointer** (the bite's "tap now!") isn't in the UI pack either, which has only arrows and cat paws for
+cursors. `hand_pointer.py` draws one, 16x16 in the palette and dark outline of the pack's mouse cursors: the index
+finger straight up, three folded fingers, the thumb out to the left. It saves `UI Sprites/Mouse sprites/Hand pointing
+Mouse icon.png` in the UI pack folder, where `ui.json`'s mouse cursors entry picks it up as
+`mouse_hand_pointing_mouse_icon` (`UiImage.HAND_POINTING`; not committed either).
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
 (`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.

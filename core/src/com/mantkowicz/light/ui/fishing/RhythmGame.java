@@ -45,7 +45,7 @@ public class RhythmGame extends Group {
         void over(boolean won);
     }
 
-    private static final float WIDTH = 600, HEIGHT = 1000, MARGIN = 32, GAP = 12;
+    private static final float WIDTH = 600, HEIGHT = 960, MARGIN = 32, GAP = 12;
     /** A fish and an X mark (16 pack pixels, 5 screen pixels each), the water's tiles. */
     private static final float ICON = 16 * 4, FISH = 16 * 7, TILE = 16 * 4;
     /** The line: how thick, how far above the nets. */
@@ -83,6 +83,7 @@ public class RhythmGame extends Group {
     /** The panel and everything on it, in the middle of the screen (it stays there when the window is resized). */
     private final Group window = new Group();
     private final TextureRegion prize;
+    private final float floor;
     private final Stage ui;
     private final Image dim;
     private final float lanesX, laneWidth, lineY, topY, waterBottom;
@@ -94,10 +95,13 @@ public class RhythmGame extends Group {
      * @param ui    the UI stage: the game covers what that shows, its window in the middle
      * @param rules how hard ({@link RhythmRules#forLevel})
      * @param prize the fish the player gets for winning: it pops up when the game is won
+     * @param floor how high the HUD's bottom row (the face, the backpack) reaches over the screen's bottom: the panel
+     *              goes in the middle of the screen above it and the dim stops there, so the face's reactions show
      */
-    public RhythmGame(ResourcesService resources, Stage ui, RhythmRules rules, TextureRegion prize,
+    public RhythmGame(ResourcesService resources, Stage ui, RhythmRules rules, TextureRegion prize, float floor,
             Listener listener) {
         this.prize = prize;
+        this.floor = floor;
         this.resources = resources;
         this.listener = listener;
         this.round = new RhythmRound(rules);
@@ -157,12 +161,15 @@ public class RhythmGame extends Group {
         });
     }
 
-    /** Over what the UI stage shows now, the panel in its middle. */
+    /** Over what the UI stage shows now (taps on the HUD under it don't get through), the panel in the middle above
+     * the HUD's bottom row. */
     private void coverTheScreen() {
         Rectangle screen = ScreenArea.of(getStage() != null ? getStage() : ui);
         setBounds(screen.x, screen.y, screen.width, screen.height);
-        dim.setSize(screen.width, screen.height);
-        window.setPosition(Math.round((screen.width - WIDTH) / 2f), Math.round((screen.height - HEIGHT) / 2f));
+        float above = Math.max(0, Math.min(floor, screen.height - HEIGHT)); // the panel always fits: above or over it
+        dim.setBounds(0, above, screen.width, screen.height - above);
+        window.setPosition(Math.round((screen.width - WIDTH) / 2f),
+                Math.round(above + (screen.height - above - HEIGHT) / 2f));
     }
 
     private float laneMiddle(int lane) {

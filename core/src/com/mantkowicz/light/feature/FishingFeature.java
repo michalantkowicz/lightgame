@@ -41,8 +41,8 @@ import java.util.Set;
  * ({@link #NO_FISH_CHANCE}) no fish comes: it bobs {@link #MOST_WAIT_SECONDS}, the line comes out and the face
  * sweats.</li>
  * <li>A fish bites: the bobber is pulled under with a splash, the rabbit's rod shakes, the face says "!!!" (happy),
- * and a big paw in the bottom right of the screen points at its middle (the rabbit), pulsing, with a circle emptying
- * under it ({@link BitePrompt}).</li>
+ * and a big hand pointer just under the screen's middle points up at it (the rabbit), pulsing, turning grey from its
+ * finger's tip down as the time passes ({@link BitePrompt}).</li>
  * <li>A tap anywhere on the screen within {@link #BITE_SECONDS} hooks it and the fishing game opens
  * ({@link RhythmGame}: fish down three lanes, catch them with the nets on the line): the face is happy at each catch
  * and sad at each miss. Won: the rabbit pulls the line out, the fish
@@ -276,22 +276,23 @@ public class FishingFeature implements PlayerFeature {
         phase = Phase.GAME;
         Stage ui = context.getUiStage();
         prize = new Fish(FishType.values()[MathUtils.random(FishType.values().length - 1)], resources);
-        game = new RhythmGame(resources, ui, rules, prize.getPicture(), new RhythmGame.Listener() {
-            @Override
-            public void caught() {
-                face().play(UiImage.TEEMO_HAPPY);
-            }
+        game = new RhythmGame(resources, ui, rules, prize.getPicture(), hud.getRow().getTop(),
+                new RhythmGame.Listener() {
+                    @Override
+                    public void caught() {
+                        face().play(UiImage.TEEMO_HAPPY);
+                    }
 
-            @Override
-            public void missed() {
-                face().play(UiImage.TEEMO_SAD);
-            }
+                    @Override
+                    public void missed() {
+                        face().play(UiImage.TEEMO_SAD);
+                    }
 
-            @Override
-            public void over(boolean won) {
-                landed(won);
-            }
-        });
+                    @Override
+                    public void over(boolean won) {
+                        landed(won);
+                    }
+                });
         ui.addActor(game);
     }
 

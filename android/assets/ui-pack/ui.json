@@ -150,6 +150,9 @@
     "mouse_catpaw_pointing_mouse_icon": {
       "frames": 1
     },
+    "mouse_hand_pointing_mouse_icon": {
+      "frames": 1
+    },
     "play_button/blank": {
       "frames": 1,
       "split": [
