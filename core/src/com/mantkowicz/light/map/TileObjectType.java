@@ -26,6 +26,8 @@ public enum TileObjectType {
     GRASS,
     /** A way to another map: whoever ends its walk on this tile comes out on the other map ({@link TileDoor}). */
     DOOR,
+    /** A place to fish from ({@link TileFishingSpot}). */
+    FISHING_SPOT,
     // sprite actors
     CHEST((context, properties) -> new Chest(context)),
     COW((context, properties) -> new Cow(context,

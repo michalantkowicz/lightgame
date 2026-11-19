@@ -72,7 +72,24 @@ public enum UiImage {
     /** Floats up over the player after stroking an animal. */
     HEART("emojis/heart"),
     /** On the round button next to an animal that can be stroked: a paw (the pack has no hand). */
-    HAND_ICON("mouse_catpaw_mouse_icon");
+    HAND_ICON("mouse_catpaw_mouse_icon"),
+    /** The pack's paw pointing: where to tap (the bobber a fish just took). */
+    PAW_POINTING("mouse_catpaw_pointing_mouse_icon"),
+    /** A pink X: a fish missed in the fishing game. */
+    MISS("marks/miss"),
+    /**
+     * A hand pointer, the finger up (drawn by tools/assets/hand_pointer.py, the pack has none): tap now! Its finger's
+     * tip is {@link #HAND_TIP_X} pack pixels from its left, on its top.
+     */
+    HAND_POINTING("mouse_hand_pointing_mouse_icon"),
+    /** The face sad (closes its eyes, then a red mark): a fish got away. */
+    TEEMO_SAD("emotes_premium/row_24"),
+    /** The face puts its sunglasses on, then wears them with a sparkle: a fish caught. */
+    TEEMO_COOL_ON("emotes_premium/row_19"),
+    TEEMO_COOL("emotes_premium/row_22");
+
+    /** Where {@link #HAND_POINTING}'s finger tip is: this many pack pixels from the picture's left (on its top). */
+    public static final int HAND_TIP_X = 5;
 
     private final String piece;
 

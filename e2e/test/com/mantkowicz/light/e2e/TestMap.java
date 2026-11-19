@@ -48,6 +48,8 @@ public final class TestMap {
     private final int width;
     private final int height;
     private final Map<Character, MapObject> objects = new HashMap<>();
+    /** The map's own properties (Tiled's map properties), e.g. featuresOff. */
+    private final Map<String, String> mapProperties = new LinkedHashMap<>();
 
     private record MapObject(String objectClass, Map<String, String> properties) {
     }
@@ -78,6 +80,12 @@ public final class TestMap {
      */
     public TestMap with(char c, String objectClass, Map<String, String> properties) {
         objects.put(c, new MapObject(objectClass, new LinkedHashMap<>(properties)));
+        return this;
+    }
+
+    /** A property of the map itself, e.g. {@code withMapProperty("featuresOff", "FISHING")}. */
+    public TestMap withMapProperty(String name, String value) {
+        mapProperties.put(name, value);
         return this;
     }
 
@@ -122,6 +130,8 @@ public final class TestMap {
         tmx.append(" <properties>\n");
         tmx.append(String.format("  <property name=\"atlas\" value=\"%s\"/>\n",
                 OUTPUT.relativize(ATLAS).toString().replace('\\', '/')));
+        mapProperties.forEach((property, value) -> tmx.append(
+                String.format("  <property name=\"%s\" value=\"%s\"/>\n", property, value)));
         tmx.append(" </properties>\n");
         tmx.append(
                 " <tileset firstgid=\"1\" name=\"water\" tilewidth=\"16\" tileheight=\"16\" tilecount=\"4\" columns=\"4\">\n");

@@ -39,11 +39,22 @@ public class AnimationPlugin implements Plugin {
     /** An action played once while standing (e.g. "rabbit/water_left"), or null. */
     private Action once;
     private Direction onceDirection;
+    /**
+     * A pose from another sheet of the same character (e.g. the rabbit fishing), held until {@link #endPose()} or
+     * walking off: looping, or played once and then still on its last frame; null for none.
+     */
+    private Sprite poseSprite;
+    private Action pose;
+    private Direction poseDirection;
+    private boolean poseLoops;
+    /** The sheet the picture is sized for now. */
+    private Sprite fitted;
 
     public AnimationPlugin(GameActor actor, ResourcesService resourcesService, Sprite sprite) {
         this.actor = actor;
         this.resourcesService = resourcesService;
         this.sprite = sprite;
+        this.fitted = sprite;
     }
 
     @Override
@@ -56,20 +67,53 @@ public class AnimationPlugin implements Plugin {
         followMovement(walking);
         if (walking) {
             once = null; // walking off stops it
+            pose = null;
         }
-        Action action = once != null ? once : walking ? Action.WALK : Action.IDLE;
-        Direction facing = once != null ? onceDirection : direction;
-        String name = ResourcesService.animationName(sprite, action, facing);
-        if (!name.equals(current)) {
-            current = name;
-            animation = resourcesService.getAnimation(sprite, action, facing);
-            stateTime = 0;
-        } else {
-            stateTime += delta;
-        }
-        ((TextureRegionDrawable) avatar.getDrawable()).setRegion(animation.getKeyFrame(stateTime));
+        Sprite sheet = pose != null ? poseSprite : sprite;
+        advance(sheet, action(walking), facing(), delta);
+        show(avatar, sheet);
         if (once != null && stateTime >= animation.getAnimationDuration()) {
             once = null; // played once: standing again from the next frame
+        }
+    }
+
+    /** What it shows: its pose, else what it plays once, else walking or standing. */
+    private Action action(boolean walking) {
+        if (pose != null) {
+            return pose;
+        }
+        if (once != null) {
+            return once;
+        }
+        return walking ? Action.WALK : Action.IDLE;
+    }
+
+    private Direction facing() {
+        if (pose != null) {
+            return poseDirection;
+        }
+        return once != null ? onceDirection : direction;
+    }
+
+    /** The animation of this sheet, action and direction, from its start when it is a new one. */
+    private void advance(Sprite sheet, Action action, Direction facing, float delta) {
+        String name = ResourcesService.animationName(sheet, action, facing);
+        if (name.equals(current)) {
+            stateTime += delta;
+            return;
+        }
+        current = name;
+        animation = resourcesService.getAnimation(sheet, action, facing);
+        stateTime = 0;
+    }
+
+    /** Its frame now (a pose played once stays on its last), the picture fitted to its sheet when that changed. */
+    private void show(Image avatar, Sprite sheet) {
+        TextureRegion frame = animation.getKeyFrame(stateTime, pose == null || poseLoops);
+        ((TextureRegionDrawable) avatar.getDrawable()).setRegion(frame);
+        if (sheet != fitted) {
+            fitted = sheet;
+            actor.fitAvatar(frame, resourcesService.getSpriteSheet(sheet));
         }
     }
 
@@ -81,6 +125,29 @@ public class AnimationPlugin implements Plugin {
         once = action;
         onceDirection = direction;
         current = null; // starts from its first frame, also when the same action is played again
+    }
+
+    /**
+     * Holds a pose from another sheet of the same character, e.g. the rabbit fishing ({@code RABBIT_FISHING}, CAST,
+     * LEFT), until {@link #endPose()} or walking off: looping, or once and then still on its last frame.
+     */
+    public void pose(Sprite sheet, Action action, Direction direction, boolean loops) {
+        poseSprite = sheet;
+        pose = action;
+        poseDirection = direction;
+        poseLoops = loops;
+        once = null;
+        current = null; // from its first frame
+    }
+
+    /** Back to its own sheet: standing (or walking) as before. */
+    public void endPose() {
+        pose = null;
+    }
+
+    /** The pose it holds now, or null. */
+    public Action getPose() {
+        return pose;
     }
 
     /** Is it playing this action once right now (not finished, not stopped by walking off)? */

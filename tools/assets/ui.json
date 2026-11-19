@@ -59,7 +59,7 @@
     {"file": "UI Sprites/Other UI sprites/Selectors/selectorst_*.png", "prefix": ""},
     {"file": "UI Sprites/Other UI sprites/Selectors/dot_*.png", "prefix": "selector_"},
     {"file": "UI Sprites/Other UI sprites/Sliders/slider_*.png", "prefix": ""},
-    {"file": "UI Sprites/Other UI sprites/Xs and check marks/Xs and check marks.png", "name": "marks", "pieces": "auto"},
+    {"file": "UI Sprites/Other UI sprites/Xs and check marks/Xs and check marks.png", "name": "marks", "pieces": "auto", "names": {"7": "miss"}},
     {"file": "UI Sprites/Other UI sprites/Setting menu.png", "name": "settings_menu", "pieces": "auto",
      "names": {"1": "panel"}, "split": {"panel": [7, 7, 7, 9]}},
     {"file": "UI Sprites/Other UI sprites/UI Settings Buttons.png", "name": "settings_buttons", "pieces": "auto", "gap": 2},

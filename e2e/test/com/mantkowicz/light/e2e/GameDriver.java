@@ -29,6 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.mantkowicz.light.actor.Bobber;
 import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.FloatingPicture;
@@ -57,10 +58,12 @@ import com.mantkowicz.light.e2e.headless.HeadlessGame;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.FishingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileDoor;
+import com.mantkowicz.light.map.TileFishingSpot;
 import com.mantkowicz.light.map.TileGrass;
 import com.mantkowicz.light.map.TileLight;
 import com.mantkowicz.light.map.TileObject;
@@ -72,6 +75,9 @@ import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
 import com.mantkowicz.light.resources.UiFont;
 import com.mantkowicz.light.resources.UiImage;
+import com.mantkowicz.light.ui.fishing.BitePrompt;
+import com.mantkowicz.light.ui.fishing.RhythmGame;
+import com.mantkowicz.light.ui.fishing.RhythmRound;
 import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
@@ -590,6 +596,9 @@ public final class GameDriver {
             String name = crop.getType().getName();
             return Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
+        if (item instanceof com.mantkowicz.light.actor.Fish fish) {
+            return "Fish(" + fish.getType().name().toLowerCase() + ")";
+        }
         return item.getClass().getSimpleName();
     }
 
@@ -1105,6 +1114,131 @@ public final class GameDriver {
         }
     }
 
+    // fishing (feature.FishingFeature)
+
+    /** Switches fishing (FeatureFlag.FISHING, on as the game ships) on or off, for games started from now on. */
+    public static void fishing(boolean on) {
+        if (on) {
+            FeatureFlag.FISHING.switchOn();
+        } else {
+            FeatureFlag.FISHING.switchOff();
+        }
+    }
+
+    /** How hard the fishing game is from now on, 0 .. 1 (0.15 as the game ships; 0.45 suits a 5-year-old, 0.8 an 8). */
+    public static void fishingLevel(float level) {
+        FishingFeature.setLevel(level);
+    }
+
+    private FishingFeature fishingFeature() {
+        for (Feature feature : this.<List<Feature>>screenField("features")) {
+            if (feature instanceof FishingFeature fishing) {
+                return fishing;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Where the fishing is at: "READY", "CASTING", "WAITING" (the bobber in the water), "BITE" (tap now!), "GAME" (the
+     * fishing game is open), "LANDING" (pulling a caught fish out); "none" without the feature.
+     */
+    public String fishing() {
+        FishingFeature fishing = fishingFeature();
+        return fishing == null ? "none" : fishing.getPhase().name();
+    }
+
+    /** The bobber: what it does ("drop", "bob", "dip") and its cell, e.g. "bob at (2,2)"; "none" without one. */
+    public String bobber() {
+        FishingFeature fishing = fishingFeature();
+        Bobber bobber = fishing == null ? null : fishing.getBobber();
+        if (bobber == null || bobber.getStage() == null) {
+            return "none";
+        }
+        Tile tile = boardService().getTileAt(bobber.getMiddle());
+        return bobber.getDoing() + " at " + (tile == null ? "?" : cellOf(tile));
+    }
+
+    /** The cells of the map's fishing spots. */
+    public List<Cell> fishingSpots() {
+        List<Cell> cells = new ArrayList<>();
+        for (Tile tile : fishingFeature().getSpots()) {
+            cells.add(cellOf(tile));
+        }
+        cells.sort(java.util.Comparator.comparing(Cell::toString));
+        return cells;
+    }
+
+    /** The paw's prompt after a bite: seconds left to tap, or -1 without it. */
+    public float biteSecondsLeft() {
+        BitePrompt prompt = fishingFeature().getPrompt();
+        return prompt == null || prompt.getStage() == null ? -1 : prompt.getSecondsLeft();
+    }
+
+    /** A short tap in the middle of the screen (anywhere: e.g. to hook a fish, or in the fishing game). */
+    public void tapAnywhere() {
+        tap(new Vector2(game.screenWidth() / 2f, game.screenHeight() / 2f));
+    }
+
+    /**
+     * The fishing game: "caught 1, missed 0, of 12 fish", "none" when it isn't open.
+     */
+    public String fishingGame() {
+        RhythmGame rhythmGame = fishingFeature() == null ? null : fishingFeature().getGame();
+        if (rhythmGame == null || rhythmGame.getStage() == null) {
+            return "none";
+        }
+        RhythmRound round = rhythmGame.getRound();
+        return "caught " + round.getCaught() + ", missed " + round.getMissed() + ", of " + round.getFishCount()
+                + " fish";
+    }
+
+    /** In the fishing game, the lane with a fish on the line (a tap on its net catches it), or -1 without one. */
+    public int fishOnTheLine() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        for (int lane = 0; rhythmGame != null && lane < rhythmGame.getRound().getRules().lanes(); lane++) {
+            if (rhythmGame.getRound().isCatchable(lane)) {
+                return lane;
+            }
+        }
+        return -1;
+    }
+
+    /** In the fishing game, a lane with a fish coming in sight but not on the line yet (a tap scares it), or -1. */
+    public int fishTooEarly() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        for (int lane = 0; rhythmGame != null && lane < rhythmGame.getRound().getRules().lanes(); lane++) {
+            if (rhythmGame.getRound().isTooEarly(lane)) {
+                return lane;
+            }
+        }
+        return -1;
+    }
+
+    /** In the fishing game, a short tap on a lane's net (0 the left one). */
+    public void tapNet(int lane) {
+        tap(uiScreenPosition(fishingFeature().getGame().getNet(lane)));
+    }
+
+    /** Is the fishing game's window over all the UI stage shows now (also after a resize)? */
+    public boolean fishingGameCoversTheScreen() {
+        RhythmGame rhythmGame = fishingFeature().getGame();
+        if (rhythmGame == null || rhythmGame.getStage() == null) {
+            return false;
+        }
+        com.badlogic.gdx.utils.viewport.Viewport viewport = rhythmGame.getStage().getViewport();
+        com.badlogic.gdx.math.Vector3 centre = viewport.getCamera().position;
+        return rhythmGame.getX() <= centre.x - viewport.getWorldWidth() / 2f + 1
+                && rhythmGame.getY() <= centre.y - viewport.getWorldHeight() / 2f + 1
+                && rhythmGame.getX() + rhythmGame.getWidth() >= centre.x + viewport.getWorldWidth() / 2f - 1
+                && rhythmGame.getY() + rhythmGame.getHeight() >= centre.y + viewport.getWorldHeight() / 2f - 1;
+    }
+
+    /** How often no fish comes to a cast from now on, 0 .. 1 (0.3 as the game ships). */
+    public static void fishingNoFishChance(float chance) {
+        FishingFeature.setNoFishChance(chance);
+    }
+
     // grass (feature.GrassFeature)
 
     /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
@@ -1521,6 +1655,8 @@ public final class GameDriver {
             return "GRASS";
         if (object instanceof TileDoor)
             return "DOOR";
+        if (object instanceof TileFishingSpot)
+            return "FISHING_SPOT";
         throw new IllegalStateException("Unknown tile object " + object.getClass());
     }
 

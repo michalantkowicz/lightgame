@@ -87,6 +87,17 @@ public abstract class GameActor extends Group {
     }
 
     /**
+     * The picture now shows a frame of another sheet of the same character (its frames are cut to another box, e.g.
+     * the rabbit fishing): it is sized and placed by that sheet, as {@link #createAvatar(TextureRegion, SpriteSheet)}
+     * does, on this actor (one tile big).
+     */
+    public void fitAvatar(TextureRegion frame, SpriteSheet sheet) {
+        avatar.setSize(frame.getRegionWidth() * PIXEL_SCALE, frame.getRegionHeight() * PIXEL_SCALE);
+        avatarRestY = getHeight() / 2f + (sheet.trimY() - sheet.anchorY()) * PIXEL_SCALE;
+        avatar.setPosition(getWidth() / 2f + (sheet.trimX() - sheet.anchorX()) * PIXEL_SCALE, avatarRestY);
+    }
+
+    /**
      * The actor's picture, or {@code null} if it has none. Moving it only changes how the actor looks, not where it is.
      */
     public Image getAvatar() {

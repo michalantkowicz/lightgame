@@ -26,6 +26,7 @@ import com.mantkowicz.light.feature.CreatureFeature;
 import com.mantkowicz.light.feature.DoorFeature;
 import com.mantkowicz.light.feature.DoorToolFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.feature.FishingFeature;
 import com.mantkowicz.light.feature.GrassCuttingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.feature.MenuFeature;
@@ -175,6 +176,9 @@ final class Area {
                 GrassFeature grass = new GrassFeature(context, player);
                 features.add(grass);
                 features.add(new GrassCuttingFeature(context, player, hud, grass));
+            }
+            if (mapProperties.isOn(FeatureFlag.FISHING)) {
+                features.add(new FishingFeature(context, player, hud));
             }
         }
         features.add(new MenuFeature(context, menuStage));

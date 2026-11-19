@@ -19,10 +19,6 @@ public class TileObjectFactory {
             case LIGHT :
                 assertMandatoryProperties(objectProperties, LIGHT_TYPE);
                 return new TileLight(objectProperties);
-            case PLAYER :
-                return new TilePlayer();
-            case DOG :
-                return new TileDog();
             case DOOR :
                 assertMandatoryProperties(objectProperties, TileObjectAttribute.DOOR, TARGET_MAP);
                 return new TileDoor(objectProperties.get(TileObjectAttribute.DOOR.getValue(), String.class),
@@ -31,6 +27,20 @@ public class TileObjectFactory {
             case GRASS :
                 return new TileGrass((int) TileObjectType.number(objectProperties, TileObjectAttribute.PHASE,
                         TileGrass.FIRST_PHASE));
+            default :
+                return marker(objectType);
+        }
+    }
+
+    /** An object with no properties: only a mark on its tile (the player's start, the dog's, a fishing spot). */
+    private static TileObject marker(TileObjectType objectType) {
+        switch (objectType) {
+            case PLAYER :
+                return new TilePlayer();
+            case DOG :
+                return new TileDog();
+            case FISHING_SPOT :
+                return new TileFishingSpot();
             default :
                 throw new IllegalArgumentException(
                         "There is no tile implementation for this tile object type: " + objectType.name());

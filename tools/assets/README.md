@@ -6,6 +6,8 @@ changes, or after editing a level in Tiled.
 ```sh
 pip3 install pillow                                   # once
 python3 tools/assets/scythe_animation.py               # once per pack copy: the rabbit's scythe swing (see below)
+python3 tools/assets/net_icon.py                       # once per pack copy: the fishing net's icon (see below)
+python3 tools/assets/hand_pointer.py                   # once per UI pack copy: the hand pointer (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -13,6 +15,13 @@ python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Pre
 
 The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
 Python.
+
+**Fishing** uses the Ocean Pack, copied into the sprites pack folder as `Ocean Pack/`: the rabbit fishing (`fishing
+animation side.png`, its rows 1-4 as `cast_left`, `wait_left`, `bite_left`, `pull_left`; a sheet of its own,
+`rabbit_fishing`, because its frames are cut to another box than the rabbit's), the bobber and its splashes
+(`fishing_bobber`), the rod's icon (`fishing_rod_2.png`), the leaping fish (`mediuml fish.png`, unused since the fishing game changed) and the fish
+(`Fish Sprites.png`: its first row, `caught`, the caught fish and some in the fishing game; its fourth, `swim`, for the
+clownfish). The other Ocean Pack files are ignored for now.
 
 **The scythe swing** isn't in the pack. `scythe_animation.py` makes it from the rabbit's `chop_down` row: the axe taken
 out (its four colours appear nowhere else on the rabbit) and a scythe drawn where it was held, a longer handle and a
@@ -22,6 +31,17 @@ rabbit (the original is ignored). It also draws the scythe's item icon, `Objects
 upright handle on the right and a long blade sweeping left and down from its top, in the palette and light outline of
 `tools and meterials.png`), read as
 the sheet `scythe_icon`. Like the pack, neither file is committed: only the atlas made from them.
+
+**The fishing net's icon** (on the fishing game's lane buttons) isn't in the pack either. `net_icon.py` draws it,
+16x16 in the same palette and outline: a long handle from the bottom left, the hoop at its top right seen a little
+from the side, and the net's bag hanging from it, its mesh see-through. It saves `Objects/Items/fishing net icon.png` in the pack folder, read as
+the sheet `fishing_net_icon` (not committed either).
+
+**The hand pointer** (the bite's "tap now!") isn't in the UI pack either, which has only arrows and cat paws for
+cursors. `hand_pointer.py` draws one, 16x16 in the palette and dark outline of the pack's mouse cursors: the index
+finger straight up, three folded fingers, the thumb out to the left. It saves `UI Sprites/Mouse sprites/Hand pointing
+Mouse icon.png` in the UI pack folder, where `ui.json`'s mouse cursors entry picks it up as
+`mouse_hand_pointing_mouse_icon` (`UiImage.HAND_POINTING`; not committed either).
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
 (`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.
@@ -56,7 +76,7 @@ tool again.
    - `collision`: cells with any tile here can't be walked on (the layer is never drawn: keep it hidden);
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
-   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `DOOR`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
+   (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `DOOR`, `FISHING_SPOT`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
    property `favouriteDish`: the crops it wishes for, comma-separated, e.g. `CARROT,CUCUMBER` (one of `CORN`,
    `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`); without it, any of them. Each time it gets hungry it picks one at
    random. A `CHEST` holds one crop, picked at random. A `FIELD` grows one crop, its string property `cropType` (one
@@ -68,9 +88,11 @@ tool again.
    `CHICKEN` for chickens and chicks), everyone without it. Whoever ends its walk on the door goes through and comes
    out of the door with the same name on the other map. Only the map the game starts on has a `PLAYER`: on the others
    the rabbit comes out of a door. Draw the door itself on the map (e.g. the coop's ramp); the object draws nothing.
+   A `FISHING_SPOT` is a place to fish from: the rabbit casts into the water two tiles to its left, so put water
+   there. No grass grows on it.
 6. Map property `ambientLight` (float, 0 = dark … 1 = daylight). Without it the level is dark, like the house.
    Map property `featuresOff` (string): features switched off on this map, comma-separated names of
-   `FeatureFlag`s, e.g. `GROWING_GRASS` inside the coop (no grass grows there); none without it.
+   `FeatureFlag`s, e.g. `GROWING_GRASS` inside the coop (no grass grows there) or `FISHING`; none without it.
 7. Save, run `python3 tools/assets/build_assets.py` (under a second), and start the game (`Main.DEFAULT_MAP`).
 
 Mirrored (X, Y) and rotated (Z) tiles, layer opacity and layer offsets look in the game as in Tiled. Maps must have a

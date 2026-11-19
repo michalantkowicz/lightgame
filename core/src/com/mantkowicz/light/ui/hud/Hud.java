@@ -282,8 +282,12 @@ public class Hud extends Group {
         face.play(UiImage.TEEMO_CHEER, SpeechBubble.SECONDS); // cheering while it says it
     }
 
-    /** A bubble over the face (replacing one still there) says something for a while, then fades out. */
-    private void say(String text, TextureRegion picture, float seconds) {
+    /**
+     * A bubble over the face (replacing one still there) says something for a while, then fades out.
+     *
+     * @param picture shown after the text, or null
+     */
+    public void say(String text, TextureRegion picture, float seconds) {
         if (bubble != null) {
             bubble.remove();
         }

@@ -69,9 +69,9 @@ design, change the rule on purpose in its own PR.
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).
 - The board tracks `TileOccupant`s and `TileContent`s and knows nothing of actors or the map.
 - HUD (`ui.hud`): the face (`Portrait`, idle and reactions), backpack slots, stamina bar, the **tool button** (the big
-  round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, the door on
-  the door it came out of, else the hint; a tool shows only over the hint and resets only itself), the hold-to-open
-  settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
+  round button right of the face, `ToolButton`: a tool for where the player stands, e.g. the scythe on grass, the
+  fishing rod on a fishing spot, the door on the door it came out of, else the hint; a tool shows only over the hint
+  and resets only itself), the hold-to-open settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
   the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`; tapping the backpack slot with its wish feeds it too, tapping its wish bubble walks the player to it). Collecting: a
   chest's button throws its items onto free tiles (`ItemThrower`), the player picks them up by walking onto them.
 

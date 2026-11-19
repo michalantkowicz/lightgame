@@ -209,9 +209,27 @@ water
 water
   bounds:218,74,16,16
   index:3
-water_tray
+water_objects
   bounds:236,74,16,16
+  index:1
+water_objects
+  bounds:2,92,16,16
+  index:4
+water_objects
+  bounds:20,92,16,16
+  index:5
+water_objects
+  bounds:38,92,16,16
+  index:7
+water_tray
+  bounds:56,92,16,16
   index:0
 water_tray
-  bounds:2,92,16,16
+  bounds:74,92,16,16
+  index:1
+wooden_bridge_v2
+  bounds:92,92,16,16
+  index:0
+wooden_bridge_v2
+  bounds:110,92,16,16
   index:1
