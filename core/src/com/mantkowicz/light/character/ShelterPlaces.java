@@ -17,7 +17,7 @@ final class ShelterPlaces {
      * In the shelter it sleeps, and out of it in the morning it first walks to, a place at least this many tiles
      * (diagonally too) from the doors, and at most {@link #NEAR_THE_DOOR} from the nearest one.
      */
-    static final int AWAY_FROM_THE_DOOR = 2, NEAR_THE_DOOR = 5;
+    static final int AWAY_FROM_THE_DOOR = 2, NEAR_THE_DOOR = 4;
 
     private ShelterPlaces() {
     }

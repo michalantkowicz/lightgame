@@ -1378,3 +1378,5 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   (`BedtimeTrip.State`: in for the night, just out, gave up), not copied by each kind's `createAnother`
   (`carryFrom` is gone). Where to go (2–5 tiles from the doors, the nearest door) moved to `ShelterPlaces`, so
   `BedtimeTrip` stays one job (PMD).
+- Owner: 5 tiles was too far: an animal sleeps, and walks to after coming out, **2 to 4 tiles** from the door
+  (`ShelterPlaces.NEAR_THE_DOOR` 5 → 4), the chickens and the cow.

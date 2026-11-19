@@ -21,7 +21,7 @@ import com.mantkowicz.light.resources.Action;
  *           RESTING, SLEEPING ──(in bed)──▶ SLEEPING_THE_NIGHT, (not in bed)──▶ GETTING_UP ──▶ STANDING
  *           the rest ends in STANDING as by day; no stroke all night
  * by day, in the barn for the night: STANDING ──▶ LEAVING_THE_BARN ──(out of the door, or gave up)──▶ STANDING
- *     out of the door: STANDING ──▶ LEAVING_THE_BARN ──(2..5 tiles from the door, or gave up)──▶ STANDING
+ *     out of the door: STANDING ──▶ LEAVING_THE_BARN ──(2..4 tiles from the door, or gave up)──▶ STANDING
  * </pre>
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
@@ -165,7 +165,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** At night, not in bed: it walks to the barn's door, through, and to a place 2..5 tiles from the door inside. */
+    /** At night, not in bed: it walks to the barn's door, through, and to a place 2..4 tiles from the door inside. */
     GOING_TO_BED {
         @Override
         public void enter(Cow cow) {
@@ -185,7 +185,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** In the morning: out of the barn through its door, then to a place 2..5 tiles from the door outside. */
+    /** In the morning: out of the barn through its door, then to a place 2..4 tiles from the door outside. */
     LEAVING_THE_BARN {
         @Override
         public void enter(Cow cow) {

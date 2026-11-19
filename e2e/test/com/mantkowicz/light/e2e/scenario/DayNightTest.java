@@ -188,7 +188,7 @@ class DayNightTest {
         assertEquals(coop, game.whereIs(Kind.CHICKEN), "it went into the coop");
         assertEquals("SLEEPING_THE_NIGHT", game.animalStateOn(coop, Kind.CHICKEN));
         assertTrue(apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) >= 2
-                && apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) <= 5,
+                && apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) <= 4,
                 "away from the entrance, not too far: " + game.cellOn(coop, Kind.CHICKEN));
         assertTrue(game.sleepsAwayOn(coop));
 
@@ -197,7 +197,7 @@ class DayNightTest {
         assertFalse(game.animalStateOn(farm, Kind.CHICKEN).contains("SLEEPING"));
         assertFalse(game.sleepsAwayOn(farm));
         assertTrue(apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) >= 2
-                && apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) <= 5,
+                && apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) <= 4,
                 "away from the door, not too far: " + game.cellOn(farm, Kind.CHICKEN));
         assertFalse(game.animalStateOn(farm, Kind.CHICKEN).equals("LEAVING_THE_COOP"), "there, it goes on");
         assertFalse(game.crashed());
@@ -217,7 +217,7 @@ class DayNightTest {
                 .withMapProperty("ambientLight", "1");
     }
 
-    /** A wide barn: its door (top left) and room far beyond 5 tiles from it. */
+    /** A wide barn: its door (top left) and room far beyond 4 tiles from it. */
     private static TestMap barn(String farm) {
         return TestMap.of(
                 "~~~~~~~~~~~~~~",
@@ -230,7 +230,7 @@ class DayNightTest {
 
     /**
      * The cow does as the chickens: at night it walks to the barn's door and goes in; inside, it sleeps on a free tile 2
-     * to 5 tiles from the entrance. In the morning it goes back out, and on to a free tile 2 to 5 tiles from the door.
+     * to 5 tiles from the entrance. In the morning it goes back out, and on to a free tile 2 to 4 tiles from the door.
      */
     @Test
     void theCowSleepsInTheBarn() {
@@ -245,14 +245,14 @@ class DayNightTest {
         assertEquals(barn, game.whereIs(Kind.COW), "it went into the barn");
         assertEquals("SLEEPING_THE_NIGHT", game.animalStateOn(barn, Kind.COW));
         int inside = apart(game.cellOn(barn, Kind.COW), barnDoor);
-        assertTrue(inside >= 2 && inside <= 5, "2 to 5 tiles from the entrance: " + game.cellOn(barn, Kind.COW));
+        assertTrue(inside >= 2 && inside <= 4, "2 to 4 tiles from the entrance: " + game.cellOn(barn, Kind.COW));
         assertTrue(game.sleepsAwayOn(barn, Kind.COW));
 
         game.seconds(30); // 70.5 s: the day started 44 s in (the next night 94 s in)
         assertEquals(farm, game.whereIs(Kind.COW), "back out on the farm in the morning");
         assertFalse(game.sleepsAwayOn(farm, Kind.COW));
         int outside = apart(game.cellOn(farm, Kind.COW), farmDoor);
-        assertTrue(outside >= 2 && outside <= 5, "2 to 5 tiles from the door: " + game.cellOn(farm, Kind.COW));
+        assertTrue(outside >= 2 && outside <= 4, "2 to 4 tiles from the door: " + game.cellOn(farm, Kind.COW));
         assertFalse(game.animalStateOn(farm, Kind.COW).equals("LEAVING_THE_BARN"), "there, it goes on");
         assertFalse(game.crashed());
     }
