@@ -283,8 +283,7 @@ public class Hud extends Group {
     }
 
     /**
-     * A bubble over the face (replacing one still there) says something for a while, then fades out, e.g. "!!!" when a
-     * fish bites.
+     * A bubble over the face (replacing one still there) says something for a while, then fades out.
      *
      * @param picture shown after the text, or null
      */

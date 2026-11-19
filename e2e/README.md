@@ -53,6 +53,9 @@ test/com/mantkowicz/light/e2e/
 ├── scenario/           gameplay tests, written against GameDriver only
 └── unit/               BoardLayoutTest, BoardDrawingTest, PathFindingTest, WallTest, InventoryTest, AssetsUpToDateTest,
                         UiAssetsTest
+
+test/com/mantkowicz/light/ui/fishing/
+└── RhythmRoundTest.java  the fishing game's rules; in the game's package to reach its package-private fish
 ```
 
 Scenario ids (S1…) date from the first refactoring; older changelog entries use them, so keep them stable:

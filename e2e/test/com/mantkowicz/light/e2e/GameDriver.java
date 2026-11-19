@@ -1189,7 +1189,7 @@ public final class GameDriver {
             return "none";
         }
         RhythmRound round = rhythmGame.getRound();
-        return "caught " + round.getCaught() + ", missed " + round.getMissed() + ", of " + round.getFish().size()
+        return "caught " + round.getCaught() + ", missed " + round.getMissed() + ", of " + round.getFishCount()
                 + " fish";
     }
 

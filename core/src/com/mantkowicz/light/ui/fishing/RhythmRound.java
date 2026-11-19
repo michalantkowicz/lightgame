@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class RhythmRound {
     /** One fish coming down a lane. */
-    public static final class Fish {
+    static final class Fish {
         private final int lane;
         private final float arrival;
         private State state = State.COMING;
@@ -29,22 +29,22 @@ public class RhythmRound {
             this.arrival = arrival;
         }
 
-        public int getLane() {
+        int getLane() {
             return lane;
         }
 
         /** When it reaches the line (seconds since the game opened). */
-        public float getArrival() {
+        float getArrival() {
             return arrival;
         }
 
-        public State getState() {
+        State getState() {
             return state;
         }
     }
 
     /** What has become of a fish. */
-    public enum State {
+    enum State {
         COMING, CAUGHT, MISSED
     }
 
@@ -81,7 +81,7 @@ public class RhythmRound {
     }
 
     /** Time passes: the fish fall. Returns the fish that have just passed the line uncaught (missed). */
-    public List<Fish> update(float delta) {
+    List<Fish> update(float delta) {
         List<Fish> gone = new ArrayList<>();
         if (isOver()) {
             return gone;
@@ -102,7 +102,7 @@ public class RhythmRound {
      * coming down that lane, which is missed; returned, look at its state. With no fish of that lane in sight, or once
      * the game is over, nothing happens (null).
      */
-    public Fish tap(int lane) {
+    Fish tap(int lane) {
         if (isOver()) {
             return null;
         }
@@ -151,12 +151,17 @@ public class RhythmRound {
     }
 
     /** How far down its lane a fish is: 0 at the top, 1 at the line (more past it; less than 0: not in yet). */
-    public float progress(Fish f) {
+    float progress(Fish f) {
         return 1 - (f.arrival - time) / rules.fallSeconds();
     }
 
-    public List<Fish> getFish() {
+    List<Fish> getFish() {
         return Collections.unmodifiableList(fish);
+    }
+
+    /** How many fish come this game. */
+    public int getFishCount() {
+        return fish.size();
     }
 
     public RhythmRules getRules() {

@@ -7,7 +7,11 @@ import com.badlogic.gdx.math.MathUtils;
  * record: GWT's compiler fails on this one as a record.)
  */
 public final class RhythmRules {
-    /** The levels made for 3-, 5- and 8-year-olds. */
+    /**
+     * The levels made for 3-, 5- and 8-year-olds. Fishing's own stand-in, too specific for the rest of the game: when
+     * the game gets its age (years-by-level) system, used in many places, this must be reworked completely (with
+     * {@link #forLevel} and {@link #byAge}) or at least made generic and moved there.
+     */
     public static final float AGE_3 = 0.15f, AGE_5 = 0.45f, AGE_8 = 0.8f;
     /** The same at every level: an 8 s run of 12 fish in 3 lanes on half-second beats, three misses lose. */
     public static final float SECONDS = 8, BEAT = 0.5f;

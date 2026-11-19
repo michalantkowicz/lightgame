@@ -1305,3 +1305,12 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   - then: the hand is the clock too, the emptying circle under it is gone: white at first, it turns grey from its
     finger's tip down as the 1.2 s pass, a row of its pixels at a time (a grey copy under a white one cut shorter from
     the top). `UiImage.HOLD_CIRCLE` stays for the settings gear.
+- **After the owner's PR review** (same day):
+  - `RhythmRules`' age levels are fishing's own stand-in: a comment says that whoever builds the game's age
+    (years-by-level) system, wanted in many places, must rework them completely or at least make them generic.
+  - `RhythmRound.Fish` (and `State`, `getFish`, `tap`, `update`, `progress`) are package-private, so they don't clash
+    with the item `actor.Fish`; `RhythmRoundTest` moved to the game's package (`e2e/test/.../ui/fishing`),
+    `GameDriver` counts the fish with `getFishCount()`.
+  - `Hud.say`'s comment no longer mentions fishing (the HUD knows nothing of it).
+  - Kept, the owner's call: the `FISHING` feature flag, and `FishingFeature`'s public getters for tests (the pattern
+    of the other features; `GameDriver` sits in another package).

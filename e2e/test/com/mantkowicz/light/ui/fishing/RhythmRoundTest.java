@@ -1,8 +1,6 @@
-package com.mantkowicz.light.e2e.unit;
+package com.mantkowicz.light.ui.fishing;
 
 import com.badlogic.gdx.math.MathUtils;
-import com.mantkowicz.light.ui.fishing.RhythmRound;
-import com.mantkowicz.light.ui.fishing.RhythmRules;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
