@@ -7,9 +7,10 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Where the chickens of a map go to sleep, from its doors (the map's {@code BedtimeFeature} makes it): on the farm, the
- * door to the coop they go through at night (Tiled's door property {@code bedtime}); in the coop, the doors they came in
- * by, the entrance they sleep away from and go out of in the morning.
+ * Where the animals of one kind on a map go to sleep, from its doors (the map's {@code BedtimeFeature} makes one per
+ * kind): on the farm, the door they go through at night (Tiled's door property {@code bedtime}, e.g. CHICKEN on the
+ * door to the coop, COW on the barn's); in the shelter, the doors they came in by, the entrance they sleep away from
+ * (but not too far) and go out of in the morning.
  */
 public final class Roost {
     private final Tile bedtimeDoor;

@@ -9,8 +9,9 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 /**
- * "Zzz" over a sleeping character, gently bobbing up and down until it is removed. It is on the stage drawn over the
- * map's lights (the notifications'), so it stays bright at night.
+ * "Zzz" over a sleeping character, gently bobbing up and down until it is removed. It is on the map's game stage, with
+ * the animals: the night's light dims it as it dims them (the owner's choice; it was on the notifications' stage,
+ * bright over the lights).
  */
 public class Zzz extends Image {
     /** Screen pixels per pixel of the picture; how far it bobs and how long one way takes. */
@@ -23,7 +24,7 @@ public class Zzz extends Image {
 
     private final Stage stage;
 
-    /** @param stage where it is shown: over the map's lights */
+    /** @param stage where it is shown: the map's game stage, with the animals */
     public Zzz(TextureRegion picture, Stage stage) {
         super(picture);
         this.stage = stage;
@@ -33,11 +34,12 @@ public class Zzz extends Image {
     }
 
     /**
-     * Over the character (which doesn't move while it sleeps); call it every frame: when it isn't shown (yet, or any
-     * more: the notifications are cleared when the player leaves the map) it comes back.
+     * Over the character (which doesn't move while it sleeps), in front of whoever was added to the map since; call it
+     * every frame.
      */
     public void keepOver(Group character) {
         if (getStage() != null) {
+            toFront();
             return;
         }
         clearActions();

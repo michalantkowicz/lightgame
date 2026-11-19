@@ -1,30 +1,29 @@
 package com.mantkowicz.light.character;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A chicken going to the coop to sleep, and back out in the morning; its states ({@link ChickenState#GOING_TO_BED},
- * {@link ChickenState#LEAVING_THE_COOP}) use this, with the {@link Roost} of the map it is on.
+ * A farm animal going to its shelter to sleep (a chicken to the coop, the cow to the barn), and back out in the
+ * morning; its states (e.g. {@link ChickenState#GOING_TO_BED}, {@link ChickenState#LEAVING_THE_COOP},
+ * {@link CowState#GOING_TO_BED}, {@link CowState#LEAVING_THE_BARN}) use this, with the {@link Roost} of the map it is on
+ * for its kind.
  * <ul>
- * <li>At night, on a map with a door to sleep behind (the farm's door to the coop), it walks to the door and goes
- * through. Behind it (the coop) it walks to a free tile at least {@link #AWAY_FROM_THE_DOOR} tiles from the doors (the
- * entrance), picked at random, and sleeps there. On a map without such a door (the coop's own chicken, a map without
- * a coop) it sleeps where it is.</li>
+ * <li>At night, on a map with a door to sleep behind (the farm's door to the coop, or to the barn), it walks to the
+ * door and goes through. Behind it it walks to a free tile {@link ShelterPlaces#AWAY_FROM_THE_DOOR} to {@link ShelterPlaces#NEAR_THE_DOOR} tiles
+ * from the doors (the entrance), picked at random, and sleeps there. On a map without such a door (the coop's own
+ * chicken, a map without a shelter) it sleeps where it is.</li>
  * <li>In the morning, if it came in for the night, it walks to the door and goes back out; out there it walks to a
- * free tile at least {@link #AWAY_FROM_THE_DOOR} tiles from the doors, picked at random, and goes on with its day.</li>
+ * free tile {@link ShelterPlaces#AWAY_FROM_THE_DOOR} to {@link ShelterPlaces#NEAR_THE_DOOR} tiles from the doors, picked at random, and goes on
+ * with its day.</li>
  * <li>With no way there (someone in the way) it waits a moment ({@link #PATIENCE}) and tries again; still no way (or
  * the door doesn't take it: no room on the other side), it gives up: it sleeps where it is, or stays in.</li>
  * </ul>
- * What it is doing goes with it through the door ({@link #carryFrom}).
+ * Where it is with its trip goes with it through the door ({@link State}, in the animal's shared part).
  */
-class CoopTrip {
-    /** In the coop it sleeps at least this many tiles (diagonally too) from the entrance. */
-    static final int AWAY_FROM_THE_DOOR = 2;
+class BedtimeTrip {
     /** With no way on, it waits this long before it gives up. */
     static final float PATIENCE = 3;
 
@@ -33,31 +32,45 @@ class CoopTrip {
         ON_THE_WAY, THERE, GAVE_UP
     }
 
-    private final Chicken chicken;
+    private final FarmAnimal animal;
     private final BoardService board;
+    /** Its step onto the next tile takes this long; after it, does it keep looking the way it went? */
+    private final float secondsPerStep;
+    private final boolean keepFacing;
     /** The map's, once its BedtimeFeature has told it (null until then). */
     private Roost roost;
-    /** It came through the door for the night: it sleeps away from the entrance and goes back out in the morning. */
-    private boolean sleepsAway;
-    /** It came out of the coop this morning: it walks away from the door first. */
-    private boolean comingOut;
-    /** It couldn't get to bed tonight: it sleeps where it is. */
-    private boolean gaveUp;
+    /**
+     * Where it is with its trip, carried through a door with the rest of the animal ({@code FarmAnimal.Shared}): on
+     * the other map it goes on from there.
+     */
+    static final class State {
+        /** It came through the door for the night: it sleeps away from the entrance and goes back out in the morning. */
+        boolean sleepsAway;
+        /** It came out of its shelter this morning: it walks away from the door first. */
+        boolean comingOut;
+        /** It couldn't get to bed tonight: it sleeps where it is. */
+        boolean gaveUp;
+    }
+
     /** Where it goes: a door or a place to sleep; null when it goes nowhere. */
     private Tile target;
     /** No way on: it waits (until it is time to give up). */
     private boolean waiting;
 
-    CoopTrip(Chicken chicken, BoardService board) {
-        this.chicken = chicken;
+    /**
+     * @param secondsPerStep its step onto the next tile takes this long
+     * @param keepFacing     after a step it keeps looking the way it went (a chicken), or turns back (the cow)
+     */
+    BedtimeTrip(FarmAnimal animal, BoardService board, float secondsPerStep, boolean keepFacing) {
+        this.animal = animal;
         this.board = board;
+        this.secondsPerStep = secondsPerStep;
+        this.keepFacing = keepFacing;
     }
 
-    /** The same chicken coming out on another map: it goes on with its trip there. */
-    void carryFrom(CoopTrip before) {
-        sleepsAway = before.sleepsAway;
-        comingOut = before.comingOut;
-        gaveUp = before.gaveUp;
+    /** Its trip so far, as the animal carries it (also through a door). */
+    private State state() {
+        return animal.shared.bedtime;
     }
 
     void setRoost(Roost roost) {
@@ -71,11 +84,11 @@ class CoopTrip {
 
     /** Is it where it sleeps the night (or it can't get there)? */
     boolean isInBed() {
-        if (gaveUp || roost == null) {
+        if (state().gaveUp || roost == null) {
             return true;
         }
-        if (sleepsAway) {
-            return isAwayFromTheDoors(chicken.getTile());
+        if (state().sleepsAway) {
+            return ShelterPlaces.isAwayFromTheDoors(roost, animal.getTile());
         }
         return roost.getBedtimeDoor() == null;
     }
@@ -84,30 +97,30 @@ class CoopTrip {
      * By day: did it come in for the night (it goes back out), or has it just come out (it walks away from the door)?
      */
     boolean isAway() {
-        return sleepsAway || comingOut;
+        return state().sleepsAway || state().comingOut;
     }
 
     /** Did it come in for the night (it goes back out in the morning)? */
     boolean sleepsAway() {
-        return sleepsAway;
+        return state().sleepsAway;
     }
 
     /** The night is over: tonight's giving up is forgotten. */
     void morning() {
-        gaveUp = false;
+        state().gaveUp = false;
     }
 
     /** At night: off to the door to sleep behind, or to a place away from the entrance. False: nowhere to go. */
     boolean startToBed() {
-        comingOut = false;
-        if (sleepsAway) {
+        state().comingOut = false;
+        if (state().sleepsAway) {
             target = randomPlaceAwayFromTheDoors();
         } else {
             target = roost == null ? null : roost.getBedtimeDoor();
         }
         waiting = false;
         if (target == null) {
-            gaveUp = true;
+            state().gaveUp = true;
         }
         return target != null;
     }
@@ -117,11 +130,11 @@ class CoopTrip {
      * place away from the door. False: nowhere to go (it stays in, or stays where it is).
      */
     boolean startOut() {
-        target = sleepsAway ? nearestDoor() : randomPlaceAwayFromTheDoors();
+        target = state().sleepsAway ? nearestDoor() : randomPlaceAwayFromTheDoors();
         waiting = false;
         if (target == null) {
-            sleepsAway = false; // nowhere to go: it lives here now
-            comingOut = false;
+            state().sleepsAway = false; // nowhere to go: it lives here now
+            state().comingOut = false;
         }
         return target != null;
     }
@@ -131,12 +144,12 @@ class CoopTrip {
      * in the morning); at a door it waits to be taken through. {@link Way#GAVE_UP} after waiting {@link #PATIENCE} for a way (or for the door).
      */
     Way walk() {
-        if (chicken.isWalking()) {
+        if (animal.isWalking()) {
             return Way.ON_THE_WAY;
         }
-        Tile at = chicken.getTile();
+        Tile at = animal.getTile();
         if (at == target && !isDoor(target)) {
-            comingOut = false;
+            state().comingOut = false;
             return Way.THERE;
         }
         if (!isDoor(target) && !isFree(target)) {
@@ -152,14 +165,14 @@ class CoopTrip {
     private Way waitOrGiveUp() {
         if (!waiting) {
             waiting = true;
-            chicken.stayExactly(PATIENCE);
+            animal.stayExactly(PATIENCE);
         }
-        if (!chicken.isTimeUp()) {
+        if (!animal.isTimeUp()) {
             return Way.ON_THE_WAY;
         }
-        gaveUp = chicken.isNight();
-        sleepsAway = false; // didn't get through: it is where it lives now
-        comingOut = false;
+        state().gaveUp = animal.isNight();
+        state().sleepsAway = false; // didn't get through: it is where it lives now
+        state().comingOut = false;
         return Way.GAVE_UP;
     }
 
@@ -169,16 +182,16 @@ class CoopTrip {
      */
     private boolean step() {
         Tile goal = target;
-        List<Tile> steps = board.findSteps(chicken.getTile(), tile -> tile == goal, this::isFree, false);
+        List<Tile> steps = board.findSteps(animal.getTile(), tile -> tile == goal, this::isFree, false);
         if (steps == null || steps.isEmpty()) {
             return false;
         }
         Tile next = steps.get(0);
         if (next == goal && isDoor(goal)) { // through it: in for the night, or out in the morning
-            sleepsAway = chicken.isNight();
-            comingOut = !sleepsAway;
+            state().sleepsAway = animal.isNight();
+            state().comingOut = !state().sleepsAway;
         }
-        chicken.stepOnto(next, chicken.getType().getSecondsPerTile(), true);
+        animal.stepOnto(next, secondsPerStep, keepFacing);
         return true;
     }
 
@@ -187,48 +200,15 @@ class CoopTrip {
     }
 
     private boolean isFree(Tile tile) {
-        return tile != null && tile.isAccessible() && board.getOccupants(tile).isEmpty();
+        return ShelterPlaces.isFree(board, tile);
     }
 
-    /** A free tile it can get to, far enough from the doors, picked at random; null when there is none. */
     private Tile randomPlaceAwayFromTheDoors() {
-        List<Tile> places = new ArrayList<>();
-        board.findSteps(chicken.getTile(), tile -> {
-            if (isAwayFromTheDoors(tile) && (tile == chicken.getTile() || isFree(tile))) {
-                places.add(tile);
-            }
-            return false;
-        }, this::isFree, false);
-        return places.isEmpty() ? null : places.get(MathUtils.random(places.size() - 1));
+        return ShelterPlaces.randomPlace(board, roost, animal.getTile());
     }
 
     private Tile nearestDoor() {
-        if (roost == null) {
-            return null;
-        }
-        Tile nearest = null;
-        for (Tile door : roost.getDoors()) {
-            if (nearest == null || tilesApart(door, chicken.getTile()) < tilesApart(nearest, chicken.getTile())) {
-                nearest = door;
-            }
-        }
-        return nearest;
-    }
-
-    private boolean isAwayFromTheDoors(Tile tile) {
-        for (Tile door : roost.getDoors()) {
-            if (tilesApart(tile, door) < AWAY_FROM_THE_DOOR) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /** How many tiles apart, diagonally too (a tile next to another, also on a corner, is 1 apart). */
-    private static int tilesApart(Tile a, Tile b) {
-        float size = Math.max(a.getWidth(), 1);
-        return Math.round(Math.max(Math.abs(a.getCenter().x - b.getCenter().x),
-                Math.abs(a.getCenter().y - b.getCenter().y)) / size);
+        return roost == null ? null : ShelterPlaces.nearestDoor(roost, animal.getTile());
     }
 
     /** Where it goes, or null (for tests). */

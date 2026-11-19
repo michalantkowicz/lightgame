@@ -1271,11 +1271,11 @@ public final class GameDriver {
         return clock.getPart().name();
     }
 
-    /** Is "zzz" shown over the animal (sleeping the night), over the map's lights? */
+    /** Is "zzz" shown over the animal (sleeping the night), on the map's game stage (dimmed by the night with it)? */
     public boolean zzzOver(Kind kind) {
         Actor zzz = ((FarmAnimal) actor(kind)).getZzz();
-        if (zzz.getStage() != null && zzz.getStage() != notificationStage()) {
-            throw new IllegalStateException("The zzz isn't over the map's lights");
+        if (zzz.getStage() != null && zzz.getStage() != gameStage()) {
+            throw new IllegalStateException("The zzz isn't on the map's game stage, with the animals");
         }
         return zzz.getStage() != null;
     }
@@ -1510,6 +1510,11 @@ public final class GameDriver {
     /** Did the first chicken on this map come into the coop for the night (it goes back out in the morning)? */
     public boolean sleepsAwayOn(String map) {
         return ((Chicken) animalOn(map, Kind.CHICKEN)).sleepsAway();
+    }
+
+    /** Did the first animal of this kind on this map come into its shelter for the night (the coop, the barn)? */
+    public boolean sleepsAwayOn(String map, Kind kind) {
+        return ((com.mantkowicz.light.character.Sheltered) animalOn(map, kind)).sleepsAway();
     }
 
     private GameBoardActor animalOn(String map, Kind kind) {

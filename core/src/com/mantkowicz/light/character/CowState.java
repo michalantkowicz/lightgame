@@ -16,15 +16,20 @@ import com.mantkowicz.light.resources.Action;
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
  *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
  * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
- * at night: WISHING ──▶ STANDING ──▶ LYING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
- *           SLEEPING ──▶ SLEEPING_THE_NIGHT; the rest ends in STANDING as by day; no stroke all night
+ * at night: WISHING ──▶ STANDING ──(not in bed: BedtimeTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ LYING_DOWN
+ *           STANDING ──(in bed)──▶ LYING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
+ *           RESTING, SLEEPING ──(in bed)──▶ SLEEPING_THE_NIGHT, (not in bed)──▶ GETTING_UP ──▶ STANDING
+ *           the rest ends in STANDING as by day; no stroke all night
+ * by day, in the barn for the night: STANDING ──▶ LEAVING_THE_BARN ──(out of the door, or gave up)──▶ STANDING
+ *     out of the door: STANDING ──▶ LEAVING_THE_BARN ──(2..5 tiles from the door, or gave up)──▶ STANDING
  * </pre>
  * Another creature gets its own enum like this one (and a class like {@link Cow}).
  */
 public enum CowState implements State<Cow> {
     /**
-     * On its feet, chewing. At night it lies down to sleep. Hungry: wishes for one of its favourite crops. Otherwise
-     * after a while it walks a step or lies down.
+     * On its feet, chewing. At night it goes to bed (into the barn, {@link BedtimeTrip}) or, in bed, lies down to
+     * sleep. In the morning, in the barn for the night, it goes out. Hungry: wishes for one of its favourite crops.
+     * Otherwise after a while it walks a step or lies down.
      */
     STANDING {
         @Override
@@ -35,8 +40,13 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void update(Cow cow) {
+            BedtimeTrip trip = cow.getTrip();
             if (cow.isNight()) {
-                cow.changeState(LYING_DOWN);
+                if (trip.knowsTheWay()) { // its first frame on a map it waits to be told the way
+                    cow.changeState(trip.isInBed() ? LYING_DOWN : GOING_TO_BED);
+                }
+            } else if (trip.isAway() && trip.knowsTheWay()) {
+                cow.changeState(LEAVING_THE_BARN);
             } else if (cow.isHungry()) {
                 cow.chooseWish(); // here, not in WISHING: stroked, it comes back wishing for the same
                 cow.changeState(WISHING);
@@ -92,7 +102,7 @@ public enum CowState implements State<Cow> {
         @Override
         public void update(Cow cow) {
             if (cow.isNight()) {
-                cow.changeState(SLEEPING_THE_NIGHT);
+                cow.changeState(cow.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
             } else if (cow.isHungry()) {
                 cow.changeState(GETTING_UP);
             } else if (cow.isTimeUp()) {
@@ -117,7 +127,7 @@ public enum CowState implements State<Cow> {
         @Override
         public void update(Cow cow) {
             if (cow.isNight()) {
-                cow.changeState(SLEEPING_THE_NIGHT);
+                cow.changeState(cow.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
             } else if (cow.isTimeUp() || cow.isHungry()) {
                 cow.changeState(GETTING_UP);
             }
@@ -144,6 +154,7 @@ public enum CowState implements State<Cow> {
             if (cow.isNight()) {
                 cow.getZzz().keepOver(cow);
             } else {
+                cow.getTrip().morning();
                 cow.changeState(GETTING_UP);
             }
         }
@@ -151,6 +162,44 @@ public enum CowState implements State<Cow> {
         @Override
         public void exit(Cow cow) {
             cow.getZzz().remove();
+        }
+    },
+
+    /** At night, not in bed: it walks to the barn's door, through, and to a place 2..5 tiles from the door inside. */
+    GOING_TO_BED {
+        @Override
+        public void enter(Cow cow) {
+            cow.playAnimation(Action.WALK);
+            if (!cow.getTrip().startToBed()) {
+                cow.changeState(LYING_DOWN); // nowhere to go: it sleeps here
+            }
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (!cow.isNight()) {
+                cow.changeState(STANDING); // morning came first
+            } else if (cow.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
+                cow.changeState(LYING_DOWN);
+            }
+        }
+    },
+
+    /** In the morning: out of the barn through its door, then to a place 2..5 tiles from the door outside. */
+    LEAVING_THE_BARN {
+        @Override
+        public void enter(Cow cow) {
+            cow.playAnimation(Action.WALK);
+            if (!cow.getTrip().startOut()) {
+                cow.changeState(STANDING);
+            }
+        }
+
+        @Override
+        public void update(Cow cow) {
+            if (cow.isNight() || cow.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
+                cow.changeState(STANDING);
+            }
         }
     },
 

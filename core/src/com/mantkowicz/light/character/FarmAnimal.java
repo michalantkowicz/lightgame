@@ -51,7 +51,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     private final List<CropType> favouriteDishes;
     private final float hungryAfterSeconds, giveUpWishingAfterSeconds;
     /** How hungry it is, what it wishes for...: what goes with it through a door. */
-    private Shared shared = new Shared();
+    Shared shared = new Shared(); // package-visible: its trip to bed reads its part (BedtimeTrip.State)
     /** What it wishes for this time it is hungry, as an item ({@link Shared#wish}). */
     private Crop favouriteFood;
     private PictureBubble wishBubble;
@@ -67,7 +67,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * it was. What lives in the animal itself (what it is doing, its wait, its bubble) starts again on the other side,
      * so a new field that must not start again belongs here.
      */
-    private static final class Shared {
+    static final class Shared {
         /** What it wishes for this time it is hungry (picked when it gets hungry). */
         CropType wish;
         /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
@@ -80,6 +80,8 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         int bitesLeft;
         /** It is night: it goes to sleep, or sleeps (see {@code BedtimeFeature}). */
         boolean night;
+        /** Where it is with its trip to its shelter for the night (in for the night, just out, gave up). */
+        final BedtimeTrip.State bedtime = new BedtimeTrip.State();
     }
 
     /**
@@ -100,7 +102,7 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
         shared.wish = this.favouriteDishes.get(0);
         favouriteFood = new Crop(shared.wish, resources);
-        zzz = new Zzz(resources.getUiImage(UiImage.ZZZ), context.getNotificationStage());
+        zzz = new Zzz(resources.getUiImage(UiImage.ZZZ), context.getGameStage());
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, events));
     }

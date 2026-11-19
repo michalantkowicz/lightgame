@@ -23,7 +23,7 @@ import com.mantkowicz.light.resources.Action;
  * all but WALKING, EATING, FORAGING, STEPPING_TO_CROP, GOING_BACK and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED
  *     ──▶ STANDING (still hungry: WISHING again, the same corn); stroked going for a crop or pecking it: it gives the
  *     crop up for good, and after STROKED goes GOING_BACK
- * at night: WISHING ──▶ STANDING ──(not in bed: CoopTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ SITTING_DOWN
+ * at night: WISHING ──▶ STANDING ──(not in bed: BedtimeTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ SITTING_DOWN
  *           STANDING ──(in bed)──▶ SITTING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
  *           RESTING, SLEEPING ──(in bed)──▶ SLEEPING_THE_NIGHT, (not in bed)──▶ GETTING_UP ──▶ STANDING
  *           GOING_FOR_CROP, PECKING_CROP ──▶ GOING_BACK; the rest ends in STANDING as by day; no stroke all night
@@ -33,7 +33,7 @@ import com.mantkowicz.light.resources.Action;
  */
 public enum ChickenState implements State<Chicken> {
     /**
-     * On its feet, looking around. At night it goes to bed (to the coop, {@link CoopTrip}) or, in bed, sits down to
+     * On its feet, looking around. At night it goes to bed (to the coop, {@link BedtimeTrip}) or, in bed, sits down to
      * sleep. In the morning, in the coop for the night, it goes out. Hungry: wants corn. Otherwise after a moment it
      * walks, pecks or sits down.
      */
@@ -46,7 +46,7 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            CoopTrip trip = chicken.getTrip();
+            BedtimeTrip trip = chicken.getTrip();
             if (chicken.isNight()) {
                 if (trip.knowsTheWay()) { // its first frame on a map it waits to be told the way
                     chicken.changeState(trip.isInBed() ? SITTING_DOWN : GOING_TO_BED);
@@ -224,7 +224,7 @@ public enum ChickenState implements State<Chicken> {
 
     /**
      * At night, on its way to bed: to the door of the coop (it goes through), or in the coop to a free place away from
-     * the entrance ({@link CoopTrip}). There, or with no way, it sits down to sleep.
+     * the entrance ({@link BedtimeTrip}). There, or with no way, it sits down to sleep.
      */
     GOING_TO_BED {
         @Override
@@ -239,7 +239,7 @@ public enum ChickenState implements State<Chicken> {
         public void update(Chicken chicken) {
             if (!chicken.isNight()) {
                 chicken.changeState(STANDING); // morning came first
-            } else if (chicken.getTrip().walk() != CoopTrip.Way.ON_THE_WAY) {
+            } else if (chicken.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
                 chicken.changeState(SITTING_DOWN);
             }
         }
@@ -247,7 +247,7 @@ public enum ChickenState implements State<Chicken> {
 
     /**
      * In the morning, in the coop for the night: back to the door, and out; out of it, to a free place at least two
-     * tiles from the door ({@link CoopTrip}).
+     * tiles from the door ({@link BedtimeTrip}).
      */
     LEAVING_THE_COOP {
         @Override
@@ -260,7 +260,7 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.isNight() || chicken.getTrip().walk() != CoopTrip.Way.ON_THE_WAY) {
+            if (chicken.isNight() || chicken.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
                 chicken.changeState(STANDING);
             }
         }

@@ -16,6 +16,13 @@ python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Pre
 The tool isn't part of the Gradle build: the game uses its committed output, so building never needs the pack or
 Python.
 
+**Village houses** come from the early-access Village pack, copied into the sprites pack folder as
+`Village pack/houses/`: a tileset per sheet for Tiled (`small_house`, `small_huts`, `brick_houses`, each also
+`_with_door`, `_with_grass`, `_with_door_grass`; the small house also in a `_light` version; their `_shadow`s; and
+`wooden_door`). Each house sheet holds nine houses (64×64, 4×4 tiles), the brick one three (96×80, 6×5 tiles). The
+door's opening (8 frames of 48×48) is also a sprite sheet, `wooden_door` (row `open`), not packed for the game until
+the `Sprite` enum lists it.
+
 **Fishing** uses the Ocean Pack, copied into the sprites pack folder as `Ocean Pack/`: the rabbit fishing (`fishing
 animation side.png`, its rows 1-4 as `cast_left`, `wait_left`, `bite_left`, `pull_left`; a sheet of its own,
 `rabbit_fishing`, because its frames are cut to another box than the rabbit's), the bobber and its splashes

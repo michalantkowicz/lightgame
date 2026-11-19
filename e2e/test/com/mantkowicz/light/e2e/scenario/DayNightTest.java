@@ -132,8 +132,7 @@ class DayNightTest {
     void animalsOnOtherMapsSleepToo() {
         shortDays();
         GameDriver game = GameDriver.start(GameDriver.defaultMap());
-        String coop = game.maps().get(1);
-        assertTrue(coop.endsWith("coop.tmx"), coop);
+        String coop = game.maps().stream().filter(map -> map.endsWith("coop.tmx")).findFirst().orElseThrow();
         game.seconds(4.5f); // 5 s in
         assertEquals("SLEEPING_THE_NIGHT", game.animalStateOn(coop, Kind.CHICKEN));
         game.seconds(6.5f); // 11.5 s
@@ -188,17 +187,73 @@ class DayNightTest {
         game.seconds(14); // 14.5 s: the night started 3 s in
         assertEquals(coop, game.whereIs(Kind.CHICKEN), "it went into the coop");
         assertEquals("SLEEPING_THE_NIGHT", game.animalStateOn(coop, Kind.CHICKEN));
-        assertTrue(apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) >= 2,
-                "away from the entrance: " + game.cellOn(coop, Kind.CHICKEN));
+        assertTrue(apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) >= 2
+                && apart(game.cellOn(coop, Kind.CHICKEN), COOP_DOOR) <= 5,
+                "away from the entrance, not too far: " + game.cellOn(coop, Kind.CHICKEN));
         assertTrue(game.sleepsAwayOn(coop));
 
         game.seconds(20); // 34.5 s: the day started 24 s in (the next night 38 s in)
         assertEquals(farm, game.whereIs(Kind.CHICKEN), "back out on the farm in the morning");
         assertFalse(game.animalStateOn(farm, Kind.CHICKEN).contains("SLEEPING"));
         assertFalse(game.sleepsAwayOn(farm));
-        assertTrue(apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) >= 2,
-                "away from the door: " + game.cellOn(farm, Kind.CHICKEN));
+        assertTrue(apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) >= 2
+                && apart(game.cellOn(farm, Kind.CHICKEN), FARM_DOOR) <= 5,
+                "away from the door, not too far: " + game.cellOn(farm, Kind.CHICKEN));
         assertFalse(game.animalStateOn(farm, Kind.CHICKEN).equals("LEAVING_THE_COOP"), "there, it goes on");
+        assertFalse(game.crashed());
+    }
+
+    /** A wide farm: the cow, the rabbit, the barn's door (the cow sleeps behind it: Tiled's bedtime COW). */
+    private static TestMap cowFarm(String barn) {
+        return TestMap.of(
+                "~~~~~~~~~~~~~~",
+                "~P..........B~",
+                "~.......N....~",
+                "~............~",
+                "~~~~~~~~~~~~~~")
+                .with('N', "COW", Map.of())
+                .with('B', "DOOR", Map.of("door", "barn", "targetMap", TestMap.pathOf(barn), "passes", "PLAYER,COW",
+                        "bedtime", "COW"))
+                .withMapProperty("ambientLight", "1");
+    }
+
+    /** A wide barn: its door (top left) and room far beyond 5 tiles from it. */
+    private static TestMap barn(String farm) {
+        return TestMap.of(
+                "~~~~~~~~~~~~~~",
+                "~B...........~",
+                "~............~",
+                "~............~",
+                "~~~~~~~~~~~~~~")
+                .with('B', "DOOR", Map.of("door", "barn", "targetMap", TestMap.pathOf(farm), "passes", "PLAYER,COW"));
+    }
+
+    /**
+     * The cow does as the chickens: at night it walks to the barn's door and goes in; inside, it sleeps on a free tile 2
+     * to 5 tiles from the entrance. In the morning it goes back out, and on to a free tile 2 to 5 tiles from the door.
+     */
+    @Test
+    void theCowSleepsInTheBarn() {
+        GameDriver.dayAndNight(3, 1, 40, 25, 0.25f); // the cow is slow: a long night and dawn
+        String barn = barn("barn-farm").write("barn-barn");
+        String farm = cowFarm("barn-barn").write("barn-farm");
+        GameDriver game = GameDriver.start(farm);
+        Cell farmDoor = new Cell(12, 3), barnDoor = new Cell(1, 3);
+        assertEquals(farm, game.whereIs(Kind.COW), "by day on the farm");
+
+        game.seconds(40); // 40.5 s: the night started 3 s in, it ends 44 s in
+        assertEquals(barn, game.whereIs(Kind.COW), "it went into the barn");
+        assertEquals("SLEEPING_THE_NIGHT", game.animalStateOn(barn, Kind.COW));
+        int inside = apart(game.cellOn(barn, Kind.COW), barnDoor);
+        assertTrue(inside >= 2 && inside <= 5, "2 to 5 tiles from the entrance: " + game.cellOn(barn, Kind.COW));
+        assertTrue(game.sleepsAwayOn(barn, Kind.COW));
+
+        game.seconds(30); // 70.5 s: the day started 44 s in (the next night 94 s in)
+        assertEquals(farm, game.whereIs(Kind.COW), "back out on the farm in the morning");
+        assertFalse(game.sleepsAwayOn(farm, Kind.COW));
+        int outside = apart(game.cellOn(farm, Kind.COW), farmDoor);
+        assertTrue(outside >= 2 && outside <= 5, "2 to 5 tiles from the door: " + game.cellOn(farm, Kind.COW));
+        assertFalse(game.animalStateOn(farm, Kind.COW).equals("LEAVING_THE_BARN"), "there, it goes on");
         assertFalse(game.crashed());
     }
 

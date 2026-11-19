@@ -1,235 +1,352 @@
 tiles.png
-size:256,128
+size:256,256
 filter:Nearest,Nearest
 repeat:none
-chicken_houses
+barn_structures
   bounds:2,2,16,16
-  index:123
-chicken_houses
-  bounds:20,2,16,16
-  index:124
-chicken_houses
-  bounds:38,2,16,16
-  index:125
-chicken_houses
-  bounds:56,2,16,16
-  index:147
-chicken_houses
-  bounds:74,2,16,16
-  index:148
-chicken_houses
-  bounds:92,2,16,16
-  index:149
-chicken_houses
-  bounds:110,2,16,16
-  index:171
-chicken_houses
-  bounds:128,2,16,16
-  index:172
-chicken_houses
-  bounds:146,2,16,16
-  index:173
-darker_soil_ground_tiles
-  bounds:164,2,16,16
-  index:0
-darker_soil_ground_tiles
-  bounds:182,2,16,16
   index:1
-darker_soil_ground_tiles
-  bounds:200,2,16,16
+barn_structures
+  bounds:20,2,16,16
   index:2
-darker_soil_ground_tiles
+barn_structures
+  bounds:38,2,16,16
+  index:3
+barn_structures
+  bounds:56,2,16,16
+  index:4
+barn_structures
+  bounds:74,2,16,16
+  index:5
+barn_structures
+  bounds:92,2,16,16
+  index:6
+barn_structures
+  bounds:110,2,16,16
+  index:7
+barn_structures
+  bounds:128,2,16,16
+  index:9
+barn_structures
+  bounds:146,2,16,16
+  index:10
+brick_houses_with_door
+  bounds:164,2,16,16
+  index:12
+brick_houses_with_door
+  bounds:182,2,16,16
+  index:13
+brick_houses_with_door
+  bounds:200,2,16,16
+  index:14
+brick_houses_with_door
   bounds:218,2,16,16
-  index:11
-darker_soil_ground_tiles
+  index:15
+brick_houses_with_door
   bounds:236,2,16,16
   index:16
-darker_soil_ground_tiles
+brick_houses_with_door
   bounds:2,20,16,16
+  index:17
+brick_houses_with_door
+  bounds:20,20,16,16
+  index:30
+brick_houses_with_door
+  bounds:38,20,16,16
+  index:31
+brick_houses_with_door
+  bounds:56,20,16,16
+  index:32
+brick_houses_with_door
+  bounds:74,20,16,16
+  index:33
+brick_houses_with_door
+  bounds:92,20,16,16
+  index:34
+brick_houses_with_door
+  bounds:110,20,16,16
+  index:35
+brick_houses_with_door
+  bounds:128,20,16,16
+  index:48
+brick_houses_with_door
+  bounds:146,20,16,16
+  index:49
+brick_houses_with_door
+  bounds:164,20,16,16
+  index:50
+brick_houses_with_door
+  bounds:182,20,16,16
+  index:51
+brick_houses_with_door
+  bounds:200,20,16,16
+  index:52
+brick_houses_with_door
+  bounds:218,20,16,16
+  index:53
+brick_houses_with_door
+  bounds:236,20,16,16
+  index:66
+brick_houses_with_door
+  bounds:2,38,16,16
+  index:67
+brick_houses_with_door
+  bounds:20,38,16,16
+  index:68
+brick_houses_with_door
+  bounds:38,38,16,16
+  index:69
+brick_houses_with_door
+  bounds:56,38,16,16
+  index:70
+brick_houses_with_door
+  bounds:74,38,16,16
+  index:71
+brick_houses_with_door
+  bounds:92,38,16,16
+  index:84
+brick_houses_with_door
+  bounds:110,38,16,16
+  index:85
+brick_houses_with_door
+  bounds:128,38,16,16
+  index:86
+brick_houses_with_door
+  bounds:146,38,16,16
+  index:87
+brick_houses_with_door
+  bounds:164,38,16,16
+  index:88
+brick_houses_with_door
+  bounds:182,38,16,16
+  index:89
+chicken_houses
+  bounds:200,38,16,16
+  index:123
+chicken_houses
+  bounds:218,38,16,16
+  index:124
+chicken_houses
+  bounds:236,38,16,16
+  index:125
+chicken_houses
+  bounds:2,56,16,16
+  index:147
+chicken_houses
+  bounds:20,56,16,16
+  index:148
+chicken_houses
+  bounds:38,56,16,16
+  index:149
+chicken_houses
+  bounds:56,56,16,16
+  index:171
+chicken_houses
+  bounds:74,56,16,16
+  index:172
+chicken_houses
+  bounds:92,56,16,16
+  index:173
+darker_soil_ground_tiles
+  bounds:110,56,16,16
+  index:0
+darker_soil_ground_tiles
+  bounds:128,56,16,16
+  index:1
+darker_soil_ground_tiles
+  bounds:146,56,16,16
+  index:2
+darker_soil_ground_tiles
+  bounds:164,56,16,16
+  index:11
+darker_soil_ground_tiles
+  bounds:182,56,16,16
+  index:16
+darker_soil_ground_tiles
+  bounds:200,56,16,16
   index:22
 darker_soil_ground_tiles
-  bounds:20,20,16,16
+  bounds:218,56,16,16
   index:23
 darker_soil_ground_tiles
-  bounds:38,20,16,16
+  bounds:236,56,16,16
   index:24
 darker_soil_ground_tiles
-  bounds:56,20,16,16
+  bounds:2,74,16,16
   index:36
 darker_soil_ground_tiles
-  bounds:74,20,16,16
+  bounds:20,74,16,16
   index:68
 fences
-  bounds:92,20,16,16
+  bounds:38,74,16,16
   index:5
 fences
-  bounds:110,20,16,16
+  bounds:56,74,16,16
   index:6
 fences
-  bounds:128,20,16,16
+  bounds:74,74,16,16
   index:7
 fences
-  bounds:146,20,16,16
+  bounds:92,74,16,16
   index:15
 fences
-  bounds:164,20,16,16
+  bounds:110,74,16,16
   index:25
 fences
-  bounds:182,20,16,16
+  bounds:128,74,16,16
   index:28
 grass_tiles_v2
-  bounds:200,20,16,16
+  bounds:146,74,16,16
   index:0
 grass_tiles_v2
-  bounds:218,20,16,16
+  bounds:164,74,16,16
   index:1
 grass_tiles_v2
-  bounds:236,20,16,16
+  bounds:182,74,16,16
   index:2
 grass_tiles_v2
-  bounds:2,38,16,16
+  bounds:200,74,16,16
   index:11
 grass_tiles_v2
-  bounds:20,38,16,16
+  bounds:218,74,16,16
   index:12
 grass_tiles_v2
-  bounds:38,38,16,16
+  bounds:236,74,16,16
   index:13
 grass_tiles_v2
-  bounds:56,38,16,16
+  bounds:2,92,16,16
   index:22
 grass_tiles_v2
-  bounds:74,38,16,16
+  bounds:20,92,16,16
   index:23
 grass_tiles_v2
-  bounds:92,38,16,16
+  bounds:38,92,16,16
   index:24
 grass_tiles_v2
-  bounds:110,38,16,16
+  bounds:56,92,16,16
   index:55
 grass_tiles_v2
-  bounds:128,38,16,16
+  bounds:74,92,16,16
   index:57
 grass_tiles_v2
-  bounds:146,38,16,16
+  bounds:92,92,16,16
   index:59
 grass_tiles_v2
-  bounds:164,38,16,16
+  bounds:110,92,16,16
   index:68
 mushrooms_flowers_stones
-  bounds:182,38,16,16
+  bounds:128,92,16,16
   index:3
 mushrooms_flowers_stones
-  bounds:200,38,16,16
+  bounds:146,92,16,16
   index:12
 mushrooms_flowers_stones
-  bounds:218,38,16,16
+  bounds:164,92,16,16
   index:16
 mushrooms_flowers_stones
-  bounds:236,38,16,16
+  bounds:182,92,16,16
   index:18
 mushrooms_flowers_stones
-  bounds:2,56,16,16
+  bounds:200,92,16,16
   index:19
 mushrooms_flowers_stones
-  bounds:20,56,16,16
+  bounds:218,92,16,16
   index:27
 mushrooms_flowers_stones
-  bounds:38,56,16,16
+  bounds:236,92,16,16
   index:30
 mushrooms_flowers_stones
-  bounds:56,56,16,16
+  bounds:2,110,16,16
   index:31
 mushrooms_flowers_stones
-  bounds:74,56,16,16
+  bounds:20,110,16,16
   index:36
 trees_stumps_bushes
-  bounds:92,56,16,16
+  bounds:38,110,16,16
   index:1
 trees_stumps_bushes
-  bounds:110,56,16,16
+  bounds:56,110,16,16
   index:2
 trees_stumps_bushes
-  bounds:128,56,16,16
+  bounds:74,110,16,16
   index:13
 trees_stumps_bushes
-  bounds:146,56,16,16
+  bounds:92,110,16,16
   index:14
 trees_stumps_bushes
-  bounds:164,56,16,16
+  bounds:110,110,16,16
   index:36
 trees_stumps_bushes
-  bounds:182,56,16,16
+  bounds:128,110,16,16
   index:37
 trees_stumps_bushes
-  bounds:200,56,16,16
+  bounds:146,110,16,16
   index:44
 trees_stumps_bushes
-  bounds:218,56,16,16
+  bounds:164,110,16,16
   index:45
 trees_stumps_bushes
-  bounds:236,56,16,16
+  bounds:182,110,16,16
   index:46
 trees_stumps_bushes
-  bounds:2,74,16,16
+  bounds:200,110,16,16
   index:47
 trees_stumps_bushes
-  bounds:20,74,16,16
+  bounds:218,110,16,16
   index:56
 trees_stumps_bushes
-  bounds:38,74,16,16
+  bounds:236,110,16,16
   index:57
 trees_stumps_bushes
-  bounds:56,74,16,16
+  bounds:2,128,16,16
   index:58
 trees_stumps_bushes
-  bounds:74,74,16,16
+  bounds:20,128,16,16
   index:59
 trees_stumps_bushes
-  bounds:92,74,16,16
+  bounds:38,128,16,16
   index:68
 trees_stumps_bushes
-  bounds:110,74,16,16
+  bounds:56,128,16,16
   index:69
 trees_stumps_bushes
-  bounds:128,74,16,16
+  bounds:74,128,16,16
   index:70
 trees_stumps_bushes
-  bounds:146,74,16,16
+  bounds:92,128,16,16
   index:71
 water
-  bounds:164,74,16,16
+  bounds:110,128,16,16
   index:0
 water
-  bounds:182,74,16,16
+  bounds:128,128,16,16
   index:1
 water
-  bounds:200,74,16,16
+  bounds:146,128,16,16
   index:2
 water
-  bounds:218,74,16,16
+  bounds:164,128,16,16
   index:3
 water_objects
-  bounds:236,74,16,16
+  bounds:182,128,16,16
   index:1
 water_objects
-  bounds:2,92,16,16
+  bounds:200,128,16,16
   index:4
 water_objects
-  bounds:20,92,16,16
+  bounds:218,128,16,16
   index:5
 water_objects
-  bounds:38,92,16,16
+  bounds:236,128,16,16
   index:7
 water_tray
-  bounds:56,92,16,16
+  bounds:2,146,16,16
   index:0
 water_tray
-  bounds:74,92,16,16
+  bounds:20,146,16,16
   index:1
 wooden_bridge_v2
-  bounds:92,92,16,16
+  bounds:38,146,16,16
   index:0
 wooden_bridge_v2
-  bounds:110,92,16,16
+  bounds:56,146,16,16
   index:1

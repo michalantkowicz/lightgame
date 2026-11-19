@@ -66,8 +66,8 @@ design, change the rule on purpose in its own PR.
 - **Day and night**: one `light.DayClock` for the whole game (`GameScreen` ticks it; tune it in
   `light.DayNightSettings`); each map's `DayNightFeature` dims its daylight and posts `NightStartedEvent` (dusk) and
   `DayStartedEvent` (dawn) on its own bus; `BedtimeFeature` puts the farm animals to sleep (`FarmAnimal.setNight`,
-  their `SLEEPING_THE_NIGHT` state) and tells the chickens the map's `Roost` (they walk into the coop through the
-  door with Tiled's `bedtime`, `CoopTrip`). Tests run with hour-long days (`GameDriver`) unless they set their own.
+  their `SLEEPING_THE_NIGHT` state) and tells each kind its `Roost` on the map (the chickens walk into the coop through the
+  door with Tiled's `bedtime`; the cow into the barn the same way, `BedtimeTrip`). Tests run with hour-long days (`GameDriver`) unless they set their own.
 - Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`); a feature checks its flag where it
   is created.
 - Events go through `GameEventService`; an event class lives next to what it is about (one that carries nothing of the

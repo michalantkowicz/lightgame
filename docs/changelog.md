@@ -1357,3 +1357,24 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   - Decided: with someone in the way it waits 3 s, then gives up and sleeps where it is (or stays in the coop).
 - **Tests run with hour-long days** (`GameDriver` sets them; `DayNightTest` its own short ones): the game's settings
   (the owner tried 10 s days) don't change what other tests see, as with the camera zoom.
+- Owner's request (on this branch): **the Village pack's houses** as Tiled tilesets. The early-access Village pack's
+  `houses` folder is copied into the sprites pack folder as `Village pack/houses/` (not committed, like the pack):
+  `pack.json` lists 20 tilesets (small houses, small huts and grey brick houses, each with and without doors and
+  grass, the small house also light; their shadows; the wooden door) and the door's opening as a sprite sheet
+  (`wooden_door`, row `open`; not packed until the `Sprite` enum lists it). `assets-src/tilesets/` has the new `.tsx`
+  files; nothing in the game changed (no map uses them yet).
+- Owner's request (on this branch): **the cow sleeps in the barn** as the chickens in the coop. The coop trip became
+  `BedtimeTrip` (was `CoopTrip`) for any farm animal (its pace and whether it keeps facing the way it went are given
+  to it); the chicken and the cow each own one (`Sheltered`: `setRoost`, `sleepsAway`), and `BedtimeFeature` makes a
+  `Roost` per kind from the doors that let it through (Tiled's `bedtime` COW on level 1's two barn doors). The cow's
+  new states `GOING_TO_BED` and `LEAVING_THE_BARN`, like the chicken's. Where an animal sleeps inside, and where it
+  walks to after coming out in the morning, is now 2 to 5 tiles from the door (was: at least 2), for the chickens too.
+  `DayNightTest.theCowSleepsInTheBarn` (a wide barn: the 5 matters); `animalsOnOtherMapsSleepToo` finds the coop by
+  name (level 1 has the barn now too). `GameDriver.sleepsAwayOn(map, kind)`. Checked on level 1: the cow goes into the
+  barn at dusk, sleeps 2–5 tiles in, and comes out in the morning to a tile 5 tiles from the door.
+- Owner's PR review: the **"zzz" is on the map's game stage** with the animals (was the notifications' stage, over
+  the lights): the night dims it as it dims them; it keeps in front of whoever comes onto the map after it.
+  `GameDriver.zzzOver` checks it is there. And **the trip to bed goes through a door in the animal's `Shared`**
+  (`BedtimeTrip.State`: in for the night, just out, gave up), not copied by each kind's `createAnother`
+  (`carryFrom` is gone). Where to go (2–5 tiles from the doors, the nearest door) moved to `ShelterPlaces`, so
+  `BedtimeTrip` stays one job (PMD).
