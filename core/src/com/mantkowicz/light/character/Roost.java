@@ -17,20 +17,21 @@ public final class Roost {
     private final List<Tile> doors;
 
     /**
-     * @param bedtimeDoor the door the chickens go through to sleep, or null
-     * @param doors       the doors chickens may go through on this map
+     * @param bedtimeDoor the door the farm animals of this kind go through to sleep (e.g. the coop's for the chickens,
+     *                    the barn's for the cow), or null
+     * @param doors       the doors farm animals of this kind may go through on this map
      */
     public Roost(Tile bedtimeDoor, List<Tile> doors) {
         this.bedtimeDoor = bedtimeDoor;
         this.doors = Collections.unmodifiableList(new ArrayList<>(doors));
     }
 
-    /** The door the chickens go through to sleep, or null. */
+    /** The door the farm animals of this kind go through to sleep, or null. */
     Tile getBedtimeDoor() {
         return bedtimeDoor;
     }
 
-    /** The doors chickens may go through on this map. */
+    /** The doors the farm animals of this kind may go through on this map. */
     List<Tile> getDoors() {
         return doors;
     }
