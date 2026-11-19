@@ -61,6 +61,8 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.feature.FishingFeature;
 import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.game.Main;
+import com.mantkowicz.light.light.DayClock;
+import com.mantkowicz.light.light.DayNightSettings;
 import com.mantkowicz.light.map.TileDog;
 import com.mantkowicz.light.map.TileDoor;
 import com.mantkowicz.light.map.TileFishingSpot;
@@ -104,6 +106,15 @@ public final class GameDriver {
     private static final int START_FRAMES = 30;
     private static final long RANDOM_SEED = 7;
     private static final int FRAMES_PER_SECOND = 60;
+    /**
+     * Day and night in the tests unless one sets its own ({@link #dayAndNight}): an hour of day, so no other test sees a
+     * night, whatever the game's settings (as with the camera zoom: changing the game's doesn't affect them).
+     */
+    private static final DayNightSettings TEST_DAYS = new DayNightSettings(3600, 8, 40, 8, 0.25f);
+
+    static {
+        DayNightSettings.use(TEST_DAYS);
+    }
 
     public enum Kind {
         PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY
@@ -1239,6 +1250,36 @@ public final class GameDriver {
         FishingFeature.setNoFishChance(chance);
     }
 
+    // day and night (light.DayClock, feature.DayNightFeature, feature.BedtimeFeature)
+
+    /**
+     * Day and night as long as these say, for games started from now on (seconds of day, dusk, night, dawn; the night's
+     * light as a part of the day's); {@link #dayAndNightAsInTests} brings the tests' own back (an hour of day).
+     */
+    public static void dayAndNight(float day, float dusk, float night, float dawn, float nightLight) {
+        DayNightSettings.use(new DayNightSettings(day, dusk, night, dawn, nightLight));
+    }
+
+    /** Day and night as in the other tests (an hour of day: no night), for games started from now on. */
+    public static void dayAndNightAsInTests() {
+        DayNightSettings.use(TEST_DAYS);
+    }
+
+    /** The time of day: "DAY", "DUSK", "NIGHT" or "DAWN" (night from dusk to dawn). */
+    public String timeOfDay() {
+        DayClock clock = screenField("clock");
+        return clock.getPart().name();
+    }
+
+    /** Is "zzz" shown over the animal (sleeping the night), on the map's game stage (dimmed by the night with it)? */
+    public boolean zzzOver(Kind kind) {
+        Actor zzz = ((FarmAnimal) actor(kind)).getZzz();
+        if (zzz.getStage() != null && zzz.getStage() != gameStage()) {
+            throw new IllegalStateException("The zzz isn't on the map's game stage, with the animals");
+        }
+        return zzz.getStage() != null;
+    }
+
     // grass (feature.GrassFeature)
 
     /** Switches growing grass (FeatureFlag.GROWING_GRASS, on as the game ships) on or off, for games started from now on. */
@@ -1452,6 +1493,33 @@ public final class GameDriver {
             }
         }
         return null;
+    }
+
+    /** The state of the first animal of this kind on this map (e.g. "maps/coop.tmx"), or null when none is there. */
+    public String animalStateOn(String map, Kind kind) {
+        GameBoardActor animal = animalOn(map, kind);
+        return animal == null ? null : ((FarmAnimal) animal).getStateName();
+    }
+
+    /** The cell of the first animal of this kind on this map, or null when none is there. */
+    public Cell cellOn(String map, Kind kind) {
+        GameBoardActor animal = animalOn(map, kind);
+        return animal == null ? null : cellOf(animal.getTile());
+    }
+
+    /** Did the first chicken on this map come into the coop for the night (it goes back out in the morning)? */
+    public boolean sleepsAwayOn(String map) {
+        return ((Chicken) animalOn(map, Kind.CHICKEN)).sleepsAway();
+    }
+
+    /** Did the first animal of this kind on this map come into its shelter for the night (the coop, the barn)? */
+    public boolean sleepsAwayOn(String map, Kind kind) {
+        return ((com.mantkowicz.light.character.Sheltered) animalOn(map, kind)).sleepsAway();
+    }
+
+    private GameBoardActor animalOn(String map, Kind kind) {
+        Object area = areas().get(map);
+        return actorOn(field(area, area.getClass(), "gameStage"), kind);
     }
 
     /** How dark the curtain over the screen is while the player goes through a door: 0 (none) to 1 (black). */

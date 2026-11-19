@@ -71,6 +71,8 @@ public enum UiImage {
     PICTURE_BUBBLE("speech_bubble_grey/row_01"),
     /** Floats up over the player after stroking an animal. */
     HEART("emojis/heart"),
+    /** Over a farm animal sleeping the night. */
+    ZZZ("emojis/zzz"),
     /** On the round button next to an animal that can be stroked: a paw (the pack has no hand). */
     HAND_ICON("mouse_catpaw_mouse_icon"),
     /** The pack's paw pointing: where to tap (the bobber a fish just took). */

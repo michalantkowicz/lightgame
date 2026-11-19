@@ -23,10 +23,20 @@ import com.mantkowicz.light.resources.Action;
  * all but WALKING, EATING, FORAGING, STEPPING_TO_CROP, GOING_BACK and the hearts ──(stroked)──▶ BEING_STROKED ──▶ STROKED
  *     ──▶ STANDING (still hungry: WISHING again, the same corn); stroked going for a crop or pecking it: it gives the
  *     crop up for good, and after STROKED goes GOING_BACK
+ * at night: WISHING ──▶ STANDING ──(not in bed: BedtimeTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ SITTING_DOWN
+ *           STANDING ──(in bed)──▶ SITTING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
+ *           RESTING, SLEEPING ──(in bed)──▶ SLEEPING_THE_NIGHT, (not in bed)──▶ GETTING_UP ──▶ STANDING
+ *           GOING_FOR_CROP, PECKING_CROP ──▶ GOING_BACK; the rest ends in STANDING as by day; no stroke all night
+ * by day, in the coop for the night: STANDING ──▶ LEAVING_THE_COOP ──(out of the door, or gave up)──▶ STANDING
+ *     out of the door: STANDING ──▶ LEAVING_THE_COOP ──(away from the door, or gave up)──▶ STANDING
  * </pre>
  */
 public enum ChickenState implements State<Chicken> {
-    /** On its feet, looking around. Hungry: wants corn. Otherwise after a moment it walks, pecks or sits down. */
+    /**
+     * On its feet, looking around. At night it goes to bed (to the coop, {@link BedtimeTrip}) or, in bed, sits down to
+     * sleep. In the morning, in the coop for the night, it goes out. Hungry: wants corn. Otherwise after a moment it
+     * walks, pecks or sits down.
+     */
     STANDING {
         @Override
         public void enter(Chicken chicken) {
@@ -36,7 +46,14 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.getHunt().spotCrop()) {
+            BedtimeTrip trip = chicken.getTrip();
+            if (chicken.isNight()) {
+                if (trip.knowsTheWay()) { // its first frame on a map it waits to be told the way
+                    chicken.changeState(trip.isInBed() ? SITTING_DOWN : GOING_TO_BED);
+                }
+            } else if (trip.isAway() && trip.knowsTheWay()) {
+                chicken.changeState(LEAVING_THE_COOP);
+            } else if (chicken.getHunt().spotCrop()) {
                 chicken.changeState(GOING_FOR_CROP);
             } else if (chicken.isHungry()) {
                 chicken.chooseWish();
@@ -112,7 +129,7 @@ public enum ChickenState implements State<Chicken> {
         }
     },
 
-    /** Sitting awake. After a while it falls asleep or gets up; hunger gets it up at once. */
+    /** Sitting awake. At night it falls asleep at once. After a while it falls asleep or gets up; hunger gets it up at once. */
     RESTING {
         @Override
         public void enter(Chicken chicken) {
@@ -122,7 +139,9 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.isHungry()) {
+            if (chicken.isNight()) {
+                chicken.changeState(chicken.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
+            } else if (chicken.isHungry()) {
                 chicken.changeState(GETTING_UP);
             } else if (chicken.isTimeUp()) {
                 chicken.changeState(MathUtils.randomBoolean() ? SLEEPING : GETTING_UP);
@@ -135,7 +154,7 @@ public enum ChickenState implements State<Chicken> {
         }
     },
 
-    /** Asleep until it has slept enough or hunger wakes it. */
+    /** A nap: asleep until it has slept enough or hunger wakes it. Night falling, it sleeps on, the night through. */
     SLEEPING {
         @Override
         public void enter(Chicken chicken) {
@@ -145,7 +164,9 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.isTimeUp() || chicken.isHungry()) {
+            if (chicken.isNight()) {
+                chicken.changeState(chicken.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
+            } else if (chicken.isTimeUp() || chicken.isHungry()) {
                 chicken.changeState(GETTING_UP);
             }
         }
@@ -153,6 +174,32 @@ public enum ChickenState implements State<Chicken> {
         @Override
         boolean canBeStroked() {
             return true;
+        }
+    },
+
+    /**
+     * Asleep for the night ("zzz" over it): nothing wakes it, not hunger, not the player (no stroke). Up when the day
+     * starts.
+     */
+    SLEEPING_THE_NIGHT {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.SLEEP);
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (chicken.isNight()) {
+                chicken.getZzz().keepOver(chicken);
+            } else {
+                chicken.getTrip().morning();
+                chicken.changeState(GETTING_UP);
+            }
+        }
+
+        @Override
+        public void exit(Chicken chicken) {
+            chicken.getZzz().remove();
         }
     },
 
@@ -175,7 +222,54 @@ public enum ChickenState implements State<Chicken> {
         }
     },
 
-    /** Stands with a bubble showing corn, until it gets it or gets bored. It can be stroked meanwhile. */
+    /**
+     * At night, on its way to bed: to the door of the coop (it goes through), or in the coop to a free place away from
+     * the entrance ({@link BedtimeTrip}). There, or with no way, it sits down to sleep.
+     */
+    GOING_TO_BED {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.WALK);
+            if (!chicken.getTrip().startToBed()) {
+                chicken.changeState(SITTING_DOWN); // nowhere to go: it sleeps here
+            }
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (!chicken.isNight()) {
+                chicken.changeState(STANDING); // morning came first
+            } else if (chicken.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
+                chicken.changeState(SITTING_DOWN);
+            }
+        }
+    },
+
+    /**
+     * In the morning, in the coop for the night: back to the door, and out; out of it, to a free place at least two
+     * tiles from the door ({@link BedtimeTrip}).
+     */
+    LEAVING_THE_COOP {
+        @Override
+        public void enter(Chicken chicken) {
+            chicken.playAnimation(Action.WALK);
+            if (!chicken.getTrip().startOut()) {
+                chicken.changeState(STANDING);
+            }
+        }
+
+        @Override
+        public void update(Chicken chicken) {
+            if (chicken.isNight() || chicken.getTrip().walk() != BedtimeTrip.Way.ON_THE_WAY) {
+                chicken.changeState(STANDING);
+            }
+        }
+    },
+
+    /**
+     * Stands with a bubble showing corn, until it gets it or gets bored (or the night comes: it goes to sleep and
+     * wishes again in the morning). It can be stroked meanwhile.
+     */
     WISHING {
         @Override
         public void enter(Chicken chicken) {
@@ -199,7 +293,9 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (chicken.getHunt().spotCrop()) { // a crop on the ground will do too
+            if (chicken.isNight()) {
+                chicken.changeState(STANDING); // and sits down from there
+            } else if (chicken.getHunt().spotCrop()) { // a crop on the ground will do too
                 chicken.changeState(GOING_FOR_CROP);
             } else if (chicken.hasWishedTooLong()) { // bored: it looks for something on the ground instead
                 chicken.startFeedingItself(Chicken.PECKS_INSTEAD);
@@ -263,8 +359,8 @@ public enum ChickenState implements State<Chicken> {
         @Override
         public void update(Chicken chicken) {
             CropHunt hunt = chicken.getHunt();
-            if (!hunt.isCropThere() || hunt.blocksThePlayerHere()) {
-                chicken.changeState(GOING_BACK); // picked up meanwhile, or in the player's way
+            if (!hunt.isCropThere() || hunt.blocksThePlayerHere() || chicken.isNight()) {
+                chicken.changeState(GOING_BACK); // picked up meanwhile, in the player's way, or bedtime
             } else if (!chicken.isTimeUp()) {
                 return; // it looks a while first, also when it is beside the crop already
             } else if (hunt.isNextToCrop()) {
@@ -307,8 +403,8 @@ public enum ChickenState implements State<Chicken> {
 
         @Override
         public void update(Chicken chicken) {
-            if (!chicken.getHunt().isCropThere() || chicken.getHunt().blocksThePlayerHere()) {
-                chicken.changeState(GOING_BACK); // picked up from under its beak, or in the player's way
+            if (!chicken.getHunt().isCropThere() || chicken.getHunt().blocksThePlayerHere() || chicken.isNight()) {
+                chicken.changeState(GOING_BACK); // picked up from under its beak, in the player's way, or bedtime
             } else if (chicken.isTimeUp()) {
                 chicken.getHunt().eatCrop();
                 chicken.stopBeingHungry();

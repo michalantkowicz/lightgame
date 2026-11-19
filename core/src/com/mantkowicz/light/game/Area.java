@@ -20,9 +20,11 @@ import com.mantkowicz.light.character.PlayerCreatedEvent;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.FeatureFlag;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.feature.BedtimeFeature;
 import com.mantkowicz.light.feature.CameraTrackingFeature;
 import com.mantkowicz.light.feature.CollectFeature;
 import com.mantkowicz.light.feature.CreatureFeature;
+import com.mantkowicz.light.feature.DayNightFeature;
 import com.mantkowicz.light.feature.DoorFeature;
 import com.mantkowicz.light.feature.DoorToolFeature;
 import com.mantkowicz.light.feature.Feature;
@@ -34,6 +36,7 @@ import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.PlayerFeature;
 import com.mantkowicz.light.feature.StageFeature;
 import com.mantkowicz.light.feature.Travel;
+import com.mantkowicz.light.light.DayClock;
 import com.mantkowicz.light.map.Maps;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TileSet;
@@ -159,9 +162,14 @@ final class Area {
 
     /**
      * Features run every frame, in this order: those of the player ({@link PlayerFeature}) only while the player is on
-     * this map, the others always. The player's and the grass only on a map with a player: they need it.
+     * this map, the others always. The player's and the grass only on a map with a player: they need it. Day and night
+     * first, so the animals hear of the night in the same frame.
+     *
+     * @param clock the time of day, the same on every map
      */
-    void startFeatures(HudProvider hudProvider, Travel travel) {
+    void startFeatures(HudProvider hudProvider, Travel travel, DayClock clock) {
+        features.add(new DayNightFeature(context, clock, mapProperties.getAmbientLight()));
+        features.add(new BedtimeFeature(context));
         doors = new DoorFeature(context, travel);
         if (player != null) {
             camera = new CameraTrackingFeature(context, player);

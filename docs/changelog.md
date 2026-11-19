@@ -1314,3 +1314,69 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   - `Hud.say`'s comment no longer mentions fishing (the HUD knows nothing of it).
   - Kept, the owner's call: the `FISHING` feature flag, and `FishingFeature`'s public getters for tests (the pattern
     of the other features; `GameDriver` sits in another package).
+
+## 2026‑11‑19, day and night (branch `day-night`)
+
+- Owner's request, written anew (the `day-and-night` branch was the owner's proof of concept; its night-only lamps
+  are left for later: the map just gets dark). Kept simple: no feature flag, no lights.
+- **One clock for the whole game** (`light.DayClock`, ticked by `GameScreen` before the maps): day, dusk, night, dawn,
+  again and again, from the morning; every map has the same time.
+- **Settings in one place** (owner asked where): `light.DayNightSettings`, a small class next to the clock, `GAME` as
+  the game ships: 3 min of day, 8 s of dusk, 40 s of night, 8 s of dawn, the night a quarter as bright as the map's
+  daylight. Code rather than a file in assets or a Tiled property: one place to edit, checked by the compiler, works
+  in GWT, and tests set short days with `DayNightSettings.use` (`GameDriver.dayAndNight`).
+- **Light**: each map's `feature.DayNightFeature` sets its ambient light to the clock's part of the map's daylight
+  (Tiled's `ambientLight`; smooth at dusk and dawn, `Interpolation.smooth`). The house (no `ambientLight`, lit by its
+  lamps) stays as it is; the coop (0.55) dims too. The HUD stays bright.
+- **Events** (owner's request): `light.NightStartedEvent` when the sun starts to set, `light.DayStartedEvent` when it
+  starts to rise (the owner wanted the animals up then), posted by each map's `DayNightFeature` on its own bus, living
+  one frame. Decided: the night starts at dusk, not when it is fully dark, so the animals settle down as it darkens.
+- **Animals sleep the night** (`feature.BedtimeFeature` hears the events, tells every `FarmAnimal` on its map,
+  `FarmAnimal.setNight`; carried through doors in its `Shared`): the cow and the chickens finish what they are doing,
+  lie (sit) down and go to a new state, `SLEEPING_THE_NIGHT`, in `CowState` and `ChickenState`: the sleep animation
+  and "zzz" over it (`actor.Zzz`, the UI pack's emoji, `UiImage.ZZZ`, gently bobbing; on the notification stage, over
+  the map's lights, so it stays bright). Nothing wakes them at night: no stroke all night (`canBeStroked`), so no
+  action button over them; a wishing animal drops its wish (the bubble goes) and wishes again in the morning; a
+  chicken going for a crop goes back. At dawn they get up. A nap by day is as before.
+- Tests: `DayNightTest` (the light through a day, the house, the animals sleeping and waking with no button, a
+  wishing cow, the coop's chicken while the rabbit is on the farm), `DayClockTest`; `GameDriver.dayAndNight`,
+  `dayAndNightAsInTests`, `timeOfDay`, `zzzOver`, `animalStateOn`, `cellOn`, `sleepsAwayOn`. No golden changed.
+- Looked at it (throwaway screenshots): the farm at day, dusk and night, "zzz" by the heads of the cow, the chicken and
+  the chick.
+- **Chickens sleep in the coop** (owner's request, then the owner's pick: back out in the morning):
+  - The farm's door to the coop has a new Tiled property, `bedtime` = `CHICKEN` (`TileDoor.isBedtimeFor`): who goes
+    through it to sleep. Each map's `BedtimeFeature` gives its chickens the map's `character.Roost` (that door, and
+    the doors chickens may use).
+  - At night a chicken walks to that door (one step at a time, at its pace, over free tiles) and goes through; in the
+    coop it walks to a free tile at least two tiles (diagonally too) from the entrance, picked at random, then sits
+    down and sleeps (`ChickenState.GOING_TO_BED`, the walking in `character.CoopTrip`). One already resting or napping
+    gets up first. In the morning those that came in for the night walk back to the door and out, and on to a free
+    tile at least two tiles from the door, picked at random (owner's request), before they go on with their day
+    (`LEAVING_THE_COOP`; `CoopTrip` goes with the chicken through the door). The coop's own chicken sleeps where it is
+    and stays. A map without such a door: they sleep where they are.
+  - Decided: with someone in the way it waits 3 s, then gives up and sleeps where it is (or stays in the coop).
+- **Tests run with hour-long days** (`GameDriver` sets them; `DayNightTest` its own short ones): the game's settings
+  (the owner tried 10 s days) don't change what other tests see, as with the camera zoom.
+- Owner's request (on this branch): **the Village pack's houses** as Tiled tilesets. The early-access Village pack's
+  `houses` folder is copied into the sprites pack folder as `Village pack/houses/` (not committed, like the pack):
+  `pack.json` lists 20 tilesets (small houses, small huts and grey brick houses, each with and without doors and
+  grass, the small house also light; their shadows; the wooden door) and the door's opening as a sprite sheet
+  (`wooden_door`, row `open`; not packed until the `Sprite` enum lists it). `assets-src/tilesets/` has the new `.tsx`
+  files; nothing in the game changed (no map uses them yet).
+- Owner's request (on this branch): **the cow sleeps in the barn** as the chickens in the coop. The coop trip became
+  `BedtimeTrip` (was `CoopTrip`) for any farm animal (its pace and whether it keeps facing the way it went are given
+  to it); the chicken and the cow each own one (`Sheltered`: `setRoost`, `sleepsAway`), and `BedtimeFeature` makes a
+  `Roost` per kind from the doors that let it through (Tiled's `bedtime` COW on level 1's two barn doors). The cow's
+  new states `GOING_TO_BED` and `LEAVING_THE_BARN`, like the chicken's. Where an animal sleeps inside, and where it
+  walks to after coming out in the morning, is now 2 to 5 tiles from the door (was: at least 2), for the chickens too.
+  `DayNightTest.theCowSleepsInTheBarn` (a wide barn: the 5 matters); `animalsOnOtherMapsSleepToo` finds the coop by
+  name (level 1 has the barn now too). `GameDriver.sleepsAwayOn(map, kind)`. Checked on level 1: the cow goes into the
+  barn at dusk, sleeps 2–5 tiles in, and comes out in the morning to a tile 5 tiles from the door.
+- Owner's PR review: the **"zzz" is on the map's game stage** with the animals (was the notifications' stage, over
+  the lights): the night dims it as it dims them; it keeps in front of whoever comes onto the map after it.
+  `GameDriver.zzzOver` checks it is there. And **the trip to bed goes through a door in the animal's `Shared`**
+  (`BedtimeTrip.State`: in for the night, just out, gave up), not copied by each kind's `createAnother`
+  (`carryFrom` is gone). Where to go (2–5 tiles from the doors, the nearest door) moved to `ShelterPlaces`, so
+  `BedtimeTrip` stays one job (PMD).
+- Owner: 5 tiles was too far: an animal sleeps, and walks to after coming out, **2 to 4 tiles** from the door
+  (`ShelterPlaces.NEAR_THE_DOOR` 5 → 4), the chickens and the cow.

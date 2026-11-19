@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="22">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="24">
  <properties>
   <property name="ambientLight" type="float" value="1"/>
  </properties>
@@ -14,6 +14,7 @@
  <tileset firstgid="371" source="../tilesets/water_tray.tsx"/>
  <tileset firstgid="377" source="../tilesets/chicken_houses.tsx"/>
  <tileset firstgid="641" source="../tilesets/wooden_bridge_v2.tsx"/>
+ <tileset firstgid="653" source="../tilesets/brick_houses_with_door.tsx"/>
  <layer id="1" name="water" width="24" height="16">
   <data encoding="csv">
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
@@ -76,11 +77,11 @@
  </layer>
  <layer id="6" name="Warstwa Kafelków 5" width="24" height="16">
   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,220,221,0,0,0,0,0,0,0,0,0,0,0,0,256,0,255,0,0,0,0,
-0,0,0,232,233,0,0,0,0,0,0,320,330,322,330,321,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,665,666,667,668,669,670,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,683,684,685,686,687,688,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,220,221,701,702,703,704,705,706,0,0,0,0,0,0,256,0,255,0,0,0,0,
+0,0,0,232,233,719,720,721,722,723,724,320,330,322,330,321,0,0,0,0,0,0,0,0,
+0,0,0,0,0,737,738,739,740,741,742,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,340,343,500,501,502,0,0,0,0,0,
 0,0,0,0,0,371,372,0,0,0,0,0,0,0,0,0,524,525,526,0,0,0,0,0,
@@ -98,9 +99,9 @@
   <data encoding="csv">
 118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,
 118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,118,
-118,118,118,118,0,0,0,0,0,0,0,0,0,0,0,0,0,118,118,118,118,118,118,118,
-118,118,118,118,118,118,0,0,0,0,0,118,118,118,118,118,0,0,0,0,118,118,118,118,
-118,118,118,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,118,118,118,118,
+118,118,118,118,118,118,118,118,118,118,0,0,0,0,0,0,0,118,118,118,118,118,118,118,
+118,118,118,118,118,118,118,118,118,118,0,118,118,118,118,118,0,0,0,0,118,118,118,118,
+118,118,118,0,0,0,118,0,0,118,0,0,0,0,0,0,0,0,0,0,118,118,118,118,
 118,118,118,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,118,118,118,118,
 118,118,118,0,0,0,0,0,0,0,0,0,0,0,118,118,118,118,118,0,118,118,118,118,
 118,118,118,0,0,118,118,0,0,0,0,0,0,0,0,0,118,118,118,0,118,118,118,118,
@@ -231,6 +232,7 @@
   </object>
   <object id="20" name="DOOR" x="276" y="132" width="8" height="8">
    <properties>
+    <property name="bedtime" value="CHICKEN"/>
     <property name="door" value="coop"/>
     <property name="objectClass" value="DOOR"/>
     <property name="passes" value="PLAYER,CHICKEN"/>
@@ -241,6 +243,26 @@
   <object id="21" name="FISHING_SPOT" x="37.9659" y="148" width="8" height="8">
    <properties>
     <property name="objectClass" value="FISHING_SPOT"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="22" name="DOOR" x="115.352" y="68.8849" width="8" height="8">
+   <properties>
+    <property name="bedtime" value="COW"/>
+    <property name="door" value="barn"/>
+    <property name="objectClass" value="DOOR"/>
+    <property name="passes" value="PLAYER,COW"/>
+    <property name="targetMap" value="maps/barn.tmx"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="23" name="DOOR" x="130.396" y="69.4654" width="8" height="8">
+   <properties>
+    <property name="bedtime" value="COW"/>
+    <property name="door" value="barn"/>
+    <property name="objectClass" value="DOOR"/>
+    <property name="passes" value="PLAYER,COW"/>
+    <property name="targetMap" value="maps/barn.tmx"/>
    </properties>
    <ellipse/>
   </object>

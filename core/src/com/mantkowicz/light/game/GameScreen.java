@@ -13,6 +13,8 @@ import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.feature.FPSFeature;
 import com.mantkowicz.light.feature.Feature;
+import com.mantkowicz.light.light.DayClock;
+import com.mantkowicz.light.light.DayNightSettings;
 import com.mantkowicz.light.map.TileDoor;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.UiStage;
@@ -33,6 +35,9 @@ import static com.mantkowicz.light.game.Main.SCREEN_WIDTH;
  * map acts each frame, the one the player is in is also drawn and gets the taps. The player goes through a door behind
  * a short curtain (the screen darkens and lightens again, {@link #CURTAIN_SECONDS} each way); an animal just comes out
  * on the other side.
+ * <p>
+ * Day and night are the same on every map: one {@link DayClock} (set in {@link DayNightSettings}), which each map's
+ * {@code DayNightFeature} follows.
  */
 public class GameScreen extends ScreenAdapter {
     /** How long the screen takes to darken, and then to lighten again, when the player goes through a door. */
@@ -54,6 +59,8 @@ public class GameScreen extends ScreenAdapter {
     private Curtain curtain;
     /** The door the player goes through, once the screen is dark (the next frame takes it there); else null. */
     private TileDoor arrivingThrough;
+    /** The time of day, for every map. */
+    private DayClock clock;
 
     public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService) {
         this.mapName = mapName;
@@ -67,6 +74,7 @@ public class GameScreen extends ScreenAdapter {
         multiplexer = new AnyButtonInput(); // the right mouse button does what the left does
         Gdx.input.setInputProcessor(multiplexer);
 
+        clock = new DayClock(DayNightSettings.current());
         active = build(mapName);
         buildTheMapsBehindDoors();
         listenTo(active);
@@ -110,7 +118,7 @@ public class GameScreen extends ScreenAdapter {
         Player elsewhere = active == null ? null : active.getPlayer();
         Area area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere);
         areas.put(name, area);
-        area.startFeatures(this::hud, this::travel);
+        area.startFeatures(this::hud, this::travel, clock);
         area.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         return area;
     }
@@ -213,6 +221,7 @@ public class GameScreen extends ScreenAdapter {
             arrive(door);
         }
         AnimatedTiledMapTile.updateAnimationBaseTime(); // animated map tiles (water)
+        clock.update(delta); // before the maps: their DayNightFeature follows it
         active.actAndDraw(delta);
 
         uiStage.act(delta);
