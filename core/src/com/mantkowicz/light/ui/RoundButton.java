@@ -70,6 +70,25 @@ public class RoundButton extends Group {
         showPressed(pressed.isVisualPressed());
     }
 
+    /** Hides the round button and its picture (e.g. while a subclass draws itself another way), or shows them again. */
+    protected void setRoundShown(boolean shown) {
+        background.setVisible(shown);
+        icon.setVisible(shown);
+    }
+
+    /**
+     * How high above its bottom the middle of its face is (the round top, over its side), not pressed: what lines up
+     * with other buttons.
+     */
+    protected float getFaceMiddle() {
+        return SIDE * scale + (getHeight() - SIDE * scale) / 2f;
+    }
+
+    /** Is it held down now (a finger or the mouse on it)? */
+    protected boolean isHeldDown() {
+        return pressed.isVisualPressed();
+    }
+
     @Override
     public void act(float delta) {
         super.act(delta);

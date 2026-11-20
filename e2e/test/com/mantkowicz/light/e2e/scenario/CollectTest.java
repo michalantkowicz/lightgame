@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,8 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * the chest, one of those closest to the player; then the button shows the closed chest: it closes the lid, and opens
  * it again (empty: nothing comes out, no stars). Stepping onto the crop puts it into the backpack (the HUD's
  * slots); tapping its slot makes it jump out again, from the player onto a free cell next to it (no stars), and it can
- * be picked up again. With the backpack full, the item in the first slot jumps out to make room (the slot shakes) and
- * the one stepped on comes into that slot a second later; the second slot is emptied only by tapping it. An item never lands on water, on a blocked cell or on someone; with no free cell it stays where
+ * be picked up again. With the backpack full nothing jumps out by itself: the item stepped on stays where it lies, and
+ * standing on it the tool button widens into a swap (see {@link #aFullBackpackLeavesTheItemAndOffersASwap}). An item
+ * never lands on water, on a blocked cell or on someone; with no free cell it stays where
  * it is (a chest with nowhere for its crop to land stays shut, its button shakes). A chest next to the player at
  * the start has its button at once.
  * <p>
@@ -162,7 +164,7 @@ class CollectTest {
         game.clickButton("COLLECT");
         game.seconds(1.5f);
         assertTrue(game.itemsOnGround().isEmpty());
-        assertTrue(game.inventories().matches("player=\\[-, -] chest=\\[" + CROP + ", -]"), game.inventories());
+        assertTrue(game.inventories().matches("player=\\[-, -, -] chest=\\[" + CROP + ", -]"), game.inventories());
         assertEquals(List.of(1f), game.buttonAlphas("COLLECT"), "it still holds something: the button stays");
     }
 
@@ -205,41 +207,167 @@ class CollectTest {
             "~~P~~",
             "~~~~~");
 
+    /**
+     * With the backpack full, the item the player walks onto stays where it lies and nothing jumps out of the backpack.
+     * Standing on it, the tool button widens to the left (its right edge stays): the left slot's item, which pulses
+     * (dark brown and back) in its slot and on the button together, would go for it; the item on the ground doesn't.
+     */
     @Test
-    void aFullBackpackThrowsOutItsFirstItemToTakeTheNewOne() {
-        GameDriver game = GameDriver.start(DEAD_END.write("collect-dead-end"));
-        game.putCarrotIntoBackpack();
-        game.putCarrotIntoBackpack();
-        List<Object> carrots = game.backpackItems(); // [first, second]
-        game.tapBackpackSlot(0); // the first one jumps onto a
-        game.seconds(1);
-        assertEquals(DEAD_END.cell('a'), game.itemCell());
-        game.putCarrotIntoBackpack(); // a third one fills the free slot: the backpack is full again
-        List<Object> full = game.backpackItems(); // [third, second]
-
-        String hud = game.describeHud();
+    void aFullBackpackLeavesTheItemAndOffersASwap() {
+        GameDriver game = fullBackpackNextToATomato();
+        List<Object> full = game.backpackItems();
+        String roundBox = game.toolButtonBox();
         game.click(DEAD_END.cell('a'));
-        for (int frame = 0; frame < 120 && game.backpackItems().equals(full); frame++) {
+        game.seconds(2);
+        assertEquals(DEAD_END.cell('a'), game.playerCell());
+        assertEquals(full, game.backpackItems(), "nothing jumps out of the backpack");
+        assertFalse(game.backpackSlotShaking(0));
+        assertEquals(List.of("Tomato cell=" + DEAD_END.cell('a')), game.itemsOnGround(), "it stays where it lies");
+
+        assertEquals("swap", game.toolButton());
+        assertEquals(List.of("Carrot", "Tomato"), game.toolButtonSwap(), "the left slot's carrot would go");
+        assertEquals(0, game.swapSlot());
+        assertEquals("at=(528.0,65.0) size=252.0x108.0", game.toolButtonBox(),
+                "wide: its right edge where it was, the middle of its face on the slots' middle");
+        assertEquals("at=(672.0,54.0) size=108.0x120.0", roundBox,
+                "round: the middle of its face on the slots' middle");
+        Set<String> tints = new HashSet<>();
+        for (int frame = 0; frame < 72; frame++) {
+            tints.add(game.backpackItemTint(0));
+            assertEquals("ffffffff", game.backpackItemTint(1), "the others keep their colours");
+            assertEquals(game.backpackItemTint(0), game.toolButtonGoingTint(), "on the button it pulses with its slot");
             game.frames(1);
         }
-        game.frames(1); // the HUD notices it in its next frame
-        assertTrue(game.backpackSlotShaking(0), "the slot its oldest item jumped out of shakes");
-        assertFalse(game.backpackSlotShaking(1));
-        assertEquals(Arrays.asList(null, carrots.get(1)), game.backpackItems(),
-                "first the one in the first slot (the third) goes out; the second stays where it is");
-        assertEquals(List.of(carrots.get(0), full.get(0)), game.itemsOnGroundThemselves(), "the first still lies on a");
-        game.seconds(0.9f);
-        assertEquals(Arrays.asList(null, carrots.get(1)), game.backpackItems(), "still waiting");
-        game.seconds(0.2f);
-        assertEquals(Arrays.asList(carrots.get(0), carrots.get(1)), game.backpackItems(),
-                "a second later it comes into the first slot");
-        game.seconds(1);
-        assertFalse(game.backpackSlotShaking(0));
-        assertEquals(slotPlace(hud), slotPlace(game.describeHud()), "and is back in its place");
-        assertEquals(DEAD_END.cell('a'), game.playerCell());
-        assertEquals(List.of(full.get(0)), game.itemsOnGroundThemselves(), "the third one lies on the ground now");
-        assertEquals(DEAD_END.cell('P'), game.itemCell(), "on the only free cell next to the player");
+        assertTrue(tints.contains("ffffffff") && tints.size() > 10, "the carrot goes dark and back: " + tints);
         assertFalse(game.crashed());
+    }
+
+    /**
+     * Tapping a slot only chooses what goes (nothing moves); tapping the tool button swaps: the item from the ground goes
+     * into that slot and the slot's item lies on the ground instead, so the same tap swaps them back.
+     */
+    @Test
+    void aSlotChoosesWhatGoesAndTheToolButtonSwaps() {
+        GameDriver game = fullBackpackNextToATomato();
+        List<Object> full = game.backpackItems(); // [carrot, corn, pumpkin]
+        Object tomato = game.itemsOnGroundThemselves().get(0);
+        game.click(DEAD_END.cell('a'));
+        game.seconds(2);
+
+        game.tapBackpackSlot(1);
+        game.seconds(1);
+        assertEquals(1, game.swapSlot());
+        assertEquals(List.of("Corn", "Tomato"), game.toolButtonSwap());
+        assertEquals(full, game.backpackItems(), "nothing moved");
+        assertEquals(List.of(tomato), game.itemsOnGroundThemselves(), "nothing thrown out");
+        assertEquals(DEAD_END.cell('a'), game.playerCell(), "the tap didn't walk the player");
+
+        game.tapToolButton();
+        assertEquals(Arrays.asList(full.get(0), tomato, full.get(2)), game.backpackItems(),
+                "the tomato in the corn's slot");
+        game.seconds(1);
+        assertEquals(List.of("Corn cell=" + DEAD_END.cell('a')), game.itemsOnGround(), "the corn lies there instead");
+        assertEquals("swap", game.toolButton());
+        assertEquals(List.of("Tomato", "Corn"), game.toolButtonSwap(), "the same tap swaps them back");
+        assertEquals(1, game.swapSlot());
+
+        game.tapToolButton();
+        game.seconds(1);
+        assertEquals(full, game.backpackItems());
+        assertEquals(List.of("Tomato cell=" + DEAD_END.cell('a')), game.itemsOnGround());
+        assertFalse(game.crashed());
+    }
+
+    /** Stepping off the item the tool button is round again and nothing pulses; the next time the left slot is first. */
+    @Test
+    void steppingOffEndsTheSwap() {
+        GameDriver game = fullBackpackNextToATomato();
+        game.click(DEAD_END.cell('a'));
+        game.seconds(2);
+        game.tapBackpackSlot(2);
+        game.frames(2);
+        assertEquals(2, game.swapSlot());
+
+        game.click(DEAD_END.cell('P'));
+        game.seconds(2);
+        assertEquals("hint", game.toolButton());
+        assertEquals(List.of(), game.toolButtonSwap());
+        assertEquals(-1, game.swapSlot());
+        assertEquals("ffffffff", game.backpackItemTint(2));
+        assertEquals("ffffffff", game.toolButtonGoingTint());
+        assertEquals("at=(672.0,54.0) size=108.0x120.0", game.toolButtonBox(), "round, where it was");
+
+        game.tapBackpackSlot(2); // no swap on offer: the slot does what it always does
+        game.frames(2);
+        assertTrue(game.backpackSlotShaking(2), "nowhere to throw the pumpkin (the tomato lies on a): it shakes");
+        game.seconds(1);
+
+        game.click(DEAD_END.cell('a'));
+        game.seconds(2);
+        assertEquals(0, game.swapSlot(), "the left slot first again");
+        assertFalse(game.crashed());
+    }
+
+    /** Only standing still: walking across an item with the backpack full, the tool button stays round. */
+    @Test
+    void noSwapWhileWalkingAcrossAnItem() {
+        TestMap row = TestMap.of("~~~~~", "~Pab~", "~~~~~");
+        GameDriver game = GameDriver.start(row.write("collect-row"));
+        game.putIntoBackpack("carrot");
+        game.putIntoBackpack("corn");
+        game.putIntoBackpack("pumpkin");
+        game.dropCrop("tomato", row.cell('a'));
+        game.seconds(1);
+        game.click(row.cell('b'));
+        for (int frame = 0; frame < 90; frame++) {
+            game.frames(1);
+            assertEquals("hint", game.toolButton(), "frame " + frame);
+        }
+        assertEquals(row.cell('b'), game.playerCell());
+        assertEquals(List.of("Tomato cell=" + row.cell('a')), game.itemsOnGround());
+        assertFalse(game.crashed());
+    }
+
+    /** The swap comes before the scythe: on grass with an item the tool button swaps; on grass alone it cuts. */
+    @Test
+    void theSwapComesBeforeTheScythe() {
+        TestMap meadow = TestMap.of("~~~~~", "~Pgh~", "~~~~~")
+                .with('g', "GRASS", Map.of())
+                .with('h', "GRASS", Map.of());
+        GameDriver game = GameDriver.start(meadow.write("collect-meadow"));
+        game.putIntoBackpack("carrot");
+        game.putIntoBackpack("corn");
+        game.putIntoBackpack("pumpkin");
+        game.dropCrop("tomato", meadow.cell('g'));
+        game.seconds(1);
+        game.click(meadow.cell('h'));
+        game.seconds(2);
+        assertEquals("scythe", game.toolButton(), "grass alone: the scythe");
+
+        game.click(meadow.cell('g'));
+        game.seconds(2);
+        assertEquals("swap", game.toolButton(), "grass with an item: the swap");
+        game.tapToolButton();
+        game.seconds(1);
+        assertEquals("[Tomato, Corn, Pumpkin]", game.describeHud().lines()
+                .filter(line -> line.startsWith("backpack:")).findFirst().orElseThrow().split(" at=")[0]
+                .substring("backpack: ".length()));
+
+        game.click(meadow.cell('h'));
+        game.seconds(2);
+        assertEquals("scythe", game.toolButton(), "off the item, the scythe again");
+        assertFalse(game.crashed());
+    }
+
+    /** The rabbit next to a tomato on {@code a}, with a carrot, corn and a pumpkin in its backpack (full). */
+    private static GameDriver fullBackpackNextToATomato() {
+        GameDriver game = GameDriver.start(DEAD_END.write("collect-dead-end"));
+        game.putIntoBackpack("carrot");
+        game.putIntoBackpack("corn");
+        game.putIntoBackpack("pumpkin");
+        game.dropCrop("tomato", DEAD_END.cell('a'));
+        game.seconds(1);
+        return game;
     }
 
     /** Where the HUD's first backpack slot is: "at=(x,y) size=WxH" from its line. */
@@ -327,7 +455,7 @@ class CollectTest {
         assertEquals(List.of(), game.buttonAlphas("COLLECT"), "empty: no button");
         assertEquals("none", game.chestButton());
         assertEquals(1, game.itemsOnGround().size());
-        assertEquals("player=[-, -] chest=[-, -]", game.inventories());
+        assertEquals("player=[-, -, -] chest=[-, -]", game.inventories());
         game.seconds(10);
         assertEquals("chest/open_front", game.chestAnimation(), "still open");
         assertEquals(List.of(), game.buttonAlphas("COLLECT"), "still no button");

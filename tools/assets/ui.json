@@ -19,6 +19,7 @@
 
   "images": [
     {"file": "UI Sprites/Icons/All Icons.png", "name": "icons", "frame": [16, 16], "names": {"165": "question", "293": "door"}},
+    {"file": "UI Sprites/Icons/Swap icon.png", "name": "icons_swap"},
     {"file": "UI Sprites/Icons/white icons.png", "name": "icons_white", "frame": [16, 16]},
     {"file": "UI Sprites/Icons/special icons/Hearts.png", "name": "hearts", "pieces": "auto"},
     {"file": "UI Sprites/Icons/special icons/Hearts in wood.png", "name": "hearts_in_wood", "pieces": "auto"},

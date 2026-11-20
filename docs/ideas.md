@@ -85,9 +85,11 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
   Worth doing before the second creature or the first field or tree.
 - **Game modes by age: a simple backpack for the youngest** (2026‑11‑10). **Needs more discussion before any
   implementation: how the backpack should look and behave (for each mode) isn't decided yet.** The game should suit kids
-  from about 3 years old up, with easier mechanics for the youngest. Today the player has 2 backpack slots (shown in the HUD); a chest's button
-  throws its contents out, items are picked up by walking onto them and thrown out by tapping their slot, and a full
-  backpack makes room by throwing out its first slot's item (PR #35). Notes so far, from before that:
+  from about 3 years old up, with easier mechanics for the youngest. Today the player has 3 backpack slots (shown in the HUD); a chest's button
+  throws its contents out, items are picked up by walking onto them and thrown out by tapping their slot, and with a
+  full backpack the item stays on the ground: standing on it, the tool button offers to swap it for a backpack item
+  (branch `backpack-swap`; until then a full backpack threw out its first slot's item, PR #35). Notes so far, from
+  before that:
   - *Older kids:* a proper backpack, e.g. 8 slots, items of one type stacked in a slot, using and dropping items, maybe
     simple crafting. Refusing a pickup when full is fine at this age, with a hint like "drop something to make room".
   - *Youngest (around 3):* they can't read or plan ahead, and drags between slots are too fiddly, so everything is

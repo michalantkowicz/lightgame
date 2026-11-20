@@ -35,6 +35,7 @@ import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.PlayerFeature;
 import com.mantkowicz.light.feature.StageFeature;
+import com.mantkowicz.light.feature.SwapFeature;
 import com.mantkowicz.light.feature.Travel;
 import com.mantkowicz.light.light.DayClock;
 import com.mantkowicz.light.map.Maps;
@@ -179,6 +180,7 @@ final class Area {
             Hud hud = hudProvider.hud(context, player);
             creatures = new CreatureFeature(context, player, hud);
             features.add(creatures);
+            features.add(new SwapFeature(player, hud, collecting)); // before every tool: it comes first
             features.add(new DoorToolFeature(context, player, hud, doors, travel)); // before the scythe: it comes first
             if (mapProperties.isOn(FeatureFlag.GROWING_GRASS)) {
                 GrassFeature grass = new GrassFeature(context, player);

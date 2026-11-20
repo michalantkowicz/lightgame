@@ -1,5 +1,6 @@
 package com.mantkowicz.light.feature;
 
+import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.ui.collect.CollectPlugin;
@@ -31,5 +32,15 @@ public class CollectFeature implements PlayerFeature {
      */
     public boolean throwOut(int slot) {
         return resolver.throwOut(slot);
+    }
+
+    /** What the player could swap a backpack item for (it stands on it, the backpack is full), or null. */
+    public ItemOnGround swapOffer() {
+        return resolver.swapOffer();
+    }
+
+    /** Swaps the item in a backpack slot for the one the player stands on; false with nothing to swap. */
+    public boolean swap(int slot) {
+        return resolver.swap(slot);
     }
 }

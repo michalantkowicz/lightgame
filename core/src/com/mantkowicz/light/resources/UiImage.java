@@ -65,6 +65,11 @@ public enum UiImage {
     HINT_ICON("icons/question"),
     /** On the tool button while the player stands on the door it came out of: tapped, it goes back through. */
     DOOR_ICON("icons/door"),
+    /**
+     * Between the two items on the wide tool button while the player stands on an item with a full backpack: they swap.
+     * Drawn for the game (tools/assets/swap_icon.py): the pack has single arrows only.
+     */
+    SWAP_ICON("icons_swap"),
     /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */
     DIALOG_BOX_DOWN("dialog_box_down"),
     /** A small bubble popping up over a character on the map, with a picture put inside it (what a cow wishes for). */

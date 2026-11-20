@@ -1380,3 +1380,30 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   `BedtimeTrip` stays one job (PMD).
 - Owner: 5 tiles was too far: an animal sleeps, and walks to after coming out, **2 to 4 tiles** from the door
   (`ShelterPlaces.NEAR_THE_DOOR` 5 → 4), the chickens and the cow.
+
+## 2026‑11‑20, backpack swap (branch `backpack-swap`)
+
+- Owner's request: **nothing jumps out of the backpack by itself any more, a third slot, and a swap** for the item
+  on the ground, simple enough for a 3-year-old, without windows or pop-ups. Chosen from mock-ups (the owner's private
+  artifact page "Backpack Swap Mock-ups": four ideas, then six around the tool button, then this one): the tool
+  button widens into a swap.
+- **Full backpack:** the item walked onto stays where it lies (`PlayerCollectResolver.pickUp`; the making-room pause,
+  `MAKING_ROOM_SECONDS`, went with the behaviour it timed). With a free slot it is picked up as before.
+- **Three slots** (`Player` 3, `Hud.BACKPACK_SLOTS` 3): 84 × 91 (were 96 × 104), 8 px apart (12), 20 px from the face
+  (40), so three fit left of the face on a screen 800 wide; the tool button moved 44 px right with them
+  (`Hud.TOOL_RIGHT`), mirroring the backpack. Owner: the tool button, round or wide, has the middle of its face
+  (over the darker side at its bottom) level with the middle of the slots' faces (`ToolButton.place`; was: its bottom
+  on the face's bottom, `Hud.TOOL_Y`, gone with it), 20 px lower for the round one.
+- **The swap** (`feature.SwapFeature`, run before the door, the scythe and the rod: owner, "items on grass should
+  always have priority"): standing still on an item with the backpack full, `ToolButton.setSwap` widens the button to
+  the left (the pack's text button, `play_button/blank`, 252 × 108; its right edge stays): the backpack item that would
+  go, the swap arrows, the item on the ground. That item pulses in its slot (to dark brown and back, owner's choice
+  instead of a ring or an arrow) and, in step with it, on the button (owner: so it's clear it is the same thing); the left slot first (owner), a tap on another slot chooses it
+  (`Hud.setChooseForSwap`, after giving to a wishing animal). The button swaps (`PlayerCollectResolver.swap`): the
+  ground item into that slot, the slot's item hops down onto the player's tile, so the same tap swaps back.
+- **The swap icon** isn't in the UI pack (single arrows only): `tools/assets/swap_icon.py` draws it in the icons'
+  white and light brown outline (`UiImage.SWAP_ICON`, `icons_swap`), not committed, like the hand pointer.
+- Goldens re-recorded (approved behaviour change: three slots and the moved tool button): `hud`, `hud-hint` and
+  `collect` (only the backpack and tool button lines). `CollectTest`: the making-room test is replaced by the swap's
+  (`aFullBackpackLeavesTheItemAndOffersASwap`, `aSlotChoosesWhatGoesAndTheToolButtonSwaps`, `steppingOffEndsTheSwap`,
+  `noSwapWhileWalkingAcrossAnItem`, `theSwapComesBeforeTheScythe`); other tests fill three slots where they filled two.

@@ -42,7 +42,7 @@ public class Player extends GameBoardActor implements Collecting {
     private static final float HOP_HEIGHT = 10f;
     private static final float HOP_DURATION = SECONDS_PER_TILE / 2;
     /** As many as the HUD's backpack slots. */
-    private static final int INVENTORY_SIZE = 2;
+    private static final int INVENTORY_SIZE = 3;
 
     private final GameEventService gameEventService;
     private final Shared shared;
