@@ -61,13 +61,16 @@ design, change the rule on purpose in its own PR.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
-  `ChickenState` for `Chicken`), all its transitions in that one file, no framework on top. What farm animals share
-  (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. `Debug.Tool.STATE_LABELS` shows the states while playing.
+  `ChickenState` for `Chicken`, `FrogState` for `Frog`), all its transitions in that one file, no framework on top. What
+  farm animals share (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. The frog is no farm animal: it
+  can't be fed or stroked, keeps more than two tiles from the player and the animals, hops (two hops a tile), blocks
+  nobody and swims in the water (`Tile.isWater`: drawn only with the map's water tileset). `Debug.Tool.STATE_LABELS` shows the states while playing.
 - **Day and night**: one `light.DayClock` for the whole game (`GameScreen` ticks it; tune it in
   `light.DayNightSettings`); each map's `DayNightFeature` dims its daylight and posts `NightStartedEvent` (dusk) and
   `DayStartedEvent` (dawn) on its own bus; `BedtimeFeature` puts the farm animals to sleep (`FarmAnimal.setNight`,
   their `SLEEPING_THE_NIGHT` state) and tells each kind its `Roost` on the map (the chickens walk into the coop through the
-  door with Tiled's `bedtime`; the cow into the barn the same way, `BedtimeTrip`). The HUD's day clock at the top left
+  door with Tiled's `bedtime`; the cow into the barn the same way, `BedtimeTrip`); a frog goes into the water for the
+  night (`Frog.setNight`). The HUD's day clock at the top left
   (`ui.hud.TimeOfDay`) shows the clock's part of the day and an arrow on the day's scale. Tests run with hour-long days (`GameDriver`) unless they set their own.
 - Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`); a feature checks its flag where it
   is created.

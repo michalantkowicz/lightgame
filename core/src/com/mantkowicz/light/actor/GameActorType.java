@@ -10,6 +10,7 @@ public enum GameActorType {
     DOG,
     COW,
     CHICKEN,
+    FROG,
     DESCRIPTION,
     COLLECT_WINDOW,
     ITEM_ON_GROUND

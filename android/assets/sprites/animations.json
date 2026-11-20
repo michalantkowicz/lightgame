@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "3fceefa7bab6cd0e1a5269484cb26d2e270a0a45",
+  "packJsonSha1": "0b1b03f7feba64903c47c575d4e8229efaa918cc",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -99,6 +99,26 @@
       "trimY": 1,
       "width": 15,
       "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "frog": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 2,
+      "width": 16,
+      "height": 12,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "frog_pale": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 0,
+      "trimY": 2,
+      "width": 16,
+      "height": 12,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -714,6 +734,78 @@
       "sheet": "fishing_rod_icon",
       "frames": 1,
       "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "frog/blink": {
+      "sheet": "frog",
+      "frames": 2,
+      "frameDuration": 0.2,
+      "playMode": "LOOP"
+    },
+    "frog/croak": {
+      "sheet": "frog",
+      "frames": 14,
+      "frameDuration": 0.09,
+      "playMode": "LOOP"
+    },
+    "frog/hop": {
+      "sheet": "frog",
+      "frames": 9,
+      "frameDuration": 0.07,
+      "playMode": "LOOP"
+    },
+    "frog/idle": {
+      "sheet": "frog",
+      "frames": 1,
+      "frameDuration": 0.07,
+      "playMode": "LOOP"
+    },
+    "frog/swim": {
+      "sheet": "frog",
+      "frames": 2,
+      "frameDuration": 0.4,
+      "playMode": "LOOP"
+    },
+    "frog/tongue": {
+      "sheet": "frog",
+      "frames": 8,
+      "frameDuration": 0.07,
+      "playMode": "LOOP"
+    },
+    "frog_pale/blink": {
+      "sheet": "frog_pale",
+      "frames": 2,
+      "frameDuration": 0.2,
+      "playMode": "LOOP"
+    },
+    "frog_pale/croak": {
+      "sheet": "frog_pale",
+      "frames": 14,
+      "frameDuration": 0.09,
+      "playMode": "LOOP"
+    },
+    "frog_pale/hop": {
+      "sheet": "frog_pale",
+      "frames": 9,
+      "frameDuration": 0.07,
+      "playMode": "LOOP"
+    },
+    "frog_pale/idle": {
+      "sheet": "frog_pale",
+      "frames": 1,
+      "frameDuration": 0.07,
+      "playMode": "LOOP"
+    },
+    "frog_pale/swim": {
+      "sheet": "frog_pale",
+      "frames": 2,
+      "frameDuration": 0.4,
+      "playMode": "LOOP"
+    },
+    "frog_pale/tongue": {
+      "sheet": "frog_pale",
+      "frames": 8,
+      "frameDuration": 0.07,
       "playMode": "LOOP"
     },
     "grass_tuft/grow": {

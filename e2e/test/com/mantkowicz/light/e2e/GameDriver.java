@@ -49,6 +49,7 @@ import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Dog;
 import com.mantkowicz.light.character.FarmAnimal;
+import com.mantkowicz.light.character.Frog;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
@@ -118,7 +119,7 @@ public final class GameDriver {
     }
 
     public enum Kind {
-        PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY
+        PLAYER, DOG, CHEST, COW, FIELD, CHICKEN, CHICKEN_BABY, FROG
     }
 
     /** What each map has of its own ({@code game.Area}); the rest is the game screen's. */
@@ -997,6 +998,44 @@ public final class GameDriver {
         return player.getAvatar().getY() - player.getAvatarRestY();
     }
 
+    /** What the frog does now, e.g. "SWIMMING" (character.FrogState). */
+    public String frogState() {
+        return ((Frog) actor(Kind.FROG)).getStateName();
+    }
+
+    /** The frog's animation right now, e.g. "frog/hop". */
+    public String frogAnimation() {
+        return ((Frog) actor(Kind.FROG)).getCurrentAnimation();
+    }
+
+    /** Where the frog is drawn right now, in cells (col, row as floats: between two cells while it hops). */
+    public Vector2 frogPosition() {
+        Vector2 center = actor(Kind.FROG).getCenter();
+        return new Vector2((center.x - CELL_SIZE / 2) / CELL_SIZE, (center.y - CELL_SIZE / 2) / CELL_SIZE);
+    }
+
+    /** The crop the frog goes for or eats, e.g. "Carrot", or "none". */
+    public String frogCrop() {
+        ItemOnGround crop = ((Frog) actor(Kind.FROG)).getCrop();
+        return crop == null ? "none" : itemName(crop.getItem());
+    }
+
+    /** Every frog on the map: its sheet, what it does and its cell, e.g. "frog_pale SITTING (15,2)". */
+    public List<String> frogs() {
+        List<String> frogs = new ArrayList<>();
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof Frog frog) {
+                frogs.add(frog.getSprite().getSheet() + " " + frog.getStateName() + " " + cellOf(frog.getTile()));
+            }
+        }
+        return frogs;
+    }
+
+    /** Is the cell water (nobody walks on it, a frog swims in it)? */
+    public boolean isWater(Cell cell) {
+        return tile(cell).isWater();
+    }
+
     /** The cow's animation right now, e.g. "cow_brown/idle". */
     public String cowAnimation() {
         return ((Cow) actor(Kind.COW)).getCurrentAnimation();
@@ -1762,6 +1801,7 @@ public final class GameDriver {
             case COW -> Cow.class;
             case FIELD -> com.mantkowicz.light.character.Field.class;
             case CHICKEN, CHICKEN_BABY -> Chicken.class;
+            case FROG -> Frog.class;
         };
         for (Actor actor : stage.getActors()) {
             if (type.isInstance(actor) && (!(actor instanceof Chicken chicken)

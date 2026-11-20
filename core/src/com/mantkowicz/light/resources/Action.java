@@ -8,10 +8,12 @@ package com.mantkowicz.light.resources;
  */
 public enum Action {
     BITE("bite"),
+    BLINK("blink"),
     BOB("bob"),
     CAST("cast"),
     CAUGHT("caught"),
     CHOP("chop"),
+    CROAK("croak"),
     DIP("dip"),
     DROP("drop"),
     EAT("eat"),
@@ -19,6 +21,7 @@ public enum Action {
     GRAZE("graze"),
     GROW("grow"),
     HEARTS("hearts"),
+    HOP("hop"),
     ICON("icon"),
     IDLE("idle"),
     LEAP("leap"),
@@ -40,6 +43,7 @@ public enum Action {
     SPLASH("splash"),
     SWIM("swim"),
     TILL("till"),
+    TONGUE("tongue"),
     WAIT("wait"),
     WALK("walk"),
     WATER("water");

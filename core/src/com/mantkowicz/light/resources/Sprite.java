@@ -11,6 +11,9 @@ public enum Sprite {
     /** A chicken and a chick; their love rows have the hearts on the row above (drawn over the bird). */
     CHICKEN("chicken"),
     CHICKEN_BABY("chicken_baby"),
+    /** A frog (the Sprout Lands "Plant update 2" early access): green, and pale green. */
+    FROG("frog"),
+    FROG_PALE("frog_pale"),
     CHEST("chest"),
     /** Farm produce lying on the ground, one per row (only the right column: the left one has seed bags). */
     FARM_ITEMS("farm_items"),

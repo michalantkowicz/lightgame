@@ -48,6 +48,8 @@ import static com.mantkowicz.light.util.Tuple.of;
 // baseline (docs/code-quality-plan.md): over the PMD limit before the check came, to be refactored
 @SuppressWarnings({"PMD.GodClass", "PMD.CouplingBetweenObjects", "PMD.ExcessiveImports"})
 public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderProperties> {
+    /** The tileset whose tiles are water (tools/assets names it after its sheet). */
+    private static final String WATER_TILESET = "water";
     static final String COLLISION_LAYER = "collision";
     static final String WALLS_LAYER = "walls";
     private static final String AMBIENT_LIGHT = "ambientLight";
@@ -174,11 +176,14 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
         private final List<TiledMapTileLayer> drawn = new ArrayList<>();
         private TiledMapTileLayer collision;
         private TiledMapTileLayer walls;
+        /** The map's tileset named "water", or null: a blocked cell drawn only from it is water. */
+        private TiledMapTileSet water;
     }
 
     /** The collision layer is never drawn; the walls layer is drawn (if visible) and also blocks. */
     private static PackedLayers sortLayers(TiledMap tiledMap) {
         PackedLayers layers = new PackedLayers();
+        layers.water = tiledMap.getTileSets().getTileSet(WATER_TILESET);
         for (TiledMapTileLayer layer : tiledMap.getLayers().getByType(TiledMapTileLayer.class)) {
             if (COLLISION_LAYER.equals(layer.getName())) {
                 layers.collision = layer;
@@ -217,6 +222,7 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
             return null;
         }
         Tile tile = TileFactory.createMapTile(wall ? TileType.WALL : blocked ? TileType.BLOCKED : TileType.FLOOR);
+        tile.setWater(blocked && !wall && isWater(layers.water, cellLayers));
         tile.setAttributes(new MapProperties());
         tile.setGraphics(cellLayers, WorldScale.TILE_SIZE);
         tile.setPosition(x * WorldScale.TILE_SIZE, y * WorldScale.TILE_SIZE);
@@ -225,6 +231,22 @@ public class TmxTiledMapLoader implements TiledMapLoader<TmxTileMapLoaderPropert
             tile.addTileObject(object);
         }
         return tile;
+    }
+
+    /**
+     * Is everything drawn on the cell water: tiles of the "water" tileset only (nothing on top of it, e.g. grass or a
+     * bridge)? Water is blocked for everyone who walks; a frog swims in it.
+     */
+    private static boolean isWater(TiledMapTileSet water, List<TileGraphic> cellLayers) {
+        if (water == null || cellLayers.isEmpty()) {
+            return false;
+        }
+        for (TileGraphic graphic : cellLayers) {
+            if (water.getTile(graphic.tile().getId()) != graphic.tile()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** What the drawn layers paint on one cell, bottom layer first. */

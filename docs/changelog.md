@@ -1445,3 +1445,31 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
 - `DayNightTest.theDayClockFollowsTheDay` (a whole short day: the pictures and the arrow in order, its place).
   `GameDriver.dayClockShows`; the HUD's description has a line for the clock, so the `hud` and `hud-hint` goldens
   were re-recorded (that line added, nothing else).
+
+## 2026‑11‑20, frog (branch `frog`)
+
+- Owner's request: **a frog**, like the chicken but shy, and at home in the water. From the early-access "Plant update
+  2" frog sheets (green and pale green, 16×16: idle, blink, croak, hop, tongue, swim), copied into the sprites pack
+  folder (`Sprout Sorry pack/Plant update 2/frog/`, not committed). Owner's choices (asked before building): visible
+  while it swims (the swim row, head and back above the water), no feeding (it only eats crops it finds), two frogs on
+  level 1 (a green and a pale one by the river), one branch.
+- `character.Frog` (no `FarmAnimal`: no wishes, no stroke, no doors), `FrogState` (its state machine, all transitions
+  in one file), `FrogSurroundings` (who is near, where it can go: away, a hop, a swim, its way to and out of the
+  water) and `FrogMeal` (going for a crop and eating it). It:
+  - keeps more than `Frog.KEEP_AWAY` (2) tiles (diagonally too) from the player, the dog, the cow and the chickens:
+    whoever comes nearer, it steps away from (onto the tile next to it where the nearest is furthest, the water
+    counting a tile further), until nobody is that near;
+  - hops: a step is two hops of half a tile (the hop row's frames 1–7, 0.49 s each); in the water it swims from tile
+    to tile (1.2 s);
+  - blocks nobody: it is on its tile for the board (nothing lands on it) but never makes it inaccessible, its map
+    object doesn't block its tile (`TileObjectType`'s new `blocks` flag, false for FROG) and taps go through it;
+  - now and then (sitting) and always at night (`BedtimeFeature` tells it, `Frog.setNight`) goes into the nearest
+    water and swims there; by day, after a while, it comes out onto the nearest land where nobody is near;
+  - goes for a crop lying within 4 tiles that nobody else goes for, stands beside it (left or right) where nobody is
+    near and licks at it three times (the crop pulses), then it is eaten; someone coming near, it lets the crop go.
+- **Water**: `Tile.isWater`, set by the map loader for a blocked cell drawn only with tiles of the map's `water`
+  tileset (level 1's river and lake, the test maps' `~`).
+- `build_assets.py`: a sheet's rows may have speeds of their own (`pack.json`'s `durations`, ms per frame by row name):
+  the frog's blink, croak and swim are slower than its hop.
+- `FrogTest` (9 scenarios; `GameDriver` kind FROG, `frogState`, `frogAnimation`, `frogPosition`, `frogs`, `isWater`).
+  Nothing else changed: no golden was re-recorded (the frogs are only on level 1, which no golden plays).
