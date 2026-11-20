@@ -594,8 +594,10 @@ def build_sprites(config, pack):
                     raise SystemExit(f"Animation '{name}' is defined twice in pack.json")
                 for index, frame in enumerate(frames):
                     regions.append({"name": name, "index": index, "image": frame.crop(box)})
+                row_duration = entry.get("durations", {}).get(row)  # a row slower or faster than the rest
                 animations[name] = {"sheet": sheet_name, "frames": len(frames),
-                                    "frameDuration": duration, "playMode": play_mode}
+                                    "frameDuration": duration if row_duration is None else row_duration / 1000,
+                                    "playMode": play_mode}
 
     used = used_sprites(sheets)
     packed_regions = [r for r in regions if animations[r["name"]]["sheet"] in used]

@@ -7,6 +7,7 @@ import com.mantkowicz.light.character.Chicken;
 import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
 import com.mantkowicz.light.character.Field;
+import com.mantkowicz.light.character.Frog;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
 
@@ -36,16 +37,31 @@ public enum TileObjectType {
     CHICKEN_BABY((context, properties) -> new Chicken(context, ChickenType.CHICKEN_BABY)),
     FIELD((context, properties) -> new Field(context,
             CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT),
-            number(properties, TileObjectAttribute.WEED_CHANCE, Field.DEFAULT_WEED_CHANCE)));
+            number(properties, TileObjectAttribute.WEED_CHANCE, Field.DEFAULT_WEED_CHANCE))),
+    /** A frog: it blocks nobody's way (it hops away from everyone anyway). */
+    FROG((context, properties) -> new Frog(context,
+            Frog.colour(properties.get(TileObjectAttribute.COLOUR.getValue(), String.class))), false);
 
     private final BiFunction<GameContext, MapProperties, SpriteActor> spriteActor;
+    /** Does the sprite actor block its tile (nobody walks onto it)? */
+    private final boolean blocks;
 
     TileObjectType() {
         this(null);
     }
 
     TileObjectType(BiFunction<GameContext, MapProperties, SpriteActor> spriteActor) {
+        this(spriteActor, true);
+    }
+
+    TileObjectType(BiFunction<GameContext, MapProperties, SpriteActor> spriteActor, boolean blocks) {
         this.spriteActor = spriteActor;
+        this.blocks = blocks;
+    }
+
+    /** Does its sprite actor block its tile (most do; a frog doesn't)? */
+    public boolean blocksItsTile() {
+        return blocks;
     }
 
     /**

@@ -25,6 +25,12 @@ Python.
 door's opening (8 frames of 48×48) is also a sprite sheet, `wooden_door` (row `open`), not packed for the game until
 the `Sprite` enum lists it.
 
+**The frog** comes from the early-access "Plant update 2" (Sprout Sorry pack), its two sheets copied into the sprites
+pack folder as `Sprout Sorry pack/Plant update 2/frog/` (`frog_spritesheet.png` green, `frog_spritesheet2.png` pale
+green): the sheets `frog` and `frog_pale`, rows `idle`, `blink`, `croak`, `hop`, `tongue` and `swim`, 16×16. Its
+rows play at speeds of their own (`pack.json`'s `durations`: the hop and the tongue quick, the blink and the swim
+slow).
+
 **Fishing** uses the Ocean Pack, copied into the sprites pack folder as `Ocean Pack/`: the rabbit fishing (`fishing
 animation side.png`, its rows 1-4 as `cast_left`, `wait_left`, `bite_left`, `pull_left`; a sheet of its own,
 `rabbit_fishing`, because its frames are cut to another box than the rabbit's), the bobber and its splashes

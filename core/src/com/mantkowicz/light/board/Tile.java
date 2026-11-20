@@ -45,6 +45,8 @@ public abstract class Tile {
     }
 
     private boolean marked = false;
+    /** Water: nobody walks on it (it is blocked), but a frog swims in it. */
+    private boolean water;
 
     protected List<TileContent> objects = new ArrayList<>();
     private TextureRegion backgroundTexture;
@@ -141,6 +143,15 @@ public abstract class Tile {
     }
 
     public abstract boolean isAccessible();
+
+    /** Is it water (nobody walks on it, a frog swims in it)? Set by the map loader. */
+    public boolean isWater() {
+        return water;
+    }
+
+    public void setWater(boolean water) {
+        this.water = water;
+    }
 
     public List<Tile> getNeighbours() {
         return neighbours;

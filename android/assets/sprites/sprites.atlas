@@ -920,6 +920,222 @@ fishing_net_icon/icon
 fishing_rod_icon/icon
   bounds:452,500,15,14
   index:0
+frog/blink
+  bounds:180,516,16,12
+  index:0
+frog/blink
+  bounds:198,516,16,12
+  index:1
+frog/croak
+  bounds:216,516,16,12
+  index:0
+frog/croak
+  bounds:234,516,16,12
+  index:1
+frog/croak
+  bounds:252,516,16,12
+  index:2
+frog/croak
+  bounds:270,516,16,12
+  index:3
+frog/croak
+  bounds:288,516,16,12
+  index:4
+frog/croak
+  bounds:306,516,16,12
+  index:5
+frog/croak
+  bounds:324,516,16,12
+  index:6
+frog/croak
+  bounds:342,516,16,12
+  index:7
+frog/croak
+  bounds:360,516,16,12
+  index:8
+frog/croak
+  bounds:378,516,16,12
+  index:9
+frog/croak
+  bounds:396,516,16,12
+  index:10
+frog/croak
+  bounds:414,516,16,12
+  index:11
+frog/croak
+  bounds:432,516,16,12
+  index:12
+frog/croak
+  bounds:450,516,16,12
+  index:13
+frog/hop
+  bounds:468,516,16,12
+  index:0
+frog/hop
+  bounds:486,516,16,12
+  index:1
+frog/hop
+  bounds:504,516,16,12
+  index:2
+frog/hop
+  bounds:522,516,16,12
+  index:3
+frog/hop
+  bounds:540,516,16,12
+  index:4
+frog/hop
+  bounds:558,516,16,12
+  index:5
+frog/hop
+  bounds:576,516,16,12
+  index:6
+frog/hop
+  bounds:594,516,16,12
+  index:7
+frog/hop
+  bounds:612,516,16,12
+  index:8
+frog/idle
+  bounds:162,516,16,12
+  index:0
+frog/swim
+  bounds:774,516,16,12
+  index:0
+frog/swim
+  bounds:792,516,16,12
+  index:1
+frog/tongue
+  bounds:630,516,16,12
+  index:0
+frog/tongue
+  bounds:648,516,16,12
+  index:1
+frog/tongue
+  bounds:666,516,16,12
+  index:2
+frog/tongue
+  bounds:684,516,16,12
+  index:3
+frog/tongue
+  bounds:702,516,16,12
+  index:4
+frog/tongue
+  bounds:720,516,16,12
+  index:5
+frog/tongue
+  bounds:738,516,16,12
+  index:6
+frog/tongue
+  bounds:756,516,16,12
+  index:7
+frog_pale/blink
+  bounds:828,516,16,12
+  index:0
+frog_pale/blink
+  bounds:846,516,16,12
+  index:1
+frog_pale/croak
+  bounds:864,516,16,12
+  index:0
+frog_pale/croak
+  bounds:882,516,16,12
+  index:1
+frog_pale/croak
+  bounds:900,516,16,12
+  index:2
+frog_pale/croak
+  bounds:918,516,16,12
+  index:3
+frog_pale/croak
+  bounds:936,516,16,12
+  index:4
+frog_pale/croak
+  bounds:954,516,16,12
+  index:5
+frog_pale/croak
+  bounds:972,516,16,12
+  index:6
+frog_pale/croak
+  bounds:990,516,16,12
+  index:7
+frog_pale/croak
+  bounds:2,531,16,12
+  index:8
+frog_pale/croak
+  bounds:20,531,16,12
+  index:9
+frog_pale/croak
+  bounds:38,531,16,12
+  index:10
+frog_pale/croak
+  bounds:56,531,16,12
+  index:11
+frog_pale/croak
+  bounds:74,531,16,12
+  index:12
+frog_pale/croak
+  bounds:92,531,16,12
+  index:13
+frog_pale/hop
+  bounds:110,531,16,12
+  index:0
+frog_pale/hop
+  bounds:128,531,16,12
+  index:1
+frog_pale/hop
+  bounds:146,531,16,12
+  index:2
+frog_pale/hop
+  bounds:164,531,16,12
+  index:3
+frog_pale/hop
+  bounds:182,531,16,12
+  index:4
+frog_pale/hop
+  bounds:200,531,16,12
+  index:5
+frog_pale/hop
+  bounds:218,531,16,12
+  index:6
+frog_pale/hop
+  bounds:236,531,16,12
+  index:7
+frog_pale/hop
+  bounds:254,531,16,12
+  index:8
+frog_pale/idle
+  bounds:810,516,16,12
+  index:0
+frog_pale/swim
+  bounds:416,531,16,12
+  index:0
+frog_pale/swim
+  bounds:434,531,16,12
+  index:1
+frog_pale/tongue
+  bounds:272,531,16,12
+  index:0
+frog_pale/tongue
+  bounds:290,531,16,12
+  index:1
+frog_pale/tongue
+  bounds:308,531,16,12
+  index:2
+frog_pale/tongue
+  bounds:326,531,16,12
+  index:3
+frog_pale/tongue
+  bounds:344,531,16,12
+  index:4
+frog_pale/tongue
+  bounds:362,531,16,12
+  index:5
+frog_pale/tongue
+  bounds:380,531,16,12
+  index:6
+frog_pale/tongue
+  bounds:398,531,16,12
+  index:7
 grass_tuft/grow
   bounds:22,516,16,13
   index:0
@@ -933,7 +1149,7 @@ grass_tuft/grow
   bounds:76,516,16,13
   index:3
 item_shadow/row_00
-  bounds:366,516,14,4
+  bounds:656,531,14,4
   index:0
 plant_carrot/grow
   bounds:94,516,15,13
@@ -987,7 +1203,7 @@ plant_pumpkin/grow
   bounds:362,466,16,16
   index:3
 plant_seedling/grow
-  bounds:382,516,6,4
+  bounds:672,531,6,4
   index:0
 plant_tomato/grow
   bounds:469,500,14,14
@@ -1002,13 +1218,13 @@ plant_tomato/grow
   bounds:517,500,14,14
   index:3
 plant_weed/grow
-  bounds:162,516,12,12
+  bounds:452,531,12,12
   index:0
 plant_weed/grow
-  bounds:176,516,12,12
+  bounds:466,531,12,12
   index:1
 plant_weed/grow
-  bounds:190,516,12,12
+  bounds:480,531,12,12
   index:2
 rabbit/chop_down
   bounds:812,182,43,34
@@ -1773,32 +1989,32 @@ water_tile/ripple
   bounds:290,466,16,16
   index:3
 watering/splash
-  bounds:204,516,14,11
+  bounds:494,531,14,11
   index:0
 watering/splash
-  bounds:220,516,14,11
+  bounds:510,531,14,11
   index:1
 watering/splash
-  bounds:236,516,14,11
+  bounds:526,531,14,11
   index:2
 watering/splash
-  bounds:252,516,14,11
+  bounds:542,531,14,11
   index:3
 watering/splash
-  bounds:268,516,14,11
+  bounds:558,531,14,11
   index:4
 watering/splash
-  bounds:284,516,14,11
+  bounds:574,531,14,11
   index:5
 watering/splash
-  bounds:300,516,14,11
+  bounds:590,531,14,11
   index:6
 watering/splash
-  bounds:316,516,14,11
+  bounds:606,531,14,11
   index:7
 watering/splash
-  bounds:332,516,14,11
+  bounds:622,531,14,11
   index:8
 watering_can/icon
-  bounds:348,516,16,10
+  bounds:638,531,16,10
   index:0

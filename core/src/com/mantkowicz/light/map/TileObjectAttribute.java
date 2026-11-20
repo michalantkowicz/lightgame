@@ -28,7 +28,9 @@ public enum TileObjectAttribute {
      * Who goes through a door to sleep, e.g. "CHICKEN" on the farm's door to the coop: at night they walk in, in the
      * morning back out; nobody without it.
      */
-    BEDTIME("bedtime");
+    BEDTIME("bedtime"),
+    /** A frog's colour (objectClass FROG): "green" or "pale"; one of them at random without it. */
+    COLOUR("colour");
 
     private final String value;
 

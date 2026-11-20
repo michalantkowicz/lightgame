@@ -6,6 +6,7 @@ import com.mantkowicz.light.actor.GameActorType;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TileContent;
 import com.mantkowicz.light.character.FarmAnimal;
+import com.mantkowicz.light.character.Frog;
 import com.mantkowicz.light.character.Roost;
 import com.mantkowicz.light.character.Sheltered;
 import com.mantkowicz.light.context.GameContext;
@@ -24,7 +25,7 @@ import java.util.Map;
  * (once done with what they are doing), when the day starts ({@link DayStartedEvent}) they wake up. Also an animal that
  * comes onto the map at night (out of a door) is told it is night. Each animal is told its kind's {@link Roost} on the
  * map: on the farm the door it sleeps behind (Tiled's door property {@code bedtime}: CHICKEN on the coop's, COW on the
- * barn's), in the shelter its entrance.
+ * barn's), in the shelter its entrance. A frog is told it is night too: it goes into the water for the night.
  */
 public class BedtimeFeature implements Feature {
     private final GameEventService events;
@@ -67,6 +68,9 @@ public class BedtimeFeature implements Feature {
             night = false;
         }
         for (Actor actor : gameStage.getActors()) {
+            if (actor instanceof Frog frog) {
+                frog.setNight(night); // it goes into the water for the night
+            }
             if (actor instanceof FarmAnimal animal) {
                 animal.setNight(night);
                 Roost roost = roosts.get(animal.getGameActorType());

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="24">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="24" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="7" nextobjectid="26">
  <properties>
   <property name="ambientLight" type="float" value="1"/>
  </properties>
@@ -263,6 +263,20 @@
     <property name="objectClass" value="DOOR"/>
     <property name="passes" value="PLAYER,COW"/>
     <property name="targetMap" value="maps/barn.tmx"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="24" name="FROG" x="84" y="212" width="8" height="8">
+   <properties>
+    <property name="colour" value="green"/>
+    <property name="objectClass" value="FROG"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="25" name="FROG" x="244" y="212" width="8" height="8">
+   <properties>
+    <property name="colour" value="pale"/>
+    <property name="objectClass" value="FROG"/>
    </properties>
    <ellipse/>
   </object>
