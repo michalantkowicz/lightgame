@@ -21,7 +21,8 @@ import com.mantkowicz.light.ui.RoundButton;
  * <p>
  * For a swap ({@link #setSwap}) it widens to the left into the pack's rounded button: what goes on its left (a backpack
  * item, pulsing with its slot), the swap arrows in the middle, what comes on its right (the item the player stands
- * on). Round or wide, its right edge and the middle of its face stay where the HUD placed them ({@link #place}).
+ * on), as wide as the backpack. Round or wide, its right edge and its middle stay where the HUD placed them
+ * ({@link #place}).
  */
 public class ToolButton extends RoundButton {
     /** Its name for the question mark (no tool). */
@@ -29,14 +30,14 @@ public class ToolButton extends RoundButton {
     /** Its name while it offers a swap ({@link #setSwap}). */
     public static final String SWAP = "swap";
     /** The wide button: as wide as there is room right of the face, the pack's button drawn at the HUD's scale. */
-    static final float WIDE_WIDTH = 252;
+    static final float WIDE_WIDTH = 3 * BackpackSlots.SLOT_WIDTH + 2 * 8; // as wide as the backpack: balance
     /** Its items and the arrows: 16 px pictures at the HUD's scale, this far in from its ends. */
     private static final float WIDE_ITEM_SIZE = 64, WIDE_INSET = 22;
 
     private final ResourcesService resources;
-    private final float roundWidth, roundHeight, roundFaceMiddle;
-    /** Where the HUD placed it: its right edge, and the middle of its face. */
-    private float right, faceMiddle;
+    private final float roundWidth, roundHeight;
+    /** Where the HUD placed it: its right edge, and the height of its middle. */
+    private float right, middle;
     private final NinePatchDrawable wideUp, wideDown;
     private final Group wide = new Group();
     private final Image wideBackground = new Image(), going = new Image(), arrows, coming = new Image();
@@ -49,7 +50,6 @@ public class ToolButton extends RoundButton {
         this.resources = resources;
         roundWidth = getWidth();
         roundHeight = getHeight();
-        roundFaceMiddle = getFaceMiddle();
         wideUp = wide(resources, UiImage.BUTTON);
         wideDown = wide(resources, UiImage.BUTTON_DOWN);
         arrows = new Image(resources.getUiImage(UiImage.SWAP_ICON));
@@ -128,23 +128,14 @@ public class ToolButton extends RoundButton {
         setPicture(resources.getUiImage(UiImage.HINT_ICON));
     }
 
-    /**
-     * Stands with its right edge here and the middle of its face (the part that is pressed, over its side) at this
-     * height, round or wide.
-     */
-    void place(float rightEdge, float faceMiddleY) {
+    /** Stands with its right edge here and its middle at this height, round or wide. */
+    void place(float rightEdge, float middleY) {
         right = rightEdge;
-        faceMiddle = faceMiddleY;
-        setPosition(right - getWidth(),
-                Math.round(faceMiddle - (wide.isVisible() ? wideFaceMiddle() : roundFaceMiddle)));
+        middle = middleY;
+        setPosition(right - getWidth(), Math.round(middle - getHeight() / 2f));
     }
 
-    /** How high above the wide button's bottom the middle of its face is (its bottom border is its side). */
-    private float wideFaceMiddle() {
-        return (wideUp.getMinHeight() + wideUp.getBottomHeight() - wideUp.getTopHeight()) / 2f;
-    }
-
-    /** Wide (a swap) or round (a tool or the hint); its right edge and the middle of its face stay where they are. */
+    /** Wide (a swap) or round (a tool or the hint); its right edge and its middle stay where they are. */
     private void showWide(boolean shown) {
         if (shown == wide.isVisible()) {
             return;
@@ -152,7 +143,7 @@ public class ToolButton extends RoundButton {
         wide.setVisible(shown);
         setRoundShown(!shown);
         setSize(shown ? WIDE_WIDTH : roundWidth, shown ? wideUp.getMinHeight() : roundHeight);
-        place(right, faceMiddle);
+        place(right, middle);
         showWidePressed();
     }
 
@@ -171,11 +162,11 @@ public class ToolButton extends RoundButton {
         wideBackground.setDrawable(drawable);
         wideBackground.setSize(getWidth(), drawable.getMinHeight());
         // the middle of the button's face (pressed, the piece is lower)
-        float middle = (drawable.getMinHeight() + drawable.getBottomHeight() - drawable.getTopHeight()) / 2f;
-        going.setPosition(WIDE_INSET, Math.round(middle - WIDE_ITEM_SIZE / 2f));
+        float faceMiddle = (drawable.getMinHeight() + drawable.getBottomHeight() - drawable.getTopHeight()) / 2f;
+        going.setPosition(WIDE_INSET, Math.round(faceMiddle - WIDE_ITEM_SIZE / 2f));
         coming.setPosition(getWidth() - WIDE_INSET - WIDE_ITEM_SIZE, going.getY());
         arrows.setPosition(Math.round((getWidth() - arrows.getWidth()) / 2f),
-                Math.round(middle - arrows.getHeight() / 2f));
+                Math.round(faceMiddle - arrows.getHeight() / 2f));
     }
 
     /** The tool on it, e.g. "scythe", {@link #SWAP} while it is wide, or {@link #HINT} for the question mark. */

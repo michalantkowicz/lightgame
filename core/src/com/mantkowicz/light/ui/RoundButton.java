@@ -76,14 +76,6 @@ public class RoundButton extends Group {
         icon.setVisible(shown);
     }
 
-    /**
-     * How high above its bottom the middle of its face is (the round top, over its side), not pressed: what lines up
-     * with other buttons.
-     */
-    protected float getFaceMiddle() {
-        return SIDE * scale + (getHeight() - SIDE * scale) / 2f;
-    }
-
     /** Is it held down now (a finger or the mouse on it)? */
     protected boolean isHeldDown() {
         return pressed.isVisualPressed();

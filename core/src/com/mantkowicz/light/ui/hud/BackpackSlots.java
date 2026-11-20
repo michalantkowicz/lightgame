@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.mantkowicz.light.actor.Item;
@@ -28,8 +27,8 @@ import java.util.function.IntPredicate;
  * pulses, from its own colours to dark brown and back.
  */
 public class BackpackSlots {
-    /** A slot (84x91: three of them fit left of the face on a screen 800 wide; two were 96x104) and its item. */
-    static final float SLOT_WIDTH = 84, SLOT_HEIGHT = 91, ITEM_SIZE = 64; // a 16 px item drawn 4x
+    /** A slot (81x87: three of them fit left of the face on a screen 800 wide; two were 96x104) and its item. */
+    static final float SLOT_WIDTH = 81, SLOT_HEIGHT = 87, ITEM_SIZE = 64; // a 16 px item drawn 4x
     /** How far a shaken slot moves up and down, and how long the first move takes (the whole shake is 6 times that). */
     private static final float SHAKE = 8, SHAKE_SECONDS = 0.04f;
     /** The item chosen for a swap goes from its own colours to this dark brown and back, once in this many seconds. */
@@ -104,14 +103,9 @@ public class BackpackSlots {
         return swapSlot;
     }
 
-    /** How high above a slot's bottom the middle of its face is (over its side, the thicker bottom border). */
-    float getFaceMiddle() {
-        Drawable slot = slots.get(0).getDrawable();
-        return (SLOT_HEIGHT + slot.getBottomHeight() - slot.getTopHeight()) / 2f;
-    }
-
-    /** Lines the slots up leftwards from {@code right} (the right slot's right edge), their bottoms on {@code bottom}. */
-    void layOut(float right, float bottom, float gap) {
+    /** Lines the slots up leftwards from {@code right} (the right slot's right edge), their middles at {@code middle}. */
+    void layOut(float right, float middle, float gap) {
+        float bottom = Math.round(middle - SLOT_HEIGHT / 2f);
         float x = right;
         for (int i = slots.size() - 1; i >= 0; i--) {
             Image slot = slots.get(i);

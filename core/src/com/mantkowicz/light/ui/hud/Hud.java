@@ -39,16 +39,24 @@ public class Hud extends Group {
     public static final int SCALE = 4;
     /** Three slots by design: few enough for the youngest players. */
     static final int BACKPACK_SLOTS = 3;
-    /** GAP: between the face and the pieces beside it (20: three slots fit); SLOT_GAP: between two backpack slots. */
+    /**
+     * GAP: between the face and the pieces beside it; SLOT_GAP: between two backpack slots. The slots are a group,
+     * apart from the face: GAP is about SLOT_GAP × φ².
+     */
     private static final float MARGIN = 16, GAP = 20, SLOT_GAP = 8;
     /** The face's bottom; the stamina bar is BAR_GAP under it. */
     private static final float FACE_Y = MARGIN + 58, BAR_GAP = 10;
     /**
      * Where the tool button stands: its right edge this far right of the screen's middle (as far as the slots' left
-     * edge is left of it); the middle of its face as high as the middle of the slots' faces, round or wide.
+     * edge is left of it: the same margin on both sides).
      */
     public static final float TOOL_RIGHT = Portrait.WIDTH / 2f + GAP + BACKPACK_SLOTS * BackpackSlots.SLOT_WIDTH
             + (BACKPACK_SLOTS - 1) * SLOT_GAP;
+    /**
+     * The pieces beside the face (the slots, the tool button round or wide) have their middles on one line this high
+     * above the face's bottom: the face's lower golden section (its height / φ², about 70 of 184).
+     */
+    static final float ROW_MIDDLE = (float) (Portrait.HEIGHT / Math.pow((1 + Math.sqrt(5)) / 2, 2));
     /** What the player says when the tool button is tapped without a tool (later: where to go next). */
     static final String HINT = "play around!";
     /**
@@ -178,10 +186,9 @@ public class Hud extends Group {
         laidOutHeight = getHeight();
         float faceX = (getWidth() - Portrait.WIDTH) / 2f, faceY = FACE_Y;
         face.setPosition(faceX, faceY);
-        // the pieces beside the face line up with the bottom of its frame
-        float ground = faceY;
+        float middle = faceY + ROW_MIDDLE;
 
-        backpack.layOut(faceX - GAP, ground, SLOT_GAP);
+        backpack.layOut(faceX - GAP, middle, SLOT_GAP);
 
         stamina.setPosition(Math.round((getWidth() - stamina.getWidth()) / 2f), faceY - BAR_GAP - stamina.getHeight());
 
@@ -192,7 +199,7 @@ public class Hud extends Group {
             child.moveBy(-left, 0);
         }
 
-        toolButton.place(getWidth() / 2f + TOOL_RIGHT, ground + backpack.getFaceMiddle());
+        toolButton.place(getWidth() / 2f + TOOL_RIGHT, middle);
         placeBubble();
         gear.setPosition(getWidth() - gear.getWidth() - GEAR_MARGIN, getHeight() - gear.getHeight() - GEAR_MARGIN);
         if (settings != null) {

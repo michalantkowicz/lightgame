@@ -1389,11 +1389,17 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   button widens into a swap.
 - **Full backpack:** the item walked onto stays where it lies (`PlayerCollectResolver.pickUp`; the making-room pause,
   `MAKING_ROOM_SECONDS`, went with the behaviour it timed). With a free slot it is picked up as before.
-- **Three slots** (`Player` 3, `Hud.BACKPACK_SLOTS` 3): 84 × 91 (were 96 × 104), 8 px apart (12), 20 px from the face
-  (40), so three fit left of the face on a screen 800 wide; the tool button moved 44 px right with them
-  (`Hud.TOOL_RIGHT`), mirroring the backpack. Owner: the tool button, round or wide, has the middle of its face
-  (over the darker side at its bottom) level with the middle of the slots' faces (`ToolButton.place`; was: its bottom
-  on the face's bottom, `Hud.TOOL_Y`, gone with it), 20 px lower for the round one.
+- **Three slots** (`Player` 3, `Hud.BACKPACK_SLOTS` 3): 81 × 87 (were 96 × 104), 8 px apart (12), 20 px from the face
+  (40), so three fit left of the face on a screen 800 wide.
+- **Alignment** (owner: "make it good due to some universal UX laws like golden ratio", slots 5–10 % smaller than the
+  84 × 91 tried first; then 78 × 84 was a little too small, so 81 × 87): the slots and the tool button, round or wide, have their middles on one line, the face's
+  lower golden section (`Hud.ROW_MIDDLE`, its height / φ² ≈ 70 px above its bottom); the wide tool button is as wide
+  as the backpack (259) and both groups are 20 px from the face and 29 px from the screen's edges (symmetry); the
+  face gap is about the slot gap × φ² (proximity: the slots are one group). Tried and dropped on the way: bottoms on
+  the face's bottom; the middles of the faces over the buttons' darker sides level with each other; everything's
+  middle on the face's middle with the button 36 px off the edge. Compared in screenshots with the line at 46, 60,
+  70 and 92 px: 70 looked best (the round button no longer hangs below the frame, nothing floats too high).
+  `Hud.TOOL_Y` is gone (the button is placed by its middle, `ToolButton.place`).
 - **The swap** (`feature.SwapFeature`, run before the door, the scythe and the rod: owner, "items on grass should
   always have priority"): standing still on an item with the backpack full, `ToolButton.setSwap` widens the button to
   the left (the pack's text button, `play_button/blank`, 252 × 108; its right edge stays): the backpack item that would

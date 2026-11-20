@@ -227,10 +227,9 @@ class CollectTest {
         assertEquals("swap", game.toolButton());
         assertEquals(List.of("Carrot", "Tomato"), game.toolButtonSwap(), "the left slot's carrot would go");
         assertEquals(0, game.swapSlot());
-        assertEquals("at=(528.0,65.0) size=252.0x108.0", game.toolButtonBox(),
-                "wide: its right edge where it was, the middle of its face on the slots' middle");
-        assertEquals("at=(672.0,54.0) size=108.0x120.0", roundBox,
-                "round: the middle of its face on the slots' middle");
+        assertEquals("at=(512.0,90.0) size=259.0x108.0", game.toolButtonBox(),
+                "wide (as wide as the backpack), its right edge and its middle where they were");
+        assertEquals("at=(663.0,84.0) size=108.0x120.0", roundBox, "round: its middle on the slots' middle");
         Set<String> tints = new HashSet<>();
         for (int frame = 0; frame < 72; frame++) {
             tints.add(game.backpackItemTint(0));
@@ -295,7 +294,7 @@ class CollectTest {
         assertEquals(-1, game.swapSlot());
         assertEquals("ffffffff", game.backpackItemTint(2));
         assertEquals("ffffffff", game.toolButtonGoingTint());
-        assertEquals("at=(672.0,54.0) size=108.0x120.0", game.toolButtonBox(), "round, where it was");
+        assertEquals("at=(663.0,84.0) size=108.0x120.0", game.toolButtonBox(), "round, where it was");
 
         game.tapBackpackSlot(2); // no swap on offer: the slot does what it always does
         game.frames(2);
