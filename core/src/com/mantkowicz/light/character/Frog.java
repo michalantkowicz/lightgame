@@ -10,10 +10,12 @@ import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.Status;
 import com.mantkowicz.light.board.Tile;
 import com.mantkowicz.light.board.TilePoint;
+import com.mantkowicz.light.board.WorldScale;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.plugin.StateLabelPlugin;
 import com.mantkowicz.light.resources.Action;
+import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 
 import java.util.ArrayDeque;
@@ -24,25 +26,33 @@ import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
 
 /**
  * A frog (green or pale green), about as big as a chick. It is shy: it can't be stroked or fed, and it keeps more than
- * {@link #KEEP_AWAY} tiles away from the player and the other animals, hopping away from whoever comes nearer. It hops,
+ * {@link #KEEP_AWAY} tiles away from the player and the other animals, hopping away from whoever comes nearer (into
+ * the water rather than along the land; in the water it is safe). It hops,
  * half a tile at a time; it doesn't block anyone's way (it is never in it for long). It lives by the water and in it:
- * now and then, and always for the night, it goes into the water, where it swims (only its head and back show), and
- * by day it comes out again after a while. A crop lying on the ground nearby it goes for and eats with its tongue
+ * now and then, and always for the night, it jumps into the water with a splash and floats there (only its head and
+ * back show), gliding from tile to tile without a hop; by day it jumps out again with a splash after a while. A crop lying on the ground nearby it goes for and eats with its tongue
  * ({@link FrogMeal}), when nobody is near. Who is near and where it can go it sees in {@link FrogSurroundings}; what it
  * does and when is all in {@link FrogState}.
  */
 public class Frog extends SpriteActor {
     /** Nobody (the player, an animal) may come this near (in tiles, diagonally too): it hops away. */
     public static final int KEEP_AWAY = 2;
+    /** The name of its splashes on the stage (for tests). */
+    public static final String SPLASH = "frog splash";
     /** One hop, half a tile: the hop row's frames from the crouch to the landing. */
     static final int FIRST_HOP_FRAME = 1, LAST_HOP_FRAME = 7;
     static final float HOP_SECONDS = 0.49f;
-    /** In the water it swims from tile to tile this slowly. */
+    /** In the water it glides from tile to tile this slowly. */
     static final float SWIM_SECONDS = 1.2f;
+    /** Into the water and out of it: one jump over the whole tile, this long. */
+    static final float JUMP_SECONDS = 0.6f;
+    /** Its splash (the fishing bobber's, 32 pack pixels) is drawn this much of its size. */
+    private static final float SPLASH_SIZE = 0.6f;
 
     private final DefaultStateMachine<Frog, FrogState> stateMachine = new DefaultStateMachine<>(this);
     private final FrogSurroundings around;
     private final FrogMeal meal;
+    private final ResourcesService resources;
     /** Seconds left of what {@link #stayFor} set. */
     private float timeLeft;
     private boolean night;
@@ -52,6 +62,7 @@ public class Frog extends SpriteActor {
     public Frog(GameContext context, Sprite sprite) {
         super(GameActorType.FROG, context, sprite, Action.IDLE,
                 "A frog. It hops away from anyone who comes near and lives by the water.");
+        resources = context.getResourcesService();
         around = new FrogSurroundings(context.getGameStage());
         meal = new FrogMeal(this, context.getGameStage(), around);
         setName("frog");
@@ -135,9 +146,12 @@ public class Frog extends SpriteActor {
 
     // going places
 
-    /** Someone is {@link #KEEP_AWAY} tiles away or nearer. */
+    /**
+     * Someone is {@link #KEEP_AWAY} tiles away or nearer, and it is on land: in the water it is safe (nobody follows it
+     * there), so once in, it floats still a while however near the bank they stand.
+     */
     boolean isThreatened() {
-        return !around.isSafe(getTile());
+        return !isInWater() && !around.isSafe(getTile());
     }
 
     /** A step away from whoever is near (see {@link FrogSurroundings#awayFrom}); false when it stays. */
@@ -192,9 +206,10 @@ public class Frog extends SpriteActor {
     }
 
     /**
-     * One step onto a tile next to it: two hops of half a tile each on land (and into or out of the water), a swim from
-     * water to water. It doesn't block the tile (it is on it for the others to see, e.g. not to throw anything onto it).
-     * Facing right as drawn, it is mirrored going left; going up or down it keeps facing the way it did.
+     * One step onto a tile next to it: on land two hops of half a tile each; into the water one jump over the whole tile
+     * and a splash where it lands; out of it a splash where it leaves and one jump; from water to water it glides,
+     * floating on (no hop). It doesn't block the tile (it is on it for the others to see, e.g. not to throw anything
+     * onto it). Facing right as drawn, it is mirrored going left; going up or down it keeps facing the way it did.
      */
     void stepTo(Tile target) {
         Tile from = getTile();
@@ -206,8 +221,21 @@ public class Frog extends SpriteActor {
         setStatus(Status.MOVEMENT);
         Vector2 end = target.calculatePositionForActorAt(this, TilePoint.CENTER);
         if (from.isWater() && target.isWater()) {
-            playAnimation(Action.SWIM);
+            floatOn();
             addAction(Actions.sequence(Actions.moveTo(end.x, end.y, SWIM_SECONDS), Actions.run(this::arrive)));
+            return;
+        }
+        if (from.isWater() || target.isWater()) { // in or out: one jump, a splash on the water's side
+            if (from.isWater()) {
+                splash(from);
+            }
+            addAction(Actions.sequence(Actions.run(this::hop), Actions.moveTo(end.x, end.y, JUMP_SECONDS),
+                    Actions.run(() -> {
+                        if (target.isWater()) {
+                            splash(target);
+                        }
+                        arrive();
+                    })));
             return;
         }
         float halfX = (end.x - getX()) / 2, halfY = (end.y - getY()) / 2;
@@ -223,6 +251,27 @@ public class Frog extends SpriteActor {
 
     private void arrive() {
         setStatus(Status.IDLE);
-        playAnimation(isInWater() ? Action.SWIM : Action.IDLE);
+        if (isInWater()) {
+            floatOn();
+        } else {
+            playAnimation(Action.IDLE);
+        }
+    }
+
+    /** Floats in the water: the swim row, going on as it was if it already floats (moving or not). */
+    void floatOn() {
+        if (!getCurrentAnimation().endsWith("/" + Action.SWIM.getRow())) {
+            playAnimation(Action.SWIM);
+        }
+    }
+
+    /** Water splashes up over this tile (the fishing bobber's splash), and is gone. */
+    private void splash(Tile water) {
+        PlayOnceImage splash = new PlayOnceImage(resources.getAnimation(Sprite.FISHING_BOBBER, Action.SPLASH), null);
+        float size = 32 * WorldScale.PIXEL_SCALE * SPLASH_SIZE;
+        splash.setSize(size, size);
+        splash.setPosition(water.getCenter().x - size / 2, water.getCenter().y - size / 2);
+        splash.setName(SPLASH);
+        getStage().addActor(splash);
     }
 }

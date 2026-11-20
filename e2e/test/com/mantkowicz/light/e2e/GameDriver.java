@@ -1031,6 +1031,17 @@ public final class GameDriver {
         return frogs;
     }
 
+    /** How many frog splashes are on the map right now (jumping into the water or out of it). */
+    public int frogSplashes() {
+        int splashes = 0;
+        for (Actor actor : gameStage().getActors()) {
+            if (Frog.SPLASH.equals(actor.getName())) {
+                splashes++;
+            }
+        }
+        return splashes;
+    }
+
     /** Is the cell water (nobody walks on it, a frog swims in it)? */
     public boolean isWater(Cell cell) {
         return tile(cell).isWater();

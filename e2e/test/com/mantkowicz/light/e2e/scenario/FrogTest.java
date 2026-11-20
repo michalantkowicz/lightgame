@@ -80,30 +80,38 @@ class FrogTest {
         game.click(frog);
         game.seconds(6);
         assertEquals(frog, game.playerCell(), "the rabbit got there");
-        assertTrue(distance(game.cellOf(Kind.FROG), game.playerCell()) > 2, "the frog keeps away");
+        assertTrue(distance(game.cellOf(Kind.FROG), game.playerCell()) > 2 || game.isWater(game.cellOf(Kind.FROG)),
+                "the frog keeps away (or is in the water): " + game.cellOf(Kind.FROG));
         assertFalse(game.crashed());
     }
 
     /**
-     * Whoever comes near, it hops away from (into the water rather than along the land): once the rabbit stands still,
-     * the frog keeps more than two tiles away. It never answers a tap: no button over it.
+     * Whoever comes near, it hops away from, into the water rather than along the land, jumping in with a splash. In the
+     * water it is safe: it floats still a while, though the rabbit stands on the bank. It never answers a tap: no button
+     * over it.
      */
     @Test
-    void itKeepsAwayFromTheRabbit() {
+    void itKeepsAwayFromTheRabbitIntoTheWater() {
         GameDriver game = GameDriver.start(POND.write("frog-pond"));
         Cell frog = POND.cell('F');
         game.click(new Cell(frog.col() + 1, frog.row()));
         Set<String> states = new HashSet<>();
-        for (int frame = 0; frame < 8 * 60; frame++) {
+        int splashes = 0;
+        for (int frame = 0; frame < 6 * 60 && !"SWIMMING".equals(game.frogState()); frame++) {
             states.add(game.frogState());
             game.frames(1);
+            splashes = Math.max(splashes, game.frogSplashes());
         }
         assertTrue(states.contains("FLEEING"), "states: " + states);
-        assertTrue(distance(game.cellOf(Kind.FROG), game.playerCell()) > 2,
-                "frog " + game.cellOf(Kind.FROG) + ", rabbit " + game.playerCell());
-        assertTrue(game.isWater(game.cellOf(Kind.FROG)), "it fled into the water: " + game.cellOf(Kind.FROG));
         assertEquals("SWIMMING", game.frogState());
-        assertEquals("frog/swim", game.frogAnimation());
+        assertTrue(game.isWater(game.cellOf(Kind.FROG)), "in the water: " + game.cellOf(Kind.FROG));
+        assertEquals(1, splashes, "it jumped in with a splash");
+        Vector2 landed = game.frogPosition();
+        for (int frame = 0; frame < 4 * 60; frame++) {
+            game.frames(1);
+            assertTrue(game.frogPosition().epsilonEquals(landed, 0.001f), "it floats still, frame " + frame);
+            assertEquals("frog/swim", game.frogAnimation());
+        }
         assertTrue(game.buttonAlphas("STROKE").isEmpty() && game.buttonAlphas("GIVE").isEmpty(), "no buttons");
         assertFalse(game.crashed());
     }
@@ -113,8 +121,9 @@ class FrogTest {
     void itKeepsAwayFromTheAnimals() {
         GameDriver game = GameDriver.start(WITH_A_CHICK.write("frog-chick"));
         game.seconds(4);
-        assertTrue(distance(game.cellOf(Kind.FROG), game.cellOf(Kind.CHICKEN_BABY)) > 2,
-                "frog " + game.cellOf(Kind.FROG) + ", chick " + game.cellOf(Kind.CHICKEN_BABY));
+        Cell frog = game.cellOf(Kind.FROG);
+        assertTrue(distance(frog, game.cellOf(Kind.CHICKEN_BABY)) > 2 || game.isWater(frog),
+                "frog " + frog + ", chick " + game.cellOf(Kind.CHICKEN_BABY));
         assertFalse(game.crashed());
     }
 
@@ -145,7 +154,10 @@ class FrogTest {
         assertFalse(game.crashed());
     }
 
-    /** At night it goes into the water and swims there until the morning, though nobody comes near. */
+    /**
+     * At night it goes into the water and floats there until the morning, though nobody comes near: gliding from tile
+     * to tile now and then, never hopping on the water.
+     */
     @Test
     void itSpendsTheNightInTheWater() {
         GameDriver.dayAndNight(2, 1, 20, 1, 0.25f);
@@ -154,12 +166,13 @@ class FrogTest {
         assertTrue(game.isWater(game.cellOf(Kind.FROG)), "in the water: " + game.cellOf(Kind.FROG));
         for (int frame = 0; frame < 8 * 60; frame++) {
             assertTrue(game.isWater(game.cellOf(Kind.FROG)), "all night, frame " + frame);
+            assertEquals("frog/swim", game.frogAnimation(), "floating, frame " + frame);
             game.frames(1);
         }
         assertFalse(game.crashed());
     }
 
-    /** Chased into the water by day, it comes out again a while after the rabbit has gone. */
+    /** Chased into the water by day, it comes out again (with a splash) a while after the rabbit has gone. */
     @Test
     void byDayItComesOutOfTheWaterAgain() {
         GameDriver game = GameDriver.start(POND.write("frog-pond"));
@@ -168,12 +181,16 @@ class FrogTest {
         game.seconds(8);
         assertTrue(game.isWater(game.cellOf(Kind.FROG)));
         game.click(POND.cell('P'));
+        game.seconds(2); // the splash going in is gone
         boolean out = false;
+        int splashes = 0;
         for (int frame = 0; frame < 60 * 60 && !out; frame++) {
             game.frames(1);
+            splashes = Math.max(splashes, game.frogSplashes());
             out = "SITTING".equals(game.frogState()) && !game.isWater(game.cellOf(Kind.FROG));
         }
         assertTrue(out, "on land again: " + game.frogState() + " " + game.cellOf(Kind.FROG));
+        assertEquals(1, splashes, "it jumped out with a splash");
         assertFalse(game.crashed());
     }
 

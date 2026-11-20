@@ -64,7 +64,7 @@ design, change the rule on purpose in its own PR.
   `ChickenState` for `Chicken`, `FrogState` for `Frog`), all its transitions in that one file, no framework on top. What
   farm animals share (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. The frog is no farm animal: it
   can't be fed or stroked, keeps more than two tiles from the player and the animals, hops (two hops a tile), blocks
-  nobody and swims in the water (`Tile.isWater`: drawn only with the map's water tileset). `Debug.Tool.STATE_LABELS` shows the states while playing.
+  nobody, jumps into the water with a splash and floats in it (`Tile.isWater`: drawn only with the map's water tileset). `Debug.Tool.STATE_LABELS` shows the states while playing.
 - **Day and night**: one `light.DayClock` for the whole game (`GameScreen` ticks it; tune it in
   `light.DayNightSettings`); each map's `DayNightFeature` dims its daylight and posts `NightStartedEvent` (dusk) and
   `DayStartedEvent` (dawn) on its own bus; `BedtimeFeature` puts the farm animals to sleep (`FarmAnimal.setNight`,

@@ -1458,13 +1458,17 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   water) and `FrogMeal` (going for a crop and eating it). It:
   - keeps more than `Frog.KEEP_AWAY` (2) tiles (diagonally too) from the player, the dog, the cow and the chickens:
     whoever comes nearer, it steps away from (onto the tile next to it where the nearest is furthest, the water
-    counting a tile further), until nobody is that near;
-  - hops: a step is two hops of half a tile (the hop row's frames 1–7, 0.49 s each); in the water it swims from tile
-    to tile (1.2 s);
+    counting a tile further), until nobody is that near. In the water it is safe (owner: going on swimming the moment it
+    landed looked unnatural): it stops fleeing and floats still a while (5–12 s) before it glides on or comes out,
+    however near the bank someone stands;
+  - hops: a step is two hops of half a tile (the hop row's frames 1–7, 0.49 s each). Owner, after a look: no hopping
+    on the water. Into the water it makes one jump over the whole tile (0.6 s) with a splash where it lands (the
+    fishing bobber's splash at 60 %); out of it a splash where it leaves and one jump; in the water it floats (the
+    swim row, going on without starting again) and glides from tile to tile (1.2 s);
   - blocks nobody: it is on its tile for the board (nothing lands on it) but never makes it inaccessible, its map
     object doesn't block its tile (`TileObjectType`'s new `blocks` flag, false for FROG) and taps go through it;
   - now and then (sitting) and always at night (`BedtimeFeature` tells it, `Frog.setNight`) goes into the nearest
-    water and swims there; by day, after a while, it comes out onto the nearest land where nobody is near;
+    water and floats there; by day, after a while, it comes out onto the nearest land where nobody is near;
   - goes for a crop lying within 4 tiles that nobody else goes for, stands beside it (left or right) where nobody is
     near and licks at it three times (the crop pulses), then it is eaten; someone coming near, it lets the crop go.
 - **Water**: `Tile.isWater`, set by the map loader for a blocked cell drawn only with tiles of the map's `water`

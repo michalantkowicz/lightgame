@@ -15,8 +15,10 @@ import com.mantkowicz.light.resources.Action;
  *         ──(now and then, and at night)──▶ GOING_TO_WATER ──(in the water)──▶ SWIMMING
  *         ──(a crop on the ground nearby)──▶ GOING_FOR_CROP ──(beside it)──▶ EATING ──(3 licks: eaten)──▶ SITTING
  *                                            GOING_FOR_CROP, EATING ──(the crop gone)──▶ SITTING
- * SWIMMING ──(after a while, by day)──▶ COMING_OUT ──(on land)──▶ SITTING; (or it swims on a tile, at night too)
- * any ──(someone {@link Frog#KEEP_AWAY} tiles away or nearer)──▶ FLEEING ──(nobody near)──▶ SITTING, SWIMMING (in water)
+ * SWIMMING ──(after a while, by day)──▶ COMING_OUT ──(on land)──▶ SITTING; (or it glides on a tile, at night too)
+ *   (into the water and out: one jump with a splash; in the water it floats and glides, no hop)
+ * any on land ──(someone {@link Frog#KEEP_AWAY} tiles away or nearer)──▶ FLEEING ──(nobody near, or in the water: safe
+ *   there)──▶ SITTING, SWIMMING (it floats still a while before it glides on)
  * </pre>
  */
 public enum FrogState implements State<Frog> {
@@ -143,13 +145,13 @@ public enum FrogState implements State<Frog> {
     },
 
     /**
-     * In the water, only its head and back showing. After a while it swims a tile on or, by day, comes out onto the
-     * nearest land where nobody is near. At night it stays in.
+     * Floating in the water, only its head and back showing. After a while it glides a tile on or, by day, comes out
+     * onto the nearest land where nobody is near (a splash, a jump). At night it stays in.
      */
     SWIMMING {
         @Override
         public void enter(Frog frog) {
-            frog.playAnimation(Action.SWIM);
+            frog.floatOn();
             frog.stayFor(5, 12);
         }
 
