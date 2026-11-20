@@ -48,7 +48,7 @@ class FaceReactions {
     /** What the last tap played (a new tap may replace it), or null. */
     private UiImage tapped;
 
-    /** @param shakeSlot shakes a backpack slot an item was taken out of ({@link BackpackItemEjectedEvent}) */
+    /** @param shakeSlot shakes a backpack slot an item was taken out of ({@link BackpackItemEjectedEvent}: given away) */
     FaceReactions(GameEventService events, ResourcesService resources, Portrait face, Speaker speaker,
             IntConsumer shakeSlot) {
         this.events = events;

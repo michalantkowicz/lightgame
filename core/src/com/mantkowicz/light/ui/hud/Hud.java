@@ -37,21 +37,13 @@ import java.util.function.IntPredicate;
 public class Hud extends Group {
     /** HUD pieces are drawn one step bigger than the rest of the UI ({@link ResourcesService#UI_SCALE}). */
     public static final int SCALE = 4;
-    /** Three slots by design: few enough for the youngest players. */
-    static final int BACKPACK_SLOTS = 3;
     /**
-     * GAP: between the face and the pieces beside it; SLOT_GAP: between two backpack slots. The slots are a group,
-     * apart from the face: GAP is about SLOT_GAP × φ².
+     * GAP: between the face and the pieces beside it. The slots are a group, apart from the face: GAP is about the gap
+     * between two slots ({@link BackpackSlots#SLOT_GAP}) × φ².
      */
-    private static final float MARGIN = 16, GAP = 20, SLOT_GAP = 8;
+    private static final float MARGIN = 16, GAP = 20;
     /** The face's bottom; the stamina bar is BAR_GAP under it. */
     private static final float FACE_Y = MARGIN + 58, BAR_GAP = 10;
-    /**
-     * Where the tool button stands: its right edge this far right of the screen's middle (as far as the slots' left
-     * edge is left of it: the same margin on both sides).
-     */
-    public static final float TOOL_RIGHT = Portrait.WIDTH / 2f + GAP + BACKPACK_SLOTS * BackpackSlots.SLOT_WIDTH
-            + (BACKPACK_SLOTS - 1) * SLOT_GAP;
     /**
      * The pieces beside the face (the slots, the tool button round or wide) have their middles on one line this high
      * above the face's bottom: the face's lower golden section (its height / φ², about 70 of 184).
@@ -106,7 +98,7 @@ public class Hud extends Group {
 
         face = new Portrait(resources, "teemo", AWAKE);
         row.addActor(face);
-        backpack = new BackpackSlots(resources, BACKPACK_SLOTS, throwOut, row);
+        backpack = new BackpackSlots(resources, player.getInventory().getCapacity(), throwOut, row);
         reactions = new FaceReactions(context.getGameEventService(), resources, face,
                 (text, seconds) -> say(text, null, seconds), backpack::shake);
         keepTaps(face, reactions::tapped);
@@ -118,7 +110,7 @@ public class Hud extends Group {
         gear = new HoldButton(resources, UiImage.GEAR_BUTTON, SCALE, this::openSettings);
         addActor(gear);
 
-        toolButton = new ToolButton(resources, this::showHint);
+        toolButton = new ToolButton(resources, this::showHint, backpack.getWidth()); // wide, as wide as the backpack
         addActor(toolButton);
     }
 
@@ -188,7 +180,7 @@ public class Hud extends Group {
         face.setPosition(faceX, faceY);
         float middle = faceY + ROW_MIDDLE;
 
-        backpack.layOut(faceX - GAP, middle, SLOT_GAP);
+        backpack.layOut(faceX - GAP, middle);
 
         stamina.setPosition(Math.round((getWidth() - stamina.getWidth()) / 2f), faceY - BAR_GAP - stamina.getHeight());
 
@@ -199,7 +191,8 @@ public class Hud extends Group {
             child.moveBy(-left, 0);
         }
 
-        toolButton.place(getWidth() / 2f + TOOL_RIGHT, middle);
+        // its right edge as far right of the face as the slots' left edge is left of it: the same margin on both sides
+        toolButton.place(faceX + Portrait.WIDTH + GAP + backpack.getWidth(), middle);
         placeBubble();
         gear.setPosition(getWidth() - gear.getWidth() - GEAR_MARGIN, getHeight() - gear.getHeight() - GEAR_MARGIN);
         if (settings != null) {

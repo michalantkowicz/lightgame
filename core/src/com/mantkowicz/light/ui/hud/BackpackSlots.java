@@ -29,6 +29,8 @@ import java.util.function.IntPredicate;
 public class BackpackSlots {
     /** A slot (81x87: three of them fit left of the face on a screen 800 wide; two were 96x104) and its item. */
     static final float SLOT_WIDTH = 81, SLOT_HEIGHT = 87, ITEM_SIZE = 64; // a 16 px item drawn 4x
+    /** Between two slots. */
+    static final float SLOT_GAP = 8;
     /** How far a shaken slot moves up and down, and how long the first move takes (the whole shake is 6 times that). */
     private static final float SHAKE = 8, SHAKE_SECONDS = 0.04f;
     /** The item chosen for a swap goes from its own colours to this dark brown and back, once in this many seconds. */
@@ -103,8 +105,13 @@ public class BackpackSlots {
         return swapSlot;
     }
 
+    /** How wide the slots are together, from the left one's left edge to the right one's right edge. */
+    float getWidth() {
+        return slots.size() * SLOT_WIDTH + (slots.size() - 1) * SLOT_GAP;
+    }
+
     /** Lines the slots up leftwards from {@code right} (the right slot's right edge), their middles at {@code middle}. */
-    void layOut(float right, float middle, float gap) {
+    void layOut(float right, float middle) {
         float bottom = Math.round(middle - SLOT_HEIGHT / 2f);
         float x = right;
         for (int i = slots.size() - 1; i >= 0; i--) {
@@ -114,7 +121,7 @@ public class BackpackSlots {
             Image item = slotItems.get(i);
             item.setPosition(x + (slot.getWidth() - item.getWidth()) / 2f,
                     slot.getY() + (slot.getHeight() - item.getHeight()) / 2f + 4);
-            x -= gap;
+            x -= SLOT_GAP;
         }
     }
 
@@ -143,7 +150,10 @@ public class BackpackSlots {
         return swapSlot < 0 ? Color.WHITE : slotItems.get(swapSlot).getColor();
     }
 
-    /** A quick shake up and down of a slot and what is in it: its item jumped out by itself. */
+    /**
+     * A quick shake up and down of a slot and what is in it: its item was given to an animal wishing for it, or it was
+     * tapped and its item has nowhere to land.
+     */
     void shake(int slot) {
         for (Image piece : List.of(slots.get(slot), slotItems.get(slot))) {
             piece.clearActions();

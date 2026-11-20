@@ -82,6 +82,9 @@ The first refactoring came before this file; its plan (`docs/refactoring-plan.md
   `ExtendViewport`; the UI stage got its own, which never moves, so buttons and windows keep their place and size at any
   zoom. Both are resized in `GameScreen.resize`. `CenterActorByCameraPlugin` now centres an actor on its own stage's
   camera (no more following the world camera by hand); the debug FPS label moved to the UI stage.
+- Owner's review: the wide tool button's width comes from the backpack (`BackpackSlots.getWidth`, given to
+  `ToolButton`), not from a 3 and an 8 of its own; `Hud.TOOL_RIGHT` and `Hud.BACKPACK_SLOTS` are gone with it. A slot
+  still shakes when its item is given to an animal or has nowhere to land; only the making-room shake is gone.
 - Goldens re-recorded: only UI positions changed (now in UI-stage coordinates; each button is at the same place
   relative to its camera, so the same place on screen) and the FPS label's stage. New `CameraZoomTest`: at zoom 0.5
   cells are twice as big and still clickable while the COLLECT button doesn't move or grow; at zoom 2 cells are half as
@@ -1389,7 +1392,8 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   button widens into a swap.
 - **Full backpack:** the item walked onto stays where it lies (`PlayerCollectResolver.pickUp`; the making-room pause,
   `MAKING_ROOM_SECONDS`, went with the behaviour it timed). With a free slot it is picked up as before.
-- **Three slots** (`Player` 3, `Hud.BACKPACK_SLOTS` 3): 81 × 87 (were 96 × 104), 8 px apart (12), 20 px from the face
+- **Three slots** (`Player.INVENTORY_SIZE` 3; the HUD shows one slot per place in the backpack, so the count is in one
+  place, owner's review): 81 × 87 (were 96 × 104), 8 px apart (12), 20 px from the face
   (40), so three fit left of the face on a screen 800 wide.
 - **Alignment** (owner: "make it good due to some universal UX laws like golden ratio", slots 5–10 % smaller than the
   84 × 91 tried first; then 78 × 84 was a little too small, so 81 × 87): the slots and the tool button, round or wide, have their middles on one line, the face's

@@ -29,13 +29,13 @@ public class ToolButton extends RoundButton {
     public static final String HINT = "hint";
     /** Its name while it offers a swap ({@link #setSwap}). */
     public static final String SWAP = "swap";
-    /** The wide button: as wide as there is room right of the face, the pack's button drawn at the HUD's scale. */
-    static final float WIDE_WIDTH = 3 * BackpackSlots.SLOT_WIDTH + 2 * 8; // as wide as the backpack: balance
     /** Its items and the arrows: 16 px pictures at the HUD's scale, this far in from its ends. */
     private static final float WIDE_ITEM_SIZE = 64, WIDE_INSET = 22;
 
     private final ResourcesService resources;
     private final float roundWidth, roundHeight;
+    /** How wide it is for a swap (the pack's button drawn at the HUD's scale): as wide as the backpack, for balance. */
+    private final float wideWidth;
     /** Where the HUD placed it: its right edge, and the height of its middle. */
     private float right, middle;
     private final NinePatchDrawable wideUp, wideDown;
@@ -44,10 +44,14 @@ public class ToolButton extends RoundButton {
     private String toolName = HINT;
     private Runnable toolUse;
 
-    /** @param hint what tapping it does without a tool (the face says the hint) */
-    ToolButton(ResourcesService resources, Runnable hint) {
+    /**
+     * @param hint      what tapping it does without a tool (the face says the hint)
+     * @param wideWidth how wide it is for a swap
+     */
+    ToolButton(ResourcesService resources, Runnable hint, float wideWidth) {
         super(resources, resources.getUiImage(UiImage.HINT_ICON));
         this.resources = resources;
+        this.wideWidth = wideWidth;
         roundWidth = getWidth();
         roundHeight = getHeight();
         wideUp = wide(resources, UiImage.BUTTON);
@@ -142,7 +146,7 @@ public class ToolButton extends RoundButton {
         }
         wide.setVisible(shown);
         setRoundShown(!shown);
-        setSize(shown ? WIDE_WIDTH : roundWidth, shown ? wideUp.getMinHeight() : roundHeight);
+        setSize(shown ? wideWidth : roundWidth, shown ? wideUp.getMinHeight() : roundHeight);
         place(right, middle);
         showWidePressed();
     }
