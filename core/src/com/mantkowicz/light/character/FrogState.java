@@ -230,7 +230,7 @@ public enum FrogState implements State<Frog> {
     };
 
     /** How many times its tongue reaches for a crop before it is eaten. */
-    static final int LICKS = 3;
+    static final int LICKS = 6;
 
     private static void sitAfterAnimation(Frog frog) {
         if (frog.isThreatened()) {
