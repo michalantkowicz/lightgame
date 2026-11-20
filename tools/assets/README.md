@@ -9,6 +9,7 @@ python3 tools/assets/scythe_animation.py               # once per pack copy: the
 python3 tools/assets/net_icon.py                       # once per pack copy: the fishing net's icon (see below)
 python3 tools/assets/hand_pointer.py                   # once per UI pack copy: the hand pointer (see below)
 python3 tools/assets/swap_icon.py                      # once per UI pack copy: the swap icon (see below)
+python3 tools/assets/day_clock_arrows.py               # once per UI pack copy: the day clock's steepest arrows (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -55,6 +56,12 @@ Mouse icon.png` in the UI pack folder, where `ui.json`'s mouse cursors entry pic
 arrows only. `swap_icon.py` draws one, 16x16 in the white and light brown outline of the pack's icons (like the
 question mark): an arrow to the right over an arrow to the left. It saves `UI Sprites/Icons/Swap icon.png` in the UI
 pack folder, which `ui.json` reads as `icons_swap` (`UiImage.SWAP_ICON`; not committed either).
+
+**The day clock's steepest arrows** (nearly straight up and down, 80°) aren't in the UI pack either: the arrows next to
+its weather frame go from about 50° up to 50° down. `day_clock_arrows.py` turns the pack's straight-right arrow up (and
+down) and shears it, each row of pixels a little to the right towards the tip (3 pixels over 16 rows, about 10°), so
+its pixels stay crisp. It saves `Day clock arrow up.png` and `Day clock arrow down.png` next to `Weather_UI.png` in the
+UI pack folder, which `ui.json` reads as `day_clock_arrow_up` and `day_clock_arrow_down` (not committed either).
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
 (`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.

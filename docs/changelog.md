@@ -1417,3 +1417,31 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   `collect` (only the backpack and tool button lines). `CollectTest`: the making-room test is replaced by the swap's
   (`aFullBackpackLeavesTheItemAndOffersASwap`, `aSlotChoosesWhatGoesAndTheToolButtonSwaps`, `steppingOffEndsTheSwap`,
   `noSwapWhileWalkingAcrossAnItem`, `theSwapComesBeforeTheScythe`); other tests fill three slots where they filled two.
+
+## 2026‑11‑20, day clock (branch `day-clock-hud`)
+
+- Owner's request: **a time-of-day indicator at the top left**, from the UI pack's weather UI, connected to day and
+  night. `ui.hud.TimeOfDay` (a piece of the HUD, added by `GameScreen` with the game's one `DayClock`; it keeps
+  itself at the top left and lets taps through): the weather UI's frame without its label (the one the owner picked).
+  Owner, after a look: 80% of the UI's scale (2.4 screen pixels per pack pixel, 221 × 120; was 3, 276 × 150), 24 px
+  from the left edge, its middle level with the settings gear's.
+  - Left window: the part of the day, the big weather icons the owner picked: the sun (day), the setting sun (dusk),
+    the moon with a star (night), the sun behind a cloud (dawn). They fit the window exactly (34 × 34).
+  - Right window: the day's scale from the same sheet (the sun at its top, the moon at its bottom), which fills the
+    D-shaped window exactly, and an arrow over it, its tail on the bump of the frame's middle.
+    Owner, after two tries: the arrow only goes down, clockwise. When the sun starts to rise (dawn) it jumps to
+    nearly straight up (80°), at the sun; then it goes down a step every fifth of the time until sunset
+    (`DayClock.getSunProgress`: from dawn's beginning to dusk's); at sunset (dusk) one more step, steeply down (owner:
+    the moon at sunset was a step or two too early); at night nearly straight down (80°) at the moon until sunrise.
+  - Seven arrows. The pack's five go only from about 50° up to 50° down; the owner missed the top and the bottom.
+    Straight up and down (its straight-right arrow turned, `ui.json`'s `rotate`) looked bad, so the two steepest are
+    80°: `tools/assets/day_clock_arrows.py` turns the straight-right arrow up (and down) and shears it, each row of
+    pixels a little to the right towards the tip (3 pixels over 16 rows), which keeps its pixels crisp (a rotation by
+    80° blurred them; compared in a preview). Not committed, like the pack; `ui.json` reads them as
+    `day_clock_arrow_up` and `day_clock_arrow_down`.
+- The weather UI sheet's automatic pieces join touching shapes (the frame, the thermometer and the label are one), so
+  `ui.json` cuts the frame, the scale and the arrows as one-cell grids at their places (`day_clock_frame/0`,
+  `day_clock_scale/0`, `day_clock_arrows/0..4`). `DayClock.getPartProgress` (how far into its part the day is).
+- `DayNightTest.theDayClockFollowsTheDay` (a whole short day: the pictures and the arrow in order, its place).
+  `GameDriver.dayClockShows`; the HUD's description has a line for the clock, so the `hud` and `hud-hint` goldens
+  were re-recorded (that line added, nothing else).

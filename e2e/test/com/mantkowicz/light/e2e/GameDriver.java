@@ -86,6 +86,7 @@ import com.mantkowicz.light.ui.hud.Portrait;
 import com.mantkowicz.light.ui.hud.SettingsPanel;
 import com.mantkowicz.light.ui.hud.SpeechBubble;
 import com.mantkowicz.light.ui.hud.StaminaBar;
+import com.mantkowicz.light.ui.hud.TimeOfDay;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -299,6 +300,8 @@ public final class GameDriver {
                         + " alpha=" + Snapshot.number(bubble.getColor().a));
         snapshot.line("gear: %s held=%d%%", uiBox(hud.getGear()), Math.round(hud.getGear().getProgress() * 100));
         snapshot.line("settings: %s", hud.getSettings() == null ? "closed" : "open");
+        TimeOfDay clock = dayClock();
+        snapshot.line("day clock: %s arrow=%d %s", clock.getShownPart(), clock.getShownArrow(), uiBox(clock));
         return snapshot.toString();
     }
 
@@ -1311,6 +1314,24 @@ public final class GameDriver {
     /** Day and night as in the other tests (an hour of day: no night), for games started from now on. */
     public static void dayAndNightAsInTests() {
         DayNightSettings.use(TEST_DAYS);
+    }
+
+    /**
+     * What the day clock at the HUD's top left shows: its picture's part of the day and its arrow (0 at the sun .. 4 at
+     * the moon), e.g. "DAY 0".
+     */
+    public String dayClockShows() {
+        TimeOfDay clock = dayClock();
+        return clock.getShownPart() + " " + clock.getShownArrow();
+    }
+
+    private TimeOfDay dayClock() {
+        for (Actor actor : hud().getChildren()) {
+            if (actor instanceof TimeOfDay clock) {
+                return clock;
+            }
+        }
+        throw new IllegalStateException("No day clock on the HUD");
     }
 
     /** The time of day: "DAY", "DUSK", "NIGHT" or "DAWN" (night from dusk to dawn). */

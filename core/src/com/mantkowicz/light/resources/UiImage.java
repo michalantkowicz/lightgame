@@ -70,6 +70,30 @@ public enum UiImage {
      * Drawn for the game (tools/assets/swap_icon.py): the pack has single arrows only.
      */
     SWAP_ICON("icons_swap"),
+    /**
+     * The day clock at the top left (the weather UI's frame without its label): a picture for the part of the day in
+     * its left window, the day's scale in its right one with an arrow over it.
+     */
+    DAY_CLOCK_FRAME("day_clock_frame/0"),
+    /** The day's scale, from the sun (top) to the moon (bottom): it fills the clock's right window. */
+    DAY_CLOCK_SCALE("day_clock_scale/0"),
+    /**
+     * The clock's arrows, clockwise from nearly straight up (80°, at the sun) to nearly straight down (at the moon). The
+     * pack has five, from about 50° up to 50° down; the steepest two are drawn for the game
+     * (tools/assets/day_clock_arrows.py).
+     */
+    DAY_CLOCK_ARROW_UP("day_clock_arrow_up"),
+    DAY_CLOCK_ARROW_STEEP_UP("day_clock_arrows/0"),
+    DAY_CLOCK_ARROW_UP_RIGHT("day_clock_arrows/1"),
+    DAY_CLOCK_ARROW_RIGHT("day_clock_arrows/2"),
+    DAY_CLOCK_ARROW_DOWN_RIGHT("day_clock_arrows/3"),
+    DAY_CLOCK_ARROW_STEEP_DOWN("day_clock_arrows/4"),
+    DAY_CLOCK_ARROW_DOWN("day_clock_arrow_down"),
+    /** The parts of the day on the clock: the sun, the setting sun, the moon with a star, the sun behind a cloud. */
+    TIME_DAY("weather_icons/01"),
+    TIME_DUSK("weather_icons/04"),
+    TIME_NIGHT("weather_icons/09"),
+    TIME_DAWN("weather_icons/03"),
     /** The dialog box turned so its pointer is at the middle of its bottom (cut in parts by {@code SpeechBubble}). */
     DIALOG_BOX_DOWN("dialog_box_down"),
     /** A small bubble popping up over a character on the map, with a picture put inside it (what a cow wishes for). */

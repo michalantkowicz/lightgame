@@ -6,6 +6,7 @@ tool button: hint at=(663.0,84.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
+day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0
 ## gear held for 2 s
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -, -] at=(29.0,101.0) size=81.0x87.0
@@ -14,6 +15,7 @@ tool button: hint at=(663.0,84.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=67%
 settings: closed
+day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0
 ## let go: the circle empties, nothing opens
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -, -] at=(29.0,101.0) size=81.0x87.0
@@ -22,6 +24,7 @@ tool button: hint at=(663.0,84.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
+day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0
 ## gear held for 3 s: the settings open
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -, -] at=(29.0,101.0) size=81.0x87.0
@@ -30,6 +33,7 @@ tool button: hint at=(663.0,84.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: open
+day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0
 ## check mark: closed
 face: teemo at=(308.0,74.0) size=184.0x184.0 awake
 backpack: [-, -, -] at=(29.0,101.0) size=81.0x87.0
@@ -38,3 +42,4 @@ tool button: hint at=(663.0,84.0) size=108.0x120.0
 bubble: none
 gear: at=(664.0,1136.0) size=88.0x96.0 held=0%
 settings: closed
+day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0
