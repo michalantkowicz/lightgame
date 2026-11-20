@@ -19,6 +19,7 @@ import com.mantkowicz.light.map.TileDoor;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.UiStage;
 import com.mantkowicz.light.ui.hud.Hud;
+import com.mantkowicz.light.ui.hud.TimeOfDay;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -131,6 +132,7 @@ public class GameScreen extends ScreenAdapter {
         if (hud == null) {
             hud = new Hud(context, player, slot -> active.throwOut(slot));
             hud.setGiveAway(slot -> active.giveFrom(slot));
+            hud.addActor(new TimeOfDay(resourcesService, clock, hud.getGear())); // the day clock at the top left
             uiStage.addActor(hud);
         }
         return hud;

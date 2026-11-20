@@ -43,6 +43,35 @@ public class DayClock {
         return time < dawn ? Part.NIGHT : Part.DAWN;
     }
 
+    /**
+     * How far it is from sunrise to sunset (from dawn's beginning to dusk's: the dawn and the day): 0 when the sun starts
+     * to rise, almost 1 just before it starts to set; 0 at dusk and at night.
+     */
+    public float getSunProgress() {
+        float daylight = settings.dawnSeconds() + settings.daySeconds();
+        Part part = getPart();
+        if (part == Part.DAY) {
+            return (settings.dawnSeconds() + time) / daylight; // the day begins with the dawn behind it
+        }
+        return part == Part.DAWN ? getPartProgress() * settings.dawnSeconds() / daylight : 0;
+    }
+
+    /** How far into the part of the day it is now ({@link #getPart}): 0 at its beginning, almost 1 at its end. */
+    public float getPartProgress() {
+        float dusk = settings.daySeconds(), night = dusk + settings.duskSeconds();
+        float dawn = night + settings.nightSeconds();
+        switch (getPart()) {
+            case DAY :
+                return time / settings.daySeconds();
+            case DUSK :
+                return (time - dusk) / settings.duskSeconds();
+            case NIGHT :
+                return (time - night) / settings.nightSeconds();
+            default :
+                return (time - dawn) / settings.dawnSeconds();
+        }
+    }
+
     public boolean isNight() {
         return getPart().isNight();
     }

@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "005e5a489a462efd4c61d1b8a33ce9ccadd66855",
+  "uiJsonSha1": "9641a29bf2b2b0a908dc41c2031199233180f4e7",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -21,6 +21,33 @@
       "frames": 7,
       "frameDuration": 0.1,
       "playMode": "LOOP"
+    },
+    "day_clock_arrow_down": {
+      "frames": 1
+    },
+    "day_clock_arrow_up": {
+      "frames": 1
+    },
+    "day_clock_arrows/0": {
+      "frames": 1
+    },
+    "day_clock_arrows/1": {
+      "frames": 1
+    },
+    "day_clock_arrows/2": {
+      "frames": 1
+    },
+    "day_clock_arrows/3": {
+      "frames": 1
+    },
+    "day_clock_arrows/4": {
+      "frames": 1
+    },
+    "day_clock_frame/0": {
+      "frames": 1
+    },
+    "day_clock_scale/0": {
+      "frames": 1
     },
     "dialog_box": {
       "frames": 1,
@@ -227,6 +254,18 @@
       "frames": 1
     },
     "tiny_emotes/sad": {
+      "frames": 1
+    },
+    "weather_icons/01": {
+      "frames": 1
+    },
+    "weather_icons/03": {
+      "frames": 1
+    },
+    "weather_icons/04": {
+      "frames": 1
+    },
+    "weather_icons/09": {
       "frames": 1
     }
   },

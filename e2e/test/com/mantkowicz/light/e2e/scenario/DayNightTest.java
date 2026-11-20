@@ -7,6 +7,7 @@ import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +70,31 @@ class DayNightTest {
     }
 
     /** The house has no daylight (no ambientLight): lit by its lamps, it stays as it is at night. */
+    /**
+     * The day clock at the top left shows the part of the day (its picture) and an arrow over the day's scale (0 the
+     * sun, nearly straight up .. 6 the moon, nearly straight down). It only goes down, clockwise: when the sun starts to rise it jumps
+     * to nearly straight up, then it goes down a step every fifth of the time until sunset; at sunset (dusk) one more step,
+     * and at night nearly straight down at the moon until sunrise.
+     */
+    @Test
+    void theDayClockFollowsTheDay() {
+        GameDriver.dayAndNight(9, 1, 2, 1, 0.25f); // from sunrise to sunset 10 s: a step every 2 s
+        GameDriver game = GameDriver.start();
+        List<String> shown = new ArrayList<>();
+        for (int frame = 0; frame < 13 * 60; frame++) { // a whole day (it starts half a second in)
+            String now = game.dayClockShows();
+            if (shown.isEmpty() || !shown.get(shown.size() - 1).equals(now)) {
+                shown.add(now);
+            }
+            game.frames(1);
+        }
+        assertEquals(List.of("DAY 0", "DAY 1", "DAY 2", "DAY 3", "DAY 4", "DUSK 5", "NIGHT 6", "DAWN 0", "DAY 0"),
+                shown);
+        assertTrue(game.describeHud().contains("day clock: DAY arrow=0 at=(24.0,1124.0) size=220.8x120.0"),
+                "at the left edge, its middle level with the gear's (y 1184): " + game.describeHud());
+        assertFalse(game.crashed());
+    }
+
     @Test
     void aMapWithoutDaylightStaysAsItIs() {
         shortDays();
