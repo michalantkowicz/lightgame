@@ -254,6 +254,7 @@ class FishingTest {
         game.seconds(2);
         game.putIntoBackpack("carrot");
         game.putIntoBackpack("carrot");
+        game.putIntoBackpack("carrot");
         game.dropCrop("corn", NOOK.cell('a'));
         game.dropCrop("corn", right);
         game.seconds(1);

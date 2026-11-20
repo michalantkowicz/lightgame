@@ -41,8 +41,8 @@ public class Player extends GameBoardActor implements Collecting {
     /** How high the rabbit hops (px) and how long one hop takes: two hops per tile. */
     private static final float HOP_HEIGHT = 10f;
     private static final float HOP_DURATION = SECONDS_PER_TILE / 2;
-    /** As many as the HUD's backpack slots. */
-    private static final int INVENTORY_SIZE = 2;
+    /** Three by design: few enough for the youngest players. The HUD shows a backpack slot for each. */
+    private static final int INVENTORY_SIZE = 3;
 
     private final GameEventService gameEventService;
     private final Shared shared;

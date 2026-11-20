@@ -13,7 +13,6 @@ import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.board.TileTouchedEvent;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
-import com.mantkowicz.light.event.BackpackItemEjectedEvent;
 import com.mantkowicz.light.ui.hud.ActionButton;
 
 import java.util.HashMap;
@@ -38,20 +37,21 @@ import static com.mantkowicz.light.actor.Status.IDLE;
  * itself without a button, which comes back once the crop is ripe. A ripe weed instead keeps the button too, the weed:
  * the player pulls it out and it disappears.
  * <p>
- * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, the item in its
- * first slot jumps out to make room. The player throws an item from the backpack out onto a free tile next to itself.
+ * Items lying on the ground are picked up when the player steps onto their tile; with the backpack full, they stay where
+ * they lie, and the player standing still on one can swap it for a backpack item ({@link #swap}). The player throws an
+ * item from the backpack out onto a free tile next to itself.
  */
 public class PlayerCollectResolver implements CollectResolver {
     private final GameContext context;
     private final Player player;
     private final ItemThrower thrower;
     private final Map<Collectible, ActionButton> buttons = new HashMap<>();
-    /** After making room in a full backpack, nothing is picked up for this long: the old item clearly leaves first. */
-    static final float MAKING_ROOM_SECONDS = 1;
     /** Clicked during a walk: open or close it once the player stands still in reach. */
     private Collectible useOnArrival;
-    /** Seconds left until something can be picked up again (after making room). */
-    private float pickUpPause;
+    /** What the last swap put down onto the player's tile, while it is still on its way there; else null. */
+    private ItemOnGround dropped;
+    /** Where {@link #dropped} lands. */
+    private Tile droppedOn;
 
     public PlayerCollectResolver(Player player, GameContext context) {
         this.player = player;
@@ -93,10 +93,7 @@ public class PlayerCollectResolver implements CollectResolver {
         for (Map.Entry<Collectible, ActionButton> entry : buttons.entrySet()) {
             showReady(entry.getKey(), entry.getValue());
         }
-        pickUpPause = Math.max(0, pickUpPause - delta);
-        if (pickUpPause == 0) {
-            pickUp();
-        }
+        pickUp();
     }
 
     /**
@@ -114,6 +111,55 @@ public class PlayerCollectResolver implements CollectResolver {
             return false;
         }
         backpack.take(slot);
+        return true;
+    }
+
+    /**
+     * What the player could swap a backpack item for: the item lying on its tile while it stands still there with the
+     * backpack full (also one a swap has just put down there, while it lands); null otherwise.
+     */
+    public ItemOnGround swapOffer() {
+        Tile tile = player.getTile();
+        if (tile == null || !IDLE.equals(player.getStatus()) || !player.getInventory().isFull()) {
+            return null;
+        }
+        return dropped != null && dropped.hasParent() && droppedOn == tile ? dropped : lyingOn(tile);
+    }
+
+    /** An item that has landed on this tile, or null. */
+    private ItemOnGround lyingOn(Tile tile) {
+        for (TileOccupant actor : context.getBoardService().getOccupants(tile)) {
+            if (actor instanceof ItemOnGround lying && lying.isLanded()) {
+                return lying;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Swaps the item in a backpack slot for the one the player stands on ({@link #swapOffer}): that one goes into the
+     * slot, and the slot's item hops down onto the player's tile, where it lies instead (the same swap takes it back).
+     *
+     * @return false when there is nothing to swap (or it is still landing)
+     */
+    public boolean swap(int slot) {
+        ItemOnGround lying = swapOffer();
+        Inventory backpack = player.getInventory();
+        Item going = backpack.getItems().get(slot);
+        if (lying == null || !lying.isLanded() || going == null) {
+            return false;
+        }
+        backpack.put(slot, lying.getItem());
+        lying.remove();
+        ItemOnGround down = new ItemOnGround(context, going);
+        context.getGameStage().addActor(down);
+        dropped = down;
+        droppedOn = player.getTile();
+        down.flyOnto(player.getCenter(), player.getTile(), () -> {
+            if (dropped == down) {
+                dropped = null;
+            }
+        });
         return true;
     }
 
@@ -188,11 +234,8 @@ public class PlayerCollectResolver implements CollectResolver {
     }
 
     /**
-     * Picks up what has landed on the player's tile. With the backpack full, the item in its first slot jumps out onto a
-     * free tile next to the player to make room and the new one goes into that slot a moment later ({@link
-     * #MAKING_ROOM_SECONDS}, if the player still stands there), so it is clear which goes and which comes; the other
-     * slots stay as they are (the player empties them by tapping them). With no free tile around, nothing changes and
-     * the item stays where it lies.
+     * Picks up what has landed on the player's tile. With the backpack full nothing changes and the item stays where it
+     * lies: the player can swap it for a backpack item ({@link #swap}) or make room by tapping a slot.
      */
     private void pickUp() {
         Tile tile = player.getTile();
@@ -205,13 +248,7 @@ public class PlayerCollectResolver implements CollectResolver {
                 continue;
             }
             if (backpack.isFull()) {
-                if (!thrower.throwOut(backpack.getItems().get(0), tile, player.getCenter())) {
-                    continue;
-                }
-                backpack.take(0);
-                context.getGameEventService().post(new BackpackItemEjectedEvent(0)); // the HUD shakes its slot
-                pickUpPause = MAKING_ROOM_SECONDS; // the new one comes in after it
-                return;
+                return; // it stays where it lies
             }
             backpack.add(lying.getItem());
             lying.remove();

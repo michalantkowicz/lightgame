@@ -98,18 +98,18 @@ class HudTest {
     @Test
     void theBackpackShowsWhatThePlayerCarries() {
         GameDriver game = GameDriver.start(MAP.write("hud"));
-        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [-, -, -]"), game.describeHud());
         game.click(MAP.cell('C'));
         game.seconds(3);
         game.clickButton("COLLECT"); // the crop jumps out of the chest
         game.seconds(1.5f);
         game.click(game.itemCell());
         game.seconds(2);
-        assertTrue(game.describeHud().matches("(?s).*backpack: \\[(Corn|Carrot|Tomato|Pumpkin|Cucumber), -].*"),
+        assertTrue(game.describeHud().matches("(?s).*backpack: \\[(Corn|Carrot|Tomato|Pumpkin|Cucumber), -, -].*"),
                 game.describeHud());
         game.tapBackpackSlot(0); // and out again
         game.frames(2);
-        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [-, -, -]"), game.describeHud());
     }
 
     @Test
@@ -122,7 +122,7 @@ class HudTest {
         // the chest's cell (3,4) is 384..512 x 512..640 on the map, the camera's middle (448,320) is the screen's (400,640):
         // centred over the chest (400 - 90 / 2 = 355), 16 px over its top (640 + 16 - 320 + 640 = 976)
         assertTrue(next.contains("action button on ui stage: COLLECT (a picture) at=(355.0,976.0) alpha=1.0"), next);
-        assertTrue(game.describeHud().contains("tool button: hint at=(628.0,74.0) size=108.0x120.0"),
+        assertTrue(game.describeHud().contains("tool button: hint at=(663.0,84.0) size=108.0x120.0"),
                 "the tool button (the hint) stays right of the face");
     }
 

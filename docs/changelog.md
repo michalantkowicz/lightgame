@@ -82,6 +82,9 @@ The first refactoring came before this file; its plan (`docs/refactoring-plan.md
   `ExtendViewport`; the UI stage got its own, which never moves, so buttons and windows keep their place and size at any
   zoom. Both are resized in `GameScreen.resize`. `CenterActorByCameraPlugin` now centres an actor on its own stage's
   camera (no more following the world camera by hand); the debug FPS label moved to the UI stage.
+- Owner's review: the wide tool button's width comes from the backpack (`BackpackSlots.getWidth`, given to
+  `ToolButton`), not from a 3 and an 8 of its own; `Hud.TOOL_RIGHT` and `Hud.BACKPACK_SLOTS` are gone with it. A slot
+  still shakes when its item is given to an animal or has nowhere to land; only the making-room shake is gone.
 - Goldens re-recorded: only UI positions changed (now in UI-stage coordinates; each button is at the same place
   relative to its camera, so the same place on screen) and the FPS label's stage. New `CameraZoomTest`: at zoom 0.5
   cells are twice as big and still clickable while the COLLECT button doesn't move or grow; at zoom 2 cells are half as
@@ -1380,3 +1383,37 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   `BedtimeTrip` stays one job (PMD).
 - Owner: 5 tiles was too far: an animal sleeps, and walks to after coming out, **2 to 4 tiles** from the door
   (`ShelterPlaces.NEAR_THE_DOOR` 5 → 4), the chickens and the cow.
+
+## 2026‑11‑20, backpack swap (branch `backpack-swap`)
+
+- Owner's request: **nothing jumps out of the backpack by itself any more, a third slot, and a swap** for the item
+  on the ground, simple enough for a 3-year-old, without windows or pop-ups. Chosen from mock-ups (the owner's private
+  artifact page "Backpack Swap Mock-ups": four ideas, then six around the tool button, then this one): the tool
+  button widens into a swap.
+- **Full backpack:** the item walked onto stays where it lies (`PlayerCollectResolver.pickUp`; the making-room pause,
+  `MAKING_ROOM_SECONDS`, went with the behaviour it timed). With a free slot it is picked up as before.
+- **Three slots** (`Player.INVENTORY_SIZE` 3; the HUD shows one slot per place in the backpack, so the count is in one
+  place, owner's review): 81 × 87 (were 96 × 104), 8 px apart (12), 20 px from the face
+  (40), so three fit left of the face on a screen 800 wide.
+- **Alignment** (owner: "make it good due to some universal UX laws like golden ratio", slots 5–10 % smaller than the
+  84 × 91 tried first; then 78 × 84 was a little too small, so 81 × 87): the slots and the tool button, round or wide, have their middles on one line, the face's
+  lower golden section (`Hud.ROW_MIDDLE`, its height / φ² ≈ 70 px above its bottom); the wide tool button is as wide
+  as the backpack (259) and both groups are 20 px from the face and 29 px from the screen's edges (symmetry); the
+  face gap is about the slot gap × φ² (proximity: the slots are one group). Tried and dropped on the way: bottoms on
+  the face's bottom; the middles of the faces over the buttons' darker sides level with each other; everything's
+  middle on the face's middle with the button 36 px off the edge. Compared in screenshots with the line at 46, 60,
+  70 and 92 px: 70 looked best (the round button no longer hangs below the frame, nothing floats too high).
+  `Hud.TOOL_Y` is gone (the button is placed by its middle, `ToolButton.place`).
+- **The swap** (`feature.SwapFeature`, run before the door, the scythe and the rod: owner, "items on grass should
+  always have priority"): standing still on an item with the backpack full, `ToolButton.setSwap` widens the button to
+  the left (the pack's text button, `play_button/blank`, 252 × 108; its right edge stays): the backpack item that would
+  go, the swap arrows, the item on the ground. That item pulses in its slot (to dark brown and back, owner's choice
+  instead of a ring or an arrow) and, in step with it, on the button (owner: so it's clear it is the same thing); the left slot first (owner), a tap on another slot chooses it
+  (`Hud.setChooseForSwap`, after giving to a wishing animal). The button swaps (`PlayerCollectResolver.swap`): the
+  ground item into that slot, the slot's item hops down onto the player's tile, so the same tap swaps back.
+- **The swap icon** isn't in the UI pack (single arrows only): `tools/assets/swap_icon.py` draws it in the icons'
+  white and light brown outline (`UiImage.SWAP_ICON`, `icons_swap`), not committed, like the hand pointer.
+- Goldens re-recorded (approved behaviour change: three slots and the moved tool button): `hud`, `hud-hint` and
+  `collect` (only the backpack and tool button lines). `CollectTest`: the making-room test is replaced by the swap's
+  (`aFullBackpackLeavesTheItemAndOffersASwap`, `aSlotChoosesWhatGoesAndTheToolButtonSwaps`, `steppingOffEndsTheSwap`,
+  `noSwapWhileWalkingAcrossAnItem`, `theSwapComesBeforeTheScythe`); other tests fill three slots where they filled two.

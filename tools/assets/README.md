@@ -8,6 +8,7 @@ pip3 install pillow                                   # once
 python3 tools/assets/scythe_animation.py               # once per pack copy: the rabbit's scythe swing (see below)
 python3 tools/assets/net_icon.py                       # once per pack copy: the fishing net's icon (see below)
 python3 tools/assets/hand_pointer.py                   # once per UI pack copy: the hand pointer (see below)
+python3 tools/assets/swap_icon.py                      # once per UI pack copy: the swap icon (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -49,6 +50,11 @@ cursors. `hand_pointer.py` draws one, 16x16 in the palette and dark outline of t
 finger straight up, three folded fingers, the thumb out to the left. It saves `UI Sprites/Mouse sprites/Hand pointing
 Mouse icon.png` in the UI pack folder, where `ui.json`'s mouse cursors entry picks it up as
 `mouse_hand_pointing_mouse_icon` (`UiImage.HAND_POINTING`; not committed either).
+
+**The swap icon** (between the two items on the wide tool button) isn't in the UI pack either: its icons have single
+arrows only. `swap_icon.py` draws one, 16x16 in the white and light brown outline of the pack's icons (like the
+question mark): an arrow to the right over an arrow to the left. It saves `UI Sprites/Icons/Swap icon.png` in the UI
+pack folder, which `ui.json` reads as `icons_swap` (`UiImage.SWAP_ICON`; not committed either).
 
 If you forget to run the tool after saving a level or editing `pack.json`, `./gradlew e2e:test` fails
 (`AssetsUpToDateTest`): the generated files record the SHA-1 of their sources.

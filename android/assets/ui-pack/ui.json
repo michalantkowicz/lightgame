@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "35da3b3332f93a256e6a98c0a2a3e4aa5446daa6",
+  "uiJsonSha1": "005e5a489a462efd4c61d1b8a33ce9ccadd66855",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -124,6 +124,9 @@
       "frames": 1
     },
     "icons/question": {
+      "frames": 1
+    },
+    "icons_swap": {
       "frames": 1
     },
     "inventory/slot": {

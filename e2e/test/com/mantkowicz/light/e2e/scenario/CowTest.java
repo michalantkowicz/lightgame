@@ -219,7 +219,7 @@ class CowTest {
 
         game.tapBackpackSlot(1);
         game.frames(2);
-        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [-, -, -]"), game.describeHud());
         assertTrue(game.backpackSlotShaking(1), "the slot it came from shakes");
         assertEquals("EATING", game.cowState(), "the cow got it");
         assertEquals(1, game.itemsOnGround().size(), "nothing more on the ground");
@@ -260,7 +260,7 @@ class CowTest {
         game.seconds(1);
         game.clickButton("GIVE");
         game.frames(2);
-        assertTrue(game.describeHud().contains("backpack: [-, -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [-, -, -]"), game.describeHud());
         assertTrue(game.backpackSlotShaking(0), "the slot it came from shakes");
         assertEquals("EATING", game.cowState());
         assertEquals("cow_brown/eat", game.cowAnimation());
@@ -321,7 +321,7 @@ class CowTest {
             if (!"WALKING".equals(state)) { // in the pen it can't walk: it turns back to standing at once
                 assertEquals(ANIMATIONS.get(state), game.cowAnimation(), state);
             }
-            if ("WISHING".equals(state) && game.describeHud().contains("backpack: [-, -]")) {
+            if ("WISHING".equals(state) && game.describeHud().contains("backpack: [-, -, -]")) {
                 game.putIntoBackpack(game.cowWants());
             } else if ("WISHING".equals(state) && !game.buttonAlphas("GIVE").isEmpty()) {
                 game.clickButton("GIVE");
@@ -372,7 +372,7 @@ class CowTest {
         game.frames(2);
         assertEquals("WISHING", game.cowState(), "the other crop: nothing to give");
         assertTrue(game.actionButtonShaking("GIVE"), "the button shakes");
-        assertTrue(game.describeHud().contains("backpack: [" + capital(other) + ", -]"), game.describeHud());
+        assertTrue(game.describeHud().contains("backpack: [" + capital(other) + ", -, -]"), game.describeHud());
 
         Set<String> wishes = new HashSet<>();
         for (int frame = 0; frame < 5 * 60 * 60; frame++) {

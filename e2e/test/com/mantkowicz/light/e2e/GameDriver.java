@@ -739,6 +739,54 @@ public final class GameDriver {
         throw new IllegalStateException("No \"" + name + "\" button on screen");
     }
 
+    /**
+     * What the tool button offers to swap while it is wide: what would go (a backpack item) and what would come (the
+     * item the player stands on), e.g. [Carrot, Tomato]; empty while it is round.
+     */
+    public List<String> toolButtonSwap() {
+        TextureRegion[] pictures = hud().getToolButton().getSwapPictures();
+        List<String> names = new ArrayList<>();
+        if (pictures == null) {
+            return names;
+        }
+        List<Item> known = new ArrayList<>();
+        for (Item item : ((Player) actor(Kind.PLAYER)).getInventory().getItems()) {
+            if (item != null) {
+                known.add(item);
+            }
+        }
+        for (Actor actor : gameStage().getActors()) {
+            if (actor instanceof ItemOnGround lying) {
+                known.add(lying.getItem());
+            }
+        }
+        for (TextureRegion picture : pictures) {
+            names.add(known.stream().filter(item -> item.getPicture() == picture).map(GameDriver::itemName)
+                    .findFirst().orElse("?"));
+        }
+        return names;
+    }
+
+    /** The backpack slot whose item would go in the swap on offer (it pulses), or -1 with no swap on offer. */
+    public int swapSlot() {
+        return hud().getBackpackSlots().getSwapSlot();
+    }
+
+    /** How the picture in a backpack slot is tinted now: "ffffffff" in its own colours. */
+    public String backpackItemTint(int slot) {
+        return hud().getBackpackSlots().getSlotItems().get(slot).getColor().toString();
+    }
+
+    /** How the backpack item on the wide tool button (what would go) is tinted now: "ffffffff" in its own colours. */
+    public String toolButtonGoingTint() {
+        return hud().getToolButton().getGoingTint();
+    }
+
+    /** Where the tool button is and how big, in UI pixels: "at=(x,y) size=WxH". */
+    public String toolButtonBox() {
+        return uiBox(hud().getToolButton());
+    }
+
     /** Short tap on a backpack slot of the HUD (0 = the left one). */
     public void tapBackpackSlot(int slot) {
         tap(uiScreenPosition(hud().getSlots().get(slot)));

@@ -46,6 +46,11 @@ public class Inventory {
         return item;
     }
 
+    /** Puts the item into this slot instead of what was there (or nothing). */
+    public void put(int slot, Item item) {
+        items.set(slot, item);
+    }
+
     public Inventory setItemsAndCompleteWithNulls(List<Item> inputItems) {
         if (inputItems == null) {
             throw new IllegalArgumentException("Items must not be null");
