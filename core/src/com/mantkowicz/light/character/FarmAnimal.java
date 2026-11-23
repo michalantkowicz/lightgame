@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.mantkowicz.light.actor.Creature;
 import com.mantkowicz.light.actor.Crop;
 import com.mantkowicz.light.actor.CropType;
+import com.mantkowicz.light.actor.DreamBubble;
 import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.GameActorType;
 import com.mantkowicz.light.actor.Item;
@@ -20,47 +21,52 @@ import com.mantkowicz.light.debug.Debug;
 import com.mantkowicz.light.event.GameEventService;
 import com.mantkowicz.light.plugin.RemoveWhenUnavailablePlugin;
 import com.mantkowicz.light.plugin.StateLabelPlugin;
+import com.mantkowicz.light.quest.CreatureQuests;
+import com.mantkowicz.light.quest.Quest;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.UiImage;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.mantkowicz.light.debug.Debug.Tool.STATE_LABELS;
 
 /**
- * What every farm animal shares (a {@link Cow}, a {@link Chicken}): it gets hungry, wishes for one of its favourite
- * crops (a bubble over it), gives up after a while, can be fed and stroked by the player (the round buttons over it,
- * {@link Creature}), and waits between what it does. What it does and when is its own gdx-ai state machine (an enum
- * next to its class, e.g. {@link CowState}); the states use the helpers here. Tapping it walks the player next to it;
- * holding it shows its description. At night it sleeps ({@link #setNight}): no wish, no stroke, "zzz" over it.
+ * What every farm animal shares (a {@link Cow}, a {@link Chicken}): its favourite thing (one kind of crop), which the
+ * player can give it whenever it can be fed (the round button with it over it, {@link Creature}; then it waits
+ * {@link #SECONDS_BETWEEN_MEALS} before it can be fed again), being stroked, its quests ({@link CreatureQuests}: the one
+ * it offers shows in a bubble over it), and waiting between what it does. What it does and when is its own gdx-ai state
+ * machine (an enum next to its class, e.g. {@link CowState}); the states use the helpers here. Tapping it walks the
+ * player next to it; holding it shows its description. At night it sleeps ({@link #setNight}): nothing to give, no
+ * stroke, "zzz" over it, and now and then it dreams about its favourite thing ({@link DreamBubble}).
  */
 public abstract class FarmAnimal extends SpriteActor implements Creature {
     /** What the player tells the animal (gdx-ai messages, answered in its states). */
     static final int MESSAGE_STROKE = 1, MESSAGE_GIFT = 2;
     /** After a stroke it can't be stroked again for this long (the hand doesn't come back meanwhile). */
     static final float SECONDS_BETWEEN_STROKES = 20;
+    /** After eating it can be fed again after this long (owner's choice for now: at once, once it has eaten). */
+    static final float SECONDS_BETWEEN_MEALS = 0;
     /** A face floating up over it: screen pixels per pack pixel, and how far over its tile (over the heart it shows). */
     private static final float EMOTE_SCALE = 6, EMOTE_GAP = 60;
 
     private final ResourcesService resources;
     private final GameEventService events;
-    /** The crops it may wish for when hungry. */
-    private final List<CropType> favouriteDishes;
-    private final float hungryAfterSeconds, giveUpWishingAfterSeconds;
-    /** How hungry it is, what it wishes for...: what goes with it through a door. */
+    /** Its favourite thing, as an item: what its button shows and its dreams are about. */
+    private final Crop favourite;
+    /** Its face on the quest panel, e.g. a cow's. */
+    private final UiImage icon;
+    /** How long since its last meal and stroke, its quests...: what goes with it through a door. */
     Shared shared = new Shared(); // package-visible: its trip to bed reads its part (BedtimeTrip.State)
-    /** What it wishes for this time it is hungry, as an item ({@link Shared#wish}). */
-    private Crop favouriteFood;
-    private PictureBubble wishBubble;
-    /** False while the action button with its wish is over it: the bubble is hidden. */
-    private boolean wishShown = true;
+    /** The bubble with the quest it offers. */
+    private final OfferBubble offer;
     /** Seconds left of what {@link #stayFor} set. */
     private float timeLeft;
-    /** Over it while it sleeps the night. */
+    /** Over it while it sleeps the night: the "zzz", and now and then a dream. */
     private final Zzz zzz;
+    private final DreamBubble dream;
+    private boolean sleepingTheNight;
 
     /**
      * What an animal carries through a door to another map ({@link #moveTo}): everything about it that has to stay as
@@ -68,54 +74,57 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
      * so a new field that must not start again belongs here.
      */
     static final class Shared {
-        /** What it wishes for this time it is hungry (picked when it gets hungry). */
-        CropType wish;
-        /** It has picked what it wishes for this time it is hungry (stroked meanwhile, it wishes for the same again). */
-        boolean wishChosen;
-        /** Seconds since the start or its last meal. */
-        float sinceFed;
+        /** Seconds since its last meal (from the start: long enough, it can be fed at once). */
+        float sinceFed = SECONDS_BETWEEN_MEALS;
         /** Seconds since it was last stroked (from the start: long enough, it can be stroked at once). */
         float sinceStroked = SECONDS_BETWEEN_STROKES;
-        /** Bites still to take when it feeds itself (grazing, pecking) after giving up its wish. */
+        /** Bites still to take when it feeds itself (grazing, pecking at the ground). */
         int bitesLeft;
         /** It is night: it goes to sleep, or sleeps (see {@code BedtimeFeature}). */
         boolean night;
         /** Where it is with its trip to its shelter for the night (in for the night, just out, gave up). */
         final BedtimeTrip.State bedtime = new BedtimeTrip.State();
+        /** Its quests, for good. */
+        CreatureQuests quests;
     }
 
     /**
-     * @param favouriteDishes           the crops it wishes for (one at random each time it gets hungry); any crop when
-     *                                  null or empty
-     * @param hungryAfterSeconds        this long after the start or its last meal it gets hungry again
-     * @param giveUpWishingAfterSeconds wishing this long without getting its crop, it gives up and feeds itself
+     * @param favourite its favourite crop
+     * @param icon      its face on the quest panel
      */
     protected FarmAnimal(GameActorType type, GameContext context, Sprite sprite, String description,
-            List<CropType> favouriteDishes, float hungryAfterSeconds, float giveUpWishingAfterSeconds) {
+            CropType favourite, UiImage icon) {
         super(type, context, sprite, Action.IDLE, description);
         resources = context.getResourcesService();
         events = context.getGameEventService();
-        this.favouriteDishes = favouriteDishes == null || favouriteDishes.isEmpty()
-                ? CropType.all()
-                : new ArrayList<>(favouriteDishes);
-        this.hungryAfterSeconds = hungryAfterSeconds;
-        this.giveUpWishingAfterSeconds = giveUpWishingAfterSeconds;
-        shared.wish = this.favouriteDishes.get(0);
-        favouriteFood = new Crop(shared.wish, resources);
+        this.favourite = new Crop(favourite, resources);
+        this.icon = icon;
+        shared.quests = new CreatureQuests(List.of(), icon);
         zzz = new Zzz(resources.getUiImage(UiImage.ZZZ), context.getGameStage());
+        dream = new DreamBubble(resources, context.getGameStage());
+        offer = new OfferBubble(this, resources, events);
         setTouchable(Touchable.enabled);
         addListener(new WalkNextToOnTapListener(this, events));
     }
 
+    /** Its quests from Tiled (its {@code quests} property): it keeps them for good. */
+    public void assignQuests(List<Quest> quests) {
+        shared.quests = new CreatureQuests(quests, icon);
+    }
+
     /**
-     * Starts its life: every frame its clocks tick and its state machine takes a step. Called by the subclass once its
-     * state machine is in its first state.
+     * Starts its life: every frame its clocks tick and its state machine takes a step. Called by the subclass once its state machine is in its first state.
      */
     protected void startLiving() {
         addPlugin(delta -> {
             timeLeft -= delta;
             shared.sinceFed += delta;
             shared.sinceStroked += delta;
+            offer.update(shared.quests.getOffered(), shared.night);
+            if (sleepingTheNight) {
+                zzz.keepOver(this);
+                dream.dream(this, favourite.getPicture(), delta);
+            }
             think();
         });
         if (Debug.isOn(STATE_LABELS)) {
@@ -129,29 +138,24 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     }
 
     /**
-     * The same animal on another map, where it came out of a door: it carries its {@link Shared} (as hungry as here,
-     * wishing for the same, as long since its last stroke). What it was doing starts again from its state machine's
-     * first state (on the other side it looks around first), so a wish comes back in a moment. Take it off this map
-     * with {@link #leaveBoard()}.
+     * The same animal on another map, where it came out of a door: it carries its {@link Shared} (its quests, how long
+     * since its last meal and stroke). What it was doing starts again from its state machine's first state.
      */
     @Override
     public FarmAnimal moveTo(GameContext context) {
         FarmAnimal there = createAnother(context);
         there.shared = shared;
-        there.favouriteFood = new Crop(shared.wish, there.resources);
         return there;
     }
 
-    /** A new animal of the same kind (a chick, a cow with the same favourite dishes) on another map. */
+    /** A new animal of the same kind (a chick, a cow with the same favourite) on another map. */
     protected abstract FarmAnimal createAnother(GameContext context);
 
-    /** Leaves the map (through a door): the bubble with its wish goes too. */
+    /** Leaves the map (through a door): its bubble, its "zzz" and its dream go too. */
     @Override
     public void leaveBoard() {
-        if (wishBubble != null) {
-            hideWish();
-        }
-        zzz.remove();
+        offer.hide();
+        stopSleepingTheNight();
         super.leaveBoard();
     }
 
@@ -161,14 +165,20 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     /** Its state machine, which the player's messages go to. */
     protected abstract Telegraph getBrain();
 
-    /** The name of the state it is in, e.g. "WISHING" (debug labels, tests). */
+    /** The name of the state it is in, e.g. "EATING" (debug labels, tests). */
     public abstract String getStateName();
 
-    /** Is it wishing for its crop right now (its wish is what the player can give it)? */
-    protected abstract boolean isWishing();
+    /**
+     * Is it still busy with what it was given: getting up to eat it, eating it, showing its hearts? What a quest gives
+     * back comes once it isn't.
+     */
+    public abstract boolean isTakingAGift();
 
     /** Does what it is doing right now allow a stroke (e.g. standing, resting; not walking or eating)? */
     protected abstract boolean isStrokable();
+
+    /** Does what it is doing right now allow being given something (e.g. standing, resting; not walking or eating)? */
+    protected abstract boolean isFeedable();
 
     /**
      * It can be stroked: it is day (at night it goes to sleep or sleeps: nothing wakes it), what it does allows it
@@ -177,6 +187,15 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     @Override
     public boolean canBeStroked() {
         return !shared.night && isStrokable() && shared.sinceStroked >= SECONDS_BETWEEN_STROKES;
+    }
+
+    /**
+     * It can be given something: it is day, what it does allows it ({@link #isFeedable()}) and it ate at least
+     * {@link #SECONDS_BETWEEN_MEALS} ago.
+     */
+    @Override
+    public boolean canBeFed() {
+        return !shared.night && isFeedable() && shared.sinceFed >= SECONDS_BETWEEN_MEALS;
     }
 
     /**
@@ -200,8 +219,13 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     }
 
     @Override
-    public Item getWish() {
-        return isWishing() ? favouriteFood : null;
+    public Item getFavourite() {
+        return favourite;
+    }
+
+    /** Its favourite crop. */
+    public CropType getFavouriteType() {
+        return favourite.getType();
     }
 
     @Override
@@ -212,6 +236,11 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
     @Override
     public void stroke() {
         MessageManager.getInstance().dispatchMessage(null, getBrain(), MESSAGE_STROKE);
+    }
+
+    @Override
+    public Actor getActor() {
+        return this;
     }
 
     // what the states use (with SpriteActor's playAnimation, playOnce, isAnimationFinished, walkToFreeNeighbour)
@@ -243,38 +272,12 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         return Status.MOVEMENT.equals(getStatus());
     }
 
-    boolean isHungry() {
-        return shared.sinceFed >= hungryAfterSeconds;
-    }
-
-    void stopBeingHungry() {
+    /** It eats what it was given: the next meal only after {@link #SECONDS_BETWEEN_MEALS}. */
+    void eat() {
         shared.sinceFed = 0;
-        shared.wishChosen = false;
     }
 
-    /**
-     * It got hungry: picks, at random, which of its favourite dishes it wishes for this time; once per hunger, so
-     * after a stroke it wishes for the same again.
-     */
-    void chooseWish() {
-        if (!shared.wishChosen) {
-            shared.wish = CropType.randomOf(favouriteDishes);
-            favouriteFood = new Crop(shared.wish, resources);
-            shared.wishChosen = true;
-        }
-    }
-
-    /** The crops it may wish for. */
-    public List<CropType> getFavouriteDishes() {
-        return favouriteDishes;
-    }
-
-    /** It has wished for its crop too long without getting it. */
-    boolean hasWishedTooLong() {
-        return shared.sinceFed >= hungryAfterSeconds + giveUpWishingAfterSeconds;
-    }
-
-    /** It gives up its wish and feeds itself: this many bites (of grass, of what it finds on the ground). */
+    /** It feeds itself now and then (grazing, pecking at the ground): this many bites. */
     void startFeedingItself(int bites) {
         shared.bitesLeft = bites;
     }
@@ -287,30 +290,35 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         return shared.bitesLeft > 0;
     }
 
-    /** A bubble over it with what it wishes for; tapping the bubble walks the player next to it, as tapping it does. */
-    void showWish() {
-        wishBubble = new PictureBubble(resources, favouriteFood.getType().getName(), favouriteFood.getPicture());
-        wishBubble.onTap(new WalkNextToOnTapListener(this, events));
-        wishBubble.showOver(this);
-        wishBubble.setVisible(wishShown);
+    // its quests
+
+    /** Its quests (they go with it through doors; {@code QuestOffersFeature} asks them whether one should start). */
+    public CreatureQuests getQuests() {
+        return shared.quests;
     }
 
     @Override
-    public void setWishShown(boolean shown) {
-        wishShown = shown;
-        if (wishBubble != null) {
-            wishBubble.setVisible(shown);
-        }
+    public void setOfferShown(boolean shown) {
+        offer.setShown(shown);
     }
 
-    @Override
-    public Actor getActor() {
-        return this;
+    /** The bubble with the quest it offers, or null: for tests and descriptions. */
+    public PictureBubble getOfferBubble() {
+        return offer.get();
     }
 
-    void hideWish() {
-        wishBubble.remove();
-        wishBubble = null;
+    // the night
+
+    /** Asleep for the night: the "zzz" over it, and now and then a dream about its favourite thing. */
+    void startSleepingTheNight() {
+        sleepingTheNight = true;
+    }
+
+    /** Awake: the "zzz" and the dream are gone. */
+    void stopSleepingTheNight() {
+        sleepingTheNight = false;
+        zzz.remove();
+        dream.wake();
     }
 
     /** The "zzz" over it while it sleeps the night (shown with {@link Zzz#keepOver}, else not on a stage). */
@@ -318,14 +326,14 @@ public abstract class FarmAnimal extends SpriteActor implements Creature {
         return zzz;
     }
 
+    /** What it dreams about now and then while it sleeps the night. */
+    public DreamBubble getDream() {
+        return dream;
+    }
+
     /** A small face (the pack's tiny emotes) floats up over it and fades. Not used right now: no state calls it. */
     void showEmote(UiImage face) {
         new FloatingPicture(face.name(), resources.getUiImage(face), EMOTE_SCALE).showOver(this, EMOTE_GAP);
-    }
-
-    /** The bubble with its wish, or null: for tests and descriptions. */
-    public PictureBubble getWishBubble() {
-        return wishBubble;
     }
 
     protected ResourcesService getResources() {

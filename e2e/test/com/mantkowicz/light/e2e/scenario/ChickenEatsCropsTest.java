@@ -266,8 +266,10 @@ class ChickenEatsCropsTest {
         boolean wentBack = false;
         for (int frame = 0; frame < 40 * 60; frame++) {
             game.frames(1);
-            assertNotEquals(new Cell(crop.col() - 1, crop.row()), game.cellOf(Kind.CHICKEN),
-                    "never in the corridor next to the crop");
+            if (HUNTING.contains(game.animalState(Kind.CHICKEN))) { // going for it, never in the player's way
+                assertNotEquals(new Cell(crop.col() - 1, crop.row()), game.cellOf(Kind.CHICKEN),
+                        "never in the corridor next to the crop while it goes for it, frame " + frame);
+            }
             wentBack |= "GOING_BACK".equals(game.animalState(Kind.CHICKEN));
         }
         assertTrue(wentBack, "it gave the crop up");

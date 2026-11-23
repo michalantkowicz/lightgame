@@ -10,13 +10,14 @@ import com.mantkowicz.light.resources.Action;
  * into it ({@code enter}), when it goes on to which state ({@code update}, called every frame) and how it answers the
  * player ({@code onMessage}). To change the cow's behaviour, change it here; {@link Cow} only has the helpers.
  * <pre>
- * STANDING ──(hungry: picks a crop)──▶ WISHING ──(gets it)──▶ EATING ──▶ HAPPY ──▶ STANDING
- *                        WISHING ──(not fed for long)──▶ GRAZING ──▶ CHEWING ──(3 bites)──▶ STANDING
+ * STANDING ──(given its favourite, or what its quest waits for)──▶ EATING ──▶ HAPPY ──▶ STANDING
+ * RESTING, SLEEPING ──(given something)──▶ GETTING_UP ──▶ EATING ──▶ HAPPY ──▶ STANDING
  * STANDING ──(after a while)──▶ WALKING ──(arrived)──▶ STANDING
+ * STANDING ──(now and then)──▶ GRAZING ──▶ CHEWING ──(3 bites)──▶ STANDING
  * STANDING ──(after a while)──▶ LYING_DOWN ──▶ RESTING ──(after a while)──▶ SLEEPING or GETTING_UP
- *                                              RESTING, SLEEPING ──(after a while, or hungry)──▶ GETTING_UP ──▶ STANDING
- * STANDING, RESTING, SLEEPING, WISHING ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING (still hungry: WISHING again)
- * at night: WISHING ──▶ STANDING ──(not in bed: BedtimeTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ LYING_DOWN
+ *                                              RESTING, SLEEPING ──(after a while)──▶ GETTING_UP ──▶ STANDING
+ * STANDING, RESTING, SLEEPING ──(stroked)──▶ BEING_STROKED ──▶ STROKED ──▶ STANDING
+ * at night: STANDING ──(not in bed: BedtimeTrip)──▶ GOING_TO_BED ──(there, or gave up)──▶ LYING_DOWN
  *           STANDING ──(in bed)──▶ LYING_DOWN ──▶ RESTING ──▶ SLEEPING_THE_NIGHT ──(day)──▶ GETTING_UP
  *           RESTING, SLEEPING ──(in bed)──▶ SLEEPING_THE_NIGHT, (not in bed)──▶ GETTING_UP ──▶ STANDING
  *           the rest ends in STANDING as by day; no stroke all night
@@ -28,14 +29,14 @@ import com.mantkowicz.light.resources.Action;
 public enum CowState implements State<Cow> {
     /**
      * On its feet, chewing. At night it goes to bed (into the barn, {@link BedtimeTrip}) or, in bed, lies down to
-     * sleep. In the morning, in the barn for the night, it goes out. Hungry: wishes for one of its favourite crops.
-     * Otherwise after a while it walks a step or lies down.
+     * sleep. In the morning, in the barn for the night, it goes out. Otherwise after a while it walks a step, grazes or
+     * lies down (as often each).
      */
     STANDING {
         @Override
         public void enter(Cow cow) {
             cow.playAnimation(Action.IDLE);
-            cow.stayFor(2, 4);
+            cow.stayFor(3, 6); // a calm animal: it stands a good while
         }
 
         @Override
@@ -47,16 +48,22 @@ public enum CowState implements State<Cow> {
                 }
             } else if (trip.isAway() && trip.knowsTheWay()) {
                 cow.changeState(LEAVING_THE_BARN);
-            } else if (cow.isHungry()) {
-                cow.chooseWish(); // here, not in WISHING: stroked, it comes back wishing for the same
-                cow.changeState(WISHING);
             } else if (cow.isTimeUp()) {
-                cow.changeState(oneOf(WALKING, WALKING, WALKING, LYING_DOWN)); // walks 3 times as often as it lies down
+                CowState next = oneOf(WALKING, LYING_DOWN, GRAZING);
+                if (next == GRAZING) {
+                    cow.startGrazing();
+                }
+                cow.changeState(next);
             }
         }
 
         @Override
         boolean canBeStroked() {
+            return true;
+        }
+
+        @Override
+        boolean canBeFed() {
             return true;
         }
     },
@@ -91,7 +98,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Lying awake. At night it falls asleep at once. After a while it falls asleep or gets up; hunger gets it up at once. */
+    /** Lying awake. At night it falls asleep at once. After a while it falls asleep or gets up. */
     RESTING {
         @Override
         public void enter(Cow cow) {
@@ -103,8 +110,6 @@ public enum CowState implements State<Cow> {
         public void update(Cow cow) {
             if (cow.isNight()) {
                 cow.changeState(cow.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
-            } else if (cow.isHungry()) {
-                cow.changeState(GETTING_UP);
             } else if (cow.isTimeUp()) {
                 cow.changeState(oneOf(SLEEPING, GETTING_UP));
             }
@@ -114,9 +119,14 @@ public enum CowState implements State<Cow> {
         boolean canBeStroked() {
             return true;
         }
+
+        @Override
+        boolean canBeFed() {
+            return true;
+        }
     },
 
-    /** A nap: asleep until it has slept enough or hunger wakes it. Night falling, it sleeps on, the night through. */
+    /** A nap: asleep until it has slept enough. Night falling, it sleeps on, the night through. */
     SLEEPING {
         @Override
         public void enter(Cow cow) {
@@ -128,7 +138,7 @@ public enum CowState implements State<Cow> {
         public void update(Cow cow) {
             if (cow.isNight()) {
                 cow.changeState(cow.getTrip().isInBed() ? SLEEPING_THE_NIGHT : GETTING_UP);
-            } else if (cow.isTimeUp() || cow.isHungry()) {
+            } else if (cow.isTimeUp()) {
                 cow.changeState(GETTING_UP);
             }
         }
@@ -137,23 +147,27 @@ public enum CowState implements State<Cow> {
         boolean canBeStroked() {
             return true;
         }
+
+        @Override
+        boolean canBeFed() {
+            return true;
+        }
     },
 
     /**
-     * Asleep for the night ("zzz" over it): nothing wakes it, not hunger, not the player (no stroke). Up when the day
-     * starts.
+     * Asleep for the night ("zzz" over it, and now and then a dream about its favourite thing): nothing wakes it, not
+     * the player (nothing to give, no stroke). Up when the day starts.
      */
     SLEEPING_THE_NIGHT {
         @Override
         public void enter(Cow cow) {
             cow.playAnimation(Action.SLEEP);
+            cow.startSleepingTheNight();
         }
 
         @Override
         public void update(Cow cow) {
-            if (cow.isNight()) {
-                cow.getZzz().keepOver(cow);
-            } else {
+            if (!cow.isNight()) {
                 cow.getTrip().morning();
                 cow.changeState(GETTING_UP);
             }
@@ -161,7 +175,7 @@ public enum CowState implements State<Cow> {
 
         @Override
         public void exit(Cow cow) {
-            cow.getZzz().remove();
+            cow.stopSleepingTheNight();
         }
     },
 
@@ -203,6 +217,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
+    /** Up on its feet; given something while lying, it eats it then. */
     GETTING_UP {
         @Override
         public void enter(Cow cow) {
@@ -212,58 +227,18 @@ public enum CowState implements State<Cow> {
         @Override
         public void update(Cow cow) {
             if (cow.isAnimationFinished()) {
-                cow.changeState(STANDING);
+                cow.changeState(cow.takeWaitingMeal() ? EATING : STANDING);
             }
         }
     },
 
-    /**
-     * Stands with a bubble showing what it wishes for, until it gets it (or the night comes: it goes to sleep and
-     * wishes again in the morning). It can be stroked meanwhile.
-     */
-    WISHING {
-        @Override
-        public void enter(Cow cow) {
-            cow.playAnimation(Action.IDLE);
-            cow.showWish();
-        }
-
-        @Override
-        public void exit(Cow cow) {
-            cow.hideWish();
-        }
-
-        @Override
-        public boolean onMessage(Cow cow, Telegram telegram) {
-            if (telegram.message == Cow.MESSAGE_GIFT) {
-                cow.changeState(EATING);
-                return true;
-            }
-            return super.onMessage(cow, telegram);
-        }
-
-        @Override
-        public void update(Cow cow) {
-            if (cow.isNight()) {
-                cow.changeState(STANDING); // and lies down from there
-            } else if (cow.hasWishedTooLong()) { // it eats grass instead
-                cow.startGrazing();
-                cow.changeState(GRAZING);
-            }
-        }
-
-        @Override
-        boolean canBeStroked() {
-            return true;
-        }
-    },
-
+    /** It eats what it was given. */
     EATING {
         @Override
         public void enter(Cow cow) {
             cow.playAnimation(Action.EAT);
             cow.stayFor(2, 2);
-            cow.stopBeingHungry();
+            cow.eat();
         }
 
         @Override
@@ -274,7 +249,7 @@ public enum CowState implements State<Cow> {
         }
     },
 
-    /** Nobody fed it: it lowers its head and takes a bite of grass. */
+    /** Now and then: it lowers its head and takes a bite of grass. */
     GRAZING {
         @Override
         public void enter(Cow cow) {
@@ -303,7 +278,6 @@ public enum CowState implements State<Cow> {
             if (cow.isTimeUp() && cow.hasBitesLeft()) {
                 cow.changeState(GRAZING);
             } else if (cow.isTimeUp()) {
-                cow.stopBeingHungry(); // it has eaten
                 cow.changeState(STANDING);
             }
         }
@@ -360,6 +334,11 @@ public enum CowState implements State<Cow> {
         return false;
     }
 
+    /** In this state the player can give the cow something (its favourite, what its quest waits for). */
+    boolean canBeFed() {
+        return false;
+    }
+
     @Override
     public void update(Cow cow) {
     }
@@ -368,11 +347,23 @@ public enum CowState implements State<Cow> {
     public void exit(Cow cow) {
     }
 
-    /** What every state does about a message unless it says otherwise: a stroke works where the cow can be stroked. */
+    /**
+     * What every state does about a message unless it says otherwise: a stroke works where the cow can be stroked, a
+     * gift where it can be fed (lying, it gets up first).
+     */
     @Override
     public boolean onMessage(Cow cow, Telegram telegram) {
         if (telegram.message == Cow.MESSAGE_STROKE && canBeStroked()) {
             cow.changeState(BEING_STROKED);
+            return true;
+        }
+        if (telegram.message == Cow.MESSAGE_GIFT && canBeFed()) {
+            if (this == STANDING) {
+                cow.changeState(EATING);
+            } else {
+                cow.eatOnceUp();
+                cow.changeState(GETTING_UP);
+            }
             return true;
         }
         return false;

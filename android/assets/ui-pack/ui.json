@@ -1,6 +1,6 @@
 {
   "atlas": "ui.atlas",
-  "uiJsonSha1": "9641a29bf2b2b0a908dc41c2031199233180f4e7",
+  "uiJsonSha1": "627e95913c707a9044bd630a7aa40b3b30b32447",
   "images": {
     "backdrops_c1": {
       "frames": 1,
@@ -15,6 +15,9 @@
       "frames": 1
     },
     "bar/full": {
+      "frames": 1
+    },
+    "close_red": {
       "frames": 1
     },
     "continue_indicator": {
@@ -59,6 +62,18 @@
       ]
     },
     "dialog_box_down": {
+      "frames": 1
+    },
+    "dream_bubble": {
+      "frames": 1
+    },
+    "emojis/250": {
+      "frames": 1
+    },
+    "emojis/252": {
+      "frames": 1
+    },
+    "emojis/285": {
       "frames": 1
     },
     "emojis/apple": {
@@ -147,6 +162,12 @@
     "icon_buttons/question": {
       "frames": 1
     },
+    "icons/arrow_left": {
+      "frames": 1
+    },
+    "icons/close": {
+      "frames": 1
+    },
     "icons/door": {
       "frames": 1
     },
@@ -204,6 +225,9 @@
         7
       ]
     },
+    "quest_arrow": {
+      "frames": 1
+    },
     "round_buttons/brown": {
       "frames": 1
     },
@@ -214,6 +238,9 @@
       "frames": 1
     },
     "round_buttons/dark_brown_down": {
+      "frames": 1
+    },
+    "round_buttons_small/beige": {
       "frames": 1
     },
     "selector_dot_1": {
@@ -235,6 +262,15 @@
       "frames": 7,
       "frameDuration": 0.08,
       "playMode": "NORMAL"
+    },
+    "square_buttons_26x19/brown": {
+      "frames": 1,
+      "split": [
+        5,
+        5,
+        5,
+        6
+      ]
     },
     "stamina_black": {
       "frames": 37,

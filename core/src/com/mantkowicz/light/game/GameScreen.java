@@ -16,8 +16,10 @@ import com.mantkowicz.light.feature.Feature;
 import com.mantkowicz.light.light.DayClock;
 import com.mantkowicz.light.light.DayNightSettings;
 import com.mantkowicz.light.map.TileDoor;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.UiStage;
+import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.TimeOfDay;
 
@@ -62,6 +64,8 @@ public class GameScreen extends ScreenAdapter {
     private TileDoor arrivingThrough;
     /** The time of day, for every map. */
     private DayClock clock;
+    /** The quests of the whole game: the one going on (one at a time), its slot. */
+    private QuestJournal quests;
 
     public GameScreen(String mapName, float cameraZoom, ResourcesService resourcesService) {
         this.mapName = mapName;
@@ -76,6 +80,7 @@ public class GameScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
 
         clock = new DayClock(DayNightSettings.current());
+        quests = new QuestJournal(clock);
         active = build(mapName);
         buildTheMapsBehindDoors();
         listenTo(active);
@@ -117,7 +122,7 @@ public class GameScreen extends ScreenAdapter {
     /** Builds the map with this file name and brings it to life; only at the start ({@link #show}). */
     private Area build(String name) {
         Player elsewhere = active == null ? null : active.getPlayer();
-        Area area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere);
+        Area area = new Area(name, cameraZoom, resourcesService, uiStage, elsewhere, quests);
         areas.put(name, area);
         area.startFeatures(this::hud, this::travel, clock);
         area.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -133,6 +138,7 @@ public class GameScreen extends ScreenAdapter {
             hud = new Hud(context, player, slot -> active.throwOut(slot));
             hud.setGiveAway(slot -> active.giveFrom(slot));
             hud.addActor(new TimeOfDay(resourcesService, clock, hud.getGear())); // the day clock at the top left
+            hud.showQuests(quests, () -> active.throwOut(PlayerCollectResolver.QUEST_SLOT)); // over the backpack
             uiStage.addActor(hud);
         }
         return hud;

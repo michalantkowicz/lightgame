@@ -125,6 +125,7 @@
   <object id="2" name="COW" x="83.3584" y="100.683" width="8" height="8">
    <properties>
     <property name="objectClass" value="COW"/>
+    <property name="quests" value="giveMilk"/>
    </properties>
    <ellipse/>
   </object>
@@ -172,6 +173,7 @@
   <object id="11" name="CHICKEN" x="244.601" y="132.137" width="8" height="8">
    <properties>
     <property name="objectClass" value="CHICKEN"/>
+    <property name="quests" value="layEgg"/>
    </properties>
    <ellipse/>
   </object>

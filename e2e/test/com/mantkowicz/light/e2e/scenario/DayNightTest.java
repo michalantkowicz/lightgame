@@ -138,18 +138,45 @@ class DayNightTest {
         assertFalse(game.crashed());
     }
 
-    /** A cow wishing for a crop when the night comes goes to sleep (no bubble, no button) and wishes again in the morning. */
+    /**
+     * Asleep for the night the cow can't be given anything (no button with its favourite), the "zzz" stays over it all
+     * night, and now and then it dreams about its favourite: the dream bubble shows a few seconds, is gone a while,
+     * and comes back. In the morning, awake, no dream and no "zzz"; it can be fed again.
+     */
     @Test
-    void aWishingCowGoesToSleepAndWishesAgainInTheMorning() {
-        GameDriver.dayAndNight(62, 1, 6, 1, 0.25f); // the cow gets hungry 60 s in
+    void atNightTheCowDreamsOfItsFavourite() {
+        GameDriver.dayAndNight(2, 1, 40, 1, 0.25f);
         GameDriver game = GameDriver.start(PEN.write("day-night-pen"));
-        game.seconds(61);
-        assertEquals("WISHING", game.animalState(Kind.COW));
-        game.seconds(2.5f);
-        assertEquals("SLEEPING_THE_NIGHT", game.animalState(Kind.COW), "hungry or not, it sleeps");
-        assertEquals("none", game.cowWish(), "no bubble");
         game.seconds(6);
-        assertEquals("WISHING", game.animalState(Kind.COW), "in the morning it wishes again");
+        assertEquals("SLEEPING_THE_NIGHT", game.animalState(Kind.COW));
+        assertEquals(List.of(), game.buttonAlphas("GIVE"), "asleep: nothing to give");
+        assertFalse(game.canBeFed(Kind.COW));
+        List<Integer> shown = new ArrayList<>(), hidden = new ArrayList<>();
+        boolean dreaming = game.isDreaming(Kind.COW);
+        int since = 0;
+        for (int frame = 0; frame < 30 * 60; frame++) {
+            assertTrue(game.zzzOver(Kind.COW), "the zzz all night, frame " + frame);
+            game.frames(1);
+            since++;
+            if (game.isDreaming(Kind.COW) != dreaming) {
+                (dreaming ? shown : hidden).add(since);
+                dreaming = !dreaming;
+                since = 0;
+                if (dreaming) {
+                    assertTrue(game.dreamsOfItsFavourite(Kind.COW), "it dreams of its carrot");
+                }
+            }
+        }
+        assertTrue(shown.size() >= 3, "it dreamt again and again: " + shown);
+        for (int frames : shown.subList(1, shown.size())) { // the first one may have begun before the count
+            assertEquals(3 * 60, frames, 2, "a dream shows 3 s: shown " + shown + ", hidden " + hidden);
+        }
+        for (int frames : hidden.subList(1, hidden.size())) {
+            assertTrue(frames >= 4 * 60 && frames <= 8 * 60, "then it is gone 4..8 s: " + hidden);
+        }
+        game.seconds(8.5f); // 44.5 s: the morning (the next day begins at 44 s, its dusk at 46 s)
+        assertFalse(game.isDreaming(Kind.COW), "awake: no dream");
+        assertFalse(game.zzzOver(Kind.COW));
         assertFalse(game.crashed());
     }
 

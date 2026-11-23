@@ -118,8 +118,8 @@ worth doing. When one gets done, remove it here and describe it in [changelog.md
     second;
   - the question mark on an empty field's sign (`Field`, `UiImage.HINT_ICON`, branch `field-grows-over-time`): about
     2 more per empty field (sign, "?", sprout), for as long as it stays empty;
-  - the cow's wish bubble (`PictureBubble`, `UiImage.PICTURE_BUBBLE`, with the crop from `sprites.atlas` inside):
-    about 2 more per wishing cow, for as long as it wishes;
+  - an animal's quest bubble (`PictureBubble`, `UiImage.PICTURE_BUBBLE`, with the crop from `sprites.atlas` inside)
+    and its dream bubble at night (`DreamBubble`): about 2 more per animal, while it shows;
   - the heart floating over the player after a stroke (`CreatureFeature`, `UiImage.HEART`): up to 2 more for a moment;
   - the cow's emotes (`Cow.showEmote`, tiny emotes): not called right now.
 

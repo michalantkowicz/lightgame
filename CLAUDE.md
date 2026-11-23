@@ -56,13 +56,14 @@ design, change the rule on purpose in its own PR.
   - A map can switch features off for itself: map property `featuresOff`, `FeatureFlag` names (e.g. `GROWING_GRASS`
     in the coop); check `TilesetProperties.isOn(flag)` where the feature is created.
   - **A character goes through doors** when it says so (`GameBoardActor.goesThroughDoors` and `moveTo`, as
-    `FarmAnimal` does): a new animal on the other map, carrying `FarmAnimal.Shared` (hunger, wish...). What must
+    `FarmAnimal` does): a new animal on the other map, carrying `FarmAnimal.Shared` (meal and stroke timers, the night, its quests...). What must
     stay as it was through a door belongs there; the rest starts again.
 - Actors (`GameActor`, `GameBoardActor`) get behaviour from per-actor **plugins** (`actor.Plugin`); screen-wide logic is
   a **feature** (`feature.Feature`), run after the stages each frame. Concrete characters live in `character`.
 - A creature's behaviour is a gdx-ai state machine: a `State` enum next to its class (`CowState` for `Cow`,
   `ChickenState` for `Chicken`, `FrogState` for `Frog`), all its transitions in that one file, no framework on top. What
-  farm animals share (hunger, wishes, being fed and stroked, waiting) is in `FarmAnimal`. The frog is no farm animal: it
+  farm animals share (one favourite crop, being fed and stroked, dreaming of the favourite at night, quests) is in
+  `FarmAnimal`. The frog is no farm animal: it
   can't be fed or stroked, keeps more than two tiles from the player and the animals, hops (two hops a tile), blocks
   nobody, jumps into the water with a splash and floats in it (`Tile.isWater`: drawn only with the map's water tileset). `Debug.Tool.STATE_LABELS` shows the states while playing.
 - **Day and night**: one `light.DayClock` for the whole game (`GameScreen` ticks it; tune it in
@@ -74,6 +75,13 @@ design, change the rule on purpose in its own PR.
   (`ui.hud.TimeOfDay`) shows the clock's part of the day and an arrow on the day's scale. Tests run with hour-long days (`GameDriver`) unless they set their own.
 - Whole features can be switched off in `debug.FeatureFlag` (e.g. `GROWING_GRASS`); a feature checks its flag where it
   is created.
+- **Quests** (`quest`, Characters layer): a `Quest` subclass with `shouldStart(QuestWorld)` and `run()` (a script:
+  `dialog`, `waitFor(crop)`, `give(produce)`), registered by name in `QuestBook`, given to an animal by Tiled's `quests`
+  (comma-separated); they go through doors in `FarmAnimal.Shared`. One `QuestJournal` for the game (`GameScreen`):
+  one quest at a time, its slot, its time. Offered: a bubble over the animal and a `QUEST` button next to it
+  (`QuestFeature`); going on: a `DELIVER` button, and a row over the backpack, `ui.hud.QuestPanel` (a brown button with
+  face, arrow, wanted thing and time line, a round X on its corner; the golden quest slot over the third slot). The next wanted thing picked up goes into the slot (`PlayerCollectResolver`), one carried in
+  the backpack too; items fly between the slots and to the animal (`ui.hud.ItemFlights`).
 - Events go through `GameEventService`; an event class lives next to what it is about (one that carries nothing of the
   game, e.g. `BackpackItemEjectedEvent`, may stay in `event`).
 - The board tracks `TileOccupant`s and `TileContent`s and knows nothing of actors or the map.
@@ -82,7 +90,7 @@ design, change the rule on purpose in its own PR.
   fishing rod on a fishing spot, the door on the door it came out of, else the hint; a tool shows only over the hint
   and resets only itself; standing on an item with the backpack full it widens into a swap, `SwapFeature`, which
   comes before every tool), the hold-to-open settings gear. **Action buttons** (`ActionButton`) are the small round buttons over things on
-  the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`; tapping the backpack slot with its wish feeds it too, tapping its wish bubble walks the player to it). Collecting: a
+  the map: a chest's, a field's, stroking or feeding a `Creature` next to the player (`CreatureFeature`: the hand and its favourite whenever it can be fed; tapping the backpack slot with the favourite feeds it too). Collecting: a
   chest's button throws its items onto free tiles (`ItemThrower`), the player picks them up by walking onto them (with
   the backpack full they stay; nothing jumps out by itself).
 

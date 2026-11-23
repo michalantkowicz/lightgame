@@ -1,6 +1,6 @@
 {
   "atlas": "sprites.atlas",
-  "packJsonSha1": "0b1b03f7feba64903c47c575d4e8229efaa918cc",
+  "packJsonSha1": "ce1387634f4c9ae326eda644856f4b47e91ffc27",
   "sheets": {
     "chest": {
       "frameWidth": 48,
@@ -41,6 +41,16 @@
       "height": 28,
       "anchorX": 16,
       "anchorY": 11
+    },
+    "egg_item": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 1,
+      "trimY": 1,
+      "width": 14,
+      "height": 14,
+      "anchorX": 8,
+      "anchorY": 8
     },
     "farm_items": {
       "frameWidth": 16,
@@ -139,6 +149,16 @@
       "trimY": 0,
       "width": 14,
       "height": 4,
+      "anchorX": 8,
+      "anchorY": 8
+    },
+    "milk_item": {
+      "frameWidth": 16,
+      "frameHeight": 16,
+      "trimX": 2,
+      "trimY": 0,
+      "width": 12,
+      "height": 15,
       "anchorX": 8,
       "anchorY": 8
     },
@@ -598,6 +618,12 @@
       "frameDuration": 0.12,
       "playMode": "LOOP"
     },
+    "egg_item/icon": {
+      "sheet": "egg_item",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
     "farm_items/row_01": {
       "sheet": "farm_items",
       "frames": 1,
@@ -816,6 +842,12 @@
     },
     "item_shadow/row_00": {
       "sheet": "item_shadow",
+      "frames": 1,
+      "frameDuration": 0.1,
+      "playMode": "LOOP"
+    },
+    "milk_item/icon": {
+      "sheet": "milk_item",
       "frames": 1,
       "frameDuration": 0.1,
       "playMode": "LOOP"

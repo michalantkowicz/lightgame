@@ -71,6 +71,26 @@ public enum UiImage {
      */
     SWAP_ICON("icons_swap"),
     /**
+     * Over a sleeping animal now and then: a cloud with what it dreams about, little circles trailing down to its
+     * head. Drawn for the game (tools/assets/dream_bubble.py): the pack's bubbles are for talking.
+     */
+    DREAM_BUBBLE("dream_bubble"),
+    /** The animals' faces on the quest panel (who asks): the emoji sheet's brown cow, chicken and chick. */
+    COW_FACE("emojis/285"),
+    /** The quest panel's cancel button (an X) and the arrow between who asks and what it asks for (turned right). */
+    CLOSE_ICON("icons/close"),
+    /** The quest's cancel button's X: the pack's X in red (drawn by tools/assets/quest_icons.py). */
+    RED_CLOSE_ICON("close_red"),
+    /** Who asks -> what for, on the quest row (drawn by tools/assets/quest_icons.py). */
+    QUEST_ARROW("quest_arrow"),
+    /** The quest row's background: the pack's brown rectangle button, a nine-patch. */
+    QUEST_BUTTON("square_buttons_26x19/brown"),
+    /** The small beige round button with the quest's X. */
+    SMALL_BEIGE_BUTTON("round_buttons_small/beige"),
+    ARROW_LEFT_ICON("icons/arrow_left"),
+    CHICKEN_FACE("emojis/250"),
+    CHICK_FACE("emojis/252"),
+    /**
      * The day clock at the top left (the weather UI's frame without its label): a picture for the part of the day in
      * its left window, the day's scale in its right one with an arrow over it.
      */

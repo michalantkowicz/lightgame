@@ -34,6 +34,8 @@ import com.mantkowicz.light.feature.GrassFeature;
 import com.mantkowicz.light.feature.MenuFeature;
 import com.mantkowicz.light.feature.NoPathFeature;
 import com.mantkowicz.light.feature.PlayerFeature;
+import com.mantkowicz.light.feature.QuestFeature;
+import com.mantkowicz.light.feature.QuestOffersFeature;
 import com.mantkowicz.light.feature.StageFeature;
 import com.mantkowicz.light.feature.SwapFeature;
 import com.mantkowicz.light.feature.Travel;
@@ -41,6 +43,7 @@ import com.mantkowicz.light.light.DayClock;
 import com.mantkowicz.light.map.Maps;
 import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TileSet;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.resources.PhraseService;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.ui.GameStage;
@@ -88,6 +91,9 @@ final class Area {
     private CameraTrackingFeature camera;
     private CollectFeature collecting;
     private CreatureFeature creatures;
+    private QuestFeature questFeature;
+    /** The quests of the whole game (the same on every map). */
+    private final QuestJournal quests;
     private DoorFeature doors;
 
     /** Something that gives the features their HUD (one for the whole game, created with the first map's player). */
@@ -100,8 +106,10 @@ final class Area {
      *
      * @param elsewhere the player on another map (its backpack and stamina come here), or null for the first map, where
      *                  the map's PLAYER object makes the player
+     * @param quests    the quests of the whole game
      */
-    Area(String mapName, float cameraZoom, ResourcesService resourcesService, UiStage uiStage, Player elsewhere) {
+    Area(String mapName, float cameraZoom, ResourcesService resourcesService, UiStage uiStage, Player elsewhere,
+            QuestJournal quests) {
         this.mapName = mapName;
         // the world (board, actors, menus and notifications next to them) moves and zooms with the camera;
         // the UI (buttons, windows) has its own fixed camera, so it stays in place and keeps its size
@@ -124,6 +132,7 @@ final class Area {
         context = new GameContext(resourcesService, gameEventService, new PhraseService(), world, rayHandler,
                 (OrthographicCamera) gameStage.getCamera(), gameStage, notificationStage, menuStage, uiStage,
                 boardService);
+        this.quests = quests;
         board = new Board(boardService, gameEventService, tiles);
 
         for (Tile tile : tiles) {
@@ -171,15 +180,19 @@ final class Area {
     void startFeatures(HudProvider hudProvider, Travel travel, DayClock clock) {
         features.add(new DayNightFeature(context, clock, mapProperties.getAmbientLight()));
         features.add(new BedtimeFeature(context));
+        features.add(new QuestOffersFeature(context, quests)); // the animals here may offer their quests
         doors = new DoorFeature(context, travel);
         if (player != null) {
             camera = new CameraTrackingFeature(context, player);
             features.add(camera);
-            collecting = new CollectFeature(context, player);
+            collecting = new CollectFeature(context, player, quests);
             features.add(collecting);
             Hud hud = hudProvider.hud(context, player);
-            creatures = new CreatureFeature(context, player, hud);
+            creatures = new CreatureFeature(context, player, hud, quests);
             features.add(creatures);
+            questFeature = new QuestFeature(context, player, hud, quests); // after the creatures: its hint over theirs
+            creatures.setQuests(questFeature);
+            features.add(questFeature);
             features.add(new SwapFeature(player, hud, collecting)); // before every tool: it comes first
             features.add(new DoorToolFeature(context, player, hud, doors, travel)); // before the scythe: it comes first
             if (mapProperties.isOn(FeatureFlag.GROWING_GRASS)) {
@@ -346,7 +359,10 @@ final class Area {
         return collecting != null && collecting.throwOut(slot);
     }
 
-    /** Gives the item in a backpack slot to an animal next to the player wishing for it (see the HUD). */
+    /**
+     * Gives the item in a backpack slot to an animal next to the player whose quest waits for it, or whose favourite it
+     * is (see the HUD).
+     */
     boolean giveFrom(int slot) {
         return creatures != null && creatures.giveFrom(slot);
     }
