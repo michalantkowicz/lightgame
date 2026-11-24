@@ -6,7 +6,6 @@ import com.mantkowicz.light.e2e.GameDriver.Kind;
 import com.mantkowicz.light.e2e.TestMap;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,10 +18,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Chickens: a chicken and a chick (Tiled's CHICKEN and CHICKEN_BABY) live like the cow (they get hungry, wish for a
- * crop, eat it, enjoy a stroke, rest and sleep) but they are restless: they walk more than the cow (the chick most),
- * peck at the ground often, wish only for corn, and soon get bored of wishing: then they peck at the ground three
- * times and are no longer hungry. Happy or stroked, hearts rise over them.
+ * Chickens: a chicken and a chick (Tiled's CHICKEN and CHICKEN_BABY) live like the cow (they eat their favourite thing
+ * when given it, enjoy a stroke, rest and sleep; no bubble by day) but they are restless: they walk more than the cow
+ * (the chick most) and peck at the ground often. Their favourite is corn. Happy or stroked, hearts rise over them.
  */
 class ChickenTest {
     /** The rabbit stands under a chicken that can't walk anywhere. */
@@ -118,18 +116,16 @@ class ChickenTest {
             Map.entry("RESTING", "rest"),
             Map.entry("SLEEPING", "sleep"),
             Map.entry("GETTING_UP", "rise"),
-            Map.entry("WISHING", "idle"),
             Map.entry("EATING", "eat"),
-            Map.entry("FORAGING", "peck"),
             Map.entry("HAPPY", "love"),
             Map.entry("BEING_STROKED", "idle"),
             Map.entry("STROKED", "love"));
 
     @Test
-    void chickensWishOnlyForCorn() {
+    void chickensLikeCorn() {
         GameDriver game = GameDriver.start(FARM.write("chicken-farm"));
-        assertEquals(List.of("corn"), game.animalFavouriteDishes(Kind.CHICKEN));
-        assertEquals(List.of("corn"), game.animalFavouriteDishes(Kind.CHICKEN_BABY));
+        assertEquals("corn", game.animalFavourite(Kind.CHICKEN));
+        assertEquals("corn", game.animalFavourite(Kind.CHICKEN_BABY));
         assertFalse(game.crashed());
     }
 
@@ -164,32 +160,17 @@ class ChickenTest {
         assertFalse(game.crashed());
     }
 
-    /** Nobody feeds it: hungry, it wishes for corn, and 15 s later, bored, it pecks at the ground three times. */
+    /** It wishes for nothing: no bubble over it for minutes (without quests); standing, it can be fed corn at once. */
     @Test
-    void aChickenSoonGetsBoredOfWishing() {
+    void aChickenCanBeFedWheneverItStands() {
         GameDriver game = GameDriver.start(PEN.write("chicken-pen"));
-        waitFor(game, Kind.CHICKEN, "WISHING", 25);
-        game.seconds(1);
-        assertEquals("corn", game.animalWants(Kind.CHICKEN));
-        List<String> states = new ArrayList<>();
-        int frames = 0;
-        int bored = -1;
-        for (; frames < 30 * 60 && !"STANDING".equals(game.animalState(Kind.CHICKEN)); frames++) {
-            String state = game.animalState(Kind.CHICKEN);
-            if (states.isEmpty() || !state.equals(states.get(states.size() - 1))) {
-                states.add(state);
-                if ("FORAGING".equals(state)) {
-                    bored = frames;
-                }
+        for (int frame = 0; frame < 3 * 60 * 60; frame++) {
+            assertEquals("none", game.animalBubble(Kind.CHICKEN), "frame " + frame);
+            if ("STANDING".equals(game.animalState(Kind.CHICKEN))) {
+                assertTrue(game.canBeFed(Kind.CHICKEN), "frame " + frame);
             }
             game.frames(1);
         }
-        assertEquals(List.of("WISHING", "FORAGING"), states, "it gives up and pecks at the ground");
-        assertTrue(bored > 13 * 60 && bored < 15 * 60,
-                "bored 15 s after it began wishing: " + (bored / 60f + 1) + " s");
-        assertEquals("none", game.animalWish(Kind.CHICKEN), "the bubble is gone");
-        game.seconds(10);
-        assertFalse("WISHING".equals(game.animalState(Kind.CHICKEN)), "it found something: not hungry for a while");
         assertFalse(game.crashed());
     }
 
@@ -197,8 +178,8 @@ class ChickenTest {
     @Test
     void aChickenFedCornIsHappy() {
         GameDriver game = GameDriver.start(PEN.write("chicken-pen"));
-        waitFor(game, Kind.CHICKEN, "WISHING", 25);
-        game.seconds(1);
+        waitFor(game, Kind.CHICKEN, "STANDING", 25);
+        game.frames(2);
         assertEquals(List.of(1f), game.buttonAlphas("GIVE"), "next to it: the button with the corn");
         game.putIntoBackpack("corn");
         game.clickButton("GIVE");
@@ -217,15 +198,15 @@ class ChickenTest {
 
     /**
      * Was a bug: with two animals next to the rabbit only the first one found got buttons, so after feeding one the
-     * other, still wishing, could not be fed. Now the button with the corn comes over the other one.
+     * other could not be fed. Now the button with the corn comes over the other one.
      */
     @Test
-    void bothWishingNeighboursCanBeFed() {
+    void bothNeighboursCanBeFed() {
         GameDriver game = GameDriver.start(BETWEEN.write("chicken-between"));
         game.putIntoBackpack("corn");
         game.putIntoBackpack("corn");
-        for (int frame = 0; frame < 30 * 60 && !("WISHING".equals(game.animalState(Kind.CHICKEN))
-                && "WISHING".equals(game.animalState(Kind.CHICKEN_BABY))); frame++) {
+        for (int frame = 0; frame < 30 * 60 && !("STANDING".equals(game.animalState(Kind.CHICKEN))
+                && "STANDING".equals(game.animalState(Kind.CHICKEN_BABY))); frame++) {
             game.frames(1);
         }
         game.seconds(0.5f);
@@ -233,7 +214,7 @@ class ChickenTest {
         Kind other = first == Kind.CHICKEN ? Kind.CHICKEN_BABY : Kind.CHICKEN;
         game.clickButton("GIVE");
         assertEquals("EATING", game.animalState(first), "the one under the button eats");
-        assertEquals("WISHING", game.animalState(other));
+        assertFalse("EATING".equals(game.animalState(other)));
         for (int frame = 0; frame < 3 * 60 && !(other == game.buttonOver("GIVE")
                 && game.buttonAlphas("GIVE").equals(List.of(1f))); frame++) {
             game.frames(1); // the first button fades out, the next one fades in
@@ -241,11 +222,11 @@ class ChickenTest {
         assertEquals(other, game.buttonOver("GIVE"), "then the button with the corn is over the other one");
         assertEquals(List.of(1f), game.buttonAlphas("GIVE"));
         game.clickButton("GIVE");
-        assertEquals("EATING", game.animalState(other), "and it eats too");
+        assertTrue(List.of("EATING", "GETTING_UP").contains(game.animalState(other)), "and it eats too");
         assertFalse(game.crashed());
     }
 
-    /** The rabbit between a cow that wants only carrots and a chicken (corn). */
+    /** The rabbit between a cow (its favourite: carrots) and a chicken (corn). */
     private static final TestMap COW_AND_CHICKEN = TestMap.of(
             "~~~~~~~",
             "~~KPH~~",
@@ -254,17 +235,16 @@ class ChickenTest {
             .with('H', "CHICKEN", Map.of());
 
     /**
-     * Found by a test agent: with the button over one wishing animal, getting what the other one wants didn't move the
-     * button there. Now it moves to the one the rabbit can feed.
+     * Found by a test agent: with the button over one animal, getting what the other one likes didn't move the button
+     * there. Now it moves to the one the rabbit can feed.
      */
     @Test
     void theGiveButtonGoesToTheAnimalTheRabbitCanFeed() {
         GameDriver game = GameDriver.start(COW_AND_CHICKEN.write("cow-and-chicken"));
-        for (int frame = 0; frame < 90 * 60 && !("WISHING".equals(game.animalState(Kind.COW))
-                && "WISHING".equals(game.animalState(Kind.CHICKEN))); frame++) {
+        for (int frame = 0; frame < 90 * 60 && !(game.canBeFed(Kind.COW) && game.canBeFed(Kind.CHICKEN)
+                && game.buttonOver("GIVE") != null); frame++) {
             game.frames(1);
         }
-        game.seconds(1);
         Kind first = game.buttonOver("GIVE");
         Kind other = first == Kind.COW ? Kind.CHICKEN : Kind.COW;
         game.putIntoBackpack(other == Kind.COW ? "carrot" : "corn");
@@ -273,10 +253,8 @@ class ChickenTest {
             game.frames(1);
         }
         assertEquals(other, game.buttonOver("GIVE"), "the button went to the one it can feed");
-        assertEquals("hidden", game.animalWish(other));
-        assertEquals(first == Kind.COW ? "carrot" : "corn", game.animalWish(first), "the other one's bubble is back");
         game.clickButton("GIVE");
-        assertEquals("EATING", game.animalState(other), "and eats");
+        assertTrue(List.of("EATING", "GETTING_UP").contains(game.animalState(other)), "and eats");
         assertFalse(game.crashed());
     }
 

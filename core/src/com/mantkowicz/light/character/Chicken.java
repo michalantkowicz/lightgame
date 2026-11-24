@@ -15,23 +15,17 @@ import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Action;
 import com.mantkowicz.light.resources.SpriteSheet;
 
-import java.util.List;
-
 import static com.mantkowicz.light.actor.GameActorType.CHICKEN;
 
 /**
- * A chicken or a chick ({@link ChickenType}). Like a {@link Cow} it gets hungry, wishes for a crop, eats what it is
- * given, enjoys a stroke and rests, but it is restless: it walks more, pecks at the ground often (looking for
- * something), and it wishes only for corn and gives up soon, bored. A crop lying on the ground nearby it goes for,
+ * A chicken or a chick ({@link ChickenType}). Like a {@link Cow} it eats its favourite thing when given it (corn),
+ * enjoys a stroke and rests, but it is restless: it walks more and pecks at the ground often (looking for something). A crop lying on the ground nearby it goes for,
  * slowly, and eats ({@link CropHunt}), unless the player picks it up first. At night it goes to the coop to sleep, and
  * out again in the morning ({@link BedtimeTrip}). What it does and when is all in {@link ChickenState}.
  */
 public class Chicken extends FarmAnimal implements Sheltered {
-    /** This long after the start or its last meal it gets hungry again. */
-    static final float HUNGRY_AFTER_SECONDS = 20;
-    /** Wishing this long without getting its corn, it is bored: it pecks at the ground instead, this many times. */
-    static final float GIVE_UP_WISHING_AFTER_SECONDS = 15;
-    static final int PECKS_INSTEAD = 3;
+    /** Its favourite: corn. */
+    public static final CropType FAVOURITE = CropType.CORN;
     /** How long leaning towards a crop, and back, takes. */
     private static final float LEAN_SECONDS = 0.2f;
 
@@ -45,10 +39,11 @@ public class Chicken extends FarmAnimal implements Sheltered {
     private MoveByAction lean;
     /** Going back to the middle of its tile after leaning, or null. */
     private MoveToAction straighten;
+    /** Given corn while sitting: it gets up and then eats. */
+    private boolean mealWaiting;
 
     public Chicken(GameContext context, ChickenType type) {
-        super(CHICKEN, context, type.getSprite(), type.getDescription(), List.of(CropType.CORN), HUNGRY_AFTER_SECONDS,
-                GIVE_UP_WISHING_AFTER_SECONDS);
+        super(CHICKEN, context, type.getSprite(), type.getDescription(), FAVOURITE, type.getIcon());
         this.type = type;
         this.hunt = new CropHunt(this, context.getBoardService());
         this.trip = new BedtimeTrip(this, context.getBoardService(), type.getSecondsPerTile(), true);
@@ -86,6 +81,11 @@ public class Chicken extends FarmAnimal implements Sheltered {
     }
 
     @Override
+    public boolean isTakingAGift() {
+        return mealWaiting || getState() == ChickenState.EATING || getState() == ChickenState.HAPPY;
+    }
+
+    @Override
     public String getStateName() {
         return getState().name();
     }
@@ -101,8 +101,8 @@ public class Chicken extends FarmAnimal implements Sheltered {
     }
 
     @Override
-    protected boolean isWishing() {
-        return getState() == ChickenState.WISHING;
+    protected boolean isFeedable() {
+        return getState().canBeFed();
     }
 
     @Override
@@ -112,6 +112,18 @@ public class Chicken extends FarmAnimal implements Sheltered {
 
     void changeState(ChickenState state) {
         stateMachine.changeState(state);
+    }
+
+    /** Given corn while sitting: it eats once it is up ({@link #takeWaitingMeal()}). */
+    void eatOnceUp() {
+        mealWaiting = true;
+    }
+
+    /** Was it given corn while sitting? Then it eats now (and the meal no longer waits). */
+    boolean takeWaitingMeal() {
+        boolean waiting = mealWaiting;
+        mealWaiting = false;
+        return waiting;
     }
 
     /** Leans sideways (to peck at what is beside it), quickly; {@link #standStraight()} undoes it. */

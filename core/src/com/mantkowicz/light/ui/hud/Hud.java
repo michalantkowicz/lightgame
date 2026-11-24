@@ -2,6 +2,7 @@ package com.mantkowicz.light.ui.hud;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -12,10 +13,12 @@ import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.GameEventService;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.UiImage;
 
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.IntPredicate;
 
 /**
@@ -70,6 +73,9 @@ public class Hud extends Group {
     private final Group row = new Group();
     private final Portrait face;
     private final BackpackSlots backpack;
+    /** The quest going on, over the backpack, or null before {@link #showQuests}. */
+    private QuestPanel questPanel;
+    private final ItemFlights flights;
     private final StaminaBar stamina;
     private final HoldButton gear;
     /** The big round button right of the face: the tool for where the player stands, or the hint. */
@@ -99,6 +105,7 @@ public class Hud extends Group {
         face = new Portrait(resources, "teemo", AWAKE);
         row.addActor(face);
         backpack = new BackpackSlots(resources, player.getInventory().getCapacity(), throwOut, row);
+        flights = new ItemFlights(this, backpack);
         reactions = new FaceReactions(context.getGameEventService(), resources, face,
                 (text, seconds) -> say(text, null, seconds), backpack::shake);
         keepTaps(face, reactions::tapped);
@@ -112,6 +119,38 @@ public class Hud extends Group {
 
         toolButton = new ToolButton(resources, this::showHint, backpack.getWidth()); // wide, as wide as the backpack
         addActor(toolButton);
+    }
+
+    /**
+     * The quest going on, in a row just over the backpack slots ({@link QuestPanel}): over the first two slots who
+     * asks for what, over the third the quest's slot.
+     *
+     * @param throwOutSlot throws what is in the quest's slot out next to the player; false when it has nowhere to land
+     */
+    public void showQuests(QuestJournal journal, BooleanSupplier throwOutSlot) {
+        questPanel = new QuestPanel(resources, journal, 2 * BackpackSlots.SLOT_WIDTH + BackpackSlots.SLOT_GAP,
+                BackpackSlots.SLOT_GAP, BackpackSlots.SLOT_WIDTH, BackpackSlots.SLOT_HEIGHT, throwOutSlot);
+        addActor(questPanel);
+        flights.setQuestPanel(questPanel);
+        placeQuestPanel();
+    }
+
+    /** Just over the backpack slots, its left edge on theirs. */
+    private void placeQuestPanel() {
+        if (questPanel != null && !backpack.getSlots().isEmpty()) {
+            Actor first = backpack.getSlots().get(0);
+            questPanel.setPosition(row.getX() + first.getX(),
+                    row.getY() + first.getY() + first.getHeight() + BackpackSlots.SLOT_GAP);
+        }
+    }
+
+    public QuestPanel getQuestPanel() {
+        return questPanel;
+    }
+
+    /** Items flying out of the slots: to an animal on the map, into the quest's slot. */
+    public ItemFlights getFlights() {
+        return flights;
     }
 
     /**
@@ -194,6 +233,7 @@ public class Hud extends Group {
         // its right edge as far right of the face as the slots' left edge is left of it: the same margin on both sides
         toolButton.place(faceX + Portrait.WIDTH + GAP + backpack.getWidth(), middle);
         placeBubble();
+        placeQuestPanel();
         gear.setPosition(getWidth() - gear.getWidth() - GEAR_MARGIN, getHeight() - gear.getHeight() - GEAR_MARGIN);
         if (settings != null) {
             settings.remove();

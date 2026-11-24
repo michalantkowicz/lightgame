@@ -20,6 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * only those kinds through.
  */
 class TravelTest {
+    static {
+        // offered at once, even while another quest goes on: corn for an egg
+        GameDriver.registerQuest("travelCornForEgg", "corn", "egg", 180, true);
+    }
+
     private static final String FARM_NAME = "travel-farm", COOP_NAME = "travel-coop";
 
     /** The farm: a field, the rabbit, a door to the coop on the right. */
@@ -104,7 +109,7 @@ class TravelTest {
                 "~~~~~~~",
                 "~KO..P~",
                 "~~~~~~~")
-                .with('K', "CHICKEN", Map.of())
+                .with('K', "CHICKEN", Map.of("quests", "travelCornForEgg"))
                 .with('O', "DOOR", door(coop));
     }
 
@@ -114,12 +119,15 @@ class TravelTest {
             "~~~~~~")
             .with('O', "DOOR", door(FARM_NAME + "-k"));
 
+    /** A chicken offering its quest goes through the door and offers the same quest on the other side. */
     @Test
-    void aChickenGoesThroughTheDoorAsHungryAsItWas() {
+    void aChickenGoesThroughTheDoorWithItsQuest() {
         CHICKEN_COOP.write(COOP_NAME + "-k");
         String farm = CHICKEN_FARM.write(FARM_NAME + "-k");
         String coop = TestMap.pathOf(COOP_NAME + "-k");
         GameDriver game = GameDriver.start(farm);
+        game.seconds(1.5f);
+        assertEquals("travelCornForEgg", game.questOfferedOnAnyMap(Kind.CHICKEN), "it offers its quest on the farm");
         int frames = 0;
         while (frames < 60 * 60 && !coop.equals(game.whereIs(Kind.CHICKEN))) {
             game.frames(1);
@@ -127,14 +135,8 @@ class TravelTest {
         }
         assertEquals(coop, game.whereIs(Kind.CHICKEN), "its one way out was the door: it went into the coop");
         assertEquals(farm, game.currentMap(), "the rabbit stays on the farm");
-        assertTrue(frames < 20 * 60, "it went before it got hungry (20 s): " + frames / 60f + " s");
-
-        while (!"WISHING".equals(game.animalStateOnAnyMap(Kind.CHICKEN)) && frames < 60 * 60) {
-            game.frames(1);
-            frames++;
-        }
-        assertTrue(frames < 22 * 60, "it wishes for corn about 20 s after the start, as on the farm, not 20 s after it"
-                + " came into the coop (it lives on there, unseen): " + frames / 60f + " s");
+        assertEquals("travelCornForEgg", game.questOfferedOnAnyMap(Kind.CHICKEN),
+                "in the coop it still offers the same quest (its quests go with it)");
 
         assertTrue(List.of(farm, coop).contains(game.whereIs(Kind.CHICKEN)),
                 "still there, on one map or the other (the coop's door lets it back out)");

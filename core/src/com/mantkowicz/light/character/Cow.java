@@ -5,43 +5,39 @@ import com.badlogic.gdx.ai.msg.Telegraph;
 import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.resources.Sprite;
-
-import java.util.List;
+import com.mantkowicz.light.resources.UiImage;
 
 import static com.mantkowicz.light.actor.GameActorType.COW;
 
 /**
- * A brown cow. What it does (stands, walks a step, lies down, sleeps, wishes for a crop, eats, grazes when nobody
- * feeds it, enjoys a stroke) and when is all in {@link CowState}, a gdx-ai state machine; what every farm animal
- * shares (hunger, wishes, being fed and stroked) is in {@link FarmAnimal}. Each time it gets hungry it wishes for one
- * of its favourite dishes, picked at random (set in Tiled with the favouriteDish property, e.g. CARROT,CUCUMBER; any
- * crop without it). At night it goes to the barn to sleep, and out again in the morning ({@link BedtimeTrip}).
+ * A brown cow. What it does (stands, walks a step, grazes now and then, lies down, sleeps, eats what it is given,
+ * enjoys a stroke) and when is all in {@link CowState}, a gdx-ai state machine; what every farm animal shares (its
+ * favourite thing, being fed and stroked, its quests) is in {@link FarmAnimal}. Its favourite crop is set in Tiled with
+ * the favouriteDish property, e.g. CARROT (a carrot without it). At night it goes to the barn to sleep, and out again
+ * in the morning ({@link BedtimeTrip}).
  */
 public class Cow extends FarmAnimal implements Sheltered {
     /** Walking pace: seconds for its step onto the next tile. */
     static final float SECONDS_PER_TILE = 1.5f;
-    /** This long after the start or its last meal it gets hungry again. */
-    static final float HUNGRY_AFTER_SECONDS = 60;
-    /** Wishing this long without getting its crop, it gives up and grazes, taking this many bites of grass. */
-    static final float GIVE_UP_WISHING_AFTER_SECONDS = 90;
+    /** Grazing now and then, it takes this many bites of grass. */
     static final int GRAZING_BITES = 3;
+    /** Its favourite crop when Tiled doesn't say. */
+    public static final CropType DEFAULT_FAVOURITE = CropType.CARROT;
 
     private final DefaultStateMachine<Cow, CowState> stateMachine = new DefaultStateMachine<>(this);
     /** Going to the barn to sleep, and out in the morning. */
     private final BedtimeTrip trip;
+    /** Given something while lying: it gets up and then eats. */
+    private boolean mealWaiting;
 
-    /** A cow that may wish for any crop. */
+    /** A cow whose favourite is a carrot. */
     public Cow(GameContext context) {
-        this(context, CropType.all());
+        this(context, DEFAULT_FAVOURITE);
     }
 
-    /**
-     * A cow that wishes only for these crops (one at random each time it gets hungry); for any crop when the list is
-     * null or empty.
-     */
-    public Cow(GameContext context, List<CropType> favouriteDishes) {
-        super(COW, context, Sprite.COW_BROWN, "A brown cow. It looks calm and a bit hungry.", favouriteDishes,
-                HUNGRY_AFTER_SECONDS, GIVE_UP_WISHING_AFTER_SECONDS);
+    public Cow(GameContext context, CropType favourite) {
+        super(COW, context, Sprite.COW_BROWN, "A brown cow. It looks calm and likes a treat.", favourite,
+                UiImage.COW_FACE);
         trip = new BedtimeTrip(this, context.getBoardService(), SECONDS_PER_TILE, false);
         stateMachine.changeState(CowState.STANDING);
         startLiving();
@@ -49,7 +45,7 @@ public class Cow extends FarmAnimal implements Sheltered {
 
     @Override
     protected FarmAnimal createAnother(GameContext context) {
-        return new Cow(context, getFavouriteDishes()); // its trip to the barn goes along in the shared part
+        return new Cow(context, getFavouriteType()); // its trip to the barn and its quests go along in the shared part
     }
 
     @Override
@@ -72,6 +68,11 @@ public class Cow extends FarmAnimal implements Sheltered {
     }
 
     @Override
+    public boolean isTakingAGift() {
+        return mealWaiting || getState() == CowState.EATING || getState() == CowState.HAPPY;
+    }
+
+    @Override
     public String getStateName() {
         return getState().name();
     }
@@ -87,21 +88,33 @@ public class Cow extends FarmAnimal implements Sheltered {
     }
 
     @Override
-    protected boolean isWishing() {
-        return getState() == CowState.WISHING;
+    protected boolean isStrokable() {
+        return getState().canBeStroked();
     }
 
     @Override
-    protected boolean isStrokable() {
-        return getState().canBeStroked();
+    protected boolean isFeedable() {
+        return getState().canBeFed();
     }
 
     void changeState(CowState state) {
         stateMachine.changeState(state);
     }
 
-    /** Nobody fed it: it grazes, {@link #GRAZING_BITES} bites of grass. */
+    /** Now and then it grazes: {@link #GRAZING_BITES} bites of grass. */
     void startGrazing() {
         startFeedingItself(GRAZING_BITES);
+    }
+
+    /** Given something while lying: it eats once it is up ({@link #takeWaitingMeal()}). */
+    void eatOnceUp() {
+        mealWaiting = true;
+    }
+
+    /** Was it given something while lying? Then it eats now (and the meal no longer waits). */
+    boolean takeWaitingMeal() {
+        boolean waiting = mealWaiting;
+        mealWaiting = false;
+        return waiting;
     }
 }

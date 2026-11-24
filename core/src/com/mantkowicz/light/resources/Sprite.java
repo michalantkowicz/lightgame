@@ -13,6 +13,9 @@ public enum Sprite {
     CHICKEN_BABY("chicken_baby"),
     /** A frog (the Sprout Lands "Plant update 2" early access): green, and pale green. */
     FROG("frog"),
+    /** What animals give on a quest: a bottle of milk (a cow), an egg (a chicken). */
+    MILK_ITEM("milk_item"),
+    EGG_ITEM("egg_item"),
     FROG_PALE("frog_pale"),
     CHEST("chest"),
     /** Farm produce lying on the ground, one per row (only the right column: the left one has seed bags). */

@@ -39,6 +39,7 @@ import com.mantkowicz.light.actor.Inventory;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.actor.PictureBubble;
+import com.mantkowicz.light.actor.ProduceType;
 import com.mantkowicz.light.board.Board;
 import com.mantkowicz.light.board.BoardService;
 import com.mantkowicz.light.board.Tile;
@@ -73,6 +74,11 @@ import com.mantkowicz.light.map.TileObject;
 import com.mantkowicz.light.map.TilePlayer;
 import com.mantkowicz.light.map.TileSprite;
 import com.mantkowicz.light.map.TileSpriteActor;
+import com.mantkowicz.light.quest.Quest;
+import com.mantkowicz.light.quest.QuestBook;
+import com.mantkowicz.light.quest.QuestJournal;
+import com.mantkowicz.light.quest.QuestRun;
+import com.mantkowicz.light.quest.QuestWorld;
 import com.mantkowicz.light.resources.ResourcesService;
 import com.mantkowicz.light.resources.Sprite;
 import com.mantkowicz.light.resources.SpriteSheet;
@@ -84,6 +90,7 @@ import com.mantkowicz.light.ui.fishing.RhythmRound;
 import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 import com.mantkowicz.light.ui.hud.Portrait;
+import com.mantkowicz.light.ui.hud.QuestPanel;
 import com.mantkowicz.light.ui.hud.SettingsPanel;
 import com.mantkowicz.light.ui.hud.SpeechBubble;
 import com.mantkowicz.light.ui.hud.StaminaBar;
@@ -611,6 +618,10 @@ public final class GameDriver {
             String name = crop.getType().getName();
             return Character.toUpperCase(name.charAt(0)) + name.substring(1);
         }
+        if (item instanceof com.mantkowicz.light.actor.Produce produce) {
+            String name = produce.getType().getName();
+            return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+        }
         if (item instanceof com.mantkowicz.light.actor.Fish fish) {
             return "Fish(" + fish.getType().name().toLowerCase() + ")";
         }
@@ -1052,7 +1063,7 @@ public final class GameDriver {
         return ((Cow) actor(Kind.COW)).getCurrentAnimation();
     }
 
-    /** What the cow is doing (its state machine's state), e.g. "STANDING", "WALKING", "WISHING". */
+    /** What the cow is doing (its state machine's state), e.g. "STANDING", "WALKING", "EATING". */
     public String cowState() {
         return ((Cow) actor(Kind.COW)).getState().name();
     }
@@ -1068,28 +1079,21 @@ public final class GameDriver {
         return new float[]{cow.getX(), cow.getY()};
     }
 
-    /** What the bubble over the cow shows (what it wishes for), e.g. "carrot", "hidden" (the button is there), or "none". */
-    public String cowWish() {
+    /**
+     * What the bubble over the cow shows (the quest it offers: the first thing the quest waits for), e.g. "carrot",
+     * "hidden" (the button is there), or "none".
+     */
+    public String cowBubble() {
         return bubbleOver(actor(Kind.COW));
     }
 
-    /** What the cow wishes for right now, bubble or not, e.g. "carrot", or "none" when it isn't wishing. */
-    public String cowWants() {
-        Item wish = ((Cow) actor(Kind.COW)).getWish();
-        return wish == null ? "none" : ((Crop) wish).getType().getName();
+    /** The cow's favourite crop (from Tiled's favouriteDish), e.g. "carrot". */
+    public String cowFavourite() {
+        return ((Cow) actor(Kind.COW)).getFavouriteType().getName();
     }
 
-    /** The crops the cow may wish for (from Tiled's favouriteDish), e.g. ["carrot", "cucumber"]. */
-    public List<String> cowFavouriteDishes() {
-        List<String> names = new ArrayList<>();
-        for (CropType type : ((Cow) actor(Kind.COW)).getFavouriteDishes()) {
-            names.add(type.getName());
-        }
-        return names;
-    }
-
-    /** Short tap on the picture in the wish bubble over the animal (the bubble must be shown). */
-    public void tapWishBubble(Kind kind) {
+    /** Short tap on the picture in the bubble over the animal (the quest it offers; the bubble must be shown). */
+    public void tapBubble(Kind kind) {
         for (Actor actor : gameStage().getActors()) {
             if (actor instanceof PictureBubble bubble && bubble.getCharacter() == actor(kind) && bubble.isVisible()) {
                 Actor picture = bubble.getChildren().peek();
@@ -1099,7 +1103,7 @@ public final class GameDriver {
                 return;
             }
         }
-        throw new IllegalStateException("No wish bubble shown over " + kind);
+        throw new IllegalStateException("No bubble shown over " + kind);
     }
 
     /** The picture bubble over a character; the bubbles on the map are drawn in front of every other actor. */
@@ -1125,7 +1129,7 @@ public final class GameDriver {
 
     // farm animals by kind: COW, CHICKEN, CHICKEN_BABY
 
-    /** What the animal is doing (its state machine's state), e.g. "STANDING", "PECKING", "WISHING". */
+    /** What the animal is doing (its state machine's state), e.g. "STANDING", "PECKING", "EATING". */
     public String animalState(Kind kind) {
         return ((FarmAnimal) actor(kind)).getStateName();
     }
@@ -1135,24 +1139,121 @@ public final class GameDriver {
         return ((FarmAnimal) actor(kind)).getCurrentAnimation();
     }
 
-    /** What the bubble over the animal shows, e.g. "corn", "hidden" (the button is there), or "none". */
-    public String animalWish(Kind kind) {
+    /** What the bubble over the animal shows (the quest it offers), e.g. "corn", "hidden" (the button is there), "none". */
+    public String animalBubble(Kind kind) {
         return bubbleOver(actor(kind));
     }
 
-    /** What the animal wishes for right now, bubble or not, e.g. "corn", or "none" when it isn't wishing. */
-    public String animalWants(Kind kind) {
-        Item wish = ((FarmAnimal) actor(kind)).getWish();
-        return wish == null ? "none" : ((Crop) wish).getType().getName();
+    /** The animal's favourite crop, e.g. "corn". */
+    public String animalFavourite(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getFavouriteType().getName();
     }
 
-    /** The crops the animal may wish for, e.g. ["corn"]. */
-    public List<String> animalFavouriteDishes(Kind kind) {
-        List<String> names = new ArrayList<>();
-        for (CropType type : ((FarmAnimal) actor(kind)).getFavouriteDishes()) {
-            names.add(type.getName());
+    /** Can the animal be given something now (its favourite, what its quest waits for)? */
+    public boolean canBeFed(Kind kind) {
+        return ((FarmAnimal) actor(kind)).canBeFed();
+    }
+
+    /** Is the animal's dream (shown now or last) about its favourite thing? */
+    public boolean dreamsOfItsFavourite(Kind kind) {
+        FarmAnimal animal = (FarmAnimal) actor(kind);
+        return animal.getDream().getPicture() == animal.getFavourite().getPicture();
+    }
+
+    /** Is the animal dreaming now (the dream bubble over it, while it sleeps the night)? */
+    public boolean isDreaming(Kind kind) {
+        return ((FarmAnimal) actor(kind)).getDream().isShown()
+                && ((FarmAnimal) actor(kind)).getDream().getStage() != null;
+    }
+
+    // quests
+
+    /**
+     * Lists a quest made for a test, for the maps' quests property: it waits for a crop ({@code waitsFor}, e.g.
+     * "carrot") and gives produce for it ({@code gives}: "milk" or "egg"), with this much time. It starts as soon as
+     * its animal waits for nothing else and, unless {@code evenWhileAnotherGoesOn}, no other quest goes on.
+     */
+    public static void registerQuest(String name, String waitsFor, String gives, float timeLimit,
+            boolean evenWhileAnotherGoesOn) {
+        CropType crop = cropType(waitsFor);
+        ProduceType produce = ProduceType.valueOf(gives.toUpperCase());
+        QuestBook.register(name, () -> new Quest(name) {
+            @Override
+            public boolean shouldStart(QuestWorld world) {
+                return !world.isWaiting() && (evenWhileAnotherGoesOn || !world.isQuestActive());
+            }
+
+            @Override
+            protected void run() {
+                dialog("Could you bring me this?");
+                waitFor(crop);
+                dialog("Thank you!");
+                give(produce);
+            }
+
+            @Override
+            public float getTimeLimit() {
+                return timeLimit;
+            }
+        });
+    }
+
+    /** The quest the animal offers (its bubble), e.g. "giveMilk", or "none". */
+    public String questOffered(Kind kind) {
+        Quest offered = ((FarmAnimal) actor(kind)).getQuests().getOffered();
+        return offered == null ? "none" : offered.getName();
+    }
+
+    /**
+     * The quest going on, as the panel shows it: its name, who asks, what for, what is in its slot, how much time is
+     * left (and the time line's colour), e.g. "giveMilk COW_FACE -> carrot slot=- line=100% ...", or "none".
+     */
+    public String quest() {
+        QuestJournal journal = quests();
+        QuestRun run = journal.getActive();
+        if (run == null) {
+            return "none";
         }
-        return names;
+        return run.getQuest().getName() + " " + run.getOwner().getIcon() + " -> " + run.getWaitingFor() + " slot="
+                + (journal.getSlot() == null ? "-" : itemName(journal.getSlot())) + " line="
+                + questPanel().describeLine();
+    }
+
+    /** Is the quest row over the backpack shown? */
+    public boolean questPanelShown() {
+        return questPanel().isVisible();
+    }
+
+    private QuestPanel questPanel() {
+        return ((Hud) screenField("hud")).getQuestPanel();
+    }
+
+    /** Short tap on the quest row's X (its round button): the quest is cancelled. */
+    public void tapCancelQuest() {
+        tap(uiScreenPosition(uiActorNamed("CANCEL QUEST")));
+    }
+
+    /** Short tap on the middle of the quest row's brown button (it does nothing: the tap stays in the HUD). */
+    public void tapQuestRow() {
+        tap(uiScreenPosition(uiActorNamed("QUEST ROW")));
+    }
+
+    /** Short tap on the quest's golden slot: what is in it jumps out. */
+    public void tapQuestSlot() {
+        tap(uiScreenPosition(uiActorNamed("QUEST SLOT")));
+    }
+
+    private QuestJournal quests() {
+        return screenField("quests");
+    }
+
+    private Actor uiActorNamed(String name) {
+        for (Actor actor : uiActors()) {
+            if (name.equals(actor.getName())) {
+                return actor;
+            }
+        }
+        throw new IllegalStateException("No " + name + " on the UI");
     }
 
     /** Is the animal's picture mirrored (its sheet looks right; it looks left)? */
@@ -1194,6 +1295,11 @@ public final class GameDriver {
     /** Strokes the animal as the round button would (the player needn't be next to it). */
     public void strokeAnimal(Kind kind) {
         ((FarmAnimal) actor(kind)).stroke();
+    }
+
+    /** The items flying out of the HUD's slots right now (to an animal, into the quest's slot), e.g. ["carrot"]. */
+    public List<String> flyingItems() {
+        return ((Hud) screenField("hud")).getFlights().describe();
     }
 
     /** The small pictures floating up on the map right now, e.g. ["heart"] over the player after stroking the cow. */
@@ -1604,6 +1710,19 @@ public final class GameDriver {
     }
 
     /** The state of the first animal of this kind on whatever map it is (also one the player isn't in), or null. */
+    /** The quest the first animal of this kind on any map offers, e.g. "layEgg", "none", or null when none is anywhere. */
+    public String questOfferedOnAnyMap(Kind kind) {
+        for (Object area : areas().values()) {
+            GameBoardActor animal = actorOn(field(area, area.getClass(), "gameStage"), kind);
+            if (animal != null) {
+                Quest offered = ((FarmAnimal) animal).getQuests().getOffered();
+                return offered == null ? "none" : offered.getName();
+            }
+        }
+        return null;
+    }
+
+    /** The state of the first animal of this kind on any map, e.g. "STANDING", or null when none is anywhere. */
     public String animalStateOnAnyMap(Kind kind) {
         for (Object area : areas().values()) {
             GameBoardActor animal = actorOn(field(area, area.getClass(), "gameStage"), kind);

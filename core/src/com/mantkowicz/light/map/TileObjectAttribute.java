@@ -7,8 +7,10 @@ public enum TileObjectAttribute {
     LIGHT_TYPE("lightType"),
     LIGHT_COLOR_HEX("lightColorHex"),
     BORDER_LIGHT_POSITION("borderLightPosition"),
-    /** A cow's crops to wish for, e.g. "CARROT,CUCUMBER"; any crop without it. */
+    /** A cow's favourite crop, e.g. "CARROT" (with several, the first); a carrot without it. */
     FAVOURITE_DISH("favouriteDish"),
+    /** An animal's quests (see quest.QuestBook), e.g. "giveMilk" or several: "giveMilk,layEgg"; none without it. */
+    QUESTS("quests"),
     /** What grows on a field, e.g. "CORN"; a carrot without it. */
     CROP_TYPE("cropType"),
     /** How likely a field grows a weed instead of its crop after watering, 0..1, e.g. "0" for never; 0.4 without it. */

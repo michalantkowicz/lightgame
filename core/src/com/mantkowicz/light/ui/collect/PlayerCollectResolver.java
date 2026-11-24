@@ -13,6 +13,7 @@ import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.board.TileTouchedEvent;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.ui.hud.ActionButton;
 
 import java.util.HashMap;
@@ -44,6 +45,9 @@ import static com.mantkowicz.light.actor.Status.IDLE;
 public class PlayerCollectResolver implements CollectResolver {
     private final GameContext context;
     private final Player player;
+    private final QuestJournal quests;
+    /** {@link #throwOut}'s slot for the quest's slot (on the quest panel), besides the backpack's. */
+    public static final int QUEST_SLOT = -1;
     private final ItemThrower thrower;
     private final Map<Collectible, ActionButton> buttons = new HashMap<>();
     /** Clicked during a walk: open or close it once the player stands still in reach. */
@@ -53,9 +57,11 @@ public class PlayerCollectResolver implements CollectResolver {
     /** Where {@link #dropped} lands. */
     private Tile droppedOn;
 
-    public PlayerCollectResolver(Player player, GameContext context) {
+    /** @param quests the quests of the whole game: what the one going on waits for goes into its slot */
+    public PlayerCollectResolver(Player player, GameContext context, QuestJournal quests) {
         this.player = player;
         this.context = context;
+        this.quests = quests;
         this.thrower = new ItemThrower(context);
     }
 
@@ -97,11 +103,15 @@ public class PlayerCollectResolver implements CollectResolver {
     }
 
     /**
-     * Throws the item in a backpack slot out onto a free tile next to the player.
+     * Throws the item in a backpack slot ({@link #QUEST_SLOT}: the quest's slot) out onto a free tile next to the
+     * player.
      *
      * @return false when there is an item but no free tile for it (it stays in the backpack)
      */
     public boolean throwOut(int slot) {
+        if (slot == QUEST_SLOT) {
+            return throwOutQuestSlot();
+        }
         Inventory backpack = player.getInventory();
         Item item = backpack.getItems().get(slot);
         if (item == null) {
@@ -160,6 +170,19 @@ public class PlayerCollectResolver implements CollectResolver {
                 dropped = null;
             }
         });
+        return true;
+    }
+
+    /** What is in the quest's slot jumps out next to the player (picked up again, it goes back into it). */
+    private boolean throwOutQuestSlot() {
+        Item item = quests.getSlot();
+        if (item == null) {
+            return true;
+        }
+        if (!thrower.throwOut(item, player.getTile(), player.getCenter())) {
+            return false;
+        }
+        quests.takeSlot();
         return true;
     }
 
@@ -234,8 +257,9 @@ public class PlayerCollectResolver implements CollectResolver {
     }
 
     /**
-     * Picks up what has landed on the player's tile. With the backpack full nothing changes and the item stays where it
-     * lies: the player can swap it for a backpack item ({@link #swap}) or make room by tapping a slot.
+     * Picks up what has landed on the player's tile: what the quest going on waits for into its slot while that is
+     * empty, else into the backpack. With the backpack full nothing changes and the item stays where it lies: the player
+     * can swap it for a backpack item ({@link #swap}) or make room by tapping a slot.
      */
     private void pickUp() {
         Tile tile = player.getTile();
@@ -245,6 +269,11 @@ public class PlayerCollectResolver implements CollectResolver {
         Inventory backpack = player.getInventory();
         for (TileOccupant actor : context.getBoardService().getOccupants(tile)) {
             if (!(actor instanceof ItemOnGround lying) || !lying.isLanded()) {
+                continue;
+            }
+            if (quests.wantsInSlot(lying.getItem())) {
+                quests.putInSlot(lying.getItem()); // what the quest going on waits for: into its slot first
+                lying.remove();
                 continue;
             }
             if (backpack.isFull()) {

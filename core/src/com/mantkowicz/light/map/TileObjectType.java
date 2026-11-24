@@ -6,11 +6,14 @@ import com.mantkowicz.light.character.Chest;
 import com.mantkowicz.light.character.Chicken;
 import com.mantkowicz.light.character.ChickenType;
 import com.mantkowicz.light.character.Cow;
+import com.mantkowicz.light.character.FarmAnimal;
 import com.mantkowicz.light.character.Field;
 import com.mantkowicz.light.character.Frog;
 import com.mantkowicz.light.character.SpriteActor;
 import com.mantkowicz.light.context.GameContext;
+import com.mantkowicz.light.quest.QuestBook;
 
+import java.util.List;
 import java.util.function.BiFunction;
 
 /**
@@ -31,10 +34,9 @@ public enum TileObjectType {
     FISHING_SPOT,
     // sprite actors
     CHEST((context, properties) -> new Chest(context)),
-    COW((context, properties) -> new Cow(context,
-            CropType.listOf(properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class)))),
-    CHICKEN((context, properties) -> new Chicken(context, ChickenType.CHICKEN)),
-    CHICKEN_BABY((context, properties) -> new Chicken(context, ChickenType.CHICKEN_BABY)),
+    COW((context, properties) -> withQuests(new Cow(context, favourite(properties)), properties)),
+    CHICKEN((context, properties) -> withQuests(new Chicken(context, ChickenType.CHICKEN), properties)),
+    CHICKEN_BABY((context, properties) -> withQuests(new Chicken(context, ChickenType.CHICKEN_BABY), properties)),
     FIELD((context, properties) -> new Field(context,
             CropType.named(properties.get(TileObjectAttribute.CROP_TYPE.getValue(), String.class), CropType.CARROT),
             number(properties, TileObjectAttribute.WEED_CHANCE, Field.DEFAULT_WEED_CHANCE))),
@@ -62,6 +64,20 @@ public enum TileObjectType {
     /** Does its sprite actor block its tile (most do; a frog doesn't)? */
     public boolean blocksItsTile() {
         return blocks;
+    }
+
+    /** A cow's favourite crop: Tiled's favouriteDish (with several, the first), a carrot without it. */
+    static CropType favourite(MapProperties properties) {
+        List<CropType> dishes = CropType.listOf(
+                properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class));
+        String named = properties.get(TileObjectAttribute.FAVOURITE_DISH.getValue(), String.class);
+        return named == null || named.trim().isEmpty() ? Cow.DEFAULT_FAVOURITE : dishes.get(0);
+    }
+
+    /** The animal with its quests from Tiled (its quests property, names from quest.QuestBook). */
+    static FarmAnimal withQuests(FarmAnimal animal, MapProperties properties) {
+        animal.assignQuests(QuestBook.create(properties.get(TileObjectAttribute.QUESTS.getValue(), String.class)));
+        return animal;
     }
 
     /**

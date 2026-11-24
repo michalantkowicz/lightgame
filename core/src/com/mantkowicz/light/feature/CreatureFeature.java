@@ -1,46 +1,42 @@
 package com.mantkowicz.light.feature;
 
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mantkowicz.light.actor.Creature;
 import com.mantkowicz.light.actor.FloatingPicture;
 import com.mantkowicz.light.actor.Item;
 import com.mantkowicz.light.board.Tile;
-import com.mantkowicz.light.board.TileOccupant;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
 import com.mantkowicz.light.event.BackpackItemEjectedEvent;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.resources.UiImage;
 import com.mantkowicz.light.ui.hud.ActionButton;
 import com.mantkowicz.light.ui.hud.Hud;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
 
 /**
- * What the player does with a creature (a cow) the player stands next to (on a tile it is used from:
+ * What the player does with a creature (a cow, a chicken) the player stands next to (on a tile it is used from:
  * {@link Tile#getUsedFromNeighbours()}), on action buttons in a row over the creature:
  * <ul>
  * <li>it can be stroked: a button with a hand (on the left); tapping it strokes the creature: it stands still while
  * the hand fades out, then shows its hearts (not covered by the button), and a heart floats up over the player;</li>
- * <li>it wishes for something: a button with that item (on the right) instead of the bubble with the wish. Tapping it
- * takes the item out of the backpack (its slot shakes) and gives it to the creature; when the player doesn't carry
- * one, the button shakes and the face says "find" with the item's picture, as the HUD's hint button (the question
- * mark) does next to it. Tapping the backpack slot with the wished item does the same as the button
- * ({@link #giveFrom}).</li>
+ * <li>it can be fed: a button with its favourite thing (right of the hand), whenever what it does allows it (not while
+ * it walks or eats, not at night). Tapping it takes one out of the backpack (its slot shakes) and gives it to the
+ * creature, which eats it; when the player doesn't carry one, the button shakes and the face says "find" with the
+ * thing's picture (also what the HUD's hint button says next to it). Tapping the backpack slot with it does the same
+ * as the button ({@link #giveFrom}).</li>
  * </ul>
- * The buttons fade out when what they do is no longer possible (the player walks away, the creature walks or eats);
- * once the button with the wish is gone, the bubble is back. With several creatures next to the player (restless
- * chickens) each button is for one of them and stays over it: the wish button for one wishing for something the
- * player carries (else any wishing one), the hand for that one too if it can be stroked (else any that can).
+ * Its quests have their buttons too ({@link QuestFeature}). The buttons fade out when what they do is no longer
+ * possible (the player walks away, the creature walks or eats). With several creatures next to the player (restless
+ * chickens) each button is for one of them and stays over it: the favourite's for one whose favourite the player
+ * carries (else any that can be fed), the hand for that one too if it can be stroked (else any that can).
  * <p>
  * Only on the map the player is in ({@link PlayerFeature}); nothing to take away when it goes: its buttons go with the
- * map, the player's new map sets the hint, and a bubble hidden under the wish button comes back when it is back.
+ * map, and the player's new map sets the hint.
  */
 public class CreatureFeature implements PlayerFeature {
-    /** What the hint says next to a creature wishing for something the player doesn't carry; the item's picture follows. */
+    /** What the hint says next to a creature whose favourite thing the player doesn't carry; the picture follows. */
     static final String FIND = "find";
     /**
      * The heart floating up over the player after a stroke: screen pixels per pack pixel (smaller than the UI's), and
@@ -48,20 +44,23 @@ public class CreatureFeature implements PlayerFeature {
      */
     private static final float HEART_SCALE = 1.5f, HEART_GAP = 0;
 
-    /** Places in the row of buttons over the creature: the hand left of the wish. */
-    private static final int STROKE_PLACE = 0, GIVE_PLACE = 1;
+    /** Places in the row of buttons over the creature: the hand, its favourite, its quest. */
+    static final int STROKE_PLACE = 0, GIVE_PLACE = 1, QUEST_PLACE = 2;
 
     private final GameContext context;
+    private final QuestJournal quests;
     private final Player player;
     private final Hud hud;
     private final TextureRegion hand, heart;
     private ActionButton strokeButton, giveButton;
-    /** The creature the give button is over (its bubble hidden meanwhile), or null. */
-    private Creature givingTo;
+    /** The quests' buttons (a backpack slot is offered to them first), or null. */
+    private QuestFeature questFeature;
     /** Stroked: the small heart floats up over the player once the hand has faded out. */
     private boolean heartAfterTheHand;
 
-    public CreatureFeature(GameContext context, Player player, Hud hud) {
+    /** @param quests the quests of the whole game: what one waits for has the quest's button, not the favourite's */
+    public CreatureFeature(GameContext context, Player player, Hud hud, QuestJournal quests) {
+        this.quests = quests;
         this.context = context;
         this.player = player;
         this.hud = hud;
@@ -69,54 +68,46 @@ public class CreatureFeature implements PlayerFeature {
         heart = context.getResourcesService().getUiImage(UiImage.HEART);
     }
 
+    /** The quests' buttons: a tapped backpack slot is offered to them first ({@link #giveFrom}). */
+    public void setQuests(QuestFeature questFeature) {
+        this.questFeature = questFeature;
+    }
+
     @Override
     public void run(float delta) {
         heartOnceTheHandIsGone();
-        List<Creature> near = creaturesNextToPlayer();
-        Creature wishing = wishingCreature(near);
-        if (wishing != null && slotWith(wishing.getWish()) < 0) {
-            hud.setHint(FIND, wishing.getWish().getPicture());
+        List<Creature> near = CreatureButtons.nextTo(player, context.getBoardService());
+        Creature feeding = creatureToFeed(near);
+        if (feeding != null && CreatureButtons.slotWith(player, feeding.getFavourite()) < 0) {
+            hud.setHint(FIND, feeding.getFavourite().getPicture());
         } else {
             hud.resetHint();
         }
-        updateGiveButton(wishing);
-        Creature strokable = strokableCreature(near, wishing);
-        if (strokable != null && !isShown(strokeButton)) {
-            strokeButton = addButton("STROKE", hand, () -> stroke(strokable), () -> canStroke(strokable), strokable);
+        if (feeding != null && !CreatureButtons.isShown(giveButton)) {
+            giveButton = CreatureButtons.add(context, "GIVE", feeding.getFavourite().getPicture(), () -> give(feeding),
+                    () -> canGive(feeding), feeding);
+            giveButton.setPlace(GIVE_PLACE);
+        }
+        Creature strokable = strokableCreature(near, feeding);
+        if (strokable != null && !CreatureButtons.isShown(strokeButton)) {
+            strokeButton = CreatureButtons.add(context, "STROKE", hand, () -> stroke(strokable),
+                    () -> canStroke(strokable), strokable);
             strokeButton.setPlace(STROKE_PLACE);
         }
     }
 
     /**
-     * The button with the wish takes the bubble's place over the creature; once it is gone, the bubble is back. A
-     * button belongs to its creature: it fades out once that creature is out of reach or wishes no more, and a new
-     * one comes over another creature only then.
+     * Of the creatures next to the player, the one the favourite's button is for: one that can be fed whose favourite
+     * the player carries, else the first one that can be fed; null when none can. A creature whose quest waits for its
+     * favourite, or offers a quest with its favourite's picture, is left to its quest's button ({@link QuestFeature}).
      */
-    private void updateGiveButton(Creature wishing) {
-        if (!isShown(giveButton) && givingTo != null) {
-            givingTo.setWishShown(true);
-            givingTo = null;
-        }
-        if (wishing != null && !isShown(giveButton)) {
-            giveButton = addButton("GIVE", wishing.getWish().getPicture(), () -> give(wishing),
-                    () -> canGive(wishing), wishing);
-            giveButton.setPlace(GIVE_PLACE);
-            givingTo = wishing;
-            wishing.setWishShown(false);
-        }
-    }
-
-    /**
-     * Of the creatures next to the player, the one the give button is for: one wishing for something the player
-     * carries, else the first one wishing at all; null when none wishes.
-     */
-    private Creature wishingCreature(List<Creature> near) {
+    private Creature creatureToFeed(List<Creature> near) {
         Creature first = null;
         for (Creature creature : near) {
-            if (creature.getWish() == null) {
+            if (!creature.canBeFed() || QuestFeature.asksFor(quests, creature, creature.getFavourite())) {
                 continue;
             }
-            if (slotWith(creature.getWish()) >= 0) {
+            if (CreatureButtons.slotWith(player, creature.getFavourite()) >= 0) {
                 return creature;
             }
             if (first == null) {
@@ -126,10 +117,10 @@ public class CreatureFeature implements PlayerFeature {
         return first;
     }
 
-    /** The one the hand is for: the wishing one if it can be stroked (the buttons stay together), else the first. */
-    private static Creature strokableCreature(List<Creature> near, Creature wishing) {
-        if (wishing != null && wishing.canBeStroked()) {
-            return wishing;
+    /** The one the hand is for: the one to feed if it can be stroked (the buttons stay together), else the first. */
+    private static Creature strokableCreature(List<Creature> near, Creature feeding) {
+        if (feeding != null && feeding.canBeStroked()) {
+            return feeding;
         }
         for (Creature creature : near) {
             if (creature.canBeStroked()) {
@@ -140,19 +131,18 @@ public class CreatureFeature implements PlayerFeature {
     }
 
     /**
-     * Its button stays while it is still the one to give to: next to the player and wishing, and no other one next to
-     * the player wishes for something the player carries when it doesn't (then its button fades and comes over that
-     * one).
+     * Its button stays while it is still the one to feed: next to the player and able to be fed, and no other one next
+     * to the player has its favourite carried when it hasn't (then its button fades and comes over that one).
      */
     private boolean canGive(Creature creature) {
-        return wishingCreature(creaturesNextToPlayer()) == creature;
+        return creatureToFeed(CreatureButtons.nextTo(player, context.getBoardService())) == creature;
     }
 
     private void give(Creature creature) {
         if (!canGive(creature)) {
             return; // a fading button catches the click but does nothing
         }
-        int slot = slotWith(creature.getWish());
+        int slot = CreatureButtons.slotWith(player, creature.getFavourite());
         if (slot < 0) {
             giveButton.shake(); // nothing to give: the face says what to find
             hud.showHint();
@@ -162,29 +152,33 @@ public class CreatureFeature implements PlayerFeature {
     }
 
     /**
-     * A tap on a backpack slot works as the wish button when what is in it is what the creature with that button (next
-     * to the player) wishes for: the creature gets it from this slot (it shakes).
+     * A tap on a backpack slot works as the favourite's button when what is in it is the favourite thing of a creature
+     * next to the player that can be fed: the creature gets it from this slot (it shakes).
      *
-     * @return false when it isn't (an empty slot, something else, nobody wishing): the slot does what it usually does
+     * @return false when it isn't (an empty slot, something else, nobody to feed): the slot does what it usually does
      */
     public boolean giveFrom(int slot) {
-        Creature wishing = wishingCreature(creaturesNextToPlayer());
-        if (wishing == null || !wishing.getWish().isSameKindAs(player.getInventory().getItems().get(slot))) {
+        if (questFeature != null && questFeature.deliverFrom(slot)) {
+            return true; // what a quest next to the player waits for
+        }
+        Creature feeding = creatureToFeed(CreatureButtons.nextTo(player, context.getBoardService()));
+        if (feeding == null || !feeding.getFavourite().isSameKindAs(player.getInventory().getItems().get(slot))) {
             return false;
         }
-        handOver(slot, wishing);
+        handOver(slot, feeding);
         return true;
     }
 
-    /** Takes the item out of the backpack slot (the HUD shakes it) and gives it to the creature. */
+    /** Takes the item out of the backpack slot (the HUD shakes it), it flies to the creature, which gets it. */
     private void handOver(int slot, Creature creature) {
         Item item = player.getInventory().take(slot);
         context.getGameEventService().post(new BackpackItemEjectedEvent(slot));
+        CreatureButtons.flyTo(context, hud, item, slot, creature);
         creature.give(item);
     }
 
     private boolean canStroke(Creature creature) {
-        return creaturesNextToPlayer().contains(creature) && creature.canBeStroked();
+        return CreatureButtons.nextTo(player, context.getBoardService()).contains(creature) && creature.canBeStroked();
     }
 
     /**
@@ -200,56 +194,10 @@ public class CreatureFeature implements PlayerFeature {
     }
 
     private void heartOnceTheHandIsGone() {
-        if (heartAfterTheHand && !isShown(strokeButton)) {
+        if (heartAfterTheHand && !CreatureButtons.isShown(strokeButton)) {
             heartAfterTheHand = false;
             new FloatingPicture("heart", heart, HEART_SCALE).showOver(player, HEART_GAP);
         }
     }
 
-    /** The creatures used from the player's tile (next to it, on a side it is used from). */
-    private List<Creature> creaturesNextToPlayer() {
-        List<Creature> near = new ArrayList<>();
-        Tile tile = player.getTile();
-        if (tile == null) {
-            return near;
-        }
-        for (Tile neighbour : tile.getSideNeighbours()) {
-            if (!neighbour.getUsedFromNeighbours().contains(tile)) {
-                continue;
-            }
-            for (TileOccupant occupant : context.getBoardService().getOccupants(neighbour)) {
-                if (occupant instanceof Creature creature) {
-                    near.add(creature);
-                }
-            }
-        }
-        return near;
-    }
-
-    /** The backpack slot holding an item of the wished kind, or -1. */
-    private int slotWith(Item wish) {
-        List<Item> items = player.getInventory().getItems();
-        for (int slot = 0; slot < items.size(); slot++) {
-            if (wish.isSameKindAs(items.get(slot))) {
-                return slot;
-            }
-        }
-        return -1;
-    }
-
-    private static boolean isShown(ActionButton button) {
-        return button != null && button.isOnStage();
-    }
-
-    private ActionButton addButton(String name, TextureRegion picture, Runnable onClick, BooleanSupplier available,
-            Creature over) {
-        ActionButton button = new ActionButton(context, name, picture, new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                onClick.run();
-            }
-        }, available, over.getActor());
-        context.getUiStage().addActor(button);
-        return button;
-    }
 }

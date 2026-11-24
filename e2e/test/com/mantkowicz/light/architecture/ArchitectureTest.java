@@ -60,7 +60,7 @@ class ArchitectureTest {
                 .layer("Leaves").definedBy(packages("util", "debug", "resources", "stage"))
                 .layer("World").definedBy(packages("board", "actor", "light", "event", "context"))
                 .layer("Behaviour").definedBy(packages("plugin", "notification"))
-                .layer("Characters").definedBy(packages("character", "map"))
+                .layer("Characters").definedBy(packages("character", "map", "quest"))
                 .layer("UI").definedBy(packages("ui"))
                 .layer("Application").definedBy(packages("feature", "game"))
                 .whereLayer("Application").mayNotBeAccessedByAnyLayer()

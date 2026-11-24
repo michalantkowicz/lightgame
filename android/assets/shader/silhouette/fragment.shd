@@ -1,0 +1,16 @@
+#ifdef GL_ES
+#define LOWP lowp
+precision mediump float;
+#else
+#define LOWP
+#endif
+
+// a picture's shape, flat in the drawing colour: e.g. the dark brown shape of what a quest wants in its empty slot
+varying LOWP vec4 v_color;
+varying vec2 v_texCoords;
+uniform sampler2D u_texture;
+
+void main()
+{
+   gl_FragColor = vec4(v_color.rgb, v_color.a * texture2D(u_texture, v_texCoords).a);
+}

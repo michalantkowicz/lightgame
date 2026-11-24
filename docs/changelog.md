@@ -1477,3 +1477,58 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   the frog's blink, croak and swim are slower than its hop.
 - `FrogTest` (9 scenarios; `GameDriver` kind FROG, `frogState`, `frogAnimation`, `frogPosition`, `frogs`, `isWater`).
   Nothing else changed: no golden was re-recorded (the frogs are only on level 1, which no golden plays).
+
+## 2026‑11‑23, favourites, dreams and quests (branch `wishes-dreams-quests`)
+
+- **One favourite, no hunger** (owner: "favourite just one thing", "no hunger, no day bubble"): every farm animal has
+  one favourite crop (`Creature.getFavourite`; the cow's from Tiled's `favouriteDish`, the first of a list, a carrot
+  without it; chickens corn). The wish states (`CowState.WISHING`, `ChickenState.WISHING`, `FORAGING`) and hunger are
+  gone: whenever it can be fed (standing; lying it gets up first, `eatOnceUp`; not walking, eating, at night) the hand
+  and a button with its favourite are over it (`CreatureFeature`). `FarmAnimal.SECONDS_BETWEEN_MEALS` is the
+  cool-down, 0 for now. Without the wishes the cow walked a lot more: it now stands 3–6 s and walks, lies down or
+  grazes as often each (keeps `chickensAreRestless`: chick > chicken > cow).
+- **Dreams**: asleep for the night an animal dreams of its favourite (`actor.DreamBubble`, a cloud drawn by the new
+  `tools/assets/dream_bubble.py`, over the "zzz"): shown 3 s, gone 4–8 s, again.
+- **Quests** (new package `quest`, Characters layer): a quest is a Java class, `shouldStart(QuestWorld)` and a script
+  in `run()` (`dialog` [not shown yet], `waitFor`, `give`), registered in `QuestBook` and given to an animal by Tiled's
+  `quests` (level 1: the cow `giveMilk`, a pumpkin for milk; the big chicken `layEgg`, a tomato for an egg; owner:
+  not their favourites, so a quest is something else to go and find). Its
+  `CreatureQuests` live in `FarmAnimal.Shared` (through doors); `QuestOffersFeature` asks them on every map. One
+  `QuestJournal` for the game (owner: one quest at a time): the run, its slot, its time (180 s by default), the
+  rewards. New items: `actor.Produce` (milk, egg).
+- `QuestFeature`: offered, a bubble over the animal and a `QUEST` button next to it (another quest going on: it
+  shakes); going on, a `DELIVER` button (from the slot first, else the backpack; the backpack slot works too); its
+  reward lands next to the animal. When the quest's thing is the favourite too, only the quest's button shows.
+- **Quest row** (`ui.hud.QuestPanel`, `Hud.showQuests`), chosen from mock-ups: first the day clock widened into a
+  brown panel; owner: "too much is happening inside this panel", so it moved over the backpack slots. Over the first
+  two slots the pack's brown rectangle button (`UiImage.QUEST_BUTTON`) with the animal's face, an arrow and the wanted
+  thing, the time line under them (green, yellow < 30 %, red < 10 %); on its top left corner a small beige round
+  button with a red X (cancel). Over the third slot the quest slot, a backpack slot tinted golden, showing the wanted
+  thing's dark brown shape while empty (a new `silhouette` shader, `ShaderType.SILHOUETTE`, at 3×: the owner found
+  4× too tight). The red X and the arrow (the pack's has a gap between shaft and head) are drawn by the new
+  `tools/assets/quest_icons.py`. The day clock is as before. The brown button keeps taps (owner: they walked the
+  player to the tile under it).
+- **What is carried goes into the slot** (owner, changing the first rule "already in the backpack it stays there"):
+  while the quest's slot is empty, what the quest waits for in the backpack moves into it (`QuestFeature`): its
+  backpack slot shakes and it flies over into the golden slot (`ui.hud.ItemFlights`: an arc, 0.5 s; the slot shows
+  the shape until it lands). Owner: first the row with the empty slot, then, a second later, the item hops in
+  (`QuestFeature.SLOT_EMPTY_SECONDS`). First it was tossed up and caught over the player on the map (`FloatingPicture.tossOver`,
+  kept); owner: a flight from slot to slot is better.
+- **Giving flies**: what is given to an animal (a quest's thing, from the golden slot or the backpack, and the
+  favourite) flies in an arc from its slot to the animal on the map (`CreatureButtons.flyTo`). Only a picture: the
+  animal gets it at the tap, as before. Owner: one after the other, so the flight to the animal is slower (0.8 s,
+  `ItemFlights.TO_MAP_SECONDS`); the quest row stays until it has landed, its slot empty (`QuestPanel.holdFor`).
+  Then the animal eats it and shows its hearts, and only then (owner: "heart animation and THEN milk") what the
+  quest gives comes out of it (`FarmAnimal.isTakingAGift`: getting up for it, eating, the hearts; at most 10 s).
+  Meanwhile no quest bubble or QUEST button covers the hearts (a quest offered again at once waits too).
+  The next wanted thing picked up goes into the slot, even with a full backpack (`PlayerCollectResolver`); tapping the
+  slot throws it out (`PlayerCollectResolver.QUEST_SLOT`); cancelled or out of time it jumps out, gone with no room.
+- Small helpers moved out to stay inside PMD: `feature.CreatureButtons` (who is next to the player, which slot,
+  adding a button), `character.OfferBubble`.
+- Tests: `QuestTest` (8), the cow's and chickens' wish tests rewritten for favourites, `DayNightTest` dreams, the
+  chicken's door test now carries its quest. Test-only quests via `GameDriver.registerQuest`. No golden changed.
+- Played by three rounds of Haiku play-testers through `GameDriver` (quests and the panel; favourites, night and
+  level 1; doors and edge cases). One bug: an animal with two quests always offered the first again; it now asks them
+  in turn, beginning after the one it offered last (`CreatureQuests`, `QuestTest.theSecondQuestComesAfterTheFirst`).
+  They found the panel's time line thin: owner, it can be thicker (8 px, was 2 pack pixels of the clock's). A cancelled quest gets no
+  pause of its own (owner): it comes again as soon as its `shouldStart` allows it (level 1's wait 20/40 s).

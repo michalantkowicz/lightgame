@@ -3,6 +3,7 @@ package com.mantkowicz.light.feature;
 import com.mantkowicz.light.actor.ItemOnGround;
 import com.mantkowicz.light.character.Player;
 import com.mantkowicz.light.context.GameContext;
+import com.mantkowicz.light.quest.QuestJournal;
 import com.mantkowicz.light.ui.collect.CollectPlugin;
 import com.mantkowicz.light.ui.collect.PlayerCollectResolver;
 
@@ -15,8 +16,9 @@ public class CollectFeature implements PlayerFeature {
     private final PlayerCollectResolver resolver;
     private final CollectPlugin plugin;
 
-    public CollectFeature(GameContext context, Player player) {
-        resolver = new PlayerCollectResolver(player, context);
+    /** @param quests the quests of the whole game: what the one going on waits for goes into its slot */
+    public CollectFeature(GameContext context, Player player, QuestJournal quests) {
+        resolver = new PlayerCollectResolver(player, context, quests);
         plugin = new CollectPlugin(resolver, context);
     }
 

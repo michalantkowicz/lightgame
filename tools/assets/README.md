@@ -10,6 +10,8 @@ python3 tools/assets/net_icon.py                       # once per pack copy: the
 python3 tools/assets/hand_pointer.py                   # once per UI pack copy: the hand pointer (see below)
 python3 tools/assets/swap_icon.py                      # once per UI pack copy: the swap icon (see below)
 python3 tools/assets/day_clock_arrows.py               # once per UI pack copy: the day clock's steepest arrows (see below)
+python3 tools/assets/dream_bubble.py                   # once per UI pack copy: the dream bubble (see below)
+python3 tools/assets/quest_icons.py                    # once per UI pack copy: the quest row's red X and arrow (see below)
 python3 tools/assets/build_assets.py "tools/assets/Sprout Lands - Sprites - premium pack"   # first run
 python3 tools/assets/build_assets.py                  # same packs as last time
 python3 tools/assets/build_assets.py --ui "/path/to/Sprout Lands - UI Pack - Premium pack"   # if it isn't in tools/assets
@@ -63,6 +65,18 @@ arrows only. `swap_icon.py` draws one, 16x16 in the white and light brown outlin
 question mark): an arrow to the right over an arrow to the left. It saves `UI Sprites/Icons/Swap icon.png` in the UI
 pack folder, which `ui.json` reads as `icons_swap` (`UiImage.SWAP_ICON`; not committed either).
 
+**The dream bubble** (what a sleeping animal dreams about) isn't in the UI pack either: its bubbles are for talking,
+with a pointer. `dream_bubble.py` draws a cloud (overlapping circles) with two little circles trailing down to the
+sleeper's head, 40x34, in the grey speech bubble's palette (outline, light rim, fill, shadow). It saves
+`UI Sprites/Dialouge UI/Dream bubble.png` in the UI pack folder, which `ui.json` reads as `dream_bubble`
+(`UiImage.DREAM_BUBBLE`; not committed either).
+
+**The quest row's red X and arrow** (`ui.hud.QuestPanel`) aren't in the UI pack either: its X comes in white, beige
+and brown, and its arrows have a gap between shaft and head. `quest_icons.py` recolours the pack's X (icon 197) red
+with a dark red outline, and draws an arrow to the right in one piece, white with the pack's beige outline. It saves
+`UI Sprites/Icons/Red close.png` and `UI Sprites/Icons/Quest arrow.png` in the UI pack folder, which `ui.json` reads
+as `close_red` and `quest_arrow` (`UiImage.RED_CLOSE_ICON`, `QUEST_ARROW`; not committed either).
+
 **The day clock's steepest arrows** (nearly straight up and down, 80°) aren't in the UI pack either: the arrows next to
 its weather frame go from about 50° up to 50° down. `day_clock_arrows.py` turns the pack's straight-right arrow up (and
 down) and shears it, each row of pixels a little to the right towards the tip (3 pixels over 16 rows, about 10°), so
@@ -103,9 +117,9 @@ tool again.
    - `walls`: like `collision`, and it also blocks light. It is drawn if visible.
 5. The `objects` layer holds the player and other objects: an **ellipse** with a string property `objectClass`
    (`PLAYER`, `CHEST`, `COW`, `FIELD`, `CHICKEN`, `CHICKEN_BABY`, `GRASS`, `DOOR`, `FISHING_SPOT`, `LIGHT`, `DOG`, `SPRITE`), as in `android/assets/map.tmx`. A `COW` may have a string
-   property `favouriteDish`: the crops it wishes for, comma-separated, e.g. `CARROT,CUCUMBER` (one of `CORN`,
-   `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`); without it, any of them. Each time it gets hungry it picks one at
-   random. A `CHEST` holds one crop, picked at random. A `FIELD` grows one crop, its string property `cropType` (one
+   property `favouriteDish`: its favourite crop (one of `CORN`, `CARROT`, `TOMATO`, `PUMPKIN`, `CUCUMBER`; of a list,
+   the first), a carrot without it; chickens like corn. A `COW`, `CHICKEN` or `CHICKEN_BABY` may have a string property
+   `quests`: the names of its quests in `QuestBook`, comma-separated (e.g. `giveMilk`). A `CHEST` holds one crop, picked at random. A `FIELD` grows one crop, its string property `cropType` (one
    of the names above; `CARROT` without it). A `GRASS` puts grass on its tile, grown as far as its property `phase`
    says: `1` a tuft, `2` two tufts, `3` a bush, `4` a big bush (`1` without it); it blocks nothing and grows on from
    there, and there is none while growing grass is switched off (`FeatureFlag.GROWING_GRASS`).
