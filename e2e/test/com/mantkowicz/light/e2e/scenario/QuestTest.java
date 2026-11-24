@@ -282,7 +282,7 @@ class QuestTest {
         assertFalse(game.crashed());
     }
 
-    /** On level 1 the cow asks for a carrot for milk (giveMilk) a while into the day. */
+    /** On level 1 the cow asks for a pumpkin for milk (giveMilk) a while into the day. */
     @Test
     void onLevelOneTheCowOffersMilk() {
         GameDriver game = GameDriver.start(GameDriver.defaultMap());

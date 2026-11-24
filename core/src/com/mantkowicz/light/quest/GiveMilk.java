@@ -4,7 +4,10 @@ import com.mantkowicz.light.actor.CropType;
 import com.mantkowicz.light.actor.ProduceType;
 import com.mantkowicz.light.light.DayClock;
 
-/** A cow asks for a carrot and gives a bottle of milk for it: by day, a while after the last quest. */
+/**
+ * A cow asks for a pumpkin (not its favourite carrot: something to go and find) and gives a bottle of milk for it: by
+ * day, a while after the last quest.
+ */
 public class GiveMilk extends Quest {
     /** It starts at least this long after a quest last ended (or after the start). */
     static final float AFTER_SECONDS = 20;
@@ -21,8 +24,8 @@ public class GiveMilk extends Quest {
 
     @Override
     protected void run() {
-        dialog("Could you bring me a carrot?");
-        waitFor(CropType.CARROT);
+        dialog("Could you bring me a pumpkin?");
+        waitFor(CropType.PUMPKIN);
         dialog("Thank you! Here is some milk.");
         give(ProduceType.MILK);
     }

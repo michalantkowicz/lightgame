@@ -1491,7 +1491,8 @@ Stardew Valley's; the owner picked "bite, then catch the leap").
   `tools/assets/dream_bubble.py`, over the "zzz"): shown 3 s, gone 4–8 s, again.
 - **Quests** (new package `quest`, Characters layer): a quest is a Java class, `shouldStart(QuestWorld)` and a script
   in `run()` (`dialog` [not shown yet], `waitFor`, `give`), registered in `QuestBook` and given to an animal by Tiled's
-  `quests` (level 1: the cow `giveMilk`, a carrot for milk; the big chicken `layEgg`, corn for an egg). Its
+  `quests` (level 1: the cow `giveMilk`, a pumpkin for milk; the big chicken `layEgg`, a tomato for an egg; owner:
+  not their favourites, so a quest is something else to go and find). Its
   `CreatureQuests` live in `FarmAnimal.Shared` (through doors); `QuestOffersFeature` asks them on every map. One
   `QuestJournal` for the game (owner: one quest at a time): the run, its slot, its time (180 s by default), the
   rewards. New items: `actor.Produce` (milk, egg).
